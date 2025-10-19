@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package service.auth;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/auth";
+
+service AuthService {
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc Login(LoginRequest) returns (LoginResponse);
+}
+
+message RegisterRequest {
+  string firstName = 1;
+  string lastName = 2;
+  string email = 3;
+  string phoneNumber = 4;
+  google.protobuf.Timestamp dateOfBirth = 5;
+  string password = 6;
+  string passwordConfirmation = 7;
+}
+
+message RegisterResponse {
+  optional uint64 id = 1;
+  map<string, string> errors = 2;
+}
+
+message LoginRequest {
+  oneof credentials {
+    string email = 1;
+    string phoneNumber = 2;
+  }
+  string password = 3;
+}
+
+message LoginResponse {
+  optional string accessToken = 1;
+  optional string refreshToken = 2;
+  map<string, string> errors = 3;
+}

@@ -84,7 +84,6 @@ jobs:
           fi
 
       - name: Push changes
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           # Check if there are commits to push
           if git diff origin/main --quiet; then

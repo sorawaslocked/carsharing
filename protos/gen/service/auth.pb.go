@@ -9,7 +9,6 @@ package auth
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -28,7 +27,7 @@ type RegisterRequest struct {
 	LastName             string                 `protobuf:"bytes,2,opt,name=lastName,proto3" json:"lastName,omitempty"`
 	Email                string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
 	PhoneNumber          string                 `protobuf:"bytes,4,opt,name=phoneNumber,proto3" json:"phoneNumber,omitempty"`
-	DateOfBirth          *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=dateOfBirth,proto3" json:"dateOfBirth,omitempty"`
+	DateOfBirth          string                 `protobuf:"bytes,5,opt,name=dateOfBirth,proto3" json:"dateOfBirth,omitempty"`
 	Password             string                 `protobuf:"bytes,6,opt,name=password,proto3" json:"password,omitempty"`
 	PasswordConfirmation string                 `protobuf:"bytes,7,opt,name=passwordConfirmation,proto3" json:"passwordConfirmation,omitempty"`
 	unknownFields        protoimpl.UnknownFields
@@ -93,11 +92,11 @@ func (x *RegisterRequest) GetPhoneNumber() string {
 	return ""
 }
 
-func (x *RegisterRequest) GetDateOfBirth() *timestamppb.Timestamp {
+func (x *RegisterRequest) GetDateOfBirth() string {
 	if x != nil {
 		return x.DateOfBirth
 	}
-	return nil
+	return ""
 }
 
 func (x *RegisterRequest) GetPassword() string {
@@ -320,13 +319,13 @@ var File_service_auth_proto protoreflect.FileDescriptor
 
 const file_service_auth_proto_rawDesc = "" +
 	"\n" +
-	"\x12service/auth.proto\x12\fservice.auth\x1a\x1fgoogle/protobuf/timestamp.proto\"\x91\x02\n" +
+	"\x12service/auth.proto\x12\fservice.auth\"\xf5\x01\n" +
 	"\x0fRegisterRequest\x12\x1c\n" +
 	"\tfirstName\x18\x01 \x01(\tR\tfirstName\x12\x1a\n" +
 	"\blastName\x18\x02 \x01(\tR\blastName\x12\x14\n" +
 	"\x05email\x18\x03 \x01(\tR\x05email\x12 \n" +
-	"\vphoneNumber\x18\x04 \x01(\tR\vphoneNumber\x12<\n" +
-	"\vdateOfBirth\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\vdateOfBirth\x12\x1a\n" +
+	"\vphoneNumber\x18\x04 \x01(\tR\vphoneNumber\x12 \n" +
+	"\vdateOfBirth\x18\x05 \x01(\tR\vdateOfBirth\x12\x1a\n" +
 	"\bpassword\x18\x06 \x01(\tR\bpassword\x122\n" +
 	"\x14passwordConfirmation\x18\a \x01(\tR\x14passwordConfirmation\"\xad\x01\n" +
 	"\x10RegisterResponse\x12\x13\n" +
@@ -368,27 +367,25 @@ func file_service_auth_proto_rawDescGZIP() []byte {
 
 var file_service_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_service_auth_proto_goTypes = []any{
-	(*RegisterRequest)(nil),       // 0: service.auth.RegisterRequest
-	(*RegisterResponse)(nil),      // 1: service.auth.RegisterResponse
-	(*LoginRequest)(nil),          // 2: service.auth.LoginRequest
-	(*LoginResponse)(nil),         // 3: service.auth.LoginResponse
-	nil,                           // 4: service.auth.RegisterResponse.ErrorsEntry
-	nil,                           // 5: service.auth.LoginResponse.ErrorsEntry
-	(*timestamppb.Timestamp)(nil), // 6: google.protobuf.Timestamp
+	(*RegisterRequest)(nil),  // 0: service.auth.RegisterRequest
+	(*RegisterResponse)(nil), // 1: service.auth.RegisterResponse
+	(*LoginRequest)(nil),     // 2: service.auth.LoginRequest
+	(*LoginResponse)(nil),    // 3: service.auth.LoginResponse
+	nil,                      // 4: service.auth.RegisterResponse.ErrorsEntry
+	nil,                      // 5: service.auth.LoginResponse.ErrorsEntry
 }
 var file_service_auth_proto_depIdxs = []int32{
-	6, // 0: service.auth.RegisterRequest.dateOfBirth:type_name -> google.protobuf.Timestamp
-	4, // 1: service.auth.RegisterResponse.errors:type_name -> service.auth.RegisterResponse.ErrorsEntry
-	5, // 2: service.auth.LoginResponse.errors:type_name -> service.auth.LoginResponse.ErrorsEntry
-	0, // 3: service.auth.AuthService.Register:input_type -> service.auth.RegisterRequest
-	2, // 4: service.auth.AuthService.Login:input_type -> service.auth.LoginRequest
-	1, // 5: service.auth.AuthService.Register:output_type -> service.auth.RegisterResponse
-	3, // 6: service.auth.AuthService.Login:output_type -> service.auth.LoginResponse
-	5, // [5:7] is the sub-list for method output_type
-	3, // [3:5] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	4, // 0: service.auth.RegisterResponse.errors:type_name -> service.auth.RegisterResponse.ErrorsEntry
+	5, // 1: service.auth.LoginResponse.errors:type_name -> service.auth.LoginResponse.ErrorsEntry
+	0, // 2: service.auth.AuthService.Register:input_type -> service.auth.RegisterRequest
+	2, // 3: service.auth.AuthService.Login:input_type -> service.auth.LoginRequest
+	1, // 4: service.auth.AuthService.Register:output_type -> service.auth.RegisterResponse
+	3, // 5: service.auth.AuthService.Login:output_type -> service.auth.LoginResponse
+	4, // [4:6] is the sub-list for method output_type
+	2, // [2:4] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_service_auth_proto_init() }

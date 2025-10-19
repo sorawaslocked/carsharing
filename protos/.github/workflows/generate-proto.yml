@@ -71,15 +71,13 @@ jobs:
           git add gen/
           git add go.mod
           
-          # Show what files are staged
           echo "Files to be committed:"
           git diff --staged --name-only
           
-          # Check if there are changes and commit
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "chore: regenerate protobuf files [skip ci]"
+            git commit -m "Regenerate protobuf files [skip ci]"
             echo "Changes committed successfully"
           fi
 

@@ -72,7 +72,7 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add car-rental-protos/gen/
-          git add go.mod go.sum
+          git add go.mod
           git diff --staged --quiet || git commit -m "chore: regenerate protobuf files [skip ci]"
 
       - name: Push changes

@@ -1,0 +1,83 @@
+name: Generate Protobuf Files
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'car-rental-protos/proto/**/*.proto'
+  pull_request:
+    paths:
+      - 'car-rental-protos/proto/**/*.proto'
+  workflow_dispatch:
+
+jobs:
+  generate-proto:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Protocol Buffers
+        run: |
+          PROTOC_VERSION=25.1
+          wget https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip
+          unzip protoc-${PROTOC_VERSION}-linux-x86_64.zip -d $HOME/protoc
+          echo "$HOME/protoc/bin" >> $GITHUB_PATH
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Install Go protobuf plugins
+        run: |
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      - name: Create gen directory structure
+        run: |
+          mkdir -p car-rental-protos/gen
+
+      - name: Generate Go protobuf files
+        run: |
+          # Find all .proto files and generate code
+          find car-rental-protos/proto -name "*.proto" | while read proto_file; do
+            # Get the relative path from proto directory
+            rel_path=${proto_file#car-rental-protos/proto/}
+            dir_path=$(dirname "$rel_path")
+          
+            # Create corresponding directory in gen
+            mkdir -p "car-rental-protos/gen/$dir_path"
+          
+            # Generate Go protobuf files
+            protoc \
+              --proto_path=car-rental-protos/proto \
+              --go_out=car-rental-protos/gen \
+              --go_opt=paths=source_relative \
+              --go-grpc_out=car-rental-protos/gen \
+              --go-grpc_opt=paths=source_relative \
+              "$proto_file"
+          done
+
+      - name: Tidy Go modules
+        run: |
+          go mod tidy
+
+      - name: Commit generated files
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add car-rental-protos/gen/
+          git add go.mod go.sum
+          git diff --staged --quiet || git commit -m "chore: regenerate protobuf files [skip ci]"
+
+      - name: Push changes
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.PAT_TOKEN }}
+          branch: ${{ github.ref }}

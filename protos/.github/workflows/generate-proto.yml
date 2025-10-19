@@ -73,9 +73,26 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add car-rental-protos/gen/
           git add go.mod
-          git diff --staged --quiet || git commit -m "chore: regenerate protobuf files [skip ci]"
+          
+          # Show what files are staged
+          echo "Files to be committed:"
+          git diff --staged --name-only
+          
+          # Check if there are changes and commit
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: regenerate protobuf files [skip ci]"
+            echo "Changes committed successfully"
+          fi
 
       - name: Push changes
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          git push
+          # Check if there are commits to push
+          if git diff origin/main --quiet; then
+            echo "No changes to push"
+          else
+            echo "Pushing changes..."
+            git push
+          fi

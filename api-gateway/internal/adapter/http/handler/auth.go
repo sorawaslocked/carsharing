@@ -1,8 +1,8 @@
-package handlers
+package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapters/http/handlers/dto"
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/handler/dto"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )
 

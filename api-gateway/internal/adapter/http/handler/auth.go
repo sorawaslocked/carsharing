@@ -40,7 +40,7 @@ func (handler *Auth) Register(ctx *gin.Context) {
 		res.ID = &id
 	}
 	if res.Errors == nil {
-		ok(ctx, res)
+		created(ctx, res)
 
 		return
 	}

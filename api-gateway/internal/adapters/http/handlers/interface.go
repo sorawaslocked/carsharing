@@ -8,7 +8,6 @@ import (
 type AuthService interface {
 	Register(
 		ctx context.Context,
-		firstName, lastName, dateOfBirth string,
 		cred model.Credentials,
 	) (uint64, map[string]string)
 	Login(ctx context.Context, cred model.Credentials) (model.Token, map[string]string)

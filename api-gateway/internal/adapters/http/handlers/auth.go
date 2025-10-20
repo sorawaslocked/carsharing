@@ -23,7 +23,10 @@ func (handler *Auth) Register(ctx *gin.Context) {
 		return
 	}
 
-	id, errors := handler.svc.Register(ctx, req.FirstName, req.LastName, req.DateOfBirth, model.Credentials{
+	id, errors := handler.svc.Register(ctx, model.Credentials{
+		FirstName:            &req.FirstName,
+		LastName:             &req.LastName,
+		DateOfBirth:          &req.DateOfBirth,
 		Email:                &req.Email,
 		PhoneNumber:          &req.PhoneNumber,
 		Password:             req.Password,
@@ -50,10 +53,9 @@ func (handler *Auth) Login(ctx *gin.Context) {
 	}
 
 	token, errors := handler.svc.Login(ctx, model.Credentials{
-		Email:                req.Email,
-		PhoneNumber:          req.PhoneNumber,
-		Password:             req.Password,
-		PasswordConfirmation: nil,
+		Email:       req.Email,
+		PhoneNumber: req.PhoneNumber,
+		Password:    req.Password,
 	})
 	if len(errors) > 0 {
 		badRequest(ctx, errors)

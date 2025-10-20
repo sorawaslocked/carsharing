@@ -1,6 +1,9 @@
 package model
 
 type Credentials struct {
+	FirstName            *string
+	LastName             *string
+	DateOfBirth          *string
 	Email                *string
 	PhoneNumber          *string
 	Password             string

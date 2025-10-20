@@ -1,9 +1,5 @@
 package dto
 
-import (
-	"github.com/gin-gonic/gin"
-)
-
 type RegisterRequest struct {
 	Email                string `json:"email"`
 	PhoneNumber          string `json:"phoneNumber"`
@@ -39,14 +35,4 @@ type RefreshTokenResponse struct {
 	AccessToken  string            `json:"accessToken"`
 	RefreshToken string            `json:"refreshToken"`
 	Errors       map[string]string `json:"errors,omitempty"`
-}
-
-func FromRefreshTokenRequest(ctx *gin.Context) (string, error) {
-	var req RefreshTokenRequest
-
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		return "", err
-	}
-
-	return req.RefreshToken, nil
 }

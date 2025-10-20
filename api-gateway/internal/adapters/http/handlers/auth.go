@@ -19,6 +19,8 @@ func (handler *Auth) Register(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		malformedJson(ctx)
+
+		return
 	}
 
 	id, errors := handler.svc.Register(ctx, req.FirstName, req.LastName, req.DateOfBirth, model.Credentials{
@@ -29,6 +31,8 @@ func (handler *Auth) Register(ctx *gin.Context) {
 	})
 	if len(errors) > 0 {
 		badRequest(ctx, errors)
+
+		return
 	}
 
 	body := make(map[string]any)
@@ -41,6 +45,8 @@ func (handler *Auth) Login(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		malformedJson(ctx)
+
+		return
 	}
 
 	token, errors := handler.svc.Login(ctx, model.Credentials{
@@ -51,6 +57,8 @@ func (handler *Auth) Login(ctx *gin.Context) {
 	})
 	if len(errors) > 0 {
 		badRequest(ctx, errors)
+
+		return
 	}
 
 	body := make(map[string]any)
@@ -65,6 +73,8 @@ func (handler *Auth) RefreshToken(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		malformedJson(ctx)
+
+		return
 	}
 
 	token, err := handler.svc.RefreshToken(ctx, req.RefreshToken)
@@ -73,6 +83,8 @@ func (handler *Auth) RefreshToken(ctx *gin.Context) {
 		errors["refreshToken"] = err.Error()
 
 		badRequest(ctx, errors)
+
+		return
 	}
 
 	body := make(map[string]any)

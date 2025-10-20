@@ -11,7 +11,7 @@ type RegisterRequest struct {
 }
 
 type RegisterResponse struct {
-	ID     uint64            `json:"id"`
+	ID     *uint64           `json:"id,omitempty"`
 	Errors map[string]string `json:"errors,omitempty"`
 }
 
@@ -22,8 +22,8 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	AccessToken  string            `json:"accessToken"`
-	RefreshToken string            `json:"refreshToken"`
+	AccessToken  *string           `json:"accessToken,omitempty"`
+	RefreshToken *string           `json:"refreshToken,omitempty"`
 	Errors       map[string]string `json:"errors,omitempty"`
 }
 
@@ -32,7 +32,7 @@ type RefreshTokenRequest struct {
 }
 
 type RefreshTokenResponse struct {
-	AccessToken  string            `json:"accessToken"`
-	RefreshToken string            `json:"refreshToken"`
+	AccessToken  *string           `json:"accessToken,omitempty"`
+	RefreshToken *string           `json:"refreshToken,omitempty"`
 	Errors       map[string]string `json:"errors,omitempty"`
 }

@@ -12,10 +12,16 @@ func malformedJson(ctx *gin.Context) {
 	badRequest(ctx, errors)
 }
 
-func badRequest(ctx *gin.Context, errors map[string]string) {
-	ctx.JSON(http.StatusBadRequest, gin.H{"errors": errors})
+func badRequest(ctx *gin.Context, body any) {
+	ctx.JSON(http.StatusBadRequest, body)
 }
 
-func ok(ctx *gin.Context, body map[string]any) {
+func ok(ctx *gin.Context, body any) {
 	ctx.JSON(http.StatusOK, body)
+}
+
+func internalServerError(ctx *gin.Context) {
+	ctx.JSON(http.StatusInternalServerError, gin.H{
+		"error": "something went wrong",
+	})
 }

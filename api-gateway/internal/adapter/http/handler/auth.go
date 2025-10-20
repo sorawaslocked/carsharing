@@ -32,15 +32,25 @@ func (handler *Auth) Register(ctx *gin.Context) {
 		Password:             req.Password,
 		PasswordConfirmation: &req.PasswordConfirmation,
 	})
-	if errors != nil {
-		badRequest(ctx, errors)
+	res := dto.RegisterResponse{
+		Errors: errors,
+	}
+
+	if id != 0 {
+		res.ID = &id
+	}
+	if res.Errors == nil {
+		ok(ctx, res)
+
+		return
+	}
+	if _, exists := res.Errors["grpc"]; exists {
+		internalServerError(ctx)
 
 		return
 	}
 
-	body := make(map[string]any)
-	body["id"] = id
-	ok(ctx, body)
+	badRequest(ctx, res)
 }
 
 func (handler *Auth) Login(ctx *gin.Context) {
@@ -57,17 +67,25 @@ func (handler *Auth) Login(ctx *gin.Context) {
 		PhoneNumber: req.PhoneNumber,
 		Password:    req.Password,
 	})
-	if errors != nil {
-		badRequest(ctx, errors)
+	res := dto.LoginResponse{
+		Errors: errors,
+	}
+	if res.AccessToken != nil && res.RefreshToken != nil {
+		res.AccessToken = &token.AccessToken
+		res.RefreshToken = &token.RefreshToken
+	}
+	if res.Errors == nil {
+		ok(ctx, res)
+
+		return
+	}
+	if _, exists := res.Errors["grpc"]; exists {
+		internalServerError(ctx)
 
 		return
 	}
 
-	body := make(map[string]any)
-	body["accessToken"] = token.AccessToken
-	body["refreshToken"] = token.RefreshToken
-
-	ok(ctx, body)
+	badRequest(ctx, res)
 }
 
 func (handler *Auth) RefreshToken(ctx *gin.Context) {
@@ -80,15 +98,24 @@ func (handler *Auth) RefreshToken(ctx *gin.Context) {
 	}
 
 	token, errors := handler.svc.RefreshToken(ctx, req.RefreshToken)
-	if errors != nil {
-		badRequest(ctx, errors)
+
+	res := dto.RefreshTokenResponse{
+		Errors: errors,
+	}
+	if res.AccessToken != nil && res.RefreshToken != nil {
+		res.AccessToken = &token.AccessToken
+		res.RefreshToken = &token.RefreshToken
+	}
+	if res.Errors == nil {
+		ok(ctx, res)
+
+		return
+	}
+	if _, exists := res.Errors["grpc"]; exists {
+		internalServerError(ctx)
 
 		return
 	}
 
-	body := make(map[string]any)
-	body["accessToken"] = token.AccessToken
-	body["refreshToken"] = token.RefreshToken
-
-	ok(ctx, body)
+	badRequest(ctx, res)
 }

@@ -32,7 +32,7 @@ func (handler *Auth) Register(ctx *gin.Context) {
 		Password:             req.Password,
 		PasswordConfirmation: &req.PasswordConfirmation,
 	})
-	if len(errors) > 0 {
+	if errors == nil {
 		badRequest(ctx, errors)
 
 		return
@@ -57,7 +57,7 @@ func (handler *Auth) Login(ctx *gin.Context) {
 		PhoneNumber: req.PhoneNumber,
 		Password:    req.Password,
 	})
-	if len(errors) > 0 {
+	if errors == nil {
 		badRequest(ctx, errors)
 
 		return

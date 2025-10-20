@@ -32,7 +32,7 @@ func (handler *Auth) Register(ctx *gin.Context) {
 		Password:             req.Password,
 		PasswordConfirmation: &req.PasswordConfirmation,
 	})
-	if errors == nil {
+	if errors != nil {
 		badRequest(ctx, errors)
 
 		return
@@ -57,7 +57,7 @@ func (handler *Auth) Login(ctx *gin.Context) {
 		PhoneNumber: req.PhoneNumber,
 		Password:    req.Password,
 	})
-	if errors == nil {
+	if errors != nil {
 		badRequest(ctx, errors)
 
 		return
@@ -79,11 +79,8 @@ func (handler *Auth) RefreshToken(ctx *gin.Context) {
 		return
 	}
 
-	token, err := handler.svc.RefreshToken(ctx, req.RefreshToken)
-	if err != nil {
-		errors := make(map[string]string)
-		errors["refreshToken"] = err.Error()
-
+	token, errors := handler.svc.RefreshToken(ctx, req.RefreshToken)
+	if errors != nil {
 		badRequest(ctx, errors)
 
 		return

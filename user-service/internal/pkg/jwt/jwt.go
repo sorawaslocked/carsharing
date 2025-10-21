@@ -43,7 +43,7 @@ func (jp *JwtProvider) GenerateAccessToken(userID uint64, role string) (string, 
 func (jp *JwtProvider) GenerateRefreshToken(userID uint64, role string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
-		"role":    "admin",
+		"role":    role,
 		"exp":     time.Now().Add(jp.refreshTokenTTL).Unix(),
 	}
 

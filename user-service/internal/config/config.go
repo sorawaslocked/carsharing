@@ -9,6 +9,7 @@ import (
 
 type (
 	Config struct {
+		Env      string          `yaml:"env" env:"ENV" required:"true"`
 		Postgres postgres.Config `yaml:"postgres" env-required:"true"`
 	}
 )

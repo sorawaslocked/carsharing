@@ -10,7 +10,7 @@ var (
 	hasUpperRX   = regexp.MustCompile(`[A-Z]`)
 	hasLowerRX   = regexp.MustCompile(`[a-z]`)
 	hasNumberRX  = regexp.MustCompile(`[0-9]`)
-	hasSpecialRX = regexp.MustCompile(`[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]`)
+	hasSpecialRX = regexp.MustCompile(`[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>?~]`)
 )
 
 func MinAge(minAge int) validator.Func {

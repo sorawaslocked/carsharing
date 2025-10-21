@@ -9,7 +9,7 @@ type User struct {
 	FirstName    string
 	LastName     string
 	BirthDate    time.Time
-	PasswordHash string
+	PasswordHash []byte
 	Role         Role
 	CreatedAt    time.Time
 	UpdatedAt    time.Time

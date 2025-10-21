@@ -3,26 +3,31 @@ package service
 import (
 	"car-rental-user-service/internal/model"
 	"car-rental-user-service/internal/pkg/jwt"
+	"car-rental-user-service/internal/pkg/logger"
 	"car-rental-user-service/internal/pkg/security"
 	"context"
 	"errors"
 	"github.com/go-playground/validator/v10"
+	"log/slog"
 	"strings"
 	"time"
 )
 
 type AuthService struct {
+	log         *slog.Logger
 	validate    *validator.Validate
 	jwtProvider *jwt.JwtProvider
 	userRepo    UserRepository
 }
 
 func NewAuthService(
+	log *slog.Logger,
 	validate *validator.Validate,
 	jwtProvider *jwt.JwtProvider,
 	userRepo UserRepository,
 ) *AuthService {
 	return &AuthService{
+		log:         log,
 		validate:    validate,
 		jwtProvider: jwtProvider,
 		userRepo:    userRepo,
@@ -90,8 +95,11 @@ func (s *AuthService) Register(ctx context.Context, cred model.Credentials) (uin
 		return 0, errs
 	}
 
+	s.log.Info("registering user", slog.String("email", *cred.Email))
+
 	passwordHash, err := security.HashPassword(cred.Password)
 	if err != nil {
+		s.log.Error("hashing password", logger.Err(err))
 		errs["bcrypt"] = ErrBcrypt
 
 		return 0, errs
@@ -113,6 +121,7 @@ func (s *AuthService) Register(ctx context.Context, cred model.Credentials) (uin
 
 	createdID, err := s.userRepo.Insert(ctx, user)
 	if err != nil {
+		s.log.Error("inserting user", logger.Err(err))
 		errs["repository"] = err
 	}
 
@@ -162,13 +171,16 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 	switch {
 	case cred.Email != nil:
 		filter.Email = cred.Email
+		s.log.Info("logging in user", slog.String("email", *cred.Email))
 	case cred.PhoneNumber != nil:
 		filter.PhoneNumber = cred.PhoneNumber
+		s.log.Info("logging in user", slog.String("phoneNumber", *cred.PhoneNumber))
 	}
 
 	// TODO: add not found error handling
 	user, err := s.userRepo.Find(ctx, filter)
 	if err != nil {
+		s.log.Error("finding user", logger.Err(err))
 		errs["repository"] = ErrNotFound
 
 		return model.Token{}, errs
@@ -183,12 +195,22 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 
 	accessToken, err := s.jwtProvider.GenerateAccessToken(user.ID, user.Role.String())
 	if err != nil {
+		s.log.Error(
+			"generating access token",
+			logger.Err(err),
+			slog.Uint64("userId", user.ID),
+		)
 		errs["jwt"] = ErrJwt
 
 		return model.Token{}, errs
 	}
 	refreshToken, err := s.jwtProvider.GenerateRefreshToken(user.ID, user.Role.String())
 	if err != nil {
+		s.log.Error(
+			"generating refresh token",
+			logger.Err(err),
+			slog.Uint64("userId", user.ID),
+		)
 		errs["jwt"] = ErrJwt
 
 		return model.Token{}, errs
@@ -212,15 +234,33 @@ func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (mo
 
 	claims, err := s.jwtProvider.VerifyAndParseClaims(refreshToken)
 	if err != nil {
+		s.log.Error(
+			"verifying refresh token",
+			logger.Err(err),
+			slog.String("refreshToken", refreshToken),
+		)
+
 		return model.Token{}, ErrJwt
 	}
 
 	newAccessToken, err := s.jwtProvider.GenerateAccessToken(claims.UserID, claims.Role)
 	if err != nil {
+		s.log.Error(
+			"generating access token",
+			logger.Err(err),
+			slog.Uint64("userId", claims.UserID),
+		)
+
 		return model.Token{}, ErrJwt
 	}
 	newRefreshToken, err := s.jwtProvider.GenerateRefreshToken(claims.UserID, claims.Role)
 	if err != nil {
+		s.log.Error(
+			"generating refresh token",
+			logger.Err(err),
+			slog.Uint64("userId", claims.UserID),
+		)
+
 		return model.Token{}, ErrJwt
 	}
 

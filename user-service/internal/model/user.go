@@ -8,7 +8,7 @@ type User struct {
 	PhoneNumber  string
 	FirstName    string
 	LastName     string
-	DateOfBirth  string
+	BirthDate    time.Time
 	PasswordHash string
 	Role         Role
 	CreatedAt    time.Time
@@ -35,7 +35,7 @@ type UserUpdateData struct {
 	PhoneNumber  *string
 	FirstName    *string
 	LastName     *string
-	DateOfBirth  *string
+	BirthDate    *time.Time
 	PasswordHash *string
 	Role         *Role
 

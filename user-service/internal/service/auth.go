@@ -2,24 +2,30 @@ package service
 
 import (
 	"car-rental-user-service/internal/model"
+	"car-rental-user-service/internal/pkg/jwt"
+	"car-rental-user-service/internal/pkg/security"
 	"context"
 	"errors"
 	"github.com/go-playground/validator/v10"
 	"strings"
+	"time"
 )
 
 type AuthService struct {
-	validate *validator.Validate
-	userRepo UserRepository
+	validate    *validator.Validate
+	jwtProvider *jwt.JwtProvider
+	userRepo    UserRepository
 }
 
 func NewAuthService(
 	validate *validator.Validate,
+	jwtProvider *jwt.JwtProvider,
 	userRepo UserRepository,
 ) *AuthService {
 	return &AuthService{
-		validate: validate,
-		userRepo: userRepo,
+		validate:    validate,
+		jwtProvider: jwtProvider,
+		userRepo:    userRepo,
 	}
 }
 
@@ -47,7 +53,6 @@ func (s *AuthService) Register(ctx context.Context, cred model.Credentials) (uin
 	if cred.BirthDate == nil {
 		errs["birthDate"] = ErrRequiredField
 	}
-
 	if len(errs) != 0 {
 		return 0, errs
 	}
@@ -81,23 +86,49 @@ func (s *AuthService) Register(ctx context.Context, cred model.Credentials) (uin
 			errs[field] = validationError(fieldErr)
 		}
 	}
+	if len(errs) != 0 {
+		return 0, errs
+	}
 
-	return 0, nil
+	passwordHash, err := security.HashPassword(cred.Password)
+	if err != nil {
+		errs["bcrypt"] = ErrBcrypt
+
+		return 0, errs
+	}
+
+	user := model.User{
+		Email:        *cred.Email,
+		PhoneNumber:  *cred.PhoneNumber,
+		FirstName:    *cred.FirstName,
+		LastName:     *cred.LastName,
+		BirthDate:    *cred.BirthDate,
+		PasswordHash: passwordHash,
+		Role:         model.RoleUser,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+		IsActive:     false,
+		IsConfirmed:  false,
+	}
+
+	createdID, err := s.userRepo.Insert(ctx, user)
+	if err != nil {
+		errs["repository"] = err
+	}
+
+	return createdID, errs
 }
 
 func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.Token, map[string]error) {
 	errs := make(map[string]error)
 
-	if cred.Email == nil {
-		errs["email"] = ErrRequiredField
-	}
-	if cred.PhoneNumber == nil {
+	if cred.Email == nil && cred.PhoneNumber == nil {
 		errs["phoneNumber"] = ErrRequiredField
+		errs["email"] = ErrRequiredField
 	}
 	if cred.Password == "" {
 		errs["password"] = ErrRequiredField
 	}
-
 	if len(errs) != 0 {
 		return model.Token{}, errs
 	}
@@ -123,8 +154,50 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 			errs[field] = validationError(fieldErr)
 		}
 	}
+	if len(errs) != 0 {
+		return model.Token{}, errs
+	}
 
-	return model.Token{}, nil
+	filter := model.UserFilter{}
+	switch {
+	case cred.Email != nil:
+		filter.Email = cred.Email
+	case cred.PhoneNumber != nil:
+		filter.PhoneNumber = cred.PhoneNumber
+	}
+
+	// TODO: add not found error handling
+	user, err := s.userRepo.Find(ctx, filter)
+	if err != nil {
+		errs["repository"] = ErrNotFound
+
+		return model.Token{}, errs
+	}
+
+	err = security.CheckPassword(cred.Password, user.PasswordHash)
+	if err != nil {
+		errs["password"] = ErrPasswordsDoNotMatch
+
+		return model.Token{}, errs
+	}
+
+	accessToken, err := s.jwtProvider.GenerateAccessToken(user.ID, user.Role.String())
+	if err != nil {
+		errs["jwt"] = ErrJwt
+
+		return model.Token{}, errs
+	}
+	refreshToken, err := s.jwtProvider.GenerateRefreshToken(user.ID, user.Role.String())
+	if err != nil {
+		errs["jwt"] = ErrJwt
+
+		return model.Token{}, errs
+	}
+
+	return model.Token{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}, nil
 }
 
 func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (model.Token, error) {
@@ -137,5 +210,22 @@ func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (mo
 		return model.Token{}, ErrInvalidToken
 	}
 
-	return model.Token{}, nil
+	claims, err := s.jwtProvider.VerifyAndParseClaims(refreshToken)
+	if err != nil {
+		return model.Token{}, ErrJwt
+	}
+
+	newAccessToken, err := s.jwtProvider.GenerateAccessToken(claims.UserID, claims.Role)
+	if err != nil {
+		return model.Token{}, ErrJwt
+	}
+	newRefreshToken, err := s.jwtProvider.GenerateRefreshToken(claims.UserID, claims.Role)
+	if err != nil {
+		return model.Token{}, ErrJwt
+	}
+
+	return model.Token{
+		AccessToken:  newAccessToken,
+		RefreshToken: newRefreshToken,
+	}, nil
 }

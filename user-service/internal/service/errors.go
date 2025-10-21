@@ -7,8 +7,12 @@ import (
 )
 
 var (
-	ErrRequiredField = errors.New("is required")
-	ErrInvalidToken  = errors.New("invalid token")
+	ErrNotFound            = errors.New("not found")
+	ErrRequiredField       = errors.New("is required")
+	ErrPasswordsDoNotMatch = errors.New("passwords do not match")
+	ErrInvalidToken        = errors.New("invalid token")
+	ErrJwt                 = errors.New("jwt error")
+	ErrBcrypt              = errors.New("bcrypt error")
 )
 
 func validationError(fieldErr validator.FieldError) error {

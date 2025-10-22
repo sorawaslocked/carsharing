@@ -6,7 +6,7 @@ toolchain go1.24.5
 
 require (
 	github.com/gin-gonic/gin v1.11.0
-	github.com/sorawaslocked/car-rental-protos v0.0.4
+	github.com/sorawaslocked/car-rental-protos v0.0.1
 )
 
 require (

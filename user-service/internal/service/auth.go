@@ -38,25 +38,25 @@ func (s *AuthService) Register(ctx context.Context, cred model.Credentials) (uin
 	errs := make(map[string]error)
 
 	if cred.Email == nil {
-		errs["email"] = ErrRequiredField
+		errs["email"] = model.ErrRequiredField
 	}
 	if cred.PhoneNumber == nil {
-		errs["phoneNumber"] = ErrRequiredField
+		errs["phoneNumber"] = model.ErrRequiredField
 	}
 	if cred.Password == "" {
-		errs["password"] = ErrRequiredField
+		errs["password"] = model.ErrRequiredField
 	}
 	if cred.PasswordConfirmation == nil {
-		errs["passwordConfirmation"] = ErrRequiredField
+		errs["passwordConfirmation"] = model.ErrRequiredField
 	}
 	if cred.FirstName == nil {
-		errs["firstName"] = ErrRequiredField
+		errs["firstName"] = model.ErrRequiredField
 	}
 	if cred.LastName == nil {
-		errs["lastName"] = ErrRequiredField
+		errs["lastName"] = model.ErrRequiredField
 	}
 	if cred.BirthDate == nil {
-		errs["birthDate"] = ErrRequiredField
+		errs["birthDate"] = model.ErrRequiredField
 	}
 	if len(errs) != 0 {
 		return 0, errs
@@ -100,7 +100,7 @@ func (s *AuthService) Register(ctx context.Context, cred model.Credentials) (uin
 	passwordHash, err := security.HashPassword(cred.Password)
 	if err != nil {
 		s.log.Error("hashing password", logger.Err(err))
-		errs["bcrypt"] = ErrBcrypt
+		errs["bcrypt"] = model.ErrBcrypt
 
 		return 0, errs
 	}
@@ -132,11 +132,11 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 	errs := make(map[string]error)
 
 	if cred.Email == nil && cred.PhoneNumber == nil {
-		errs["phoneNumber"] = ErrRequiredField
-		errs["email"] = ErrRequiredField
+		errs["phoneNumber"] = model.ErrRequiredField
+		errs["email"] = model.ErrRequiredField
 	}
 	if cred.Password == "" {
-		errs["password"] = ErrRequiredField
+		errs["password"] = model.ErrRequiredField
 	}
 	if len(errs) != 0 {
 		return model.Token{}, errs
@@ -178,17 +178,17 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 	}
 
 	// TODO: add not found error handling
-	user, err := s.userRepo.Find(ctx, filter)
+	user, err := s.userRepo.FindOne(ctx, filter)
 	if err != nil {
 		s.log.Error("finding user", logger.Err(err))
-		errs["repository"] = ErrNotFound
+		errs["repository"] = model.ErrNotFound
 
 		return model.Token{}, errs
 	}
 
 	err = security.CheckPassword(cred.Password, user.PasswordHash)
 	if err != nil {
-		errs["password"] = ErrPasswordsDoNotMatch
+		errs["password"] = model.ErrPasswordsDoNotMatch
 
 		return model.Token{}, errs
 	}
@@ -200,7 +200,7 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 			logger.Err(err),
 			slog.Uint64("userId", user.ID),
 		)
-		errs["jwt"] = ErrJwt
+		errs["jwt"] = model.ErrJwt
 
 		return model.Token{}, errs
 	}
@@ -211,7 +211,7 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 			logger.Err(err),
 			slog.Uint64("userId", user.ID),
 		)
-		errs["jwt"] = ErrJwt
+		errs["jwt"] = model.ErrJwt
 
 		return model.Token{}, errs
 	}
@@ -224,12 +224,12 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 
 func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (model.Token, error) {
 	if refreshToken == "" {
-		return model.Token{}, ErrRequiredField
+		return model.Token{}, model.ErrRequiredField
 	}
 
 	err := s.validate.Var(refreshToken, "jwt")
 	if err != nil {
-		return model.Token{}, ErrInvalidToken
+		return model.Token{}, model.ErrInvalidToken
 	}
 
 	claims, err := s.jwtProvider.VerifyAndParseClaims(refreshToken)
@@ -240,7 +240,7 @@ func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (mo
 			slog.String("refreshToken", refreshToken),
 		)
 
-		return model.Token{}, ErrJwt
+		return model.Token{}, model.ErrJwt
 	}
 
 	newAccessToken, err := s.jwtProvider.GenerateAccessToken(claims.UserID, claims.Role)
@@ -251,7 +251,7 @@ func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (mo
 			slog.Uint64("userId", claims.UserID),
 		)
 
-		return model.Token{}, ErrJwt
+		return model.Token{}, model.ErrJwt
 	}
 	newRefreshToken, err := s.jwtProvider.GenerateRefreshToken(claims.UserID, claims.Role)
 	if err != nil {
@@ -261,7 +261,7 @@ func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (mo
 			slog.Uint64("userId", claims.UserID),
 		)
 
-		return model.Token{}, ErrJwt
+		return model.Token{}, model.ErrJwt
 	}
 
 	return model.Token{

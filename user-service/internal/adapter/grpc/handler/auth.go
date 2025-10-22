@@ -24,7 +24,7 @@ func NewAuthHandler(log *slog.Logger, authService AuthService) *AuthHandler {
 }
 
 func (h *AuthHandler) Register(ctx context.Context, req *svc.RegisterRequest) (*svc.RegisterResponse, error) {
-	birthDate, err := time.Parse("2006-01-24", req.DateOfBirth)
+	birthDate, err := time.Parse("2006-01-04", req.DateOfBirth)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}

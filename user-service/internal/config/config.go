@@ -1,6 +1,7 @@
 package config
 
 import (
+	"car-rental-user-service/internal/pkg/grpc"
 	"car-rental-user-service/internal/pkg/postgres"
 	"flag"
 	"github.com/ilyakaznacheev/cleanenv"
@@ -11,6 +12,7 @@ type (
 	Config struct {
 		Env      string          `yaml:"env" env:"ENV" required:"true"`
 		Postgres postgres.Config `yaml:"postgres" env-required:"true"`
+		GRPC     grpc.Config     `yaml:"grpc" env-required:"true"`
 	}
 )
 

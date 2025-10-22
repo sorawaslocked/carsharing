@@ -70,7 +70,7 @@ func (handler *Auth) Login(ctx *gin.Context) {
 	res := dto.LoginResponse{
 		Errors: errors,
 	}
-	if res.AccessToken != nil && res.RefreshToken != nil {
+	if token.AccessToken != "" && token.RefreshToken != "" {
 		res.AccessToken = &token.AccessToken
 		res.RefreshToken = &token.RefreshToken
 	}
@@ -102,7 +102,7 @@ func (handler *Auth) RefreshToken(ctx *gin.Context) {
 	res := dto.RefreshTokenResponse{
 		Errors: errors,
 	}
-	if res.AccessToken != nil && res.RefreshToken != nil {
+	if token.AccessToken != "" && token.RefreshToken != "" {
 		res.AccessToken = &token.AccessToken
 		res.RefreshToken = &token.RefreshToken
 	}

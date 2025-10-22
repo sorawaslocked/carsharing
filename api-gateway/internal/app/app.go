@@ -31,10 +31,10 @@ func New(cfg config.Config) *App {
 		log.Println("could not connect to auth service", err.Error())
 	}
 
-	err = grpcconn.PingServer(authServiceGrpcConn)
-	if err != nil {
-		log.Println("could not connect to auth service", err.Error())
-	}
+	//err = grpcconn.PingServer(authServiceGrpcConn)
+	//if err != nil {
+	//	log.Println("could not connect to auth service", err.Error())
+	//}
 
 	authServiceGrpcClient := grpcSvc.NewAuthServiceClient(authServiceGrpcConn)
 	authServiceGrpcHandler := grpc.NewAuthHandler(authServiceGrpcClient)

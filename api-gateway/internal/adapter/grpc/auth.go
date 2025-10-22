@@ -36,13 +36,9 @@ func (h *AuthHandler) Register(ctx context.Context, cred model.Credentials) (uin
 
 func (h *AuthHandler) Login(ctx context.Context, cred model.Credentials) (model.Token, map[string]string) {
 	req := &svc.LoginRequest{
-		Password: cred.Password,
-	}
-	if cred.Email != nil {
-		req.Credentials = &svc.LoginRequest_Email{Email: *cred.Email}
-	}
-	if cred.PhoneNumber != nil {
-		req.Credentials = &svc.LoginRequest_PhoneNumber{PhoneNumber: *cred.PhoneNumber}
+		Password:    cred.Password,
+		Email:       cred.Email,
+		PhoneNumber: cred.PhoneNumber,
 	}
 
 	res, err := h.client.Login(ctx, req)

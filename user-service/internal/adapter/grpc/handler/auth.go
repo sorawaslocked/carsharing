@@ -24,20 +24,29 @@ func NewAuthHandler(log *slog.Logger, authService AuthService) *AuthHandler {
 }
 
 func (h *AuthHandler) Register(ctx context.Context, req *svc.RegisterRequest) (*svc.RegisterResponse, error) {
+	cred := model.Credentials{}
+	if req.Email != "" {
+		cred.Email = &req.Email
+	}
+	if req.PhoneNumber != "" {
+		cred.PhoneNumber = &req.PhoneNumber
+	}
+	if req.PasswordConfirmation != "" {
+		cred.PasswordConfirmation = &req.PasswordConfirmation
+	}
+	if req.FirstName != "" {
+		cred.FirstName = &req.FirstName
+	}
+	if req.LastName != "" {
+		cred.LastName = &req.LastName
+	}
+	cred.Password = req.Password
+
 	birthDate, err := time.Parse("2006-01-04", req.DateOfBirth)
-	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+	if err == nil {
+		cred.BirthDate = &birthDate
 	}
 
-	cred := model.Credentials{
-		Email:                &req.Email,
-		PhoneNumber:          &req.PhoneNumber,
-		Password:             req.Password,
-		PasswordConfirmation: &req.PasswordConfirmation,
-		FirstName:            &req.FirstName,
-		LastName:             &req.LastName,
-		BirthDate:            &birthDate,
-	}
 	newID, errs := h.authService.Register(ctx, cred)
 
 	res := &svc.RegisterResponse{

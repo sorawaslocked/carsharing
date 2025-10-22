@@ -135,7 +135,7 @@ func (r *UserRepository) FindOne(ctx context.Context, filter model.UserFilter) (
 
 	var u model.User
 
-	err := r.db.QueryRow(query, args...).Scan(
+	err := r.db.QueryRowContext(ctx, query, args...).Scan(
 		&u.ID, &u.Email, &u.PhoneNumber, &u.FirstName, &u.LastName,
 		&u.BirthDate, &u.PasswordHash, &u.IsActive, &u.IsConfirmed,
 		&u.CreatedAt, &u.UpdatedAt, &u.Role,

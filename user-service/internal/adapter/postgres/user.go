@@ -123,13 +123,13 @@ func (r *UserRepository) FindOne(ctx context.Context, filter model.UserFilter) (
 		argID++
 	}
 	if filter.Role != nil {
-		query += ` INNER JOIN user_roles ur ON u.id = ur.user_id`
 		whereClauses = append(whereClauses, fmt.Sprintf("ur.role_id = $%d", argID))
 		args = append(args, int32(*filter.Role))
 		argID++
 	}
 
 	if len(whereClauses) > 0 {
+		query += ` INNER JOIN user_roles ur ON u.id = ur.user_id`
 		query += " WHERE " + strings.Join(whereClauses, " AND ") + " LIMIT 1"
 	}
 

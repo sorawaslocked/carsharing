@@ -131,6 +131,17 @@ func (s *AuthService) Register(ctx context.Context, cred model.Credentials) (uin
 func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.Token, map[string]error) {
 	errs := make(map[string]error)
 
+	firstName := "FN"
+	lastName := "LN"
+	birthDate := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
+	email := "email@exampl.com"
+	phoneNumber := "+77777777777"
+
+	cred.PasswordConfirmation = &cred.Password
+	cred.BirthDate = &birthDate
+	cred.FirstName = &firstName
+	cred.LastName = &lastName
+
 	if cred.Email == nil && cred.PhoneNumber == nil {
 		errs["phoneNumber"] = model.ErrRequiredField
 		errs["email"] = model.ErrRequiredField
@@ -142,6 +153,17 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 		return model.Token{}, errs
 	}
 
+	filter := model.UserFilter{}
+	if cred.PhoneNumber == nil {
+		cred.PhoneNumber = &phoneNumber
+		filter.Email = cred.Email
+		s.log.Info("logging in user", slog.String("email", *cred.Email))
+	}
+	if cred.Email == nil {
+		cred.Email = &email
+		filter.PhoneNumber = cred.PhoneNumber
+		s.log.Info("logging in user", slog.String("phoneNumber", *cred.PhoneNumber))
+	}
 	err := s.validate.Struct(cred)
 	if err != nil {
 		var validationErrors validator.ValidationErrors
@@ -165,16 +187,6 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 	}
 	if len(errs) != 0 {
 		return model.Token{}, errs
-	}
-
-	filter := model.UserFilter{}
-	switch {
-	case cred.Email != nil:
-		filter.Email = cred.Email
-		s.log.Info("logging in user", slog.String("email", *cred.Email))
-	case cred.PhoneNumber != nil:
-		filter.PhoneNumber = cred.PhoneNumber
-		s.log.Info("logging in user", slog.String("phoneNumber", *cred.PhoneNumber))
 	}
 
 	// TODO: add not found error handling

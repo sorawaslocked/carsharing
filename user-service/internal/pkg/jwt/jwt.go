@@ -63,7 +63,7 @@ func (jp *JwtProvider) VerifyAndParseClaims(token string) (Claims, error) {
 	}
 
 	claims := Claims{}
-	claims.UserID = jwtClaims["user_id"].(uint64)
+	claims.UserID = uint64(jwtClaims["user_id"].(float64))
 	claims.Role = jwtClaims["role"].(string)
 
 	return claims, nil

@@ -166,13 +166,10 @@ func (x *RegisterResponse) GetErrors() map[string]string {
 }
 
 type LoginRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Credentials:
-	//
-	//	*LoginRequest_Email
-	//	*LoginRequest_PhoneNumber
-	Credentials   isLoginRequest_Credentials `protobuf_oneof:"credentials"`
-	Password      string                     `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Email         *string                `protobuf:"bytes,1,opt,name=email,proto3,oneof" json:"email,omitempty"`
+	PhoneNumber   *string                `protobuf:"bytes,2,opt,name=phoneNumber,proto3,oneof" json:"phoneNumber,omitempty"`
+	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -207,27 +204,16 @@ func (*LoginRequest) Descriptor() ([]byte, []int) {
 	return file_service_auth_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *LoginRequest) GetCredentials() isLoginRequest_Credentials {
-	if x != nil {
-		return x.Credentials
-	}
-	return nil
-}
-
 func (x *LoginRequest) GetEmail() string {
-	if x != nil {
-		if x, ok := x.Credentials.(*LoginRequest_Email); ok {
-			return x.Email
-		}
+	if x != nil && x.Email != nil {
+		return *x.Email
 	}
 	return ""
 }
 
 func (x *LoginRequest) GetPhoneNumber() string {
-	if x != nil {
-		if x, ok := x.Credentials.(*LoginRequest_PhoneNumber); ok {
-			return x.PhoneNumber
-		}
+	if x != nil && x.PhoneNumber != nil {
+		return *x.PhoneNumber
 	}
 	return ""
 }
@@ -238,22 +224,6 @@ func (x *LoginRequest) GetPassword() string {
 	}
 	return ""
 }
-
-type isLoginRequest_Credentials interface {
-	isLoginRequest_Credentials()
-}
-
-type LoginRequest_Email struct {
-	Email string `protobuf:"bytes,1,opt,name=email,proto3,oneof"`
-}
-
-type LoginRequest_PhoneNumber struct {
-	PhoneNumber string `protobuf:"bytes,2,opt,name=phoneNumber,proto3,oneof"`
-}
-
-func (*LoginRequest_Email) isLoginRequest_Credentials() {}
-
-func (*LoginRequest_PhoneNumber) isLoginRequest_Credentials() {}
 
 type LoginResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -438,12 +408,13 @@ const file_service_auth_proto_rawDesc = "" +
 	"\vErrorsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x05\n" +
-	"\x03_id\"u\n" +
-	"\fLoginRequest\x12\x16\n" +
-	"\x05email\x18\x01 \x01(\tH\x00R\x05email\x12\"\n" +
-	"\vphoneNumber\x18\x02 \x01(\tH\x00R\vphoneNumber\x12\x1a\n" +
-	"\bpassword\x18\x03 \x01(\tR\bpasswordB\r\n" +
-	"\vcredentials\"\xfc\x01\n" +
+	"\x03_id\"\x86\x01\n" +
+	"\fLoginRequest\x12\x19\n" +
+	"\x05email\x18\x01 \x01(\tH\x00R\x05email\x88\x01\x01\x12%\n" +
+	"\vphoneNumber\x18\x02 \x01(\tH\x01R\vphoneNumber\x88\x01\x01\x12\x1a\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpasswordB\b\n" +
+	"\x06_emailB\x0e\n" +
+	"\f_phoneNumber\"\xfc\x01\n" +
 	"\rLoginResponse\x12%\n" +
 	"\vaccessToken\x18\x01 \x01(\tH\x00R\vaccessToken\x88\x01\x01\x12'\n" +
 	"\frefreshToken\x18\x02 \x01(\tH\x01R\frefreshToken\x88\x01\x01\x12?\n" +
@@ -516,10 +487,7 @@ func file_service_auth_proto_init() {
 		return
 	}
 	file_service_auth_proto_msgTypes[1].OneofWrappers = []any{}
-	file_service_auth_proto_msgTypes[2].OneofWrappers = []any{
-		(*LoginRequest_Email)(nil),
-		(*LoginRequest_PhoneNumber)(nil),
-	}
+	file_service_auth_proto_msgTypes[2].OneofWrappers = []any{}
 	file_service_auth_proto_msgTypes[3].OneofWrappers = []any{}
 	file_service_auth_proto_msgTypes[5].OneofWrappers = []any{}
 	type x struct{}

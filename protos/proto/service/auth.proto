@@ -26,10 +26,8 @@ message RegisterResponse {
 }
 
 message LoginRequest {
-  oneof credentials {
-    string email = 1;
-    string phoneNumber = 2;
-  }
+  optional string email = 1;
+  optional string phoneNumber = 2;
   string password = 3;
 }
 

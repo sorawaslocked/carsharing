@@ -38,6 +38,7 @@ type UserUpdateData struct {
 	BirthDate    *time.Time
 	PasswordHash *string
 	Role         *Role
+	UpdatedAt    time.Time
 
 	IsActive    *bool
 	IsConfirmed *bool

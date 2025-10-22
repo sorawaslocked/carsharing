@@ -1,9 +1,11 @@
 package grpc
 
 import (
+	"car-rental-user-service/internal/adapter/grpc/handler"
 	grpccfg "car-rental-user-service/internal/pkg/grpc"
 	"car-rental-user-service/internal/service"
 	"fmt"
+	svc "github.com/sorawaslocked/car-rental-protos/gen/service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log/slog"
@@ -28,7 +30,7 @@ func NewServer(
 		authService: authService,
 	}
 
-	server.register()
+	server.register(authService)
 
 	return server
 }
@@ -50,8 +52,10 @@ func (s *Server) Stop() {
 	s.s.GracefulStop()
 }
 
-func (s *Server) register() {
+func (s *Server) register(authService handler.AuthService) {
 	s.s = grpc.NewServer()
+
+	svc.RegisterAuthServiceServer(s.s, handler.NewAuthHandler(s.log, authService))
 
 	reflection.Register(s.s)
 }

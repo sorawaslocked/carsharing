@@ -22,7 +22,8 @@ message RegisterRequest {
 
 message RegisterResponse {
   optional uint64 id = 1;
-  map<string, string> errors = 2;
+  optional string error = 2;
+  map<string, string> validationErrors = 3;
 }
 
 message LoginRequest {
@@ -34,7 +35,8 @@ message LoginRequest {
 message LoginResponse {
   optional string accessToken = 1;
   optional string refreshToken = 2;
-  map<string, string> errors = 3;
+  optional string error = 3;
+  map<string, string> validationErrors = 4;
 }
 
 message RefreshTokenRequest {
@@ -44,5 +46,6 @@ message RefreshTokenRequest {
 message RefreshTokenResponse {
   optional string accessToken = 1;
   optional string refreshToken = 2;
-  map<string, string> errors = 3;
+  optional string error = 3;
+  map<string, string> validationErrors = 4;
 }

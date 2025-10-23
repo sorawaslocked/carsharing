@@ -5,18 +5,18 @@ import (
 	"time"
 )
 
-type JwtProvider struct {
+type Provider struct {
 	secretKey       string
 	accessTokenTTL  time.Duration
 	refreshTokenTTL time.Duration
 }
 
-func NewJwtProvider(
+func NewProvider(
 	secretKey string,
 	accessTokenTTL time.Duration,
 	refreshTokenTTL time.Duration,
-) *JwtProvider {
-	return &JwtProvider{
+) *Provider {
+	return &Provider{
 		secretKey:       secretKey,
 		accessTokenTTL:  accessTokenTTL,
 		refreshTokenTTL: refreshTokenTTL,
@@ -24,15 +24,16 @@ func NewJwtProvider(
 }
 
 type Claims struct {
-	UserID uint64
-	Role   string
+	ID    uint64
+	Roles []string
 }
 
-func (jp *JwtProvider) GenerateAccessToken(userID uint64, role string) (string, error) {
+func (jp *Provider) GenerateAccessToken(id uint64, roles []string) (string, error) {
 	claims := jwt.MapClaims{
-		"user_id": userID,
-		"role":    role,
-		"exp":     time.Now().Add(jp.accessTokenTTL).Unix(),
+		"sub":   id,
+		"roles": roles,
+		"iat":   time.Now().Unix(),
+		"exp":   time.Now().Add(jp.accessTokenTTL).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -40,11 +41,12 @@ func (jp *JwtProvider) GenerateAccessToken(userID uint64, role string) (string, 
 	return token.SignedString([]byte(jp.secretKey))
 }
 
-func (jp *JwtProvider) GenerateRefreshToken(userID uint64, role string) (string, error) {
+func (jp *Provider) GenerateRefreshToken(id uint64, roles []string) (string, error) {
 	claims := jwt.MapClaims{
-		"user_id": userID,
-		"role":    role,
-		"exp":     time.Now().Add(jp.refreshTokenTTL).Unix(),
+		"sub":   id,
+		"roles": roles,
+		"iat":   time.Now().Unix(),
+		"exp":   time.Now().Add(jp.refreshTokenTTL).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -52,7 +54,7 @@ func (jp *JwtProvider) GenerateRefreshToken(userID uint64, role string) (string,
 	return token.SignedString([]byte(jp.secretKey))
 }
 
-func (jp *JwtProvider) VerifyAndParseClaims(token string) (Claims, error) {
+func (jp *Provider) VerifyAndParseClaims(token string) (Claims, error) {
 	jwtClaims := jwt.MapClaims{}
 
 	_, err := jwt.ParseWithClaims(token, jwtClaims, func(token *jwt.Token) (interface{}, error) {
@@ -63,8 +65,8 @@ func (jp *JwtProvider) VerifyAndParseClaims(token string) (Claims, error) {
 	}
 
 	claims := Claims{}
-	claims.UserID = uint64(jwtClaims["user_id"].(float64))
-	claims.Role = jwtClaims["role"].(string)
+	claims.ID = uint64(jwtClaims["sub"].(float64))
+	claims.Roles = jwtClaims["roles"].([]string)
 
 	return claims, nil
 }

@@ -16,14 +16,14 @@ import (
 type AuthService struct {
 	log         *slog.Logger
 	validate    *validator.Validate
-	jwtProvider *jwt.JwtProvider
+	jwtProvider *jwt.Provider
 	userRepo    UserRepository
 }
 
 func NewAuthService(
 	log *slog.Logger,
 	validate *validator.Validate,
-	jwtProvider *jwt.JwtProvider,
+	jwtProvider *jwt.Provider,
 	userRepo UserRepository,
 ) *AuthService {
 	return &AuthService{
@@ -255,22 +255,22 @@ func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (mo
 		return model.Token{}, model.ErrJwt
 	}
 
-	newAccessToken, err := s.jwtProvider.GenerateAccessToken(claims.UserID, claims.Role)
+	newAccessToken, err := s.jwtProvider.GenerateAccessToken(claims.ID, claims.Role)
 	if err != nil {
 		s.log.Error(
 			"generating access token",
 			logger.Err(err),
-			slog.Uint64("userId", claims.UserID),
+			slog.Uint64("userId", claims.ID),
 		)
 
 		return model.Token{}, model.ErrJwt
 	}
-	newRefreshToken, err := s.jwtProvider.GenerateRefreshToken(claims.UserID, claims.Role)
+	newRefreshToken, err := s.jwtProvider.GenerateRefreshToken(claims.ID, claims.Role)
 	if err != nil {
 		s.log.Error(
 			"generating refresh token",
 			logger.Err(err),
-			slog.Uint64("userId", claims.UserID),
+			slog.Uint64("userId", claims.ID),
 		)
 
 		return model.Token{}, model.ErrJwt

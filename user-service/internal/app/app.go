@@ -36,7 +36,7 @@ func New(
 		return nil, err
 	}
 
-	jwtProvider := jwt.NewJwtProvider(
+	jwtProvider := jwt.NewProvider(
 		"secretKey",
 		time.Minute*15,
 		time.Hour*24,

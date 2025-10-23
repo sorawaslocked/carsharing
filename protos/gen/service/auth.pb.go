@@ -114,11 +114,12 @@ func (x *RegisterRequest) GetPasswordConfirmation() string {
 }
 
 type RegisterResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            *uint64                `protobuf:"varint,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
-	Errors        map[string]string      `protobuf:"bytes,2,rep,name=errors,proto3" json:"errors,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Id               *uint64                `protobuf:"varint,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
+	Error            *string                `protobuf:"bytes,2,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	ValidationErrors map[string]string      `protobuf:"bytes,3,rep,name=validationErrors,proto3" json:"validationErrors,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *RegisterResponse) Reset() {
@@ -158,9 +159,16 @@ func (x *RegisterResponse) GetId() uint64 {
 	return 0
 }
 
-func (x *RegisterResponse) GetErrors() map[string]string {
+func (x *RegisterResponse) GetError() string {
+	if x != nil && x.Error != nil {
+		return *x.Error
+	}
+	return ""
+}
+
+func (x *RegisterResponse) GetValidationErrors() map[string]string {
 	if x != nil {
-		return x.Errors
+		return x.ValidationErrors
 	}
 	return nil
 }
@@ -226,12 +234,13 @@ func (x *LoginRequest) GetPassword() string {
 }
 
 type LoginResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AccessToken   *string                `protobuf:"bytes,1,opt,name=accessToken,proto3,oneof" json:"accessToken,omitempty"`
-	RefreshToken  *string                `protobuf:"bytes,2,opt,name=refreshToken,proto3,oneof" json:"refreshToken,omitempty"`
-	Errors        map[string]string      `protobuf:"bytes,3,rep,name=errors,proto3" json:"errors,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	AccessToken      *string                `protobuf:"bytes,1,opt,name=accessToken,proto3,oneof" json:"accessToken,omitempty"`
+	RefreshToken     *string                `protobuf:"bytes,2,opt,name=refreshToken,proto3,oneof" json:"refreshToken,omitempty"`
+	Error            *string                `protobuf:"bytes,3,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	ValidationErrors map[string]string      `protobuf:"bytes,4,rep,name=validationErrors,proto3" json:"validationErrors,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *LoginResponse) Reset() {
@@ -278,9 +287,16 @@ func (x *LoginResponse) GetRefreshToken() string {
 	return ""
 }
 
-func (x *LoginResponse) GetErrors() map[string]string {
+func (x *LoginResponse) GetError() string {
+	if x != nil && x.Error != nil {
+		return *x.Error
+	}
+	return ""
+}
+
+func (x *LoginResponse) GetValidationErrors() map[string]string {
 	if x != nil {
-		return x.Errors
+		return x.ValidationErrors
 	}
 	return nil
 }
@@ -330,12 +346,13 @@ func (x *RefreshTokenRequest) GetRefreshToken() string {
 }
 
 type RefreshTokenResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AccessToken   *string                `protobuf:"bytes,1,opt,name=accessToken,proto3,oneof" json:"accessToken,omitempty"`
-	RefreshToken  *string                `protobuf:"bytes,2,opt,name=refreshToken,proto3,oneof" json:"refreshToken,omitempty"`
-	Errors        map[string]string      `protobuf:"bytes,3,rep,name=errors,proto3" json:"errors,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	AccessToken      *string                `protobuf:"bytes,1,opt,name=accessToken,proto3,oneof" json:"accessToken,omitempty"`
+	RefreshToken     *string                `protobuf:"bytes,2,opt,name=refreshToken,proto3,oneof" json:"refreshToken,omitempty"`
+	Error            *string                `protobuf:"bytes,3,opt,name=error,proto3,oneof" json:"error,omitempty"`
+	ValidationErrors map[string]string      `protobuf:"bytes,4,rep,name=validationErrors,proto3" json:"validationErrors,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *RefreshTokenResponse) Reset() {
@@ -382,9 +399,16 @@ func (x *RefreshTokenResponse) GetRefreshToken() string {
 	return ""
 }
 
-func (x *RefreshTokenResponse) GetErrors() map[string]string {
+func (x *RefreshTokenResponse) GetError() string {
+	if x != nil && x.Error != nil {
+		return *x.Error
+	}
+	return ""
+}
+
+func (x *RefreshTokenResponse) GetValidationErrors() map[string]string {
 	if x != nil {
-		return x.Errors
+		return x.ValidationErrors
 	}
 	return nil
 }
@@ -401,40 +425,46 @@ const file_service_auth_proto_rawDesc = "" +
 	"\vphoneNumber\x18\x04 \x01(\tR\vphoneNumber\x12\x1c\n" +
 	"\tbirthDate\x18\x05 \x01(\tR\tbirthDate\x12\x1a\n" +
 	"\bpassword\x18\x06 \x01(\tR\bpassword\x122\n" +
-	"\x14passwordConfirmation\x18\a \x01(\tR\x14passwordConfirmation\"\xad\x01\n" +
+	"\x14passwordConfirmation\x18\a \x01(\tR\x14passwordConfirmation\"\xfa\x01\n" +
 	"\x10RegisterResponse\x12\x13\n" +
-	"\x02id\x18\x01 \x01(\x04H\x00R\x02id\x88\x01\x01\x12B\n" +
-	"\x06errors\x18\x02 \x03(\v2*.service.auth.RegisterResponse.ErrorsEntryR\x06errors\x1a9\n" +
-	"\vErrorsEntry\x12\x10\n" +
+	"\x02id\x18\x01 \x01(\x04H\x00R\x02id\x88\x01\x01\x12\x19\n" +
+	"\x05error\x18\x02 \x01(\tH\x01R\x05error\x88\x01\x01\x12`\n" +
+	"\x10validationErrors\x18\x03 \x03(\v24.service.auth.RegisterResponse.ValidationErrorsEntryR\x10validationErrors\x1aC\n" +
+	"\x15ValidationErrorsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x05\n" +
-	"\x03_id\"\x86\x01\n" +
+	"\x03_idB\b\n" +
+	"\x06_error\"\x86\x01\n" +
 	"\fLoginRequest\x12\x19\n" +
 	"\x05email\x18\x01 \x01(\tH\x00R\x05email\x88\x01\x01\x12%\n" +
 	"\vphoneNumber\x18\x02 \x01(\tH\x01R\vphoneNumber\x88\x01\x01\x12\x1a\n" +
 	"\bpassword\x18\x03 \x01(\tR\bpasswordB\b\n" +
 	"\x06_emailB\x0e\n" +
-	"\f_phoneNumber\"\xfc\x01\n" +
+	"\f_phoneNumber\"\xc9\x02\n" +
 	"\rLoginResponse\x12%\n" +
 	"\vaccessToken\x18\x01 \x01(\tH\x00R\vaccessToken\x88\x01\x01\x12'\n" +
-	"\frefreshToken\x18\x02 \x01(\tH\x01R\frefreshToken\x88\x01\x01\x12?\n" +
-	"\x06errors\x18\x03 \x03(\v2'.service.auth.LoginResponse.ErrorsEntryR\x06errors\x1a9\n" +
-	"\vErrorsEntry\x12\x10\n" +
+	"\frefreshToken\x18\x02 \x01(\tH\x01R\frefreshToken\x88\x01\x01\x12\x19\n" +
+	"\x05error\x18\x03 \x01(\tH\x02R\x05error\x88\x01\x01\x12]\n" +
+	"\x10validationErrors\x18\x04 \x03(\v21.service.auth.LoginResponse.ValidationErrorsEntryR\x10validationErrors\x1aC\n" +
+	"\x15ValidationErrorsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0e\n" +
 	"\f_accessTokenB\x0f\n" +
-	"\r_refreshToken\"9\n" +
+	"\r_refreshTokenB\b\n" +
+	"\x06_error\"9\n" +
 	"\x13RefreshTokenRequest\x12\"\n" +
-	"\frefreshToken\x18\x01 \x01(\tR\frefreshToken\"\x8a\x02\n" +
+	"\frefreshToken\x18\x01 \x01(\tR\frefreshToken\"\xd7\x02\n" +
 	"\x14RefreshTokenResponse\x12%\n" +
 	"\vaccessToken\x18\x01 \x01(\tH\x00R\vaccessToken\x88\x01\x01\x12'\n" +
-	"\frefreshToken\x18\x02 \x01(\tH\x01R\frefreshToken\x88\x01\x01\x12F\n" +
-	"\x06errors\x18\x03 \x03(\v2..service.auth.RefreshTokenResponse.ErrorsEntryR\x06errors\x1a9\n" +
-	"\vErrorsEntry\x12\x10\n" +
+	"\frefreshToken\x18\x02 \x01(\tH\x01R\frefreshToken\x88\x01\x01\x12\x19\n" +
+	"\x05error\x18\x03 \x01(\tH\x02R\x05error\x88\x01\x01\x12d\n" +
+	"\x10validationErrors\x18\x04 \x03(\v28.service.auth.RefreshTokenResponse.ValidationErrorsEntryR\x10validationErrors\x1aC\n" +
+	"\x15ValidationErrorsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0e\n" +
 	"\f_accessTokenB\x0f\n" +
-	"\r_refreshToken2\xf1\x01\n" +
+	"\r_refreshTokenB\b\n" +
+	"\x06_error2\xf1\x01\n" +
 	"\vAuthService\x12I\n" +
 	"\bRegister\x12\x1d.service.auth.RegisterRequest\x1a\x1e.service.auth.RegisterResponse\x12@\n" +
 	"\x05Login\x12\x1a.service.auth.LoginRequest\x1a\x1b.service.auth.LoginResponse\x12U\n" +
@@ -460,14 +490,14 @@ var file_service_auth_proto_goTypes = []any{
 	(*LoginResponse)(nil),        // 3: service.auth.LoginResponse
 	(*RefreshTokenRequest)(nil),  // 4: service.auth.RefreshTokenRequest
 	(*RefreshTokenResponse)(nil), // 5: service.auth.RefreshTokenResponse
-	nil,                          // 6: service.auth.RegisterResponse.ErrorsEntry
-	nil,                          // 7: service.auth.LoginResponse.ErrorsEntry
-	nil,                          // 8: service.auth.RefreshTokenResponse.ErrorsEntry
+	nil,                          // 6: service.auth.RegisterResponse.ValidationErrorsEntry
+	nil,                          // 7: service.auth.LoginResponse.ValidationErrorsEntry
+	nil,                          // 8: service.auth.RefreshTokenResponse.ValidationErrorsEntry
 }
 var file_service_auth_proto_depIdxs = []int32{
-	6, // 0: service.auth.RegisterResponse.errors:type_name -> service.auth.RegisterResponse.ErrorsEntry
-	7, // 1: service.auth.LoginResponse.errors:type_name -> service.auth.LoginResponse.ErrorsEntry
-	8, // 2: service.auth.RefreshTokenResponse.errors:type_name -> service.auth.RefreshTokenResponse.ErrorsEntry
+	6, // 0: service.auth.RegisterResponse.validationErrors:type_name -> service.auth.RegisterResponse.ValidationErrorsEntry
+	7, // 1: service.auth.LoginResponse.validationErrors:type_name -> service.auth.LoginResponse.ValidationErrorsEntry
+	8, // 2: service.auth.RefreshTokenResponse.validationErrors:type_name -> service.auth.RefreshTokenResponse.ValidationErrorsEntry
 	0, // 3: service.auth.AuthService.Register:input_type -> service.auth.RegisterRequest
 	2, // 4: service.auth.AuthService.Login:input_type -> service.auth.LoginRequest
 	4, // 5: service.auth.AuthService.RefreshToken:input_type -> service.auth.RefreshTokenRequest

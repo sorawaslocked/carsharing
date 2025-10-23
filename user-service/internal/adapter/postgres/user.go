@@ -3,9 +3,8 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"fmt"
+	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/postgres/dto"
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/logger"
 	"log/slog"
 	"strings"
 )
@@ -25,9 +24,7 @@ func NewUserRepository(log *slog.Logger, db *sql.DB) *UserRepository {
 func (r *UserRepository) Insert(ctx context.Context, user model.User) (uint64, error) {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
-		r.log.Error("beginning transaction", logger.Err(err))
-
-		return 0, err
+		return 0, model.ErrSqlTransaction
 	}
 	defer tx.Rollback()
 
@@ -52,85 +49,42 @@ func (r *UserRepository) Insert(ctx context.Context, user model.User) (uint64, e
 		user.UpdatedAt,
 	).Scan(&userID)
 	if err != nil {
-		r.log.Error("inserting user", logger.Err(err))
-
 		return 0, err
 	}
 
-	_, err = tx.ExecContext(
-		ctx,
-		`
-		INSERT INTO user_roles
-		(user_id, role_id)
-		VALUES ($1, $2)`,
-		userID,
-		int32(user.Role),
-	)
-	if err != nil {
-		r.log.Error("inserting user role", logger.Err(err))
-
-		return 0, err
+	roles := user.Roles
+	for _, role := range roles {
+		_, err = tx.ExecContext(
+			ctx,
+			`
+			INSERT INTO user_roles
+			(user_id, role_id)
+			VALUES ($1, $2)`,
+			userID,
+			int32(role),
+		)
+		if err != nil {
+			return 0, model.ErrSql
+		}
 	}
 
-	return uint64(userID), tx.Commit()
+	if tx.Commit() != nil {
+		return 0, model.ErrSqlTransaction
+	}
+
+	return uint64(userID), nil
 }
 
 func (r *UserRepository) FindOne(ctx context.Context, filter model.UserFilter) (model.User, error) {
 	query := `
         SELECT u.id, u.email, u.phone_number, u.first_name, u.last_name, 
                u.birth_date, u.password_hash, u.is_active, u.is_confirmed,
-               u.created_at, u.updated_at, ur.role_id
-        FROM users u
-    `
+               u.created_at, u.updated_at
+        FROM users u`
 
-	var whereClauses []string
-	var args []any
-	argID := 1
-
-	if filter.ID != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.id = $%d", argID))
-		args = append(args, *filter.ID)
-		argID++
-	}
-	if filter.Email != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.email = $%d", argID))
-		args = append(args, *filter.Email)
-		argID++
-	}
-	if filter.PhoneNumber != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.phone_number = $%d", argID))
-		args = append(args, *filter.PhoneNumber)
-		argID++
-	}
-	if filter.FirstName != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.first_name = $%d", argID))
-		args = append(args, *filter.FirstName)
-		argID++
-	}
-	if filter.LastName != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.last_name = $%d", argID))
-		args = append(args, *filter.LastName)
-		argID++
-	}
-	if filter.IsActive != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.is_active = $%d", argID))
-		args = append(args, *filter.IsActive)
-		argID++
-	}
-	if filter.IsConfirmed != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.is_confirmed = $%d", argID))
-		args = append(args, *filter.IsConfirmed)
-		argID++
-	}
-	if filter.Role != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("ur.role_id = $%d", argID))
-		args = append(args, int32(*filter.Role))
-		argID++
-	}
-
+	whereClauses, args := dto.WhereClausesFromFilter(filter, nil, 1)
 	if len(whereClauses) > 0 {
-		query += ` INNER JOIN user_roles ur ON u.id = ur.user_id`
-		query += " WHERE " + strings.Join(whereClauses, " AND ") + " LIMIT 1"
+		query += " WHERE " + strings.Join(whereClauses, " AND ")
 	}
 
 	var u model.User
@@ -138,13 +92,14 @@ func (r *UserRepository) FindOne(ctx context.Context, filter model.UserFilter) (
 	err := r.db.QueryRowContext(ctx, query, args...).Scan(
 		&u.ID, &u.Email, &u.PhoneNumber, &u.FirstName, &u.LastName,
 		&u.BirthDate, &u.PasswordHash, &u.IsActive, &u.IsConfirmed,
-		&u.CreatedAt, &u.UpdatedAt, &u.Role,
+		&u.CreatedAt, &u.UpdatedAt,
 	)
-	if err != nil {
-		r.log.Error("finding user", logger.Err(err))
 
-		return model.User{}, err
+	roles, err := r.findRolesForUser(ctx, u.ID)
+	if err != nil {
+		return model.User{}, model.ErrSql
 	}
+	u.Roles = roles
 
 	return u, nil
 }
@@ -153,56 +108,11 @@ func (r *UserRepository) Find(ctx context.Context, filter model.UserFilter) ([]m
 	query := `
         SELECT u.id, u.email, u.phone_number, u.first_name, u.last_name, 
                u.birth_date, u.password_hash, u.is_active, u.is_confirmed,
-               u.created_at, u.updated_at, ur.role_id
+               u.created_at, u.updated_at
         FROM users u
     `
 
-	var whereClauses []string
-	var args []any
-	argID := 1
-
-	if filter.ID != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.id = $%d", argID))
-		args = append(args, *filter.ID)
-		argID++
-	}
-	if filter.Email != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.email = $%d", argID))
-		args = append(args, *filter.Email)
-		argID++
-	}
-	if filter.PhoneNumber != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.phone_number = $%d", argID))
-		args = append(args, *filter.PhoneNumber)
-		argID++
-	}
-	if filter.FirstName != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.first_name = $%d", argID))
-		args = append(args, *filter.FirstName)
-		argID++
-	}
-	if filter.LastName != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.last_name = $%d", argID))
-		args = append(args, *filter.LastName)
-		argID++
-	}
-	if filter.IsActive != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.is_active = $%d", argID))
-		args = append(args, *filter.IsActive)
-		argID++
-	}
-	if filter.IsConfirmed != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.is_confirmed = $%d", argID))
-		args = append(args, *filter.IsConfirmed)
-		argID++
-	}
-	if filter.Role != nil {
-		query += ` INNER JOIN user_roles ur ON u.id = ur.user_id`
-		whereClauses = append(whereClauses, fmt.Sprintf("ur.role_id = $%d", argID))
-		args = append(args, int32(*filter.Role))
-		argID++
-	}
-
+	whereClauses, args := dto.WhereClausesFromFilter(filter, nil, 1)
 	if len(whereClauses) > 0 {
 		query += " WHERE " + strings.Join(whereClauses, " AND ")
 	}
@@ -220,123 +130,120 @@ func (r *UserRepository) Find(ctx context.Context, filter model.UserFilter) ([]m
 		err := rows.Scan(
 			&u.ID, &u.Email, &u.PhoneNumber, &u.FirstName, &u.LastName,
 			&u.BirthDate, &u.PasswordHash, &u.IsActive, &u.IsConfirmed,
-			&u.CreatedAt, &u.UpdatedAt, &u.Role,
+			&u.CreatedAt, &u.UpdatedAt,
 		)
 		if err != nil {
-			r.log.Error("scanning user row", logger.Err(err))
-
-			return nil, err
+			return nil, model.ErrSql
 		}
+
+		roles, err := r.findRolesForUser(ctx, u.ID)
+		if err != nil {
+			return nil, model.ErrSql
+		}
+		u.Roles = roles
 
 		users = append(users, u)
 	}
 
-	return users, rows.Err()
+	if rows.Err() != nil {
+		return nil, model.ErrSql
+	}
+
+	return users, nil
+}
+
+func (r *UserRepository) findRolesForUser(ctx context.Context, userId uint64) ([]model.Role, error) {
+	query := `
+		SELECT role_id
+		FROM user_roles
+		WHERE user_id = $1`
+
+	rows, err := r.db.QueryContext(ctx, query, userId)
+	if err != nil {
+		return nil, model.ErrSql
+	}
+	defer rows.Close()
+
+	var roles []model.Role
+	for rows.Next() {
+		var role model.Role
+
+		err = rows.Scan(&role)
+		if err != nil {
+			return nil, model.ErrSql
+		}
+
+		roles = append(roles, role)
+	}
+
+	return roles, nil
 }
 
 func (r *UserRepository) Update(ctx context.Context, filter model.UserFilter, update model.UserUpdateData) error {
 	query := "UPDATE users SET "
-	var args []any
-	argID := 1
-	var setClauses []string
 
-	if update.Email != nil {
-		setClauses = append(setClauses, fmt.Sprintf("email = $%d", argID))
-		args = append(args, *update.Email)
-		argID++
+	setClauses, args, argNumber := dto.SetClausesFromUpdateData(update)
+	if len(setClauses) <= 1 {
+		return model.ErrNoUpdateFields
 	}
-	if update.PhoneNumber != nil {
-		setClauses = append(setClauses, fmt.Sprintf("phone = $%d", argID))
-		args = append(args, *update.PhoneNumber)
-		argID++
-	}
-	if update.FirstName != nil {
-		setClauses = append(setClauses, fmt.Sprintf("first_name = $%d", argID))
-		args = append(args, *update.FirstName)
-		argID++
-	}
-	if update.LastName != nil {
-		setClauses = append(setClauses, fmt.Sprintf("last_name = $%d", argID))
-		args = append(args, *update.LastName)
-		argID++
-	}
-	if update.BirthDate != nil {
-		setClauses = append(setClauses, fmt.Sprintf("birth_date = $%d", argID))
-		args = append(args, *update.BirthDate)
-		argID++
-	}
-	if update.PasswordHash != nil {
-		setClauses = append(setClauses, fmt.Sprintf("password_hash = $%d", argID))
-		args = append(args, *update.PasswordHash)
-		argID++
-	}
-	if update.IsActive != nil {
-		setClauses = append(setClauses, fmt.Sprintf("is_active = $%d", argID))
-		args = append(args, *update.IsActive)
-		argID++
-	}
-	if update.IsConfirmed != nil {
-		setClauses = append(setClauses, fmt.Sprintf("is_confirmed = $%d", argID))
-		args = append(args, *update.IsConfirmed)
-		argID++
-	}
+	query += strings.Join(setClauses, ", ")
 
+	whereClauses, args := dto.WhereClausesFromFilter(filter, args, argNumber)
+	if len(whereClauses) == 0 {
+		return model.ErrEmptyFilter
+	}
+	query += " WHERE " + strings.Join(whereClauses, " AND ")
+
+	// TODO: add change of roles
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
-		r.log.Error("beginning transaction", logger.Err(err))
-
-		return err
+		return model.ErrSqlTransaction
 	}
 	defer tx.Rollback()
 
-	if update.Role != nil {
-		_, err = tx.ExecContext(
-			ctx,
-			`
-			UPDATE user_roles
-			SET user_id = $1
-				role_id = $2`,
-			*filter.ID,
-			int32(*update.Role),
-		)
-
-		if len(setClauses) == 0 {
-			return tx.Commit()
-		}
-	}
-
-	if len(setClauses) == 0 {
-		return ErrNoUpdateFields
-	}
-	setClauses = append(setClauses, fmt.Sprintf("updated_at = $%d", argID))
-	args = append(args, update.UpdatedAt)
-	argID++
-
-	query += strings.Join(setClauses, ", ")
-	query += fmt.Sprintf(" WHERE id = $%d", argID)
-	args = append(args, *filter.ID)
-
 	res, err := tx.ExecContext(ctx, query, args...)
 	if err != nil {
-		r.log.Error("updating user", logger.Err(err))
-
-		return err
+		return model.ErrSql
 	}
 
 	rowsAffected, err := res.RowsAffected()
 	if err != nil {
-		r.log.Error("getting affected rows", logger.Err(err))
-
-		return err
+		return model.ErrSql
 	}
 
 	if rowsAffected == 0 {
 		return model.ErrNotFound
 	}
 
-	return tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return model.ErrSqlTransaction
+	}
+
+	return nil
 }
 
 func (r *UserRepository) Delete(ctx context.Context, filter model.UserFilter) error {
+	query := `DELETE FROM users`
+
+	whereClauses, args := dto.WhereClausesFromFilter(filter, nil, 1)
+	if len(whereClauses) > 0 {
+		query += " WHERE " + strings.Join(whereClauses, " AND ")
+	}
+
+	res, err := r.db.Exec(query, args)
+	if err != nil {
+		return model.ErrSql
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return model.ErrSql
+	}
+
+	if rowsAffected == 0 {
+		return model.ErrNotFound
+	}
+
 	return nil
 }

@@ -1,6 +1,6 @@
 package model
 
-type Role int
+type Role int32
 
 const (
 	RoleUser Role = iota

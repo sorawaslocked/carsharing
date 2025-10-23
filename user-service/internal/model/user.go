@@ -24,7 +24,7 @@ type UserFilter struct {
 	PhoneNumber *string
 	FirstName   *string
 	LastName    *string
-	Roles       []*Role
+	Roles       []Role
 
 	IsActive    *bool
 	IsConfirmed *bool
@@ -37,7 +37,7 @@ type UserUpdateData struct {
 	LastName     *string
 	BirthDate    *time.Time
 	PasswordHash *string
-	Roles        []*Role
+	Roles        []Role
 	UpdatedAt    time.Time
 
 	IsActive    *bool

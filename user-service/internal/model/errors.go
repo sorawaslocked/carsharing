@@ -21,12 +21,17 @@ func (ve ValidationErrors) Error() string {
 }
 
 var (
-	ErrNotFound            = errors.New("resource not found")
+	ErrNotFound       = errors.New("resource not found")
+	ErrNoUpdateFields = errors.New("no update fields set")
+	ErrEmptyFilter    = errors.New("filter is empty")
+	ErrSqlTransaction = errors.New("sql transaction error")
+	ErrSql            = errors.New("sql error")
+
 	ErrRequiredField       = errors.New("required")
 	ErrInvalidDateFormat   = errors.New("invalid date format")
 	ErrPasswordsDoNotMatch = errors.New("passwords do not match")
 	ErrInvalidToken        = errors.New("invalid token")
-	ErrJwt                 = errors.New("jwt error")
-	ErrBcrypt              = errors.New("bcrypt error")
-	ErrSql                 = errors.New("sql error")
+
+	ErrJwt    = errors.New("jwt error")
+	ErrBcrypt = errors.New("bcrypt error")
 )

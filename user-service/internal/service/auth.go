@@ -141,7 +141,7 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 	}, nil
 }
 
-func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (model.Token, error) {
+func (s *AuthService) RefreshToken(_ context.Context, refreshToken string) (model.Token, error) {
 	err := s.validate.Var(refreshToken, "required")
 	if err != nil {
 		return model.Token{}, model.ErrRequiredField

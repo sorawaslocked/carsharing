@@ -8,16 +8,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func ToGrpcValidationError(validationErrors model.ValidationErrors) map[string]string {
-	errs := make(map[string]string)
-
-	for field, err := range validationErrors {
-		errs[field] = err.Error()
-	}
-
-	return errs
-}
-
 func validationError(ve model.ValidationErrors) error {
 	st := status.New(codes.InvalidArgument, "invalid request")
 

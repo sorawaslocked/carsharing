@@ -8,7 +8,7 @@ import (
 
 func TestMinAge(t *testing.T) {
 	validate := validator.New()
-	validate.RegisterValidation("min_age_18", MinAge(18))
+	validate.RegisterValidation("min_age", MinAge)
 
 	tests := []struct {
 		name      string
@@ -59,7 +59,7 @@ func TestMinAge(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := validate.Var(tt.birthDate, "min_age_18")
+			err := validate.Var(tt.birthDate, "min_age=18")
 			isValid := err == nil
 
 			if isValid != tt.wantValid {

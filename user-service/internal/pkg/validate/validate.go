@@ -1,6 +1,7 @@
 package validate
 
 import (
+	"fmt"
 	"github.com/go-playground/validator/v10"
 	"regexp"
 	"time"
@@ -13,20 +14,25 @@ var (
 	hasSpecialRX = regexp.MustCompile(`[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>?~]`)
 )
 
-func MinAge(minAge int) validator.Func {
-	return func(fl validator.FieldLevel) bool {
-		birthDate := fl.Field().Interface().(time.Time)
-		now := time.Now()
+func MinAge(fl validator.FieldLevel) bool {
+	minAgeParam := fl.Param()
+	minAge := 18 // Default value
 
-		age := now.Year() - birthDate.Year()
-
-		if now.Month() < birthDate.Month() ||
-			(now.Month() == birthDate.Month() && now.Day() < birthDate.Day()) {
-			age--
-		}
-
-		return age >= minAge
+	if minAgeParam != "" {
+		fmt.Sscanf(minAgeParam, "%d", &minAge)
 	}
+
+	birthDate := fl.Field().Interface().(time.Time)
+	now := time.Now()
+
+	age := now.Year() - birthDate.Year()
+
+	if now.Month() < birthDate.Month() ||
+		(now.Month() == birthDate.Month() && now.Day() < birthDate.Day()) {
+		age--
+	}
+
+	return age >= minAge
 }
 
 func ComplexPassword(fl validator.FieldLevel) bool {

@@ -43,7 +43,7 @@ func New(
 	)
 
 	validate := validator.New()
-	err = validate.RegisterValidation("min_age_18", validatecfg.MinAge(18))
+	err = validate.RegisterValidation("min_age", validatecfg.MinAge)
 	if err != nil {
 		return nil, err
 	}

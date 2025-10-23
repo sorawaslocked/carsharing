@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/postgres/dto"
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 	"log/slog"
@@ -94,6 +95,12 @@ func (r *UserRepository) FindOne(ctx context.Context, filter model.UserFilter) (
 		&u.BirthDate, &u.PasswordHash, &u.IsActive, &u.IsConfirmed,
 		&u.CreatedAt, &u.UpdatedAt,
 	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return model.User{}, model.ErrNotFound
+		}
+		return model.User{}, model.ErrSql
+	}
 
 	roles, err := r.findRolesForUser(ctx, u.ID)
 	if err != nil {

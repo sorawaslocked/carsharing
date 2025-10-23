@@ -60,7 +60,12 @@ func (jp *Provider) VerifyAndParseClaims(token string) (uint64, []string, error)
 	}
 
 	id := uint64(jwtClaims["sub"].(float64))
-	roles := jwtClaims["roles"].([]string)
+	roles := jwtClaims["roles"].([]interface{})
 
-	return id, roles, nil
+	roleStrings := make([]string, len(roles))
+	for i, v := range roles {
+		roleStrings[i] = v.(string)
+	}
+
+	return id, roleStrings, nil
 }

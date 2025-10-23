@@ -9,6 +9,8 @@ func validationError(fieldErr validator.FieldError) error {
 	switch fieldErr.Tag() {
 	case "required":
 		return fmt.Errorf("required")
+	case "required_without":
+		return fmt.Errorf("required")
 	case "max":
 		return fmt.Errorf("must be at most %s characters", fieldErr.Param())
 	case "min":

@@ -44,6 +44,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/sorawaslocked/car-rental-protos v0.0.3 h1:DCI9Ps3yg7zooI9v+GafXea77OfTDXZdV/vs5GeP7ok=
 github.com/sorawaslocked/car-rental-protos v0.0.3/go.mod h1:ThSVtD+dtUfuaRpaZSzXPeF+RVNI6ii4AhcSH5hY7es=
+github.com/sorawaslocked/car-rental-protos v0.0.4 h1:VZ7AlXw5YYiP87LmTvuikeQHrMaUi7Qrq4WbBVLWG+o=
+github.com/sorawaslocked/car-rental-protos v0.0.4/go.mod h1:ThSVtD+dtUfuaRpaZSzXPeF+RVNI6ii4AhcSH5hY7es=
 github.com/stretchr/objx v0.5.2 h1:xuMeJ0Sdp5ZMRXx/aWO6RZxdr3beISkG5/G/aIRr3pY=
 github.com/stretchr/objx v0.5.2/go.mod h1:FRsXN1f5AsAjCGJKqEizvkpNtU+EGNCLh3NxZ/8L+MA=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=

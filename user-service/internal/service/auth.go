@@ -108,7 +108,9 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 
 	err = security.CheckPassword(cred.Password, user.PasswordHash)
 	if err != nil {
-		return model.Token{}, model.ErrPasswordsDoNotMatch
+		return model.Token{}, model.ValidationErrors{
+			"password": model.ErrPasswordsDoNotMatch,
+		}
 	}
 
 	userRoles := toRoleStrings(user.Roles)

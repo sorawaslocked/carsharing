@@ -1,7 +1,6 @@
 package dto
 
 import (
-	"errors"
 	svc "github.com/sorawaslocked/car-rental-protos/gen/service"
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 	"time"
@@ -26,27 +25,6 @@ func FromRegisterRequest(req *svc.RegisterRequest) (model.Credentials, model.Val
 	}, nil
 }
 
-func ToRegisterResponse(id uint64, err error) *svc.RegisterResponse {
-	if err == nil {
-		return &svc.RegisterResponse{
-			Id: &id,
-		}
-	}
-
-	var validationErrors model.ValidationErrors
-	if errors.As(err, &validationErrors) {
-		return &svc.RegisterResponse{
-			ValidationErrors: ToGrpcValidationError(validationErrors),
-		}
-	}
-
-	errStr := err.Error()
-
-	return &svc.RegisterResponse{
-		Error: &errStr,
-	}
-}
-
 func FromLoginRequest(req *svc.LoginRequest) model.Credentials {
 	cred := model.Credentials{
 		Password: req.Password,
@@ -59,48 +37,4 @@ func FromLoginRequest(req *svc.LoginRequest) model.Credentials {
 	}
 
 	return cred
-}
-
-func ToLoginResponse(token model.Token, err error) *svc.LoginResponse {
-	if err == nil {
-		return &svc.LoginResponse{
-			AccessToken:  &token.AccessToken,
-			RefreshToken: &token.RefreshToken,
-		}
-	}
-
-	var validationErrors model.ValidationErrors
-	if errors.As(err, &validationErrors) {
-		return &svc.LoginResponse{
-			ValidationErrors: ToGrpcValidationError(validationErrors),
-		}
-	}
-
-	errStr := err.Error()
-
-	return &svc.LoginResponse{
-		Error: &errStr,
-	}
-}
-
-func ToRefreshTokenResponse(token model.Token, err error) *svc.RefreshTokenResponse {
-	if err == nil {
-		return &svc.RefreshTokenResponse{
-			AccessToken:  &token.AccessToken,
-			RefreshToken: &token.RefreshToken,
-		}
-	}
-
-	var validationErrors model.ValidationErrors
-	if errors.As(err, &validationErrors) {
-		return &svc.RefreshTokenResponse{
-			ValidationErrors: ToGrpcValidationError(validationErrors),
-		}
-	}
-
-	errStr := err.Error()
-
-	return &svc.RefreshTokenResponse{
-		Error: &errStr,
-	}
 }

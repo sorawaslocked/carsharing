@@ -23,11 +23,6 @@ func NewProvider(
 	}
 }
 
-type Claims struct {
-	ID    uint64
-	Roles []string
-}
-
 func (jp *Provider) GenerateAccessToken(id uint64, roles []string) (string, error) {
 	claims := jwt.MapClaims{
 		"sub":   id,
@@ -54,19 +49,18 @@ func (jp *Provider) GenerateRefreshToken(id uint64, roles []string) (string, err
 	return token.SignedString([]byte(jp.secretKey))
 }
 
-func (jp *Provider) VerifyAndParseClaims(token string) (Claims, error) {
+func (jp *Provider) VerifyAndParseClaims(token string) (uint64, []string, error) {
 	jwtClaims := jwt.MapClaims{}
 
 	_, err := jwt.ParseWithClaims(token, jwtClaims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(jp.secretKey), nil
 	})
 	if err != nil {
-		return Claims{}, err
+		return 0, nil, err
 	}
 
-	claims := Claims{}
-	claims.ID = uint64(jwtClaims["sub"].(float64))
-	claims.Roles = jwtClaims["roles"].([]string)
+	id := uint64(jwtClaims["sub"].(float64))
+	roles := jwtClaims["roles"].([]string)
 
-	return claims, nil
+	return id, roles, nil
 }

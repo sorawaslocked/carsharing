@@ -19,8 +19,8 @@ type registerValidation struct {
 }
 
 type loginValidation struct {
-	Email       string `validate:"required_without=PhoneNumber,email"`
-	PhoneNumber string `validate:"required_without=Email,e164"`
+	Email       string `validate:"required_without=PhoneNumber,omitempty,email"`
+	PhoneNumber string `validate:"required_without=Email,omitempty,e164"`
 	Password    string `validate:"required"`
 }
 
@@ -31,6 +31,7 @@ func validateInput(v *validator.Validate, input any) error {
 	}
 
 	var errs model.ValidationErrors
+	errs = make(map[string]error)
 	var validationErrors validator.ValidationErrors
 	errors.As(err, &validationErrors)
 

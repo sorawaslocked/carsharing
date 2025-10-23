@@ -2,7 +2,6 @@ package service
 
 import (
 	"car-rental-user-service/internal/model"
-	"car-rental-user-service/internal/pkg/jwt"
 	"car-rental-user-service/internal/pkg/logger"
 	"car-rental-user-service/internal/pkg/security"
 	"context"
@@ -14,14 +13,14 @@ import (
 type AuthService struct {
 	log         *slog.Logger
 	validate    *validator.Validate
-	jwtProvider *jwt.Provider
+	jwtProvider JwtProvider
 	userRepo    UserRepository
 }
 
 func NewAuthService(
 	log *slog.Logger,
 	validate *validator.Validate,
-	jwtProvider *jwt.Provider,
+	jwtProvider JwtProvider,
 	userRepo UserRepository,
 ) *AuthService {
 	return &AuthService{
@@ -150,7 +149,7 @@ func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (mo
 		return model.Token{}, model.ErrInvalidToken
 	}
 
-	claims, err := s.jwtProvider.VerifyAndParseClaims(refreshToken)
+	id, roles, err := s.jwtProvider.VerifyAndParseClaims(refreshToken)
 	if err != nil {
 		s.log.Error(
 			"jwt: verifying refresh token",
@@ -161,22 +160,22 @@ func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (mo
 		return model.Token{}, model.ErrJwt
 	}
 
-	newAccessToken, err := s.jwtProvider.GenerateAccessToken(claims.ID, claims.Roles)
+	newAccessToken, err := s.jwtProvider.GenerateAccessToken(id, roles)
 	if err != nil {
 		s.log.Error(
 			"jwt: generating access token",
 			logger.Err(err),
-			slog.Uint64("userId", claims.ID),
+			slog.Uint64("userId", id),
 		)
 
 		return model.Token{}, model.ErrJwt
 	}
-	newRefreshToken, err := s.jwtProvider.GenerateRefreshToken(claims.ID, claims.Roles)
+	newRefreshToken, err := s.jwtProvider.GenerateRefreshToken(id, roles)
 	if err != nil {
 		s.log.Error(
 			"jwt: generating refresh token",
 			logger.Err(err),
-			slog.Uint64("userId", claims.ID),
+			slog.Uint64("userId", id),
 		)
 
 		return model.Token{}, model.ErrJwt

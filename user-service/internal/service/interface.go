@@ -12,3 +12,9 @@ type UserRepository interface {
 	Update(ctx context.Context, filter model.UserFilter, update model.UserUpdateData) error
 	Delete(ctx context.Context, filter model.UserFilter) error
 }
+
+type JwtProvider interface {
+	GenerateAccessToken(id uint64, roles []string) (string, error)
+	GenerateRefreshToken(id uint64, roles []string) (string, error)
+	VerifyAndParseClaims(token string) (uint64, []string, error)
+}

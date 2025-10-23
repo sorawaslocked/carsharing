@@ -1,9 +1,8 @@
 package handler
 
 import (
-	"car-rental-user-service/internal/model"
 	"context"
-	svc "github.com/sorawaslocked/car-rental-protos/gen/service"
+	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log/slog"

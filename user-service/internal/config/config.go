@@ -1,10 +1,10 @@
 package config
 
 import (
-	"car-rental-user-service/internal/pkg/grpc"
-	"car-rental-user-service/internal/pkg/postgres"
 	"flag"
 	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/grpc"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/postgres"
 	"os"
 )
 

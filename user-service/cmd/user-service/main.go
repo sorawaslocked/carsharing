@@ -1,10 +1,10 @@
 package main
 
 import (
-	"car-rental-user-service/internal/app"
-	"car-rental-user-service/internal/config"
-	"car-rental-user-service/internal/pkg/logger"
 	"context"
+	"github.com/sorawaslocked/car-rental-user-service/internal/app"
+	"github.com/sorawaslocked/car-rental-user-service/internal/config"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/logger"
 )
 
 func main() {

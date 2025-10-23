@@ -1,11 +1,11 @@
 package postgres
 
 import (
-	"car-rental-user-service/internal/model"
-	"car-rental-user-service/internal/pkg/logger"
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/sorawaslocked/car-rental-user-service/internal/model"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/logger"
 	"log/slog"
 	"strings"
 )

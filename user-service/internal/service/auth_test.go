@@ -1,11 +1,11 @@
 package service
 
 import (
-	"car-rental-user-service/internal/model"
-	validatecfg "car-rental-user-service/internal/pkg/validate"
 	"context"
 	"errors"
 	"github.com/go-playground/validator/v10"
+	"github.com/sorawaslocked/car-rental-user-service/internal/model"
+	validatecfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/validate"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"log/slog"

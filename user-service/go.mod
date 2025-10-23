@@ -1,4 +1,4 @@
-module car-rental-user-service
+module github.com/sorawaslocked/car-rental-user-service
 
 go 1.24.0
 
@@ -10,7 +10,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/lib/pq v1.10.9
-	github.com/sorawaslocked/car-rental-protos v0.0.1
+	github.com/sorawaslocked/car-rental-protos v0.0.2
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/crypto v0.42.0
 	google.golang.org/grpc v1.76.0

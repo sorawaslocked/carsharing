@@ -1,11 +1,11 @@
 package service
 
 import (
-	"car-rental-user-service/internal/model"
-	"car-rental-user-service/internal/pkg/logger"
-	"car-rental-user-service/internal/pkg/security"
 	"context"
 	"github.com/go-playground/validator/v10"
+	"github.com/sorawaslocked/car-rental-user-service/internal/model"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/logger"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/security"
 	"log/slog"
 	"time"
 )

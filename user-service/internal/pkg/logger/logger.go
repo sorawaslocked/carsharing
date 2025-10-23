@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"car-rental-user-service/internal/pkg/logger/pretty"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/logger/pretty"
 	"log/slog"
 	"os"
 )

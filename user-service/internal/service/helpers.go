@@ -1,9 +1,9 @@
 package service
 
 import (
-	"car-rental-user-service/internal/model"
 	"errors"
 	"github.com/go-playground/validator/v10"
+	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 	"strings"
 	"time"
 )

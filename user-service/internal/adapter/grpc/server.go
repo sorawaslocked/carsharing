@@ -1,11 +1,10 @@
 package grpc
 
 import (
-	"car-rental-user-service/internal/adapter/grpc/handler"
-	grpccfg "car-rental-user-service/internal/pkg/grpc"
-	"car-rental-user-service/internal/service"
 	"fmt"
-	svc "github.com/sorawaslocked/car-rental-protos/gen/service"
+	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/handler"
+	grpccfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/grpc"
+	"github.com/sorawaslocked/car-rental-user-service/internal/service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log/slog"

@@ -1,8 +1,8 @@
 package service
 
 import (
-	"car-rental-user-service/internal/model"
 	"context"
+	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 )
 
 type UserRepository interface {

@@ -27,7 +27,7 @@ type RegisterRequest struct {
 	LastName             string                 `protobuf:"bytes,2,opt,name=lastName,proto3" json:"lastName,omitempty"`
 	Email                string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
 	PhoneNumber          string                 `protobuf:"bytes,4,opt,name=phoneNumber,proto3" json:"phoneNumber,omitempty"`
-	DateOfBirth          string                 `protobuf:"bytes,5,opt,name=dateOfBirth,proto3" json:"dateOfBirth,omitempty"`
+	BirthDate            string                 `protobuf:"bytes,5,opt,name=birthDate,proto3" json:"birthDate,omitempty"`
 	Password             string                 `protobuf:"bytes,6,opt,name=password,proto3" json:"password,omitempty"`
 	PasswordConfirmation string                 `protobuf:"bytes,7,opt,name=passwordConfirmation,proto3" json:"passwordConfirmation,omitempty"`
 	unknownFields        protoimpl.UnknownFields
@@ -92,9 +92,9 @@ func (x *RegisterRequest) GetPhoneNumber() string {
 	return ""
 }
 
-func (x *RegisterRequest) GetDateOfBirth() string {
+func (x *RegisterRequest) GetBirthDate() string {
 	if x != nil {
-		return x.DateOfBirth
+		return x.BirthDate
 	}
 	return ""
 }
@@ -393,13 +393,13 @@ var File_service_auth_proto protoreflect.FileDescriptor
 
 const file_service_auth_proto_rawDesc = "" +
 	"\n" +
-	"\x12service/auth.proto\x12\fservice.auth\"\xf5\x01\n" +
+	"\x12service/auth.proto\x12\fservice.auth\"\xf1\x01\n" +
 	"\x0fRegisterRequest\x12\x1c\n" +
 	"\tfirstName\x18\x01 \x01(\tR\tfirstName\x12\x1a\n" +
 	"\blastName\x18\x02 \x01(\tR\blastName\x12\x14\n" +
 	"\x05email\x18\x03 \x01(\tR\x05email\x12 \n" +
-	"\vphoneNumber\x18\x04 \x01(\tR\vphoneNumber\x12 \n" +
-	"\vdateOfBirth\x18\x05 \x01(\tR\vdateOfBirth\x12\x1a\n" +
+	"\vphoneNumber\x18\x04 \x01(\tR\vphoneNumber\x12\x1c\n" +
+	"\tbirthDate\x18\x05 \x01(\tR\tbirthDate\x12\x1a\n" +
 	"\bpassword\x18\x06 \x01(\tR\bpassword\x122\n" +
 	"\x14passwordConfirmation\x18\a \x01(\tR\x14passwordConfirmation\"\xad\x01\n" +
 	"\x10RegisterResponse\x12\x13\n" +

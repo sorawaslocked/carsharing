@@ -15,7 +15,7 @@ message RegisterRequest {
   string lastName = 2;
   string email = 3;
   string phoneNumber = 4;
-  string dateOfBirth = 5;
+  string birthDate = 5;
   string password = 6;
   string passwordConfirmation = 7;
 }

@@ -21,8 +21,9 @@ func (ve ValidationErrors) Error() string {
 }
 
 var (
-	ErrNotFound            = errors.New("not found")
-	ErrRequiredField       = errors.New("is required")
+	ErrNotFound            = errors.New("resource not found")
+	ErrRequiredField       = errors.New("required")
+	ErrInvalidDateFormat   = errors.New("invalid date format")
 	ErrPasswordsDoNotMatch = errors.New("passwords do not match")
 	ErrInvalidToken        = errors.New("invalid token")
 	ErrJwt                 = errors.New("jwt error")

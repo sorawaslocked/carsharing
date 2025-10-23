@@ -50,7 +50,7 @@ func (s *AuthService) Register(ctx context.Context, cred model.Credentials) (uin
 	s.log.Info("registering user", slog.String("email", cred.Email))
 	passwordHash, err := security.HashPassword(cred.Password)
 	if err != nil {
-		s.log.Error("hashing password", logger.Err(err))
+		s.log.Error("bcrypt: hashing password", logger.Err(err))
 
 		return 0, model.ErrBcrypt
 	}

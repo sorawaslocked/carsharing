@@ -12,7 +12,7 @@ type registerValidation struct {
 	Email                string    `validate:"required,email"`
 	PhoneNumber          string    `validate:"required,e164"`
 	Password             string    `validate:"required,min=8,max=20,complex_password"`
-	PasswordConfirmation string    `validate:"required,min=8,max=20,complex_password"`
+	PasswordConfirmation string    `validate:"required,min=8,max=20,eqfield=Password,complex_password"`
 	FirstName            string    `validate:"required,min=1,max=100"`
 	LastName             string    `validate:"required,min=1,max=100"`
 	BirthDate            time.Time `validate:"required,min_age=18"`

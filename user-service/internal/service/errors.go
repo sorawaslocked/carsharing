@@ -17,10 +17,12 @@ func validationError(fieldErr validator.FieldError) error {
 		return fmt.Errorf("must be a valid email address")
 	case "e164":
 		return fmt.Errorf("must be a valid e164 phone number")
+	case "eqfield":
+		return fmt.Errorf("must be same value")
 	case "complex_password":
 		return fmt.Errorf("must contain uppercase characters, lowercase characters, numbers, and special characters(!@#)")
-	case "min_age_18":
-		return fmt.Errorf("must be at least 18 years")
+	case "min_age":
+		return fmt.Errorf("must be at least %s years", fieldErr.Param())
 	default:
 		return fmt.Errorf("validation error")
 	}

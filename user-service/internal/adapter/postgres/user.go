@@ -231,7 +231,7 @@ func (r *UserRepository) Delete(ctx context.Context, filter model.UserFilter) er
 		query += " WHERE " + strings.Join(whereClauses, " AND ")
 	}
 
-	res, err := r.db.Exec(query, args)
+	res, err := r.db.ExecContext(ctx, query, args)
 	if err != nil {
 		return model.ErrSql
 	}

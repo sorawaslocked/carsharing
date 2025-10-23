@@ -6,10 +6,8 @@ import (
 	"car-rental-user-service/internal/pkg/logger"
 	"car-rental-user-service/internal/pkg/security"
 	"context"
-	"errors"
 	"github.com/go-playground/validator/v10"
 	"log/slog"
-	"strings"
 	"time"
 )
 
@@ -34,85 +32,37 @@ func NewAuthService(
 	}
 }
 
-func (s *AuthService) Register(ctx context.Context, cred model.Credentials) (uint64, map[string]error) {
-	errs := make(map[string]error)
-
-	if cred.Email == nil {
-		errs["email"] = model.ErrRequiredField
+func (s *AuthService) Register(ctx context.Context, cred model.Credentials) (uint64, error) {
+	input := registerValidation{
+		Email:                cred.Email,
+		PhoneNumber:          cred.PhoneNumber,
+		Password:             cred.Password,
+		PasswordConfirmation: cred.PasswordConfirmation,
+		FirstName:            cred.FirstName,
+		LastName:             cred.LastName,
+		BirthDate:            cred.BirthDate,
 	}
-	if cred.PhoneNumber == nil {
-		errs["phoneNumber"] = model.ErrRequiredField
-	}
-	if cred.Password == "" {
-		errs["password"] = model.ErrRequiredField
-	}
-	if cred.PasswordConfirmation == nil {
-		errs["passwordConfirmation"] = model.ErrRequiredField
-	}
-	if cred.FirstName == nil {
-		errs["firstName"] = model.ErrRequiredField
-	}
-	if cred.LastName == nil {
-		errs["lastName"] = model.ErrRequiredField
-	}
-	if cred.BirthDate == nil {
-		errs["birthDate"] = model.ErrRequiredField
-	}
-	if len(errs) != 0 {
-		return 0, errs
-	}
-
-	err := s.validate.Struct(cred)
+	err := validateInput(s.validate, input)
 	if err != nil {
-		var validationErrors validator.ValidationErrors
-		errors.As(err, &validationErrors)
-
-		for _, fieldErr := range validationErrors {
-			var field string
-
-			switch fieldErr.Field() {
-			case "PhoneNumber":
-				field = "phoneNumber"
-			case "PasswordConfirmation":
-				field = "passwordConfirmation"
-			case "FirstName":
-				field = "firstName"
-			case "LastName":
-				field = "lastName"
-			case "BirthDate":
-				field = "birthDate"
-			default:
-				field = strings.ToLower(fieldErr.Field())
-			}
-
-			if _, ok := errs[field]; ok {
-				continue
-			}
-			errs[field] = validationError(fieldErr)
-		}
-	}
-	if len(errs) != 0 {
-		return 0, errs
+		return 0, err
 	}
 
-	s.log.Info("registering user", slog.String("email", *cred.Email))
-
+	s.log.Info("registering user", slog.String("email", cred.Email))
 	passwordHash, err := security.HashPassword(cred.Password)
 	if err != nil {
 		s.log.Error("hashing password", logger.Err(err))
-		errs["bcrypt"] = model.ErrBcrypt
 
-		return 0, errs
+		return 0, model.ErrBcrypt
 	}
 
 	user := model.User{
-		Email:        *cred.Email,
-		PhoneNumber:  *cred.PhoneNumber,
-		FirstName:    *cred.FirstName,
-		LastName:     *cred.LastName,
-		BirthDate:    *cred.BirthDate,
+		Email:        cred.Email,
+		PhoneNumber:  cred.PhoneNumber,
+		FirstName:    cred.FirstName,
+		LastName:     cred.LastName,
+		BirthDate:    cred.BirthDate,
 		PasswordHash: passwordHash,
-		Role:         model.RoleUser,
+		Roles:        []model.Role{model.RoleUser},
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 		IsActive:     false,
@@ -121,111 +71,67 @@ func (s *AuthService) Register(ctx context.Context, cred model.Credentials) (uin
 
 	createdID, err := s.userRepo.Insert(ctx, user)
 	if err != nil {
-		s.log.Error("inserting user", logger.Err(err))
-		errs["repository"] = err
+		s.log.Error("sql: inserting user", logger.Err(err))
+		err = model.ErrSql
 	}
 
-	return createdID, errs
+	return createdID, err
 }
 
-func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.Token, map[string]error) {
-	errs := make(map[string]error)
-
-	firstName := "FN"
-	lastName := "LN"
-	birthDate := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
-	email := "email@exampl.com"
-	phoneNumber := "+77777777777"
-
-	cred.PasswordConfirmation = &cred.Password
-	cred.BirthDate = &birthDate
-	cred.FirstName = &firstName
-	cred.LastName = &lastName
-
-	if cred.Email == nil && cred.PhoneNumber == nil {
-		errs["phoneNumber"] = model.ErrRequiredField
-		errs["email"] = model.ErrRequiredField
+func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.Token, error) {
+	input := loginValidation{
+		Email:       cred.Email,
+		PhoneNumber: cred.PhoneNumber,
+		Password:    cred.Password,
 	}
-	if cred.Password == "" {
-		errs["password"] = model.ErrRequiredField
-	}
-	if len(errs) != 0 {
-		return model.Token{}, errs
+	err := validateInput(s.validate, input)
+	if err != nil {
+		return model.Token{}, err
 	}
 
 	filter := model.UserFilter{}
-	if cred.PhoneNumber == nil {
-		cred.PhoneNumber = &phoneNumber
-		filter.Email = cred.Email
-		s.log.Info("logging in user", slog.String("email", *cred.Email))
+	if input.Email != "" {
+		filter.Email = &input.Email
+		s.log.Info("logging in user", slog.String("email", input.Email))
 	}
-	if cred.Email == nil {
-		cred.Email = &email
-		filter.PhoneNumber = cred.PhoneNumber
-		s.log.Info("logging in user", slog.String("phoneNumber", *cred.PhoneNumber))
-	}
-	err := s.validate.Struct(cred)
-	if err != nil {
-		var validationErrors validator.ValidationErrors
-		errors.As(err, &validationErrors)
-
-		for _, fieldErr := range validationErrors {
-			var field string
-
-			switch fieldErr.Field() {
-			case "PhoneNumber":
-				field = "phoneNumber"
-			default:
-				field = strings.ToLower(fieldErr.Field())
-			}
-
-			if _, ok := errs[field]; ok {
-				continue
-			}
-			errs[field] = validationError(fieldErr)
-		}
-	}
-	if len(errs) != 0 {
-		return model.Token{}, errs
+	if cred.PhoneNumber != "" {
+		filter.PhoneNumber = &input.PhoneNumber
+		s.log.Info("logging in user", slog.String("phoneNumber", input.PhoneNumber))
 	}
 
 	// TODO: add not found error handling
 	user, err := s.userRepo.FindOne(ctx, filter)
 	if err != nil {
-		s.log.Error("finding user", logger.Err(err))
-		errs["repository"] = model.ErrNotFound
+		s.log.Error("sql: finding user", logger.Err(err))
 
-		return model.Token{}, errs
+		return model.Token{}, model.ErrNotFound
 	}
 
 	err = security.CheckPassword(cred.Password, user.PasswordHash)
 	if err != nil {
-		errs["password"] = model.ErrPasswordsDoNotMatch
-
-		return model.Token{}, errs
+		return model.Token{}, model.ErrPasswordsDoNotMatch
 	}
 
-	accessToken, err := s.jwtProvider.GenerateAccessToken(user.ID, user.Role.String())
+	userRoles := toRoleStrings(user.Roles)
+	accessToken, err := s.jwtProvider.GenerateAccessToken(user.ID, userRoles)
 	if err != nil {
 		s.log.Error(
-			"generating access token",
+			"jwt: generating access token",
 			logger.Err(err),
 			slog.Uint64("userId", user.ID),
 		)
-		errs["jwt"] = model.ErrJwt
 
-		return model.Token{}, errs
+		return model.Token{}, model.ErrJwt
 	}
-	refreshToken, err := s.jwtProvider.GenerateRefreshToken(user.ID, user.Role.String())
+	refreshToken, err := s.jwtProvider.GenerateRefreshToken(user.ID, userRoles)
 	if err != nil {
 		s.log.Error(
-			"generating refresh token",
+			"jwt: generating refresh token",
 			logger.Err(err),
 			slog.Uint64("userId", user.ID),
 		)
-		errs["jwt"] = model.ErrJwt
 
-		return model.Token{}, errs
+		return model.Token{}, model.ErrJwt
 	}
 
 	return model.Token{
@@ -235,11 +141,11 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 }
 
 func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (model.Token, error) {
-	if refreshToken == "" {
+	err := s.validate.Var(refreshToken, "required")
+	if err != nil {
 		return model.Token{}, model.ErrRequiredField
 	}
-
-	err := s.validate.Var(refreshToken, "jwt")
+	err = s.validate.Var(refreshToken, "jwt")
 	if err != nil {
 		return model.Token{}, model.ErrInvalidToken
 	}
@@ -247,7 +153,7 @@ func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (mo
 	claims, err := s.jwtProvider.VerifyAndParseClaims(refreshToken)
 	if err != nil {
 		s.log.Error(
-			"verifying refresh token",
+			"jwt: verifying refresh token",
 			logger.Err(err),
 			slog.String("refreshToken", refreshToken),
 		)
@@ -255,20 +161,20 @@ func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (mo
 		return model.Token{}, model.ErrJwt
 	}
 
-	newAccessToken, err := s.jwtProvider.GenerateAccessToken(claims.ID, claims.Role)
+	newAccessToken, err := s.jwtProvider.GenerateAccessToken(claims.ID, claims.Roles)
 	if err != nil {
 		s.log.Error(
-			"generating access token",
+			"jwt: generating access token",
 			logger.Err(err),
 			slog.Uint64("userId", claims.ID),
 		)
 
 		return model.Token{}, model.ErrJwt
 	}
-	newRefreshToken, err := s.jwtProvider.GenerateRefreshToken(claims.ID, claims.Role)
+	newRefreshToken, err := s.jwtProvider.GenerateRefreshToken(claims.ID, claims.Roles)
 	if err != nil {
 		s.log.Error(
-			"generating refresh token",
+			"jwt: generating refresh token",
 			logger.Err(err),
 			slog.Uint64("userId", claims.ID),
 		)

@@ -1,13 +1,13 @@
 package model
 
 type Credentials struct {
-	FirstName            string
-	LastName             string
 	Email                string
 	PhoneNumber          string
-	BirthDate            string
 	Password             string
 	PasswordConfirmation string
+	FirstName            string
+	LastName             string
+	BirthDate            string
 }
 
 type Token struct {

@@ -6,11 +6,15 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )
 
-func errorBody(message string) map[string]any {
+func errorBody(message string, metadata map[string]any) map[string]any {
 	body := map[string]any{
-		"error": map[string]string{
+		"error": map[string]any{
 			"message": message,
 		},
+	}
+
+	for k, v := range metadata {
+		body["error"].(map[string]any)[k] = v
 	}
 
 	return body
@@ -21,11 +25,7 @@ func FromError(ctx *gin.Context, err error) {
 
 	switch {
 	case errors.As(err, &ve):
-		body := errorBody("validation error")
-		body["type"] = "validation"
-		body["validation"] = ve
-
-		badRequest(ctx, body)
+		validationError(ctx, ve)
 	case errors.Is(err, model.ErrUnauthorized):
 		unauthorized(ctx)
 	case errors.Is(err, model.ErrForbidden):

@@ -8,10 +8,11 @@ import (
 )
 
 var (
-	ErrNotFound            = errors.New("resource not found")
-	ErrAlreadyExists       = errors.New("resource already exists")
+	ErrInvalidArgument     = errors.New("invalid argument")
 	ErrUnauthorized        = errors.New("unauthorized")
 	ErrForbidden           = errors.New("forbidden")
+	ErrNotFound            = errors.New("resource not found")
+	ErrAlreadyExists       = errors.New("resource already exists")
 	ErrInternalServerError = errors.New("something went wrong")
 )
 

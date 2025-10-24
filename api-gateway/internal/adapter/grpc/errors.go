@@ -3,6 +3,7 @@ package grpc
 import (
 	"errors"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -20,7 +21,7 @@ func fromGrpcErr(err error) error {
 
 	switch st.Code() {
 	case codes.InvalidArgument:
-		return ErrInvalidStatusCode
+		return fromInvalidArgument(st)
 	case codes.NotFound:
 		return model.ErrNotFound
 	case codes.AlreadyExists:
@@ -37,5 +38,19 @@ func fromGrpcErr(err error) error {
 }
 
 func fromInvalidArgument(st *status.Status) error {
-	return nil
+	for _, d := range st.Details() {
+		switch info := d.(type) {
+		case *errdetails.BadRequest:
+			var ve model.ValidationErrors
+			ve = make(map[string]string)
+
+			for _, fv := range info.FieldViolations {
+				ve[fv.Field] = fv.Description
+			}
+
+			return ve
+		}
+	}
+
+	return model.ErrInvalidArgument
 }

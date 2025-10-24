@@ -1,8 +1,0 @@
-env: "local"
-
-postgres:
-  dsn: "postgres://car_rental:car_rental@localhost/car_rental?sslmode=disable"
-
-grpc:
-  host: "localhost"
-  port: 9999

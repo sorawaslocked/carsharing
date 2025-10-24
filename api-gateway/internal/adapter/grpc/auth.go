@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
+	svc "github.com/sorawaslocked/car-rental-protos/gen/service"
 )
 
 type AuthHandler struct {
@@ -13,39 +14,31 @@ func NewAuthHandler(client svc.AuthServiceClient) *AuthHandler {
 	return &AuthHandler{client: client}
 }
 
-func (h *AuthHandler) Register(ctx context.Context, cred model.Credentials) (uint64, map[string]string) {
+func (h *AuthHandler) Register(ctx context.Context, cred model.Credentials) (uint64, error) {
 	res, err := h.client.Register(ctx, &svc.RegisterRequest{
-		FirstName:            *cred.FirstName,
-		LastName:             *cred.LastName,
-		Email:                *cred.Email,
-		PhoneNumber:          *cred.PhoneNumber,
-		DateOfBirth:          *cred.DateOfBirth,
+		Email:                cred.Email,
+		PhoneNumber:          cred.PhoneNumber,
 		Password:             cred.Password,
-		PasswordConfirmation: *cred.PasswordConfirmation,
+		PasswordConfirmation: cred.PasswordConfirmation,
+		FirstName:            cred.FirstName,
+		LastName:             cred.LastName,
+		BirthDate:            cred.BirthDate,
 	})
 	if err != nil {
-		return 0, grpcError(err)
-	}
-	if res.Id == nil {
-		return 0, res.Errors
+		return 0, fromGrpcErr(err)
 	}
 
 	return *res.Id, nil
 }
 
-func (h *AuthHandler) Login(ctx context.Context, cred model.Credentials) (model.Token, map[string]string) {
-	req := &svc.LoginRequest{
+func (h *AuthHandler) Login(ctx context.Context, cred model.Credentials) (model.Token, error) {
+	res, err := h.client.Login(ctx, &svc.LoginRequest{
+		Email:       &cred.Email,
+		PhoneNumber: &cred.PhoneNumber,
 		Password:    cred.Password,
-		Email:       cred.Email,
-		PhoneNumber: cred.PhoneNumber,
-	}
-
-	res, err := h.client.Login(ctx, req)
+	})
 	if err != nil {
-		return model.Token{}, grpcError(err)
-	}
-	if res.AccessToken == nil {
-		return model.Token{}, res.Errors
+		return model.Token{}, fromGrpcErr(err)
 	}
 
 	return model.Token{
@@ -54,15 +47,12 @@ func (h *AuthHandler) Login(ctx context.Context, cred model.Credentials) (model.
 	}, nil
 }
 
-func (h *AuthHandler) RefreshToken(ctx context.Context, refreshToken string) (model.Token, map[string]string) {
+func (h *AuthHandler) RefreshToken(ctx context.Context, refreshToken string) (model.Token, error) {
 	res, err := h.client.RefreshToken(ctx, &svc.RefreshTokenRequest{
 		RefreshToken: refreshToken,
 	})
 	if err != nil {
-		return model.Token{}, grpcError(err)
-	}
-	if res.AccessToken == nil {
-		return model.Token{}, res.Errors
+		return model.Token{}, fromGrpcErr(err)
 	}
 
 	return model.Token{

@@ -13,14 +13,14 @@ func NewAuthService(presenter AuthPresenter) *AuthService {
 	return &AuthService{presenter: presenter}
 }
 
-func (svc *AuthService) Register(ctx context.Context, cred model.Credentials) (uint64, map[string]string) {
+func (svc *AuthService) Register(ctx context.Context, cred model.Credentials) (uint64, error) {
 	return svc.presenter.Register(ctx, cred)
 }
 
-func (svc *AuthService) Login(ctx context.Context, cred model.Credentials) (model.Token, map[string]string) {
+func (svc *AuthService) Login(ctx context.Context, cred model.Credentials) (model.Token, error) {
 	return svc.presenter.Login(ctx, cred)
 }
 
-func (svc *AuthService) RefreshToken(ctx context.Context, refreshToken string) (model.Token, map[string]string) {
+func (svc *AuthService) RefreshToken(ctx context.Context, refreshToken string) (model.Token, error) {
 	return svc.presenter.RefreshToken(ctx, refreshToken)
 }

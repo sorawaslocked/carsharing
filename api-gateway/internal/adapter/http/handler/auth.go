@@ -29,7 +29,7 @@ func (handler *Auth) Register(ctx *gin.Context) {
 	}
 
 	res := dto.RegisterResponse{ID: &id}
-	dto.Ok(ctx, res)
+	dto.Created(ctx, res)
 }
 
 func (handler *Auth) Login(ctx *gin.Context) {

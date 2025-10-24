@@ -9,7 +9,7 @@ func Ok(ctx *gin.Context, body any) {
 	ctx.JSON(http.StatusOK, body)
 }
 
-func created(ctx *gin.Context, body any) {
+func Created(ctx *gin.Context, body any) {
 	ctx.JSON(http.StatusCreated, body)
 }
 

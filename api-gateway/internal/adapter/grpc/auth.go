@@ -3,7 +3,6 @@ package grpc
 import (
 	"context"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
-	svc "github.com/sorawaslocked/car-rental-protos/gen/service"
 )
 
 type AuthHandler struct {

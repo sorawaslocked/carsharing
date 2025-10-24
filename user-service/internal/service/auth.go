@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"github.com/go-playground/validator/v10"
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/logger"
@@ -71,10 +72,11 @@ func (s *AuthService) Register(ctx context.Context, cred model.Credentials) (uin
 	createdID, err := s.userRepo.Insert(ctx, user)
 	if err != nil {
 		s.log.Error("sql: inserting user", logger.Err(err))
-		err = model.ErrSql
+
+		return 0, model.ErrSql
 	}
 
-	return createdID, err
+	return createdID, nil
 }
 
 func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.Token, error) {
@@ -101,9 +103,12 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 	// TODO: add not found error handling
 	user, err := s.userRepo.FindOne(ctx, filter)
 	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return model.Token{}, model.ErrNotFound
+		}
 		s.log.Error("sql: finding user", logger.Err(err))
 
-		return model.Token{}, model.ErrNotFound
+		return model.Token{}, model.ErrSql
 	}
 
 	err = security.CheckPassword(cred.Password, user.PasswordHash)
@@ -142,13 +147,12 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 }
 
 func (s *AuthService) RefreshToken(_ context.Context, refreshToken string) (model.Token, error) {
-	err := s.validate.Var(refreshToken, "required")
-	if err != nil {
-		return model.Token{}, model.ErrRequiredField
+	input := refreshTokenValidation{
+		RefreshToken: refreshToken,
 	}
-	err = s.validate.Var(refreshToken, "jwt")
+	err := validateInput(s.validate, input)
 	if err != nil {
-		return model.Token{}, model.ErrInvalidToken
+		return model.Token{}, err
 	}
 
 	id, roles, err := s.jwtProvider.VerifyAndParseClaims(refreshToken)

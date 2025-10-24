@@ -24,6 +24,10 @@ type loginValidation struct {
 	Password    string `validate:"required"`
 }
 
+type refreshTokenValidation struct {
+	RefreshToken string `validate:"required,jwt"`
+}
+
 func validateInput(v *validator.Validate, input any) error {
 	err := v.Struct(input)
 	if err == nil {

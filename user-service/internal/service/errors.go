@@ -11,6 +11,8 @@ func validationError(fieldErr validator.FieldError) error {
 		return fmt.Errorf("required")
 	case "required_without":
 		return fmt.Errorf("required")
+	case "eqfield":
+		return fmt.Errorf("must be same value")
 	case "max":
 		return fmt.Errorf("must be at most %s characters", fieldErr.Param())
 	case "min":
@@ -19,8 +21,8 @@ func validationError(fieldErr validator.FieldError) error {
 		return fmt.Errorf("must be a valid email address")
 	case "e164":
 		return fmt.Errorf("must be a valid e164 phone number")
-	case "eqfield":
-		return fmt.Errorf("must be same value")
+	case "jwt":
+		return fmt.Errorf("must be a valid jwt token")
 	case "complex_password":
 		return fmt.Errorf("must contain uppercase characters, lowercase characters, numbers, and special characters(!@#)")
 	case "min_age":

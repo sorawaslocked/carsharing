@@ -3,7 +3,6 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/handler/dto"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )
 
 type Auth struct {
@@ -15,107 +14,64 @@ func NewAuth(svc AuthService) *Auth {
 }
 
 func (handler *Auth) Register(ctx *gin.Context) {
-	var req dto.RegisterRequest
-
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		malformedJson(ctx)
-
-		return
-	}
-
-	id, errors := handler.svc.Register(ctx, model.Credentials{
-		FirstName:            &req.FirstName,
-		LastName:             &req.LastName,
-		DateOfBirth:          &req.DateOfBirth,
-		Email:                &req.Email,
-		PhoneNumber:          &req.PhoneNumber,
-		Password:             req.Password,
-		PasswordConfirmation: &req.PasswordConfirmation,
-	})
-	res := dto.RegisterResponse{
-		Errors: errors,
-	}
-
-	if id != 0 {
-		res.ID = &id
-	}
-	if res.Errors == nil {
-		created(ctx, res)
-
-		return
-	}
-	if _, exists := res.Errors["grpc"]; exists {
-		internalServerError(ctx)
+	cred, err := dto.FromRegisterRequest(ctx)
+	if err != nil {
+		dto.MalformedJson(ctx)
 
 		return
 	}
 
-	badRequest(ctx, res)
+	id, err := handler.svc.Register(ctx, cred)
+	if err != nil {
+		dto.FromError(ctx, err)
+
+		return
+	}
+
+	res := dto.RegisterResponse{ID: &id}
+	dto.Ok(ctx, res)
 }
 
 func (handler *Auth) Login(ctx *gin.Context) {
-	var req dto.LoginRequest
-
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		malformedJson(ctx)
+	cred, err := dto.FromLoginRequest(ctx)
+	if err != nil {
+		dto.MalformedJson(ctx)
 
 		return
 	}
 
-	token, errors := handler.svc.Login(ctx, model.Credentials{
-		Email:       req.Email,
-		PhoneNumber: req.PhoneNumber,
-		Password:    req.Password,
-	})
+	token, err := handler.svc.Login(ctx, cred)
+	if err != nil {
+		dto.FromError(ctx, err)
+
+		return
+	}
+
 	res := dto.LoginResponse{
-		Errors: errors,
+		AccessToken:  &token.AccessToken,
+		RefreshToken: &token.RefreshToken,
 	}
-	if token.AccessToken != "" && token.RefreshToken != "" {
-		res.AccessToken = &token.AccessToken
-		res.RefreshToken = &token.RefreshToken
-	}
-	if res.Errors == nil {
-		ok(ctx, res)
-
-		return
-	}
-	if _, exists := res.Errors["grpc"]; exists {
-		internalServerError(ctx)
-
-		return
-	}
-
-	badRequest(ctx, res)
+	dto.Ok(ctx, res)
 }
 
 func (handler *Auth) RefreshToken(ctx *gin.Context) {
-	var req dto.RefreshTokenRequest
-
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		malformedJson(ctx)
+	cred, err := dto.FromRefreshTokenRequest(ctx)
+	if err != nil {
+		dto.MalformedJson(ctx)
 
 		return
 	}
 
-	token, errors := handler.svc.RefreshToken(ctx, req.RefreshToken)
+	token, err := handler.svc.RefreshToken(ctx, cred)
+	if err != nil {
+		dto.FromError(ctx, err)
+
+		return
+	}
 
 	res := dto.RefreshTokenResponse{
-		Errors: errors,
+		AccessToken:  &token.AccessToken,
+		RefreshToken: &token.RefreshToken,
 	}
-	if token.AccessToken != "" && token.RefreshToken != "" {
-		res.AccessToken = &token.AccessToken
-		res.RefreshToken = &token.RefreshToken
-	}
-	if res.Errors == nil {
-		ok(ctx, res)
-
-		return
-	}
-	if _, exists := res.Errors["grpc"]; exists {
-		internalServerError(ctx)
-
-		return
-	}
-
-	badRequest(ctx, res)
+	dto.Ok(ctx, res)
 }

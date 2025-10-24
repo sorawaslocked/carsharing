@@ -32,11 +32,17 @@ func (h *AuthHandler) Register(ctx context.Context, cred model.Credentials) (uin
 }
 
 func (h *AuthHandler) Login(ctx context.Context, cred model.Credentials) (model.Token, error) {
-	res, err := h.client.Login(ctx, &svc.LoginRequest{
-		Email:       &cred.Email,
-		PhoneNumber: &cred.PhoneNumber,
-		Password:    cred.Password,
-	})
+	req := &svc.LoginRequest{
+		Password: cred.Password,
+	}
+	if cred.Email != "" {
+		req.Email = &cred.Email
+	}
+	if cred.PhoneNumber != "" {
+		req.PhoneNumber = &cred.PhoneNumber
+	}
+
+	res, err := h.client.Login(ctx, req)
 	if err != nil {
 		return model.Token{}, fromGrpcErr(err)
 	}

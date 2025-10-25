@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"context"
-	"errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/health/grpc_health_v1"
@@ -16,7 +15,7 @@ type (
 	}
 
 	Client struct {
-		AuthServiceURL   string        `yaml:"auth_service_url" env:"GRPC_AUTH_SERVICE_URL" env-required:"true"`
+		UserServiceURL   string        `yaml:"user_service_url" env:"GRPC_USER_SERVICE_URL" env-required:"true"`
 		MaxReceiveSizeMb int           `yaml:"max_receive_size_mb" env:"GRPC_MAX_RECEIVE_SIZE_MB" env-default:"4"`
 		TimeKeepAlive    time.Duration `yaml:"time_keep_alive" env:"GRPC_TIME_KEEP_ALIVE" env-default:"1m"`
 		Timeout          time.Duration `yaml:"timeout" env:"GRPC_TIMEOUT" env-default:"10s"`
@@ -55,7 +54,7 @@ func PingServer(conn *grpc.ClientConn) error {
 	}
 
 	if resp.Status != grpc_health_v1.HealthCheckResponse_SERVING {
-		return errors.New("service is not serving")
+		return ErrGrpcServerOffline
 	}
 
 	return nil

@@ -13,5 +13,7 @@ func main() {
 
 	application := app.New(cfg, log)
 
-	application.Run()
+	if application != nil {
+		application.Run()
+	}
 }

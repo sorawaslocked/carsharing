@@ -45,6 +45,8 @@ func New(cfg config.Config, log *slog.Logger) *App {
 	if err != nil {
 		userServiceLog.Error("error connecting to grpc server")
 		userServiceLog.Debug("error connecting to grpc server", logger.Err(err))
+
+		return nil
 	}
 
 	err = grpcconn.PingServer(userServiceGrpcConn)
@@ -57,7 +59,7 @@ func New(cfg config.Config, log *slog.Logger) *App {
 	authServiceGrpcHandler := grpc.NewAuthHandler(authServiceGrpcClient)
 	authService := service.NewAuthService(authServiceGrpcHandler)
 
-	httpServer := httpserver.New(cfg.HTTPServer, authService)
+	httpServer := httpserver.New(cfg.HTTPServer, log, authService)
 
 	app := &App{
 		cfg:        cfg,

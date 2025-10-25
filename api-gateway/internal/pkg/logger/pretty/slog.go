@@ -65,7 +65,7 @@ func (h *Handler) Handle(_ context.Context, r slog.Record) error {
 		}
 	}
 
-	timeStr := r.Time.Format("[2006-01-02 15:04:05.000]")
+	timeStr := r.Time.Format("[2006-01-02 15:04:05.000000000]")
 	msg := color.CyanString(r.Message)
 
 	h.l.Println(

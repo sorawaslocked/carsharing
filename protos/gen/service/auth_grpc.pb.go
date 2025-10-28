@@ -4,7 +4,7 @@
 // - protoc             v4.25.1
 // source: service/auth.proto
 
-package auth
+package service
 
 import (
 	context "context"
@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthService_Register_FullMethodName     = "/service.auth.AuthService/Register"
-	AuthService_Login_FullMethodName        = "/service.auth.AuthService/Login"
-	AuthService_RefreshToken_FullMethodName = "/service.auth.AuthService/RefreshToken"
+	AuthService_Register_FullMethodName     = "/service.AuthService/Register"
+	AuthService_Login_FullMethodName        = "/service.AuthService/Login"
+	AuthService_RefreshToken_FullMethodName = "/service.AuthService/RefreshToken"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -176,7 +176,7 @@ func _AuthService_RefreshToken_Handler(srv interface{}, ctx context.Context, dec
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var AuthService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "service.auth.AuthService",
+	ServiceName: "service.AuthService",
 	HandlerType: (*AuthServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

@@ -158,7 +158,7 @@ var File_base_user_proto protoreflect.FileDescriptor
 
 const file_base_user_proto_rawDesc = "" +
 	"\n" +
-	"\x0fbase/user.proto\x12\tbase.user\x1a\x1fgoogle/protobuf/timestamp.proto\"\x92\x03\n" +
+	"\x0fbase/user.proto\x12\x04base\x1a\x1fgoogle/protobuf/timestamp.proto\"\x92\x03\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02ID\x18\x01 \x01(\x04R\x02ID\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12 \n" +
@@ -188,12 +188,12 @@ func file_base_user_proto_rawDescGZIP() []byte {
 
 var file_base_user_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_base_user_proto_goTypes = []any{
-	(*User)(nil),                  // 0: base.user.User
+	(*User)(nil),                  // 0: base.User
 	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
 }
 var file_base_user_proto_depIdxs = []int32{
-	1, // 0: base.user.User.createdAt:type_name -> google.protobuf.Timestamp
-	1, // 1: base.user.User.updatedAt:type_name -> google.protobuf.Timestamp
+	1, // 0: base.User.createdAt:type_name -> google.protobuf.Timestamp
+	1, // 1: base.User.updatedAt:type_name -> google.protobuf.Timestamp
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name

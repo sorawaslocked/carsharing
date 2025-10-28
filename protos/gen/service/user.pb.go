@@ -4,7 +4,7 @@
 // 	protoc        v4.25.1
 // source: service/user.proto
 
-package user
+package service
 
 import (
 	base "github.com/sorawaslocked/car-rental-protos/gen/base"
@@ -618,7 +618,7 @@ var File_service_user_proto protoreflect.FileDescriptor
 
 const file_service_user_proto_rawDesc = "" +
 	"\n" +
-	"\x12service/user.proto\x12\fservice.user\x1a\x0fbase/user.proto\"\xd8\x02\n" +
+	"\x12service/user.proto\x12\aservice\x1a\x0fbase/user.proto\"\xd8\x02\n" +
 	"\rCreateRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12%\n" +
 	"\vphoneNumber\x18\x02 \x01(\tH\x00R\vphoneNumber\x88\x01\x01\x12\x1c\n" +
@@ -640,13 +640,15 @@ const file_service_user_proto_rawDesc = "" +
 	"\x02ID\x18\x01 \x01(\x04H\x00R\x02ID\x88\x01\x01\x12\x19\n" +
 	"\x05email\x18\x02 \x01(\tH\x01R\x05email\x88\x01\x01B\x05\n" +
 	"\x03_IDB\b\n" +
-	"\x06_email\"@\n" +
-	"\vGetResponse\x12(\n" +
-	"\x04user\x18\x01 \x01(\v2\x0f.base.user.UserH\x00R\x04user\x88\x01\x01B\a\n" +
+	"\x06_email\";\n" +
+	"\vGetResponse\x12#\n" +
+	"\x04user\x18\x01 \x01(\v2\n" +
+	".base.UserH\x00R\x04user\x88\x01\x01B\a\n" +
 	"\x05_user\"\x0f\n" +
-	"\rGetAllRequest\"7\n" +
-	"\x0eGetAllResponse\x12%\n" +
-	"\x05users\x18\x01 \x03(\v2\x0f.base.user.UserR\x05users\"\xc0\x04\n" +
+	"\rGetAllRequest\"2\n" +
+	"\x0eGetAllResponse\x12 \n" +
+	"\x05users\x18\x01 \x03(\v2\n" +
+	".base.UserR\x05users\"\xc0\x04\n" +
 	"\rUpdateRequest\x12\x13\n" +
 	"\x02ID\x18\x01 \x01(\x04H\x00R\x02ID\x88\x01\x01\x12\x19\n" +
 	"\x05email\x18\x02 \x01(\tH\x01R\x05email\x88\x01\x01\x12\x1f\n" +
@@ -681,13 +683,13 @@ const file_service_user_proto_rawDesc = "" +
 	"\x05email\x18\x02 \x01(\tH\x01R\x05email\x88\x01\x01B\x05\n" +
 	"\x03_IDB\b\n" +
 	"\x06_email\"\x10\n" +
-	"\x0eDeleteResponse2\xdd\x02\n" +
-	"\vUserService\x12C\n" +
-	"\x06Create\x12\x1b.service.user.CreateRequest\x1a\x1c.service.user.CreateResponse\x12:\n" +
-	"\x03Get\x12\x18.service.user.GetRequest\x1a\x19.service.user.GetResponse\x12C\n" +
-	"\x06GetAll\x12\x1b.service.user.GetAllRequest\x1a\x1c.service.user.GetAllResponse\x12C\n" +
-	"\x06Update\x12\x1b.service.user.UpdateRequest\x1a\x1c.service.user.UpdateResponse\x12C\n" +
-	"\x06Delete\x12\x1b.service.user.DeleteRequest\x1a\x1c.service.user.DeleteResponseB=Z;github.com/sorawaslocked/car-rental-protos/gen/service/userb\x06proto3"
+	"\x0eDeleteResponse2\xab\x02\n" +
+	"\vUserService\x129\n" +
+	"\x06Create\x12\x16.service.CreateRequest\x1a\x17.service.CreateResponse\x120\n" +
+	"\x03Get\x12\x13.service.GetRequest\x1a\x14.service.GetResponse\x129\n" +
+	"\x06GetAll\x12\x16.service.GetAllRequest\x1a\x17.service.GetAllResponse\x129\n" +
+	"\x06Update\x12\x16.service.UpdateRequest\x1a\x17.service.UpdateResponse\x129\n" +
+	"\x06Delete\x12\x16.service.DeleteRequest\x1a\x17.service.DeleteResponseB8Z6github.com/sorawaslocked/car-rental-protos/gen/serviceb\x06proto3"
 
 var (
 	file_service_user_proto_rawDescOnce sync.Once
@@ -703,31 +705,31 @@ func file_service_user_proto_rawDescGZIP() []byte {
 
 var file_service_user_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_service_user_proto_goTypes = []any{
-	(*CreateRequest)(nil),  // 0: service.user.CreateRequest
-	(*CreateResponse)(nil), // 1: service.user.CreateResponse
-	(*GetRequest)(nil),     // 2: service.user.GetRequest
-	(*GetResponse)(nil),    // 3: service.user.GetResponse
-	(*GetAllRequest)(nil),  // 4: service.user.GetAllRequest
-	(*GetAllResponse)(nil), // 5: service.user.GetAllResponse
-	(*UpdateRequest)(nil),  // 6: service.user.UpdateRequest
-	(*UpdateResponse)(nil), // 7: service.user.UpdateResponse
-	(*DeleteRequest)(nil),  // 8: service.user.DeleteRequest
-	(*DeleteResponse)(nil), // 9: service.user.DeleteResponse
-	(*base.User)(nil),      // 10: base.user.User
+	(*CreateRequest)(nil),  // 0: service.CreateRequest
+	(*CreateResponse)(nil), // 1: service.CreateResponse
+	(*GetRequest)(nil),     // 2: service.GetRequest
+	(*GetResponse)(nil),    // 3: service.GetResponse
+	(*GetAllRequest)(nil),  // 4: service.GetAllRequest
+	(*GetAllResponse)(nil), // 5: service.GetAllResponse
+	(*UpdateRequest)(nil),  // 6: service.UpdateRequest
+	(*UpdateResponse)(nil), // 7: service.UpdateResponse
+	(*DeleteRequest)(nil),  // 8: service.DeleteRequest
+	(*DeleteResponse)(nil), // 9: service.DeleteResponse
+	(*base.User)(nil),      // 10: base.User
 }
 var file_service_user_proto_depIdxs = []int32{
-	10, // 0: service.user.GetResponse.user:type_name -> base.user.User
-	10, // 1: service.user.GetAllResponse.users:type_name -> base.user.User
-	0,  // 2: service.user.UserService.Create:input_type -> service.user.CreateRequest
-	2,  // 3: service.user.UserService.Get:input_type -> service.user.GetRequest
-	4,  // 4: service.user.UserService.GetAll:input_type -> service.user.GetAllRequest
-	6,  // 5: service.user.UserService.Update:input_type -> service.user.UpdateRequest
-	8,  // 6: service.user.UserService.Delete:input_type -> service.user.DeleteRequest
-	1,  // 7: service.user.UserService.Create:output_type -> service.user.CreateResponse
-	3,  // 8: service.user.UserService.Get:output_type -> service.user.GetResponse
-	5,  // 9: service.user.UserService.GetAll:output_type -> service.user.GetAllResponse
-	7,  // 10: service.user.UserService.Update:output_type -> service.user.UpdateResponse
-	9,  // 11: service.user.UserService.Delete:output_type -> service.user.DeleteResponse
+	10, // 0: service.GetResponse.user:type_name -> base.User
+	10, // 1: service.GetAllResponse.users:type_name -> base.User
+	0,  // 2: service.UserService.Create:input_type -> service.CreateRequest
+	2,  // 3: service.UserService.Get:input_type -> service.GetRequest
+	4,  // 4: service.UserService.GetAll:input_type -> service.GetAllRequest
+	6,  // 5: service.UserService.Update:input_type -> service.UpdateRequest
+	8,  // 6: service.UserService.Delete:input_type -> service.DeleteRequest
+	1,  // 7: service.UserService.Create:output_type -> service.CreateResponse
+	3,  // 8: service.UserService.Get:output_type -> service.GetResponse
+	5,  // 9: service.UserService.GetAll:output_type -> service.GetAllResponse
+	7,  // 10: service.UserService.Update:output_type -> service.UpdateResponse
+	9,  // 11: service.UserService.Delete:output_type -> service.DeleteResponse
 	7,  // [7:12] is the sub-list for method output_type
 	2,  // [2:7] is the sub-list for method input_type
 	2,  // [2:2] is the sub-list for extension type_name

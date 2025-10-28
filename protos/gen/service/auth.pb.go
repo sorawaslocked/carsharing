@@ -4,7 +4,7 @@
 // 	protoc        v4.25.1
 // source: service/auth.proto
 
-package auth
+package service
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -369,7 +369,7 @@ var File_service_auth_proto protoreflect.FileDescriptor
 
 const file_service_auth_proto_rawDesc = "" +
 	"\n" +
-	"\x12service/auth.proto\x12\fservice.auth\"\xf1\x01\n" +
+	"\x12service/auth.proto\x12\aservice\"\xf1\x01\n" +
 	"\x0fRegisterRequest\x12\x1c\n" +
 	"\tfirstName\x18\x01 \x01(\tR\tfirstName\x12\x1a\n" +
 	"\blastName\x18\x02 \x01(\tR\blastName\x12\x14\n" +
@@ -398,11 +398,11 @@ const file_service_auth_proto_rawDesc = "" +
 	"\vaccessToken\x18\x01 \x01(\tH\x00R\vaccessToken\x88\x01\x01\x12'\n" +
 	"\frefreshToken\x18\x02 \x01(\tH\x01R\frefreshToken\x88\x01\x01B\x0e\n" +
 	"\f_accessTokenB\x0f\n" +
-	"\r_refreshToken2\xf1\x01\n" +
-	"\vAuthService\x12I\n" +
-	"\bRegister\x12\x1d.service.auth.RegisterRequest\x1a\x1e.service.auth.RegisterResponse\x12@\n" +
-	"\x05Login\x12\x1a.service.auth.LoginRequest\x1a\x1b.service.auth.LoginResponse\x12U\n" +
-	"\fRefreshToken\x12!.service.auth.RefreshTokenRequest\x1a\".service.auth.RefreshTokenResponseB=Z;github.com/sorawaslocked/car-rental-protos/gen/service/authb\x06proto3"
+	"\r_refreshToken2\xd3\x01\n" +
+	"\vAuthService\x12?\n" +
+	"\bRegister\x12\x18.service.RegisterRequest\x1a\x19.service.RegisterResponse\x126\n" +
+	"\x05Login\x12\x15.service.LoginRequest\x1a\x16.service.LoginResponse\x12K\n" +
+	"\fRefreshToken\x12\x1c.service.RefreshTokenRequest\x1a\x1d.service.RefreshTokenResponseB8Z6github.com/sorawaslocked/car-rental-protos/gen/serviceb\x06proto3"
 
 var (
 	file_service_auth_proto_rawDescOnce sync.Once
@@ -418,20 +418,20 @@ func file_service_auth_proto_rawDescGZIP() []byte {
 
 var file_service_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_service_auth_proto_goTypes = []any{
-	(*RegisterRequest)(nil),      // 0: service.auth.RegisterRequest
-	(*RegisterResponse)(nil),     // 1: service.auth.RegisterResponse
-	(*LoginRequest)(nil),         // 2: service.auth.LoginRequest
-	(*LoginResponse)(nil),        // 3: service.auth.LoginResponse
-	(*RefreshTokenRequest)(nil),  // 4: service.auth.RefreshTokenRequest
-	(*RefreshTokenResponse)(nil), // 5: service.auth.RefreshTokenResponse
+	(*RegisterRequest)(nil),      // 0: service.RegisterRequest
+	(*RegisterResponse)(nil),     // 1: service.RegisterResponse
+	(*LoginRequest)(nil),         // 2: service.LoginRequest
+	(*LoginResponse)(nil),        // 3: service.LoginResponse
+	(*RefreshTokenRequest)(nil),  // 4: service.RefreshTokenRequest
+	(*RefreshTokenResponse)(nil), // 5: service.RefreshTokenResponse
 }
 var file_service_auth_proto_depIdxs = []int32{
-	0, // 0: service.auth.AuthService.Register:input_type -> service.auth.RegisterRequest
-	2, // 1: service.auth.AuthService.Login:input_type -> service.auth.LoginRequest
-	4, // 2: service.auth.AuthService.RefreshToken:input_type -> service.auth.RefreshTokenRequest
-	1, // 3: service.auth.AuthService.Register:output_type -> service.auth.RegisterResponse
-	3, // 4: service.auth.AuthService.Login:output_type -> service.auth.LoginResponse
-	5, // 5: service.auth.AuthService.RefreshToken:output_type -> service.auth.RefreshTokenResponse
+	0, // 0: service.AuthService.Register:input_type -> service.RegisterRequest
+	2, // 1: service.AuthService.Login:input_type -> service.LoginRequest
+	4, // 2: service.AuthService.RefreshToken:input_type -> service.RefreshTokenRequest
+	1, // 3: service.AuthService.Register:output_type -> service.RegisterResponse
+	3, // 4: service.AuthService.Login:output_type -> service.LoginResponse
+	5, // 5: service.AuthService.RefreshToken:output_type -> service.RefreshTokenResponse
 	3, // [3:6] is the sub-list for method output_type
 	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

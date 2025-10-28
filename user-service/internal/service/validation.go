@@ -27,6 +27,11 @@ type refreshTokenValidation struct {
 	RefreshToken string `validate:"required,jwt"`
 }
 
+type queryParamsValidation struct {
+	ID    uint64 `validate:"required_without=Email"`
+	Email string `validate:"required_without=ID"`
+}
+
 func validateInput(v *validator.Validate, input any) error {
 	err := v.Struct(input)
 	if err == nil {
@@ -49,4 +54,17 @@ func validateInput(v *validator.Validate, input any) error {
 	}
 
 	return errs
+}
+
+func checkQueryParams(v *validator.Validate, filter model.UserFilter) error {
+	queryParams := queryParamsValidation{}
+
+	if filter.ID != nil {
+		queryParams.ID = *filter.ID
+	}
+	if filter.Email != nil {
+		queryParams.Email = *filter.Email
+	}
+
+	return validateInput(v, queryParams)
 }

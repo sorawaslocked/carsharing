@@ -45,6 +45,11 @@ func (s *UserService) Insert(ctx context.Context, user model.User) (uint64, erro
 }
 
 func (s *UserService) FindOne(ctx context.Context, filter model.UserFilter) (model.User, error) {
+	err := checkQueryParams(s.validate, filter)
+	if err != nil {
+		return model.User{}, err
+	}
+
 	user, err := s.userRepo.FindOne(ctx, filter)
 	if err != nil {
 		if errors.Is(err, model.ErrNotFound) {
@@ -70,7 +75,12 @@ func (s *UserService) Find(ctx context.Context, filter model.UserFilter) ([]mode
 }
 
 func (s *UserService) Update(ctx context.Context, filter model.UserFilter, updateData model.UserUpdateData) error {
-	err := validateInput(s.validate, updateData)
+	err := checkQueryParams(s.validate, filter)
+	if err != nil {
+		return err
+	}
+
+	err = validateInput(s.validate, updateData)
 	if err != nil {
 		return err
 	}
@@ -109,5 +119,10 @@ func (s *UserService) Update(ctx context.Context, filter model.UserFilter, updat
 }
 
 func (s *UserService) Delete(ctx context.Context, filter model.UserFilter) error {
+	err := checkQueryParams(s.validate, filter)
+	if err != nil {
+		return err
+	}
+
 	return s.userRepo.Delete(ctx, filter)
 }

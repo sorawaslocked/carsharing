@@ -69,7 +69,7 @@ func (r *UserRepository) Insert(ctx context.Context, user model.User) (uint64, e
 			(user_id, role_id)
 			VALUES ($1, $2)`,
 			userID,
-			int32(role),
+			uint32(role),
 		)
 		if err != nil {
 			return 0, model.ErrSql
@@ -207,36 +207,48 @@ func (r *UserRepository) Update(ctx context.Context, filter model.UserFilter, up
 		return model.ErrEmptyFilter
 	}
 	query += " WHERE " + strings.Join(whereClauses, " AND ")
+	query += " RETURNING id"
 
-	// TODO: add change of roles
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return model.ErrSqlTransaction
 	}
 	defer tx.Rollback()
 
-	res, err := tx.ExecContext(ctx, query, args...)
+	var userID uint64
+	err = tx.QueryRowContext(ctx, query, args...).Scan(&userID)
 	if err != nil {
 		var pqErr *pq.Error
 
-		if errors.As(err, &pqErr) && pqErr.Constraint == "users_email_key" {
-			return model.ErrDuplicateEmail
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return model.ErrNotFound
+		case errors.As(err, &pqErr) && pqErr.Constraint == "users_email_key":
+			return model.ErrSqlTransaction
+		default:
+			return model.ErrSql
+		}
+	}
+
+	if update.Roles != nil {
+		query = "DELETE FROM user_roles WHERE user_id = $1"
+
+		_, err = tx.ExecContext(ctx, query, userID)
+		if err != nil {
+			return model.ErrSql
 		}
 
-		return err
+		for _, role := range *update.Roles {
+			query = "INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2)"
+
+			_, err = tx.ExecContext(ctx, query, userID, uint32(role))
+			if err != nil {
+				return model.ErrSql
+			}
+		}
 	}
 
-	rowsAffected, err := res.RowsAffected()
-	if err != nil {
-		return model.ErrSql
-	}
-
-	if rowsAffected == 0 {
-		return model.ErrNotFound
-	}
-
-	err = tx.Commit()
-	if err != nil {
+	if tx.Commit() != nil {
 		return model.ErrSqlTransaction
 	}
 

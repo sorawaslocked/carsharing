@@ -3,11 +3,11 @@ package model
 type Role int32
 
 const (
-	RoleUser Role = iota
-	RoleAdmin
-	RoleTechSupport
-	RoleFinanceManager
-	RoleMaintenanceSpecialist
+	RoleUser                  Role = 1
+	RoleAdmin                 Role = 2
+	RoleTechSupport           Role = 3
+	RoleFinanceManager        Role = 4
+	RoleMaintenanceSpecialist Role = 5
 )
 
 var roleName = map[Role]string{

@@ -14,7 +14,7 @@ func validationError(fieldErr validator.FieldError) error {
 		field := uncapitalize(fieldErr.Field())
 		param := uncapitalize(fieldErr.Param())
 
-		return fmt.Errorf("%s required without %s", field, param)
+		return fmt.Errorf("either %s is required or %s", field, param)
 	case "required_with":
 		field := uncapitalize(fieldErr.Field())
 		param := uncapitalize(fieldErr.Param())
@@ -37,7 +37,7 @@ func validationError(fieldErr validator.FieldError) error {
 	case "jwt":
 		return model.ErrInvalidJwtToken
 	case "complex_password":
-		return fmt.Errorf("must contain uppercase characters, lowercase characters, numbers, and special characters(!@#)")
+		return model.ErrNotComplexPassword
 	case "min_age":
 		return fmt.Errorf("must be at least %s years", fieldErr.Param())
 	default:

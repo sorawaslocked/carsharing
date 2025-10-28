@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     email citext NOT NULL UNIQUE,
-    phone_number VARCHAR(20) NOT NULL UNIQUE,
+    phone_number VARCHAR(20) UNIQUE,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     birth_date DATE NOT NULL,

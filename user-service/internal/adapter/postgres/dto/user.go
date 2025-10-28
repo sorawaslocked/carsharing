@@ -50,7 +50,7 @@ func WhereClausesFromFilter(filter model.UserFilter, args []any, argNumber int) 
 	return whereClauses, args
 }
 
-func SetClausesFromUpdateData(update model.UserUpdateData) ([]string, []any, int) {
+func SetClausesFromUpdateData(update model.UserUpdate) ([]string, []any, int) {
 	var setClauses []string
 	var args []any
 	argNumber := 1
@@ -80,11 +80,11 @@ func SetClausesFromUpdateData(update model.UserUpdateData) ([]string, []any, int
 		args = append(args, *update.BirthDate)
 		argNumber++
 	}
-	//if update.PasswordHash != nil {
-	//	setClauses = append(setClauses, fmt.Sprintf("password_hash = $%d", argNumber))
-	//	args = append(args, *update.PasswordHash)
-	//	argNumber++
-	//}
+	if update.PasswordHash != nil {
+		setClauses = append(setClauses, fmt.Sprintf("password_hash = $%d", argNumber))
+		args = append(args, *update.PasswordHash)
+		argNumber++
+	}
 	if update.IsActive != nil {
 		setClauses = append(setClauses, fmt.Sprintf("is_active = $%d", argNumber))
 		args = append(args, *update.IsActive)

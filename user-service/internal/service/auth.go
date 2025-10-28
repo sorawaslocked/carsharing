@@ -103,15 +103,9 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 		s.log.Info("logging in user", slog.String("phoneNumber", input.PhoneNumber))
 	}
 
-	// TODO: add not found error handling
-	user, err := s.userRepo.FindOne(ctx, filter)
+	user, err := s.userService.FindOne(ctx, filter)
 	if err != nil {
-		if errors.Is(err, model.ErrNotFound) {
-			return model.Token{}, model.ErrNotFound
-		}
-		s.log.Error("sql: finding user", logger.Err(err))
-
-		return model.Token{}, model.ErrSql
+		return model.Token{}, err
 	}
 
 	err = security.CheckPassword(cred.Password, user.PasswordHash)

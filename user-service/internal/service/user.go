@@ -2,8 +2,11 @@ package service
 
 import (
 	"context"
+	"errors"
 	"github.com/go-playground/validator/v10"
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/logger"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/security"
 	"log/slog"
 	"time"
 )
@@ -41,18 +44,70 @@ func (s *UserService) Insert(ctx context.Context, user model.User) (uint64, erro
 	return createdID, err
 }
 
-func (s *UserService) FindOne(ctx context.Context, filter model.UserFilter, jwtToken string) (model.User, error) {
-	return model.User{}, nil
+func (s *UserService) FindOne(ctx context.Context, filter model.UserFilter) (model.User, error) {
+	user, err := s.userRepo.FindOne(ctx, filter)
+	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return model.User{}, model.ErrNotFound
+		}
+		s.log.Error("sql: finding user", logger.Err(err))
+
+		return model.User{}, model.ErrSql
+	}
+
+	return user, nil
 }
 
-func (s *UserService) Find(ctx context.Context, filter model.UserFilter, jwtToken string) ([]model.User, error) {
-	return nil, nil
+func (s *UserService) Find(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
+	users, err := s.userRepo.Find(ctx, filter)
+	if err != nil {
+		s.log.Error("sql: finding users", logger.Err(err))
+
+		return []model.User{}, model.ErrSql
+	}
+
+	return users, nil
 }
 
-func (s *UserService) Update(ctx context.Context, filter model.UserFilter, update model.UserUpdateData, jwtToken string) error {
+func (s *UserService) Update(ctx context.Context, filter model.UserFilter, updateData model.UserUpdateData) error {
+	err := validateInput(s.validate, updateData)
+	if err != nil {
+		return err
+	}
+
+	passwordHash, err := security.HashPassword(*updateData.Password)
+	if err != nil {
+		s.log.Error("bcrypt: hashing password", logger.Err(err))
+
+		return model.ErrBcrypt
+	}
+
+	err = s.userRepo.Update(ctx, filter, model.UserUpdate{
+		Email:        updateData.Email,
+		PhoneNumber:  updateData.PhoneNumber,
+		FirstName:    updateData.FirstName,
+		LastName:     updateData.LastName,
+		BirthDate:    updateData.BirthDate,
+		PasswordHash: &passwordHash,
+		Roles:        updateData.Roles,
+		UpdatedAt:    time.Now(),
+		IsActive:     updateData.IsActive,
+		IsConfirmed:  updateData.IsConfirmed,
+	})
+
+	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return model.ValidationErrors{
+				"email": model.ErrDuplicateEmail,
+			}
+		}
+
+		return err
+	}
+
 	return nil
 }
 
-func (s *UserService) Delete(ctx context.Context, filter model.UserFilter, jwtToken string) error {
-	return nil
+func (s *UserService) Delete(ctx context.Context, filter model.UserFilter) error {
+	return s.userRepo.Delete(ctx, filter)
 }

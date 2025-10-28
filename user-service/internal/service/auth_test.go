@@ -36,7 +36,7 @@ func (m *MockUserRepository) Find(ctx context.Context, filter model.UserFilter) 
 	return args.Get(0).([]model.User), args.Error(1)
 }
 
-func (m *MockUserRepository) Update(ctx context.Context, filter model.UserFilter, update model.UserUpdateData) error {
+func (m *MockUserRepository) Update(ctx context.Context, filter model.UserFilter, update model.UserUpdate) error {
 	args := m.Called(ctx, filter, update)
 
 	return args.Error(0)

@@ -57,7 +57,7 @@ func (r *UserRepository) Insert(ctx context.Context, user model.User) (uint64, e
 			return 0, model.ErrDuplicateEmail
 		}
 
-		return 0, err
+		return 0, model.ErrSql
 	}
 
 	roles := user.Roles
@@ -133,7 +133,7 @@ func (r *UserRepository) Find(ctx context.Context, filter model.UserFilter) ([]m
 
 	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
-		return nil, err
+		return nil, model.ErrSql
 	}
 	defer rows.Close()
 
@@ -193,7 +193,7 @@ func (r *UserRepository) findRolesForUser(ctx context.Context, userId uint64) ([
 	return roles, nil
 }
 
-func (r *UserRepository) Update(ctx context.Context, filter model.UserFilter, update model.UserUpdateData) error {
+func (r *UserRepository) Update(ctx context.Context, filter model.UserFilter, update model.UserUpdate) error {
 	query := "UPDATE users SET "
 
 	setClauses, args, argNumber := dto.SetClausesFromUpdateData(update)
@@ -217,7 +217,13 @@ func (r *UserRepository) Update(ctx context.Context, filter model.UserFilter, up
 
 	res, err := tx.ExecContext(ctx, query, args...)
 	if err != nil {
-		return model.ErrSql
+		var pqErr *pq.Error
+
+		if errors.As(err, &pqErr) && pqErr.Constraint == "users_email_key" {
+			return model.ErrDuplicateEmail
+		}
+
+		return err
 	}
 
 	rowsAffected, err := res.RowsAffected()

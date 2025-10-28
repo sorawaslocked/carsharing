@@ -15,6 +15,11 @@ func validationError(fieldErr validator.FieldError) error {
 		param := uncapitalize(fieldErr.Param())
 
 		return fmt.Errorf("%s required without %s", field, param)
+	case "required_with":
+		field := uncapitalize(fieldErr.Field())
+		param := uncapitalize(fieldErr.Param())
+
+		return fmt.Errorf("%s required with %s", field, param)
 	case "eqfield":
 		param := uncapitalize(fieldErr.Param())
 

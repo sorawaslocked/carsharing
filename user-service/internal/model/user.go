@@ -38,8 +38,21 @@ type UserUpdateData struct {
 	BirthDate            *time.Time `validate:"omitempty,min_age=18"`
 	Password             *string    `validate:"omitempty,min=8,max=20,complex_password"`
 	PasswordConfirmation *string    `validate:"required_with=Password,min=8,max=20,complex_password"`
-	Roles                []Role
-	UpdatedAt            time.Time
+	Roles                *[]Role
+
+	IsActive    *bool
+	IsConfirmed *bool
+}
+
+type UserUpdate struct {
+	Email        *string
+	PhoneNumber  *string
+	FirstName    *string
+	LastName     *string
+	BirthDate    *time.Time
+	PasswordHash *[]byte
+	Roles        *[]Role
+	UpdatedAt    time.Time
 
 	IsActive    *bool
 	IsConfirmed *bool

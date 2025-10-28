@@ -4,6 +4,7 @@ import (
 	"flag"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/grpc"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/jwt"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/postgres"
 	"os"
 )
@@ -13,6 +14,7 @@ type (
 		Env      string          `yaml:"env" env:"ENV" required:"true"`
 		Postgres postgres.Config `yaml:"postgres" env-required:"true"`
 		GRPC     grpc.Config     `yaml:"grpc" env-required:"true"`
+		JWT      jwt.Config      `yaml:"jwt" env-required:"true"`
 	}
 )
 

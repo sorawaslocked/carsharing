@@ -15,7 +15,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 )
 
 type App struct {
@@ -24,7 +23,7 @@ type App struct {
 }
 
 func New(
-	ctx context.Context,
+	_ context.Context,
 	cfg config.Config,
 	log *slog.Logger,
 ) (*App, error) {
@@ -37,9 +36,9 @@ func New(
 	}
 
 	jwtProvider := jwt.NewProvider(
-		"secretKey",
-		time.Minute*15,
-		time.Hour*24,
+		cfg.JWT.SecretKey,
+		cfg.JWT.AccessTokenTTL,
+		cfg.JWT.RefreshTokenTTL,
 	)
 
 	validate := validator.New()

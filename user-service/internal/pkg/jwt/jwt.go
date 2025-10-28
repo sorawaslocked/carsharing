@@ -5,6 +5,12 @@ import (
 	"time"
 )
 
+type Config struct {
+	SecretKey       string        `env:"JWT_SECRET_KEY" env-required:"true"`
+	AccessTokenTTL  time.Duration `yaml:"access_token_ttl" env:"JWT_ACCESS_TOKEN_TTL" env-default:"15m"`
+	RefreshTokenTTL time.Duration `yaml:"refresh_token_ttl" env:"JWT_REFRESH_TOKEN_TTL" env-default:"24h"`
+}
+
 type Provider struct {
 	secretKey       string
 	accessTokenTTL  time.Duration

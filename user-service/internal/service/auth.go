@@ -14,7 +14,7 @@ type AuthService struct {
 	log         *slog.Logger
 	validate    *validator.Validate
 	jwtProvider JwtProvider
-	userService UserService
+	userService *UserService
 	userRepo    UserRepository
 }
 
@@ -22,7 +22,7 @@ func NewAuthService(
 	log *slog.Logger,
 	validate *validator.Validate,
 	jwtProvider JwtProvider,
-	userService UserService,
+	userService *UserService,
 	userRepo UserRepository,
 ) *AuthService {
 	return &AuthService{

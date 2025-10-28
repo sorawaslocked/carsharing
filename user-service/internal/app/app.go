@@ -53,7 +53,8 @@ func New(
 
 	userRepo := postgres.NewUserRepository(log, db)
 
-	authService := service.NewAuthService(log, validate, jwtProvider, userRepo)
+	userService := service.NewUserService(log, validate, jwtProvider, userRepo)
+	authService := service.NewAuthService(log, validate, jwtProvider, userService, userRepo)
 
 	grpcServer := grpcserver.NewServer(cfg.GRPC, log, authService)
 

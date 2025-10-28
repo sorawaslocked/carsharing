@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package service.user;
+package service;
 
 import "base/user.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/user";
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service";
 
 service UserService {
   rpc Create(CreateRequest) returns (CreateResponse);
@@ -38,13 +38,13 @@ message GetRequest {
 }
 
 message GetResponse {
-  optional base.user.User user = 1;
+  optional base.User user = 1;
 }
 
 message GetAllRequest {}
 
 message GetAllResponse {
-  repeated base.user.User users = 1;
+  repeated base.User users = 1;
 }
 
 message UpdateRequest {

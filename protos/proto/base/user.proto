@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package base.user;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base";
+
+message User {
+  uint64 ID = 1;
+  string email = 2;
+  string phoneNumber = 3;
+  string firstName = 4;
+  string lastName = 5;
+  string birthDate = 6;
+  bytes passwordHash = 7;
+  repeated string roles = 8;
+  google.protobuf.Timestamp createdAt = 9;
+  google.protobuf.Timestamp updatedAt = 10;
+
+  bool isActive = 11;
+  bool isConfirmed = 12;
+}

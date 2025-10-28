@@ -32,12 +32,41 @@ func NewUserService(
 	}
 }
 
-func (s *UserService) Insert(ctx context.Context, user model.User) (uint64, error) {
-	user.Roles = []model.Role{model.RoleUser}
-	user.CreatedAt = time.Now()
-	user.UpdatedAt = time.Now()
-	user.IsActive = false
-	user.IsConfirmed = false
+func (s *UserService) Insert(ctx context.Context, data model.UserCreateData) (uint64, error) {
+	err := validateInput(s.validate, data)
+	if err != nil {
+		return 0, err
+	}
+
+	passwordHash, err := security.HashPassword(data.Password)
+	if err != nil {
+		s.log.Error("bcrypt: hashing password", logger.Err(err))
+
+		return 0, model.ErrBcrypt
+	}
+
+	user := model.User{
+		ID:           0,
+		Email:        data.Email,
+		PhoneNumber:  data.PhoneNumber,
+		FirstName:    data.FirstName,
+		LastName:     data.LastName,
+		BirthDate:    data.BirthDate,
+		PasswordHash: passwordHash,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+	}
+
+	// TODO: add permission checks
+	if data.Roles == nil {
+		user.Roles = []model.Role{model.RoleUser}
+	}
+	if data.IsActive != nil {
+		user.IsActive = *data.IsActive
+	}
+	if data.IsConfirmed != nil {
+		user.IsConfirmed = *data.IsConfirmed
+	}
 
 	createdID, err := s.userRepo.Insert(ctx, user)
 
@@ -74,18 +103,18 @@ func (s *UserService) Find(ctx context.Context, filter model.UserFilter) ([]mode
 	return users, nil
 }
 
-func (s *UserService) Update(ctx context.Context, filter model.UserFilter, updateData model.UserUpdateData) error {
+func (s *UserService) Update(ctx context.Context, filter model.UserFilter, data model.UserUpdateData) error {
 	err := checkQueryParams(s.validate, filter)
 	if err != nil {
 		return err
 	}
 
-	err = validateInput(s.validate, updateData)
+	err = validateInput(s.validate, data)
 	if err != nil {
 		return err
 	}
 
-	passwordHash, err := security.HashPassword(*updateData.Password)
+	passwordHash, err := security.HashPassword(*data.Password)
 	if err != nil {
 		s.log.Error("bcrypt: hashing password", logger.Err(err))
 
@@ -93,16 +122,16 @@ func (s *UserService) Update(ctx context.Context, filter model.UserFilter, updat
 	}
 
 	err = s.userRepo.Update(ctx, filter, model.UserUpdate{
-		Email:        updateData.Email,
-		PhoneNumber:  updateData.PhoneNumber,
-		FirstName:    updateData.FirstName,
-		LastName:     updateData.LastName,
-		BirthDate:    updateData.BirthDate,
+		Email:        data.Email,
+		PhoneNumber:  data.PhoneNumber,
+		FirstName:    data.FirstName,
+		LastName:     data.LastName,
+		BirthDate:    data.BirthDate,
 		PasswordHash: &passwordHash,
-		Roles:        updateData.Roles,
+		Roles:        data.Roles,
 		UpdatedAt:    time.Now(),
-		IsActive:     updateData.IsActive,
-		IsConfirmed:  updateData.IsConfirmed,
+		IsActive:     data.IsActive,
+		IsConfirmed:  data.IsConfirmed,
 	})
 
 	if err != nil {

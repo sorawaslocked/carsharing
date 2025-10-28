@@ -34,6 +34,7 @@ var (
 	ErrInvalidJwtToken     = errors.New("must be a valid jwt token")
 	ErrNotComplexPassword  = errors.New("must contain uppercase characters, lowercase characters, numbers, and special characters(!@#)")
 	ErrDuplicateEmail      = errors.New("user with this email already exists")
+	ErrInvalidRole         = errors.New("must be a valid role")
 
 	ErrSqlTransaction = errors.New("sql transaction error")
 	ErrSql            = errors.New("sql error")

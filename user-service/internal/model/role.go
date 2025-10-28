@@ -18,6 +18,23 @@ var roleName = map[Role]string{
 	RoleMaintenanceSpecialist: "maintenance_specialist",
 }
 
+var nameRole = map[string]Role{
+	"user":                   RoleUser,
+	"admin":                  RoleAdmin,
+	"tech_support":           RoleTechSupport,
+	"finance_manager":        RoleFinanceManager,
+	"maintenance_specialist": RoleMaintenanceSpecialist,
+}
+
 func (role Role) String() string {
 	return roleName[role]
+}
+
+func FromStringToRole(s string) (Role, error) {
+	role, ok := nameRole[s]
+	if !ok {
+		return 0, ErrInvalidRole
+	}
+
+	return role, nil
 }

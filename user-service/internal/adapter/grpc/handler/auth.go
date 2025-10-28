@@ -2,7 +2,7 @@ package handler
 
 import (
 	"context"
-	svc "github.com/sorawaslocked/car-rental-protos/gen/service"
+	authsvc "github.com/sorawaslocked/car-rental-protos/gen/service/auth"
 	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/handler/dto"
 	"log/slog"
 )
@@ -10,7 +10,7 @@ import (
 type AuthHandler struct {
 	log         *slog.Logger
 	authService AuthService
-	svc.UnimplementedAuthServiceServer
+	authsvc.UnimplementedAuthServiceServer
 }
 
 func NewAuthHandler(log *slog.Logger, authService AuthService) *AuthHandler {
@@ -20,41 +20,41 @@ func NewAuthHandler(log *slog.Logger, authService AuthService) *AuthHandler {
 	}
 }
 
-func (h *AuthHandler) Register(ctx context.Context, req *svc.RegisterRequest) (*svc.RegisterResponse, error) {
+func (h *AuthHandler) Register(ctx context.Context, req *authsvc.RegisterRequest) (*authsvc.RegisterResponse, error) {
 	cred, validationErrors := dto.FromRegisterRequest(req)
 	if validationErrors != nil {
-		return &svc.RegisterResponse{}, dto.ToStatusCodeError(validationErrors)
+		return &authsvc.RegisterResponse{}, dto.ToStatusCodeError(validationErrors)
 	}
 
 	id, err := h.authService.Register(ctx, cred)
 	if err != nil {
-		return &svc.RegisterResponse{}, dto.ToStatusCodeError(err)
+		return &authsvc.RegisterResponse{}, dto.ToStatusCodeError(err)
 	}
 
-	return &svc.RegisterResponse{Id: &id}, nil
+	return &authsvc.RegisterResponse{Id: &id}, nil
 }
 
-func (h *AuthHandler) Login(ctx context.Context, req *svc.LoginRequest) (*svc.LoginResponse, error) {
+func (h *AuthHandler) Login(ctx context.Context, req *authsvc.LoginRequest) (*authsvc.LoginResponse, error) {
 	cred := dto.FromLoginRequest(req)
 
 	token, err := h.authService.Login(ctx, cred)
 	if err != nil {
-		return &svc.LoginResponse{}, dto.ToStatusCodeError(err)
+		return &authsvc.LoginResponse{}, dto.ToStatusCodeError(err)
 	}
 
-	return &svc.LoginResponse{
+	return &authsvc.LoginResponse{
 		AccessToken:  &token.AccessToken,
 		RefreshToken: &token.RefreshToken,
 	}, nil
 }
 
-func (h *AuthHandler) RefreshToken(ctx context.Context, req *svc.RefreshTokenRequest) (*svc.RefreshTokenResponse, error) {
+func (h *AuthHandler) RefreshToken(ctx context.Context, req *authsvc.RefreshTokenRequest) (*authsvc.RefreshTokenResponse, error) {
 	token, err := h.authService.RefreshToken(ctx, req.RefreshToken)
 	if err != nil {
-		return &svc.RefreshTokenResponse{}, dto.ToStatusCodeError(err)
+		return &authsvc.RefreshTokenResponse{}, dto.ToStatusCodeError(err)
 	}
 
-	return &svc.RefreshTokenResponse{
+	return &authsvc.RefreshTokenResponse{
 		AccessToken:  &token.AccessToken,
 		RefreshToken: &token.RefreshToken,
 	}, nil

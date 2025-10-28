@@ -1,12 +1,12 @@
 package dto
 
 import (
-	svc "github.com/sorawaslocked/car-rental-protos/gen/service"
+	authsvc "github.com/sorawaslocked/car-rental-protos/gen/service/auth"
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 	"time"
 )
 
-func FromRegisterRequest(req *svc.RegisterRequest) (model.Credentials, model.ValidationErrors) {
+func FromRegisterRequest(req *authsvc.RegisterRequest) (model.Credentials, model.ValidationErrors) {
 	birthDate, err := time.Parse("2006-01-02", req.BirthDate)
 	if err != nil {
 		return model.Credentials{}, model.ValidationErrors{
@@ -25,7 +25,7 @@ func FromRegisterRequest(req *svc.RegisterRequest) (model.Credentials, model.Val
 	}, nil
 }
 
-func FromLoginRequest(req *svc.LoginRequest) model.Credentials {
+func FromLoginRequest(req *authsvc.LoginRequest) model.Credentials {
 	cred := model.Credentials{
 		Password: req.Password,
 	}

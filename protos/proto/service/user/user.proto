@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package service;
+package service.user;
 
 import "base/user.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service";
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/user";
 
 service UserService {
   rpc Create(CreateRequest) returns (CreateResponse);

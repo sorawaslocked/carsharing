@@ -80,11 +80,11 @@ func SetClausesFromUpdateData(update model.UserUpdateData) ([]string, []any, int
 		args = append(args, *update.BirthDate)
 		argNumber++
 	}
-	if update.PasswordHash != nil {
-		setClauses = append(setClauses, fmt.Sprintf("password_hash = $%d", argNumber))
-		args = append(args, *update.PasswordHash)
-		argNumber++
-	}
+	//if update.PasswordHash != nil {
+	//	setClauses = append(setClauses, fmt.Sprintf("password_hash = $%d", argNumber))
+	//	args = append(args, *update.PasswordHash)
+	//	argNumber++
+	//}
 	if update.IsActive != nil {
 		setClauses = append(setClauses, fmt.Sprintf("is_active = $%d", argNumber))
 		args = append(args, *update.IsActive)

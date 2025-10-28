@@ -32,6 +32,7 @@ var (
 	ErrInvalidPhoneNumber  = errors.New("must be a valid 164 phone number")
 	ErrInvalidDateFormat   = errors.New("must be a valid date format")
 	ErrInvalidJwtToken     = errors.New("must be a valid jwt token")
+	ErrDuplicateEmail      = errors.New("user with this email already exists")
 
 	ErrSqlTransaction = errors.New("sql transaction error")
 	ErrSql            = errors.New("sql error")

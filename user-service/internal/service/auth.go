@@ -8,13 +8,13 @@ import (
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/logger"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/security"
 	"log/slog"
-	"time"
 )
 
 type AuthService struct {
 	log         *slog.Logger
 	validate    *validator.Validate
 	jwtProvider JwtProvider
+	userService UserService
 	userRepo    UserRepository
 }
 
@@ -22,12 +22,14 @@ func NewAuthService(
 	log *slog.Logger,
 	validate *validator.Validate,
 	jwtProvider JwtProvider,
+	userService UserService,
 	userRepo UserRepository,
 ) *AuthService {
 	return &AuthService{
 		log:         log,
 		validate:    validate,
 		jwtProvider: jwtProvider,
+		userService: userService,
 		userRepo:    userRepo,
 	}
 }
@@ -62,15 +64,16 @@ func (s *AuthService) Register(ctx context.Context, cred model.Credentials) (uin
 		LastName:     cred.LastName,
 		BirthDate:    cred.BirthDate,
 		PasswordHash: passwordHash,
-		Roles:        []model.Role{model.RoleUser},
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
-		IsActive:     false,
-		IsConfirmed:  false,
 	}
 
-	createdID, err := s.userRepo.Insert(ctx, user)
+	createdID, err := s.userService.Insert(ctx, user)
 	if err != nil {
+		if errors.Is(err, model.ErrDuplicateEmail) {
+			return 0, model.ValidationErrors{
+				"email": model.ErrDuplicateEmail,
+			}
+		}
+
 		s.log.Error("sql: inserting user", logger.Err(err))
 
 		return 0, model.ErrSql

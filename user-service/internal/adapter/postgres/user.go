@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/lib/pq"
 	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/postgres/dto"
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 	"log/slog"
@@ -50,6 +51,12 @@ func (r *UserRepository) Insert(ctx context.Context, user model.User) (uint64, e
 		user.UpdatedAt,
 	).Scan(&userID)
 	if err != nil {
+		var pqErr *pq.Error
+
+		if errors.As(err, &pqErr) && pqErr.Constraint == "users_email_key" {
+			return 0, model.ErrDuplicateEmail
+		}
+
 		return 0, err
 	}
 

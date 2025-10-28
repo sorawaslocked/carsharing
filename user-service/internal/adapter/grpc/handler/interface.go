@@ -10,3 +10,11 @@ type AuthService interface {
 	Login(ctx context.Context, cred model.Credentials) (model.Token, error)
 	RefreshToken(ctx context.Context, refreshToken string) (model.Token, error)
 }
+
+type UserService interface {
+	Insert(ctx context.Context, user model.User) (uint64, error)
+	FindOne(ctx context.Context, filter model.UserFilter, jwtToken string) (model.User, error)
+	Find(ctx context.Context, filter model.UserFilter, jwtToken string) ([]model.User, error)
+	Update(ctx context.Context, filter model.UserFilter, update model.UserUpdateData, jwtToken string) error
+	Delete(ctx context.Context, filter model.UserFilter, jwtToken string) error
+}

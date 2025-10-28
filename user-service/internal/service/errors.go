@@ -3,26 +3,34 @@ package service
 import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
+	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 )
 
 func validationError(fieldErr validator.FieldError) error {
 	switch fieldErr.Tag() {
 	case "required":
-		return fmt.Errorf("required")
+		return model.ErrRequiredField
 	case "required_without":
-		return fmt.Errorf("required")
+		field := uncapitalize(fieldErr.Field())
+		param := uncapitalize(fieldErr.Param())
+
+		return fmt.Errorf("%s required without %s", field, param)
 	case "eqfield":
-		return fmt.Errorf("must be same value")
+		param := uncapitalize(fieldErr.Param())
+
+		return fmt.Errorf("must be same value as %s", param)
+	case "alphaunicode":
+		return model.ErrNotAlphaUnicode
 	case "max":
 		return fmt.Errorf("must be at most %s characters", fieldErr.Param())
 	case "min":
 		return fmt.Errorf("must be at least %s characters", fieldErr.Param())
 	case "email":
-		return fmt.Errorf("must be a valid email address")
+		return model.ErrInvalidEmail
 	case "e164":
-		return fmt.Errorf("must be a valid e164 phone number")
+		return model.ErrInvalidPhoneNumber
 	case "jwt":
-		return fmt.Errorf("must be a valid jwt token")
+		return model.ErrInvalidJwtToken
 	case "complex_password":
 		return fmt.Errorf("must contain uppercase characters, lowercase characters, numbers, and special characters(!@#)")
 	case "min_age":

@@ -411,7 +411,7 @@ func TestAuthService_RefreshToken_InvalidToken(t *testing.T) {
 	token, err := service.RefreshToken(ctx, refreshToken)
 
 	assert.Error(t, err)
-	assert.Equal(t, model.ErrInvalidToken, err)
+	assert.Equal(t, model.ErrInvalidJwtToken, err)
 	assert.Empty(t, token.AccessToken)
 }
 

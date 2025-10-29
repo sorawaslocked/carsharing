@@ -68,9 +68,7 @@ func (s *UserService) Insert(ctx context.Context, data model.UserCreateData) (ui
 		user.IsConfirmed = *data.IsConfirmed
 	}
 
-	createdID, err := s.userRepo.Insert(ctx, user)
-
-	return createdID, err
+	return s.userRepo.Insert(ctx, user)
 }
 
 func (s *UserService) FindOne(ctx context.Context, filter model.UserFilter) (model.User, error) {
@@ -135,7 +133,7 @@ func (s *UserService) Update(ctx context.Context, filter model.UserFilter, data 
 	})
 
 	if err != nil {
-		if errors.Is(err, model.ErrNotFound) {
+		if errors.Is(err, model.ErrDuplicateEmail) {
 			return model.ValidationErrors{
 				"email": model.ErrDuplicateEmail,
 			}

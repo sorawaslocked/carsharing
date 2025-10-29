@@ -65,7 +65,7 @@ type UserUpdateData struct {
 	LastName             *string    `validate:"omitempty,min=1,max=100,alphaunicode"`
 	BirthDate            *time.Time `validate:"omitempty,min_age=18"`
 	Password             *string    `validate:"omitempty,min=8,max=20,complex_password"`
-	PasswordConfirmation *string    `validate:"required_with=Password,min=8,max=20,complex_password"`
+	PasswordConfirmation *string    `validate:"required_with=Password,omitempty,min=8,max=20,complex_password"`
 	Roles                *[]Role
 
 	IsActive    *bool

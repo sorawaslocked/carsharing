@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	"github.com/go-playground/validator/v10"
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/logger"
@@ -34,75 +33,30 @@ func NewAuthService(
 	}
 }
 
-func (s *AuthService) Register(ctx context.Context, cred model.Credentials) (uint64, error) {
-	input := registerValidation{
-		Email:                cred.Email,
-		PhoneNumber:          cred.PhoneNumber,
-		Password:             cred.Password,
-		PasswordConfirmation: cred.PasswordConfirmation,
-		FirstName:            cred.FirstName,
-		LastName:             cred.LastName,
-		BirthDate:            cred.BirthDate,
-	}
-	err := validateInput(s.validate, input)
+func (s *AuthService) Register(ctx context.Context, data model.UserCreateData) (uint64, error) {
+	err := validateInput(s.validate, data)
 	if err != nil {
 		return 0, err
 	}
 
-	s.log.Info("registering user", slog.String("email", cred.Email))
-	passwordHash, err := security.HashPassword(cred.Password)
+	createdID, err := s.userService.Insert(ctx, data)
 	if err != nil {
-		s.log.Error("bcrypt: hashing password", logger.Err(err))
-
-		return 0, model.ErrBcrypt
-	}
-
-	user := model.User{
-		Email:        cred.Email,
-		PhoneNumber:  cred.PhoneNumber,
-		FirstName:    cred.FirstName,
-		LastName:     cred.LastName,
-		BirthDate:    cred.BirthDate,
-		PasswordHash: passwordHash,
-	}
-
-	createdID, err := s.userService.Insert(ctx, user)
-	if err != nil {
-		if errors.Is(err, model.ErrDuplicateEmail) {
-			return 0, model.ValidationErrors{
-				"email": model.ErrDuplicateEmail,
-			}
-		}
-
-		s.log.Error("sql: inserting user", logger.Err(err))
-
-		return 0, model.ErrSql
+		return 0, err
 	}
 
 	return createdID, nil
 }
 
 func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.Token, error) {
-	input := loginValidation{
-		Email:       cred.Email,
-		PhoneNumber: cred.PhoneNumber,
-		Password:    cred.Password,
-	}
-	err := validateInput(s.validate, input)
+	err := validateInput(s.validate, cred)
 	if err != nil {
 		return model.Token{}, err
 	}
 
-	filter := model.UserFilter{}
-	if input.Email != "" {
-		filter.Email = &input.Email
-		s.log.Info("logging in user", slog.String("email", input.Email))
+	filter := model.UserFilter{
+		Email:       &cred.Email,
+		PhoneNumber: &cred.PhoneNumber,
 	}
-	if cred.PhoneNumber != "" {
-		filter.PhoneNumber = &input.PhoneNumber
-		s.log.Info("logging in user", slog.String("phoneNumber", input.PhoneNumber))
-	}
-
 	user, err := s.userService.FindOne(ctx, filter)
 	if err != nil {
 		return model.Token{}, err
@@ -126,6 +80,7 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 
 		return model.Token{}, model.ErrJwt
 	}
+
 	refreshToken, err := s.jwtProvider.GenerateRefreshToken(user.ID, userRoles)
 	if err != nil {
 		s.log.Error(

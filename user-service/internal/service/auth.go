@@ -52,11 +52,10 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 	if err != nil {
 		return model.Token{}, err
 	}
-
 	filter := model.UserFilter{
-		Email:       &cred.Email,
-		PhoneNumber: &cred.PhoneNumber,
+		Email: &cred.Email,
 	}
+
 	user, err := s.userService.FindOne(ctx, filter)
 	if err != nil {
 		return model.Token{}, err

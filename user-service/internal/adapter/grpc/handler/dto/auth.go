@@ -6,15 +6,15 @@ import (
 	"time"
 )
 
-func FromRegisterRequest(req *authsvc.RegisterRequest) (model.Credentials, model.ValidationErrors) {
+func FromRegisterRequest(req *authsvc.RegisterRequest) (model.UserCreateData, model.ValidationErrors) {
 	birthDate, err := time.Parse("2006-01-02", req.BirthDate)
 	if err != nil {
-		return model.Credentials{}, model.ValidationErrors{
+		return model.UserCreateData{}, model.ValidationErrors{
 			"email": model.ErrInvalidDateFormat,
 		}
 	}
 
-	return model.Credentials{
+	return model.UserCreateData{
 		Email:                req.Email,
 		PhoneNumber:          req.PhoneNumber,
 		Password:             req.Password,

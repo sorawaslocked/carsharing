@@ -2,10 +2,10 @@ package grpc
 
 import (
 	"fmt"
-	svc "github.com/sorawaslocked/car-rental-protos/gen/service"
+	authsvc "github.com/sorawaslocked/car-rental-protos/gen/service/auth"
+	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/handler"
 	grpccfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/grpc"
-	"github.com/sorawaslocked/car-rental-user-service/internal/service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log/slog"
@@ -13,24 +13,23 @@ import (
 )
 
 type Server struct {
-	s           *grpc.Server
-	cfg         grpccfg.Config
-	log         *slog.Logger
-	authService *service.AuthService
+	s   *grpc.Server
+	cfg grpccfg.Config
+	log *slog.Logger
 }
 
 func NewServer(
 	cfg grpccfg.Config,
 	log *slog.Logger,
-	authService *service.AuthService,
+	authService handler.AuthService,
+	userService handler.UserService,
 ) *Server {
 	server := &Server{
-		cfg:         cfg,
-		log:         log,
-		authService: authService,
+		cfg: cfg,
+		log: log,
 	}
 
-	server.register(authService)
+	server.register(authService, userService)
 
 	return server
 }
@@ -52,10 +51,11 @@ func (s *Server) Stop() {
 	s.s.GracefulStop()
 }
 
-func (s *Server) register(authService handler.AuthService) {
+func (s *Server) register(authService handler.AuthService, userService handler.UserService) {
 	s.s = grpc.NewServer()
 
-	svc.RegisterAuthServiceServer(s.s, handler.NewAuthHandler(s.log, authService))
+	authsvc.RegisterAuthServiceServer(s.s, handler.NewAuthHandler(s.log, authService))
+	usersvc.RegisterUserServiceServer(s.s, handler.NewUserHandler(s.log, userService))
 
 	reflection.Register(s.s)
 }

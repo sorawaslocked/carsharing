@@ -56,7 +56,7 @@ func New(
 	userService := service.NewUserService(log, validate, jwtProvider, userRepo)
 	authService := service.NewAuthService(log, validate, jwtProvider, userService, userRepo)
 
-	grpcServer := grpcserver.NewServer(cfg.GRPC, log, authService)
+	grpcServer := grpcserver.NewServer(cfg.GRPC, log, authService, userService)
 
 	return &App{
 		log:        log,

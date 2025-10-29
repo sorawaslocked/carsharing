@@ -21,12 +21,12 @@ func NewAuthHandler(log *slog.Logger, authService AuthService) *AuthHandler {
 }
 
 func (h *AuthHandler) Register(ctx context.Context, req *authsvc.RegisterRequest) (*authsvc.RegisterResponse, error) {
-	cred, validationErrors := dto.FromRegisterRequest(req)
+	data, validationErrors := dto.FromRegisterRequest(req)
 	if validationErrors != nil {
 		return &authsvc.RegisterResponse{}, dto.ToStatusCodeError(validationErrors)
 	}
 
-	id, err := h.authService.Register(ctx, cred)
+	id, err := h.authService.Register(ctx, data)
 	if err != nil {
 		return &authsvc.RegisterResponse{}, dto.ToStatusCodeError(err)
 	}

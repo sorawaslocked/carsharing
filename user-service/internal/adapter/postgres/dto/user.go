@@ -12,37 +12,37 @@ func WhereClausesFromFilter(filter model.UserFilter, args []any, argNumber int) 
 	}
 
 	if filter.ID != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.id = $%d", argNumber))
+		whereClauses = append(whereClauses, fmt.Sprintf("id = $%d", argNumber))
 		args = append(args, *filter.ID)
 		argNumber++
 	}
 	if filter.Email != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.email = $%d", argNumber))
+		whereClauses = append(whereClauses, fmt.Sprintf("email = $%d", argNumber))
 		args = append(args, *filter.Email)
 		argNumber++
 	}
 	if filter.PhoneNumber != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.phone_number = $%d", argNumber))
+		whereClauses = append(whereClauses, fmt.Sprintf("phone_number = $%d", argNumber))
 		args = append(args, *filter.PhoneNumber)
 		argNumber++
 	}
 	if filter.FirstName != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.first_name = $%d", argNumber))
+		whereClauses = append(whereClauses, fmt.Sprintf("first_name = $%d", argNumber))
 		args = append(args, *filter.FirstName)
 		argNumber++
 	}
 	if filter.LastName != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.last_name = $%d", argNumber))
+		whereClauses = append(whereClauses, fmt.Sprintf("last_name = $%d", argNumber))
 		args = append(args, *filter.LastName)
 		argNumber++
 	}
 	if filter.IsActive != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.is_active = $%d", argNumber))
+		whereClauses = append(whereClauses, fmt.Sprintf("is_active = $%d", argNumber))
 		args = append(args, *filter.IsActive)
 		argNumber++
 	}
 	if filter.IsConfirmed != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("u.is_confirmed = $%d", argNumber))
+		whereClauses = append(whereClauses, fmt.Sprintf("is_confirmed = $%d", argNumber))
 		args = append(args, *filter.IsConfirmed)
 		argNumber++
 	}
@@ -61,7 +61,7 @@ func SetClausesFromUpdateData(update model.UserUpdate) ([]string, []any, int) {
 		argNumber++
 	}
 	if update.PhoneNumber != nil {
-		setClauses = append(setClauses, fmt.Sprintf("phone = $%d", argNumber))
+		setClauses = append(setClauses, fmt.Sprintf("phone_number = $%d", argNumber))
 		args = append(args, *update.PhoneNumber)
 		argNumber++
 	}

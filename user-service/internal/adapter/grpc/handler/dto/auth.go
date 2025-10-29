@@ -10,7 +10,7 @@ func FromRegisterRequest(req *authsvc.RegisterRequest) (model.UserCreateData, mo
 	birthDate, err := time.Parse("2006-01-02", req.BirthDate)
 	if err != nil {
 		return model.UserCreateData{}, model.ValidationErrors{
-			"email": model.ErrInvalidDateFormat,
+			"birthDate": model.ErrInvalidDateFormat,
 		}
 	}
 

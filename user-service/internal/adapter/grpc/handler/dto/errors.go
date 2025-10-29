@@ -32,8 +32,12 @@ func ToStatusCodeError(err error) error {
 	switch {
 	case errors.As(err, &ve):
 		return validationError(ve)
+	case errors.Is(err, model.ErrNoUpdateFields):
+		return status.Error(codes.InvalidArgument, err.Error())
 	case errors.Is(err, model.ErrNotFound):
 		return status.Error(codes.NotFound, "resource not found")
+	case errors.Is(err, model.ErrDuplicateEmail):
+		return status.Error(codes.AlreadyExists, err.Error())
 	default:
 		return status.Error(codes.Internal, "something went wrong")
 	}

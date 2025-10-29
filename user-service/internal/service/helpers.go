@@ -17,3 +17,12 @@ func toRoleStrings(roles []model.Role) []string {
 
 	return result
 }
+
+func formatFilter(filter *model.UserFilter) {
+	if filter.ID != nil && *filter.ID > 0 {
+		filter.Email = nil
+	}
+	if filter.Email != nil && *filter.Email != "" {
+		filter.ID = nil
+	}
+}

@@ -12,7 +12,7 @@ func FromCreateUserRequest(req *usersvc.CreateRequest) (model.UserCreateData, er
 	birthDate, err := time.Parse("2006-01-02", req.BirthDate)
 	if err != nil {
 		return model.UserCreateData{}, model.ValidationErrors{
-			"email": model.ErrInvalidDateFormat,
+			"birthDate": model.ErrInvalidDateFormat,
 		}
 	}
 
@@ -54,7 +54,7 @@ func ToUserProto(user model.User) *base.User {
 	}
 
 	return &base.User{
-		ID:           0,
+		ID:           user.ID,
 		Email:        user.Email,
 		PhoneNumber:  user.PhoneNumber,
 		FirstName:    user.FirstName,
@@ -101,7 +101,7 @@ func FromUpdateUserRequest(req *usersvc.UpdateRequest) (model.UserUpdateData, er
 		birthDate, err := time.Parse("2006-01-02", *req.BirthDate)
 		if err != nil {
 			return model.UserUpdateData{}, model.ValidationErrors{
-				"email": model.ErrInvalidDateFormat,
+				"birthDate": model.ErrInvalidDateFormat,
 			}
 		}
 

@@ -85,10 +85,10 @@ func (r *UserRepository) Insert(ctx context.Context, user model.User) (uint64, e
 
 func (r *UserRepository) FindOne(ctx context.Context, filter model.UserFilter) (model.User, error) {
 	query := `
-        SELECT u.id, u.email, u.phone_number, u.first_name, u.last_name, 
-               u.birth_date, u.password_hash, u.is_active, u.is_confirmed,
-               u.created_at, u.updated_at
-        FROM users u`
+        SELECT id, email, phone_number, first_name, last_name, 
+               birth_date, password_hash, is_active, is_confirmed,
+               created_at, updated_at
+        FROM users`
 
 	whereClauses, args := dto.WhereClausesFromFilter(filter, nil, 1)
 	if len(whereClauses) > 0 {
@@ -120,10 +120,10 @@ func (r *UserRepository) FindOne(ctx context.Context, filter model.UserFilter) (
 
 func (r *UserRepository) Find(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
 	query := `
-        SELECT u.id, u.email, u.phone_number, u.first_name, u.last_name, 
-               u.birth_date, u.password_hash, u.is_active, u.is_confirmed,
-               u.created_at, u.updated_at
-        FROM users u
+        SELECT id, email, phone_number, first_name, last_name, 
+               birth_date, password_hash, is_active, is_confirmed,
+               created_at, updated_at
+        FROM users
     `
 
 	whereClauses, args := dto.WhereClausesFromFilter(filter, nil, 1)
@@ -197,7 +197,7 @@ func (r *UserRepository) Update(ctx context.Context, filter model.UserFilter, up
 	query := "UPDATE users SET "
 
 	setClauses, args, argNumber := dto.SetClausesFromUpdateData(update)
-	if len(setClauses) <= 1 {
+	if len(setClauses) <= 1 && update.Roles == nil {
 		return model.ErrNoUpdateFields
 	}
 	query += strings.Join(setClauses, ", ")
@@ -263,7 +263,7 @@ func (r *UserRepository) Delete(ctx context.Context, filter model.UserFilter) er
 		query += " WHERE " + strings.Join(whereClauses, " AND ")
 	}
 
-	res, err := r.db.ExecContext(ctx, query, args)
+	res, err := r.db.ExecContext(ctx, query, args...)
 	if err != nil {
 		return model.ErrSql
 	}

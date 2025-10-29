@@ -38,6 +38,11 @@ func (s *UserService) Insert(ctx context.Context, data model.UserCreateData) (ui
 		return 0, err
 	}
 
+	_, err = s.userRepo.FindOne(ctx, model.UserFilter{Email: &data.Email})
+	if err == nil {
+		return 0, model.ErrDuplicateEmail
+	}
+
 	passwordHash, err := security.HashPassword(data.Password)
 	if err != nil {
 		s.log.Error("bcrypt: hashing password", logger.Err(err))
@@ -46,7 +51,6 @@ func (s *UserService) Insert(ctx context.Context, data model.UserCreateData) (ui
 	}
 
 	user := model.User{
-		ID:           0,
 		Email:        data.Email,
 		PhoneNumber:  data.PhoneNumber,
 		FirstName:    data.FirstName,
@@ -76,6 +80,7 @@ func (s *UserService) FindOne(ctx context.Context, filter model.UserFilter) (mod
 	if err != nil {
 		return model.User{}, err
 	}
+	formatFilter(&filter)
 
 	user, err := s.userRepo.FindOne(ctx, filter)
 	if err != nil {
@@ -106,31 +111,41 @@ func (s *UserService) Update(ctx context.Context, filter model.UserFilter, data 
 	if err != nil {
 		return err
 	}
+	formatFilter(&filter)
+
+	_, err = s.FindOne(ctx, filter)
+	if err != nil {
+		return err
+	}
 
 	err = validateInput(s.validate, data)
 	if err != nil {
 		return err
 	}
 
-	passwordHash, err := security.HashPassword(*data.Password)
-	if err != nil {
-		s.log.Error("bcrypt: hashing password", logger.Err(err))
-
-		return model.ErrBcrypt
+	update := model.UserUpdate{
+		Email:       data.Email,
+		PhoneNumber: data.PhoneNumber,
+		FirstName:   data.FirstName,
+		LastName:    data.LastName,
+		BirthDate:   data.BirthDate,
+		Roles:       data.Roles,
+		UpdatedAt:   time.Now(),
+		IsActive:    data.IsActive,
+		IsConfirmed: data.IsConfirmed,
 	}
 
-	err = s.userRepo.Update(ctx, filter, model.UserUpdate{
-		Email:        data.Email,
-		PhoneNumber:  data.PhoneNumber,
-		FirstName:    data.FirstName,
-		LastName:     data.LastName,
-		BirthDate:    data.BirthDate,
-		PasswordHash: &passwordHash,
-		Roles:        data.Roles,
-		UpdatedAt:    time.Now(),
-		IsActive:     data.IsActive,
-		IsConfirmed:  data.IsConfirmed,
-	})
+	if data.Password != nil {
+		passwordHash, err := security.HashPassword(*data.Password)
+		if err != nil {
+			s.log.Error("bcrypt: hashing password", logger.Err(err))
+
+			return model.ErrBcrypt
+		}
+		update.PasswordHash = &passwordHash
+	}
+
+	err = s.userRepo.Update(ctx, filter, update)
 
 	if err != nil {
 		if errors.Is(err, model.ErrDuplicateEmail) {
@@ -150,6 +165,7 @@ func (s *UserService) Delete(ctx context.Context, filter model.UserFilter) error
 	if err != nil {
 		return err
 	}
+	formatFilter(&filter)
 
 	return s.userRepo.Delete(ctx, filter)
 }

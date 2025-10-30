@@ -14,7 +14,7 @@ func NewAuthHandler(client authsvc.AuthServiceClient) *AuthHandler {
 	return &AuthHandler{client: client}
 }
 
-func (h *AuthHandler) Register(ctx context.Context, cred model.Credentials) (uint64, error) {
+func (h *AuthHandler) Register(ctx context.Context, cred model.UserCreateData) (uint64, error) {
 	res, err := h.client.Register(ctx, &authsvc.RegisterRequest{
 		Email:                cred.Email,
 		PhoneNumber:          cred.PhoneNumber,

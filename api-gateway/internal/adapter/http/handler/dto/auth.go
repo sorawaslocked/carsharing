@@ -39,14 +39,14 @@ type RefreshTokenResponse struct {
 	RefreshToken *string `json:"refreshToken,omitempty"`
 }
 
-func FromRegisterRequest(ctx *gin.Context) (model.Credentials, error) {
+func FromRegisterRequest(ctx *gin.Context) (model.UserCreateData, error) {
 	var req RegisterRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		return model.Credentials{}, err
+		return model.UserCreateData{}, err
 	}
 
-	return model.Credentials{
+	return model.UserCreateData{
 		Email:                req.Email,
 		PhoneNumber:          req.PhoneNumber,
 		Password:             req.Password,

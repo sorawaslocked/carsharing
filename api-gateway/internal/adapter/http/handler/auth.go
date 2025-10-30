@@ -14,14 +14,14 @@ func NewAuth(svc AuthService) *Auth {
 }
 
 func (handler *Auth) Register(ctx *gin.Context) {
-	cred, err := dto.FromRegisterRequest(ctx)
+	data, err := dto.FromRegisterRequest(ctx)
 	if err != nil {
 		dto.MalformedJson(ctx)
 
 		return
 	}
 
-	id, err := handler.svc.Register(ctx, cred)
+	id, err := handler.svc.Register(ctx, data)
 	if err != nil {
 		dto.FromError(ctx, err)
 

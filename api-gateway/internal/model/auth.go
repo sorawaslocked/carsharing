@@ -1,13 +1,9 @@
 package model
 
 type Credentials struct {
-	Email                string
-	PhoneNumber          string
-	Password             string
-	PasswordConfirmation string
-	FirstName            string
-	LastName             string
-	BirthDate            string
+	Email       string
+	PhoneNumber string
+	Password    string
 }
 
 type Token struct {

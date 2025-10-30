@@ -14,15 +14,15 @@ func NewAuthHandler(client authsvc.AuthServiceClient) *AuthHandler {
 	return &AuthHandler{client: client}
 }
 
-func (h *AuthHandler) Register(ctx context.Context, cred model.UserCreateData) (uint64, error) {
+func (h *AuthHandler) Register(ctx context.Context, data model.UserCreateData) (uint64, error) {
 	res, err := h.client.Register(ctx, &authsvc.RegisterRequest{
-		Email:                cred.Email,
-		PhoneNumber:          cred.PhoneNumber,
-		Password:             cred.Password,
-		PasswordConfirmation: cred.PasswordConfirmation,
-		FirstName:            cred.FirstName,
-		LastName:             cred.LastName,
-		BirthDate:            cred.BirthDate,
+		Email:                data.Email,
+		PhoneNumber:          data.PhoneNumber,
+		Password:             data.Password,
+		PasswordConfirmation: data.PasswordConfirmation,
+		FirstName:            data.FirstName,
+		LastName:             data.LastName,
+		BirthDate:            data.BirthDate,
 	})
 	if err != nil {
 		return 0, fromGrpcErr(err)

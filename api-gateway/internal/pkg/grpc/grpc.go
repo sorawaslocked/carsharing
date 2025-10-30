@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/grpc/interceptor"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/health/grpc_health_v1"
@@ -31,10 +32,13 @@ func Connect(target string, clientCfg Client) (*grpc.ClientConn, error) {
 
 	maxReceiveSizeBytes := 1024 * 1024 * clientCfg.MaxReceiveSizeMb
 
+	baseClientInterceptor := interceptor.NewBaseInterceptor()
+
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithKeepaliveParams(keepAlivePrms),
 		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(maxReceiveSizeBytes)),
+		grpc.WithUnaryInterceptor(baseClientInterceptor.Unary),
 	}
 
 	return grpc.NewClient(target, opts...)

@@ -27,7 +27,9 @@ func New(
 	cfg config.Config,
 	log *slog.Logger,
 ) (*App, error) {
-	log.Info("connecting to postgres database", slog.String("dsn", cfg.Postgres.Dsn))
+	log = log.With(slog.String("appId", "user-service"))
+
+	log.Info("connecting to postgres database")
 	db, err := postgrescfg.OpenDB(cfg.Postgres)
 	if err != nil {
 		log.Error("connecting to postgres database", logger.Err(err))

@@ -31,7 +31,7 @@ func NewServer(
 		log: log,
 	}
 
-	server.register(authService, userService, jwtProvider)
+	server.register(authService, userService, jwtProvider, log)
 
 	return server
 }
@@ -57,10 +57,17 @@ func (s *Server) register(
 	authService handler.AuthService,
 	userService handler.UserService,
 	jwtProvider interceptor.JwtProvider,
+	log *slog.Logger,
 ) {
+	baseInterceptor := interceptor.NewBaseInterceptor()
+	loggerInterceptor := interceptor.NewLoggerInterceptor(log)
 	authInterceptor := interceptor.NewAuthInterceptor(jwtProvider)
 
-	s.s = grpc.NewServer(grpc.UnaryInterceptor(authInterceptor.Unary))
+	s.s = grpc.NewServer(grpc.ChainUnaryInterceptor(
+		baseInterceptor.Unary,
+		loggerInterceptor.Unary,
+		authInterceptor.Unary,
+	))
 
 	authsvc.RegisterAuthServiceServer(s.s, handler.NewAuthHandler(s.log, authService))
 	usersvc.RegisterUserServiceServer(s.s, handler.NewUserHandler(s.log, userService))

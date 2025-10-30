@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/handler"
@@ -13,33 +14,42 @@ import (
 	"net/http"
 )
 
+const (
+	envLocal = "local"
+	envDev   = "dev"
+	envProd  = "prod"
+)
+
 type Server struct {
-	s           *gin.Engine
+	router      *gin.Engine
 	cfg         config.HTTPServer
 	log         *slog.Logger
 	authHandler *handler.Auth
 }
 
-func New(cfg config.HTTPServer, log *slog.Logger, authService handler.AuthService) *Server {
+func New(env string, cfg config.HTTPServer, log *slog.Logger, authService handler.AuthService) *Server {
 	httpLog := log.With(
 		slog.String("httpServerHost", cfg.Host),
 		slog.Int("httpServerPort", cfg.Port),
 	)
 
 	gin.SetMode(cfg.GinMode)
-	s := gin.New()
+	router := gin.New()
 
 	// Middleware
-	s.Use(gin.Recovery())
-	s.Use(requestid.New())
-	s.Use(middleware.Base())
-	s.Use(middleware.Logger(httpLog))
+	router.Use(gin.Recovery())
+	if env == envLocal || env == envDev {
+		router.Use(cors.Default())
+	}
+	router.Use(requestid.New())
+	router.Use(middleware.Base())
+	router.Use(middleware.Logger(httpLog))
 
 	// Handlers
 	authHandler := handler.NewAuth(authService)
 
 	server := &Server{
-		s:           s,
+		router:      router,
 		cfg:         cfg,
 		log:         httpLog,
 		authHandler: authHandler,
@@ -51,7 +61,7 @@ func New(cfg config.HTTPServer, log *slog.Logger, authService handler.AuthServic
 }
 
 func (s *Server) setupRoutes() {
-	v1 := s.s.Group("/api/v1")
+	v1 := s.router.Group("/api/v1")
 	{
 		auth := v1.Group("/auth")
 		{
@@ -67,7 +77,7 @@ func (s *Server) MustRun() {
 		addr := fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
 
 		s.log.Info("starting http server")
-		err := s.s.Run(addr)
+		err := s.router.Run(addr)
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			panic(err)
 		}

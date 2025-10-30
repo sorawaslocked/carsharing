@@ -3,19 +3,19 @@ package grpc
 import (
 	"context"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
-	svc "github.com/sorawaslocked/car-rental-protos/gen/service"
+	authsvc "github.com/sorawaslocked/car-rental-protos/gen/service/auth"
 )
 
 type AuthHandler struct {
-	client svc.AuthServiceClient
+	client authsvc.AuthServiceClient
 }
 
-func NewAuthHandler(client svc.AuthServiceClient) *AuthHandler {
+func NewAuthHandler(client authsvc.AuthServiceClient) *AuthHandler {
 	return &AuthHandler{client: client}
 }
 
 func (h *AuthHandler) Register(ctx context.Context, cred model.Credentials) (uint64, error) {
-	res, err := h.client.Register(ctx, &svc.RegisterRequest{
+	res, err := h.client.Register(ctx, &authsvc.RegisterRequest{
 		Email:                cred.Email,
 		PhoneNumber:          cred.PhoneNumber,
 		Password:             cred.Password,
@@ -32,7 +32,7 @@ func (h *AuthHandler) Register(ctx context.Context, cred model.Credentials) (uin
 }
 
 func (h *AuthHandler) Login(ctx context.Context, cred model.Credentials) (model.Token, error) {
-	req := &svc.LoginRequest{
+	req := &authsvc.LoginRequest{
 		Password: cred.Password,
 	}
 	if cred.Email != "" {
@@ -54,7 +54,7 @@ func (h *AuthHandler) Login(ctx context.Context, cred model.Credentials) (model.
 }
 
 func (h *AuthHandler) RefreshToken(ctx context.Context, refreshToken string) (model.Token, error) {
-	res, err := h.client.RefreshToken(ctx, &svc.RefreshTokenRequest{
+	res, err := h.client.RefreshToken(ctx, &authsvc.RefreshTokenRequest{
 		RefreshToken: refreshToken,
 	})
 	if err != nil {

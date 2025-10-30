@@ -24,7 +24,7 @@ type (
 )
 
 func Connect(target string, clientCfg Client) (*grpc.ClientConn, error) {
-	keepAlivePrms := keepalive.ClientParameters{
+	keepAliveParams := keepalive.ClientParameters{
 		Time:                clientCfg.TimeKeepAlive,
 		Timeout:             clientCfg.Timeout,
 		PermitWithoutStream: true,
@@ -36,7 +36,7 @@ func Connect(target string, clientCfg Client) (*grpc.ClientConn, error) {
 
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithKeepaliveParams(keepAlivePrms),
+		grpc.WithKeepaliveParams(keepAliveParams),
 		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(maxReceiveSizeBytes)),
 		grpc.WithUnaryInterceptor(baseClientInterceptor.Unary),
 	}

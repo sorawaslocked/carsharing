@@ -8,7 +8,7 @@ import (
 	grpcconn "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/grpc"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/logger"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/service"
-	grpcSvc "github.com/sorawaslocked/car-rental-protos/gen/service"
+	authsvc "github.com/sorawaslocked/car-rental-protos/gen/service/auth"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -55,7 +55,7 @@ func New(cfg config.Config, log *slog.Logger) *App {
 		userServiceLog.Debug("error pinging grpc server", logger.Err(err))
 	}
 
-	authServiceGrpcClient := grpcSvc.NewAuthServiceClient(userServiceGrpcConn)
+	authServiceGrpcClient := authsvc.NewAuthServiceClient(userServiceGrpcConn)
 	authServiceGrpcHandler := grpc.NewAuthHandler(authServiceGrpcClient)
 	authService := service.NewAuthService(authServiceGrpcHandler)
 

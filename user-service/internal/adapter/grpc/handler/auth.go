@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 	authsvc "github.com/sorawaslocked/car-rental-protos/gen/service/auth"
-	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/handler/dto"
+	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/dto"
 	"log/slog"
 )
 

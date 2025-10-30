@@ -5,6 +5,7 @@ import (
 	authsvc "github.com/sorawaslocked/car-rental-protos/gen/service/auth"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/handler"
+	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/interceptor"
 	grpccfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -23,13 +24,14 @@ func NewServer(
 	log *slog.Logger,
 	authService handler.AuthService,
 	userService handler.UserService,
+	jwtProvider interceptor.JwtProvider,
 ) *Server {
 	server := &Server{
 		cfg: cfg,
 		log: log,
 	}
 
-	server.register(authService, userService)
+	server.register(authService, userService, jwtProvider)
 
 	return server
 }
@@ -51,8 +53,14 @@ func (s *Server) Stop() {
 	s.s.GracefulStop()
 }
 
-func (s *Server) register(authService handler.AuthService, userService handler.UserService) {
-	s.s = grpc.NewServer()
+func (s *Server) register(
+	authService handler.AuthService,
+	userService handler.UserService,
+	jwtProvider interceptor.JwtProvider,
+) {
+	authInterceptor := interceptor.NewAuthInterceptor(jwtProvider)
+
+	s.s = grpc.NewServer(grpc.UnaryInterceptor(authInterceptor.Unary))
 
 	authsvc.RegisterAuthServiceServer(s.s, handler.NewAuthHandler(s.log, authService))
 	usersvc.RegisterUserServiceServer(s.s, handler.NewUserHandler(s.log, userService))

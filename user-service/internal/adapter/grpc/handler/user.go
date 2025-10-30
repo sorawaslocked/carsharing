@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/sorawaslocked/car-rental-protos/gen/base"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
-	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/handler/dto"
+	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/dto"
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 	"log/slog"
 )

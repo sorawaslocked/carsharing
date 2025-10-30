@@ -21,9 +21,12 @@ func (ve ValidationErrors) Error() string {
 }
 
 var (
-	ErrNotFound       = errors.New("resource not found")
-	ErrNoUpdateFields = errors.New("no update fields set")
-	ErrEmptyFilter    = errors.New("filter is empty")
+	ErrMissingMetadata         = errors.New("missing metadata")
+	ErrInvalidToken            = errors.New("invalid token")
+	ErrInsufficientPermissions = errors.New("insufficient permissions")
+	ErrNotFound                = errors.New("resource not found")
+	ErrNoUpdateFields          = errors.New("no update fields set")
+	ErrEmptyFilter             = errors.New("filter is empty")
 
 	ErrRequiredField       = errors.New("required")
 	ErrPasswordsDoNotMatch = errors.New("passwords do not match")
@@ -31,10 +34,10 @@ var (
 	ErrInvalidEmail        = errors.New("must be a valid email address")
 	ErrInvalidPhoneNumber  = errors.New("must be a valid 164 phone number")
 	ErrInvalidDateFormat   = errors.New("must be a valid date format")
-	ErrInvalidJwtToken     = errors.New("must be a valid jwt token")
 	ErrNotComplexPassword  = errors.New("must contain uppercase characters, lowercase characters, numbers, and special characters(!@#)")
 	ErrDuplicateEmail      = errors.New("user with this email already exists")
 	ErrInvalidRole         = errors.New("must be a valid role")
+	ErrInvalidJwtToken     = errors.New("must be a valid jwt token")
 
 	ErrSqlTransaction = errors.New("sql transaction error")
 	ErrSql            = errors.New("sql error")

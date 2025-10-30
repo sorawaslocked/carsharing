@@ -30,14 +30,20 @@ func ToStatusCodeError(err error) error {
 	var ve model.ValidationErrors
 
 	switch {
-	case errors.As(err, &ve):
-		return validationError(ve)
-	case errors.Is(err, model.ErrNoUpdateFields):
+	case errors.Is(err, model.ErrMissingMetadata):
 		return status.Error(codes.InvalidArgument, err.Error())
+	case errors.Is(err, model.ErrInvalidToken):
+		return status.Error(codes.Unauthenticated, err.Error())
+	case errors.Is(err, model.ErrInsufficientPermissions):
+		return status.Error(codes.PermissionDenied, err.Error())
 	case errors.Is(err, model.ErrNotFound):
-		return status.Error(codes.NotFound, "resource not found")
+		return status.Error(codes.NotFound, err.Error())
 	case errors.Is(err, model.ErrDuplicateEmail):
 		return status.Error(codes.AlreadyExists, err.Error())
+	case errors.Is(err, model.ErrNoUpdateFields):
+		return status.Error(codes.InvalidArgument, err.Error())
+	case errors.As(err, &ve):
+		return validationError(ve)
 	default:
 		return status.Error(codes.Internal, "something went wrong")
 	}

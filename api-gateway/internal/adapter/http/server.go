@@ -7,6 +7,7 @@ import (
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/handler"
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/middleware"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/config"
 	"log/slog"
 	"net/http"
@@ -31,7 +32,8 @@ func New(cfg config.HTTPServer, log *slog.Logger, authService handler.AuthServic
 	// Middleware
 	s.Use(gin.Recovery())
 	s.Use(requestid.New())
-	s.Use(LoggerMiddleware(httpLog))
+	s.Use(middleware.Base())
+	s.Use(middleware.Logger(httpLog))
 
 	// Handlers
 	authHandler := handler.NewAuth(authService)

@@ -59,7 +59,7 @@ func New(cfg config.Config, log *slog.Logger) *App {
 	authServiceGrpcHandler := grpc.NewAuthHandler(authServiceGrpcClient)
 	authService := service.NewAuthService(authServiceGrpcHandler)
 
-	httpServer := httpserver.New(cfg.HTTPServer, log, authService)
+	httpServer := httpserver.New(cfg.Env, cfg.HTTPServer, log, authService)
 
 	app := &App{
 		cfg:        cfg,

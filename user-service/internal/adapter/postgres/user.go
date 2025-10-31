@@ -56,6 +56,9 @@ func (r *UserRepository) Insert(ctx context.Context, user model.User) (uint64, e
 		if errors.As(err, &pqErr) && pqErr.Constraint == "users_email_key" {
 			return 0, model.ErrDuplicateEmail
 		}
+		if errors.As(err, &pqErr) && pqErr.Constraint == "users_phone_number_key" {
+			return 0, model.ErrDuplicateEmail
+		}
 
 		return 0, model.ErrSql
 	}

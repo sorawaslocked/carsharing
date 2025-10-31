@@ -59,7 +59,7 @@ func (h *UserHandler) Get(ctx context.Context, filter model.UserFilter) (model.U
 	return dto.FromProto(res.User), nil
 }
 
-func (h *UserHandler) GetAll(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
+func (h *UserHandler) GetAll(ctx context.Context, _ model.UserFilter) ([]model.User, error) {
 	req := &usersvc.GetAllRequest{}
 
 	res, err := h.client.GetAll(ctx, req)

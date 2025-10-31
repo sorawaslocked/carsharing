@@ -43,6 +43,12 @@ func (h *User) Get(ctx *gin.Context) {
 		return
 	}
 
+	if filter.ID == nil && filter.Email == nil {
+		h.GetAll(ctx)
+
+		return
+	}
+
 	user, err := h.svc.FindOne(ctx, filter)
 	if err != nil {
 		dto.FromError(ctx, err)

@@ -9,8 +9,8 @@ type UserService struct {
 	presenter UserPresenter
 }
 
-func NewUserService(presenter UserPresenter) UserService {
-	return UserService{presenter: presenter}
+func NewUserService(presenter UserPresenter) *UserService {
+	return &UserService{presenter: presenter}
 }
 
 func (s *UserService) Insert(ctx context.Context, data model.UserCreateData) (uint64, error) {

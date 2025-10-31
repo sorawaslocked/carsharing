@@ -13,10 +13,9 @@ func (s *Server) setupRoutes() {
 		users := v1.Group("/users")
 		{
 			users.POST("", s.userHandler.Create)
-			users.GET("/", s.userHandler.Get)
-			users.GET("", s.userHandler.GetAll)
-			users.PATCH("/", s.userHandler.Update)
-			users.DELETE("/", s.userHandler.Delete)
+			users.GET("", s.userHandler.Get)
+			users.PATCH("", s.userHandler.Update)
+			users.DELETE("", s.userHandler.Delete)
 		}
 	}
 }

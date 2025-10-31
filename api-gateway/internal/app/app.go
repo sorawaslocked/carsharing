@@ -9,6 +9,7 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/logger"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/service"
 	authsvc "github.com/sorawaslocked/car-rental-protos/gen/service/auth"
+	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -59,7 +60,11 @@ func New(cfg config.Config, log *slog.Logger) *App {
 	authServiceGrpcHandler := grpc.NewAuthHandler(authServiceGrpcClient)
 	authService := service.NewAuthService(authServiceGrpcHandler)
 
-	httpServer := httpserver.New(cfg.Env, cfg.HTTPServer, log, authService)
+	userServiceGrpcClient := usersvc.NewUserServiceClient(userServiceGrpcConn)
+	userServiceGrpcHandler := grpc.NewUserHandler(userServiceGrpcClient)
+	userService := service.NewUserService(userServiceGrpcHandler)
+
+	httpServer := httpserver.New(cfg.Env, cfg.HTTPServer, log, authService, userService)
 
 	app := &App{
 		cfg:        cfg,

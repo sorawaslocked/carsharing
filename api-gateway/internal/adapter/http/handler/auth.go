@@ -2,7 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/handler/dto"
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/dto"
 )
 
 type Auth struct {
@@ -13,7 +13,7 @@ func NewAuth(svc AuthService) *Auth {
 	return &Auth{svc: svc}
 }
 
-func (handler *Auth) Register(ctx *gin.Context) {
+func (h *Auth) Register(ctx *gin.Context) {
 	data, err := dto.FromRegisterRequest(ctx)
 	if err != nil {
 		dto.MalformedJson(ctx)
@@ -21,7 +21,7 @@ func (handler *Auth) Register(ctx *gin.Context) {
 		return
 	}
 
-	id, err := handler.svc.Register(ctx, data)
+	id, err := h.svc.Register(ctx, data)
 	if err != nil {
 		dto.FromError(ctx, err)
 
@@ -32,7 +32,7 @@ func (handler *Auth) Register(ctx *gin.Context) {
 	dto.Created(ctx, res)
 }
 
-func (handler *Auth) Login(ctx *gin.Context) {
+func (h *Auth) Login(ctx *gin.Context) {
 	cred, err := dto.FromLoginRequest(ctx)
 	if err != nil {
 		dto.MalformedJson(ctx)
@@ -40,7 +40,7 @@ func (handler *Auth) Login(ctx *gin.Context) {
 		return
 	}
 
-	token, err := handler.svc.Login(ctx, cred)
+	token, err := h.svc.Login(ctx, cred)
 	if err != nil {
 		dto.FromError(ctx, err)
 
@@ -54,7 +54,7 @@ func (handler *Auth) Login(ctx *gin.Context) {
 	dto.Ok(ctx, res)
 }
 
-func (handler *Auth) RefreshToken(ctx *gin.Context) {
+func (h *Auth) RefreshToken(ctx *gin.Context) {
 	cred, err := dto.FromRefreshTokenRequest(ctx)
 	if err != nil {
 		dto.MalformedJson(ctx)
@@ -62,7 +62,7 @@ func (handler *Auth) RefreshToken(ctx *gin.Context) {
 		return
 	}
 
-	token, err := handler.svc.RefreshToken(ctx, cred)
+	token, err := h.svc.RefreshToken(ctx, cred)
 	if err != nil {
 		dto.FromError(ctx, err)
 

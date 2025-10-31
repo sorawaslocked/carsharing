@@ -113,9 +113,13 @@ func (s *UserService) Update(ctx context.Context, filter model.UserFilter, data 
 	}
 	formatFilter(&filter)
 
-	_, err = s.FindOne(ctx, filter)
+	user, err := s.FindOne(ctx, filter)
 	if err != nil {
 		return err
+	}
+
+	if user.ID != ctx.Value("userID").(uint64) {
+		return model.ErrInsufficientPermissions
 	}
 
 	err = validateInput(s.validate, data)

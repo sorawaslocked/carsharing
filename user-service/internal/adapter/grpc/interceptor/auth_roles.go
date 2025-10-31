@@ -17,12 +17,14 @@ func createPermittedRoles() map[string]map[model.Role]bool {
 		model.RoleAdmin: true,
 	}
 	permittedRoles[UserServiceGet] = map[model.Role]bool{
+		model.RoleUser:  true,
 		model.RoleAdmin: true,
 	}
 	permittedRoles[UserServiceGetAll] = map[model.Role]bool{
 		model.RoleAdmin: true,
 	}
 	permittedRoles[UserServiceUpdate] = map[model.Role]bool{
+		model.RoleUser:  true,
 		model.RoleAdmin: true,
 	}
 	permittedRoles[UserServiceDelete] = map[model.Role]bool{

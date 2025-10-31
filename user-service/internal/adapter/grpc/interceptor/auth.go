@@ -2,6 +2,7 @@ package interceptor
 
 import (
 	"context"
+	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/dto"
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 	"google.golang.org/grpc"
@@ -47,7 +48,22 @@ func (i *AuthInterceptor) Unary(ctx context.Context, req any, info *grpc.UnarySe
 		return nil, dto.ToStatusCodeError(err)
 	}
 
-	return handler(ctx, req)
+	ctx = context.WithValue(ctx, "userID", claims.id)
+
+	m, err := handler(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	if info.FullMethod == UserServiceGet {
+		res := m.(*usersvc.GetResponse)
+
+		if res.User.ID != claims.id {
+			return nil, dto.ToStatusCodeError(model.ErrInsufficientPermissions)
+		}
+	}
+
+	return m, err
 }
 
 func (i *AuthInterceptor) authenticateAndGetClaims(authorization []string, method string) (_claims, error) {

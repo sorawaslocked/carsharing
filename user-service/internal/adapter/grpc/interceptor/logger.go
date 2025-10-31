@@ -25,7 +25,7 @@ func (i *LoggerInterceptor) Unary(ctx context.Context, req any, info *grpc.Unary
 
 	logger := i.log.With(
 		slog.String("requestId", requestID),
-		slog.String("clientIPFromMetadata", clientIP),
+		slog.String("clientIP", clientIP),
 		slog.String("method", info.FullMethod),
 	)
 	logger.Info("grpc request")

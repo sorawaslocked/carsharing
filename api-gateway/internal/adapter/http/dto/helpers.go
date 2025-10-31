@@ -26,6 +26,16 @@ func MalformedJson(ctx *gin.Context) {
 	badRequest(ctx, body)
 }
 
+func InvalidQueryParams(ctx *gin.Context) {
+	body := gin.H{
+		"error": gin.H{
+			"message": "invalid query params",
+		},
+	}
+
+	badRequest(ctx, body)
+}
+
 func validationError(ctx *gin.Context, ve model.ValidationErrors) {
 	md := make(map[string]any)
 	md["type"] = "validation"

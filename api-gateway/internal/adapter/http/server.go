@@ -25,9 +25,16 @@ type Server struct {
 	cfg         config.HTTPServer
 	log         *slog.Logger
 	authHandler *handler.Auth
+	userHandler *handler.User
 }
 
-func New(env string, cfg config.HTTPServer, log *slog.Logger, authService handler.AuthService) *Server {
+func New(
+	env string,
+	cfg config.HTTPServer,
+	log *slog.Logger,
+	authService handler.AuthService,
+	userService handler.UserService,
+) *Server {
 	httpLog := log.With(
 		slog.String("httpServerHost", cfg.Host),
 		slog.Int("httpServerPort", cfg.Port),
@@ -47,29 +54,19 @@ func New(env string, cfg config.HTTPServer, log *slog.Logger, authService handle
 
 	// Handlers
 	authHandler := handler.NewAuth(authService)
+	userHandler := handler.NewUser(userService)
 
 	server := &Server{
 		router:      router,
 		cfg:         cfg,
 		log:         httpLog,
 		authHandler: authHandler,
+		userHandler: userHandler,
 	}
 
 	server.setupRoutes()
 
 	return server
-}
-
-func (s *Server) setupRoutes() {
-	v1 := s.router.Group("/api/v1")
-	{
-		auth := v1.Group("/auth")
-		{
-			auth.POST("/register", s.authHandler.Register)
-			auth.POST("/login", s.authHandler.Login)
-			auth.POST("/refresh-token", s.authHandler.RefreshToken)
-		}
-	}
 }
 
 func (s *Server) MustRun() {

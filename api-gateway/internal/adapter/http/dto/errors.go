@@ -24,8 +24,6 @@ func FromError(ctx *gin.Context, err error) {
 	var ve model.ValidationErrors
 
 	switch {
-	case errors.As(err, &ve):
-		validationError(ctx, ve)
 	case errors.Is(err, model.ErrUnauthorized):
 		unauthorized(ctx)
 	case errors.Is(err, model.ErrForbidden):
@@ -36,6 +34,10 @@ func FromError(ctx *gin.Context, err error) {
 		conflict(ctx)
 	case errors.Is(err, model.ErrInternalServerError):
 		internalServerError(ctx)
+	case errors.As(err, &ve):
+		validationError(ctx, ve)
+	case errors.Is(err, model.ErrInvalidQueryParam):
+		InvalidQueryParams(ctx)
 	default:
 		internalServerError(ctx)
 	}

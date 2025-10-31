@@ -30,20 +30,6 @@ type UserFilter struct {
 	IsConfirmed *bool
 }
 
-type UserUpdate struct {
-	Email        *string
-	PhoneNumber  *string
-	FirstName    *string
-	LastName     *string
-	BirthDate    *string
-	PasswordHash *[]byte
-	Roles        *[]string
-	UpdatedAt    time.Time
-
-	IsActive    *bool
-	IsConfirmed *bool
-}
-
 type UserCreateData struct {
 	Email                string
 	PhoneNumber          string

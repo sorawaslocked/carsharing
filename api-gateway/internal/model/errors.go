@@ -14,6 +14,8 @@ var (
 	ErrNotFound            = errors.New("resource not found")
 	ErrAlreadyExists       = errors.New("resource already exists")
 	ErrInternalServerError = errors.New("something went wrong")
+
+	ErrInvalidQueryParam = errors.New("invalid query param")
 )
 
 type ValidationErrors map[string]string

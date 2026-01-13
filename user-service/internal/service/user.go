@@ -173,3 +173,16 @@ func (s *UserService) Delete(ctx context.Context, filter model.UserFilter) error
 
 	return s.userRepo.Delete(ctx, filter)
 }
+
+func (s *UserService) Me(ctx context.Context) (model.User, error) {
+	id, ok := ctx.Value("userID").(uint64)
+	if !ok {
+		return model.User{}, model.ErrInvalidToken
+	}
+
+	filter := model.UserFilter{
+		ID: &id,
+	}
+
+	return s.userRepo.FindOne(ctx, filter)
+}

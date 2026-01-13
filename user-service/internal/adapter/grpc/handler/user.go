@@ -102,3 +102,14 @@ func (h *UserHandler) Delete(ctx context.Context, req *usersvc.DeleteRequest) (*
 
 	return &usersvc.DeleteResponse{}, nil
 }
+
+func (h *UserHandler) Me(ctx context.Context, _ *usersvc.MeRequest) (*usersvc.MeResponse, error) {
+	user, err := h.userService.Me(ctx)
+	if err != nil {
+		return nil, dto.ToStatusCodeError(err)
+	}
+
+	return &usersvc.MeResponse{
+		User: dto.ToUserProto(user),
+	}, nil
+}

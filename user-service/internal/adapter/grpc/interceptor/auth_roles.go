@@ -8,6 +8,7 @@ const (
 	UserServiceGetAll = "/service.user.UserService/GetAll"
 	UserServiceUpdate = "/service.user.UserService/Update"
 	UserServiceDelete = "/service.user.UserService/Delete"
+	UserServiceMe     = "/service.user.UserService/Me"
 )
 
 func createPermittedRoles() map[string]map[model.Role]bool {
@@ -28,6 +29,10 @@ func createPermittedRoles() map[string]map[model.Role]bool {
 		model.RoleAdmin: true,
 	}
 	permittedRoles[UserServiceDelete] = map[model.Role]bool{
+		model.RoleAdmin: true,
+	}
+	permittedRoles[UserServiceMe] = map[model.Role]bool{
+		model.RoleUser:  true,
 		model.RoleAdmin: true,
 	}
 

@@ -48,19 +48,16 @@ func (i *AuthInterceptor) Unary(ctx context.Context, req any, info *grpc.UnarySe
 		return nil, dto.ToStatusCodeError(err)
 	}
 
+	err = i.matchesID(req, claims, info.FullMethod)
+	if err != nil {
+		return nil, dto.ToStatusCodeError(err)
+	}
+
 	ctx = context.WithValue(ctx, "userID", claims.id)
 
 	m, err := handler(ctx, req)
 	if err != nil {
 		return nil, err
-	}
-
-	if info.FullMethod == UserServiceGet {
-		res := m.(*usersvc.GetResponse)
-
-		if res.User.ID != claims.id {
-			return nil, dto.ToStatusCodeError(model.ErrInsufficientPermissions)
-		}
 	}
 
 	return m, err
@@ -108,4 +105,23 @@ func (i *AuthInterceptor) authorize(claims _claims, method string) error {
 	}
 
 	return model.ErrInsufficientPermissions
+}
+
+func (i *AuthInterceptor) matchesID(request any, claims _claims, method string) error {
+	switch method {
+	case UserServiceGet:
+		req := request.(*usersvc.GetRequest)
+
+		for _, role := range claims.roles {
+			if role == model.RoleAdmin {
+				return nil
+			}
+		}
+
+		if req.ID != nil && *req.ID != claims.id {
+			return model.ErrInsufficientPermissions
+		}
+	}
+
+	return nil
 }

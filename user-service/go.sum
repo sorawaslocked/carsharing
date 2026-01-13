@@ -50,6 +50,10 @@ github.com/sorawaslocked/car-rental-protos v0.0.5 h1:0NgqXV/gLzRKjk32iKiSanAnWKT
 github.com/sorawaslocked/car-rental-protos v0.0.5/go.mod h1:ThSVtD+dtUfuaRpaZSzXPeF+RVNI6ii4AhcSH5hY7es=
 github.com/sorawaslocked/car-rental-protos v0.0.6 h1:22e6tp2Ug2BW6DILG0CPPNjWYD2ToG1W3BOZoZx+cQE=
 github.com/sorawaslocked/car-rental-protos v0.0.6/go.mod h1:ThSVtD+dtUfuaRpaZSzXPeF+RVNI6ii4AhcSH5hY7es=
+github.com/sorawaslocked/car-rental-protos v0.0.7 h1:9M7hRbJzZSXbiLb2BmQ5BwB7zixacZ2PP/Z6XjM+bnQ=
+github.com/sorawaslocked/car-rental-protos v0.0.7/go.mod h1:ThSVtD+dtUfuaRpaZSzXPeF+RVNI6ii4AhcSH5hY7es=
+github.com/sorawaslocked/car-rental-protos v0.0.8 h1:O+2NbRFHHj941vewgCYbKlIEPwv3uDPnjZwy0whlBws=
+github.com/sorawaslocked/car-rental-protos v0.0.8/go.mod h1:ThSVtD+dtUfuaRpaZSzXPeF+RVNI6ii4AhcSH5hY7es=
 github.com/stretchr/objx v0.5.2 h1:xuMeJ0Sdp5ZMRXx/aWO6RZxdr3beISkG5/G/aIRr3pY=
 github.com/stretchr/objx v0.5.2/go.mod h1:FRsXN1f5AsAjCGJKqEizvkpNtU+EGNCLh3NxZ/8L+MA=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=

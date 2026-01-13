@@ -12,6 +12,7 @@ service UserService {
   rpc GetAll(GetAllRequest) returns (GetAllResponse);
   rpc Update(UpdateRequest) returns (UpdateResponse);
   rpc Delete(DeleteRequest) returns (DeleteResponse);
+  rpc Me(MeRequest) returns (MeResponse);
 }
 
 message CreateRequest {
@@ -72,3 +73,11 @@ message DeleteRequest {
 }
 
 message DeleteResponse {}
+
+message MeRequest {
+  string token = 1;
+}
+
+message MeResponse {
+  base.User user = 1;
+}

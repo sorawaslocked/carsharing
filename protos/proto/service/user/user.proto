@@ -74,9 +74,7 @@ message DeleteRequest {
 
 message DeleteResponse {}
 
-message MeRequest {
-  string token = 1;
-}
+message MeRequest {}
 
 message MeResponse {
   base.User user = 1;

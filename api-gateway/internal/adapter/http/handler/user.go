@@ -112,3 +112,14 @@ func (h *User) Delete(ctx *gin.Context) {
 
 	dto.Ok(ctx, nil)
 }
+
+func (h *User) Me(ctx *gin.Context) {
+	user, err := h.svc.Me(ctx)
+	if err != nil {
+		dto.FromError(ctx, err)
+
+		return
+	}
+
+	dto.Ok(ctx, gin.H{"user": user})
+}

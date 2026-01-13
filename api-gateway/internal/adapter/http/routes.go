@@ -16,6 +16,7 @@ func (s *Server) setupRoutes() {
 			users.GET("", s.userHandler.Get)
 			users.PATCH("", s.userHandler.Update)
 			users.DELETE("", s.userHandler.Delete)
+			users.GET("/me", s.userHandler.Me)
 		}
 	}
 }

@@ -32,3 +32,7 @@ func (s *UserService) Update(ctx context.Context, filter model.UserFilter, data 
 func (s *UserService) Delete(ctx context.Context, filter model.UserFilter) error {
 	return s.presenter.Delete(ctx, filter)
 }
+
+func (s *UserService) Me(ctx context.Context) (model.User, error) {
+	return s.presenter.Me(ctx)
+}

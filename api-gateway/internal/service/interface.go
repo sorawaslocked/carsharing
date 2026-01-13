@@ -17,4 +17,5 @@ type UserPresenter interface {
 	GetAll(ctx context.Context, filter model.UserFilter) ([]model.User, error)
 	Update(ctx context.Context, filter model.UserFilter, data model.UserUpdateData) error
 	Delete(ctx context.Context, filter model.UserFilter) error
+	Me(ctx context.Context) (model.User, error)
 }

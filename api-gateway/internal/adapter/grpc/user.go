@@ -114,3 +114,14 @@ func (h *UserHandler) Delete(ctx context.Context, filter model.UserFilter) error
 
 	return nil
 }
+
+func (h *UserHandler) Me(ctx context.Context) (model.User, error) {
+	req := &usersvc.MeRequest{}
+
+	res, err := h.client.Me(ctx, req)
+	if err != nil {
+		return model.User{}, fromGrpcErr(err)
+	}
+
+	return dto.FromProto(res.User), nil
+}

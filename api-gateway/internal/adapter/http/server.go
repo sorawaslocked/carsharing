@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/handler"
@@ -45,9 +44,7 @@ func New(
 
 	// Middleware
 	router.Use(gin.Recovery())
-	if env == envLocal || env == envDev {
-		router.Use(cors.Default())
-	}
+	router.Use(middleware.Cors())
 	router.Use(requestid.New())
 	router.Use(middleware.Base())
 	router.Use(middleware.Logger(httpLog))

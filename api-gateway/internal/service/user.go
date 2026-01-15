@@ -36,3 +36,11 @@ func (s *UserService) Delete(ctx context.Context, filter model.UserFilter) error
 func (s *UserService) Me(ctx context.Context) (model.User, error) {
 	return s.presenter.Me(ctx)
 }
+
+func (s *UserService) SendActivationCode(ctx context.Context) error {
+	return s.presenter.SendActivationCode(ctx)
+}
+
+func (s *UserService) CheckActivationCode(ctx context.Context, code string) error {
+	return s.presenter.CheckActivationCode(ctx, code)
+}

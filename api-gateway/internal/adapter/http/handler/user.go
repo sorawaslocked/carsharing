@@ -123,3 +123,32 @@ func (h *User) Me(ctx *gin.Context) {
 
 	dto.Ok(ctx, gin.H{"user": user})
 }
+
+func (h *User) SendActivationCode(ctx *gin.Context) {
+	err := h.svc.SendActivationCode(ctx)
+	if err != nil {
+		dto.FromError(ctx, err)
+
+		return
+	}
+
+	dto.Ok(ctx, nil)
+}
+
+func (h *User) CheckActivationCode(ctx *gin.Context) {
+	code, err := dto.FromCheckActivationCodeRequest(ctx)
+	if err != nil {
+		dto.FromError(ctx, err)
+
+		return
+	}
+
+	err = h.svc.CheckActivationCode(ctx, code)
+	if err != nil {
+		dto.FromError(ctx, err)
+
+		return
+	}
+
+	dto.Ok(ctx, nil)
+}

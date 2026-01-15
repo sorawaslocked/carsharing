@@ -60,6 +60,10 @@ type UserUpdateRequest struct {
 	IsConfirmed          *bool     `json:"isConfirmed"`
 }
 
+type CheckActivationCodeRequest struct {
+	Code string `json:"code"`
+}
+
 func FromCreateUserRequest(ctx *gin.Context) (model.UserCreateData, error) {
 	var req UserCreateRequest
 
@@ -106,6 +110,16 @@ func FromUpdateRequest(ctx *gin.Context) (model.UserUpdateData, error) {
 		IsActive:             req.IsActive,
 		IsConfirmed:          req.IsConfirmed,
 	}, nil
+}
+
+func FromCheckActivationCodeRequest(ctx *gin.Context) (string, error) {
+	var req CheckActivationCodeRequest
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return "", err
+	}
+
+	return req.Code, nil
 }
 
 func FilterFromCtx(ctx *gin.Context) (model.UserFilter, error) {

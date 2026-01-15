@@ -125,3 +125,27 @@ func (h *UserHandler) Me(ctx context.Context) (model.User, error) {
 
 	return dto.FromProto(res.User), nil
 }
+
+func (h *UserHandler) SendActivationCode(ctx context.Context) error {
+	req := &usersvc.SendActivationCodeRequest{}
+
+	_, err := h.client.SendActivationCode(ctx, req)
+	if err != nil {
+		return fromGrpcErr(err)
+	}
+
+	return nil
+}
+
+func (h *UserHandler) CheckActivationCode(ctx context.Context, code string) error {
+	req := &usersvc.CheckActivationCodeRequest{
+		Code: code,
+	}
+
+	_, err := h.client.CheckActivationCode(ctx, req)
+	if err != nil {
+		return fromGrpcErr(err)
+	}
+
+	return nil
+}

@@ -24,6 +24,8 @@ func FromError(ctx *gin.Context, err error) {
 	var ve model.ValidationErrors
 
 	switch {
+	case errors.Is(err, model.ErrInvalidArgument):
+		badRequest(ctx, err.Error())
 	case errors.Is(err, model.ErrUnauthorized):
 		unauthorized(ctx)
 	case errors.Is(err, model.ErrForbidden):

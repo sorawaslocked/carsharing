@@ -17,6 +17,8 @@ func (s *Server) setupRoutes() {
 			users.PATCH("", s.userHandler.Update)
 			users.DELETE("", s.userHandler.Delete)
 			users.GET("/me", s.userHandler.Me)
+			users.POST("/activation-code/send", s.userHandler.SendActivationCode)
+			users.POST("/activation-code/check", s.userHandler.CheckActivationCode)
 		}
 	}
 }

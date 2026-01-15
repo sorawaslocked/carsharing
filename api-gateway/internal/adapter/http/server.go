@@ -13,12 +13,6 @@ import (
 	"net/http"
 )
 
-const (
-	envLocal = "local"
-	envDev   = "dev"
-	envProd  = "prod"
-)
-
 type Server struct {
 	router      *gin.Engine
 	cfg         config.HTTPServer
@@ -28,7 +22,6 @@ type Server struct {
 }
 
 func New(
-	env string,
 	cfg config.HTTPServer,
 	log *slog.Logger,
 	authService handler.AuthService,

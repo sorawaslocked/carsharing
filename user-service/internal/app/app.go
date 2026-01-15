@@ -4,11 +4,14 @@ import (
 	"context"
 	"github.com/go-playground/validator/v10"
 	grpcserver "github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc"
+	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/mailer"
 	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/postgres"
+	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/redis"
 	"github.com/sorawaslocked/car-rental-user-service/internal/config"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/jwt"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/logger"
 	postgrescfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/postgres"
+	rediscfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/redis"
 	validatecfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/validate"
 	"github.com/sorawaslocked/car-rental-user-service/internal/service"
 	"log/slog"
@@ -55,7 +58,11 @@ func New(
 
 	userRepo := postgres.NewUserRepository(log, db)
 
-	userService := service.NewUserService(log, validate, jwtProvider, userRepo)
+	activationCodeRedisCache := redis.NewActivationCodeRedisCache(rediscfg.Client(cfg.Redis))
+
+	msMailer := mailer.New(cfg.MailerSendAPIKey)
+
+	userService := service.NewUserService(log, validate, jwtProvider, userRepo, activationCodeRedisCache, msMailer)
 	authService := service.NewAuthService(log, validate, jwtProvider, userService)
 
 	grpcServer := grpcserver.NewServer(cfg.GRPC, log, authService, userService, jwtProvider)

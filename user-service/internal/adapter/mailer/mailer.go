@@ -4,24 +4,26 @@ import (
 	"context"
 	"fmt"
 	"github.com/mailersend/mailersend-go"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/mailer"
 	"time"
 )
 
-var (
-	from = mailersend.From{
-		Name:  "Car Rental",
-		Email: "car-rental@mail.com",
-	}
-)
-
 type Mailer struct {
-	ms *mailersend.Mailersend
+	ms   *mailersend.Mailersend
+	from mailersend.From
 }
 
-func New(apiKey string) *Mailer {
-	ms := mailersend.NewMailersend(apiKey)
+func New(cfg mailer.Config) *Mailer {
+	ms := mailersend.NewMailersend(cfg.APIKey)
+	from := mailersend.From{
+		Name:  "Car Rental",
+		Email: cfg.From,
+	}
 
-	return &Mailer{ms: ms}
+	return &Mailer{
+		ms:   ms,
+		from: from,
+	}
 }
 
 func (m *Mailer) SendActivationCode(ctx context.Context, to, code string) error {
@@ -39,7 +41,7 @@ func (m *Mailer) SendActivationCode(ctx context.Context, to, code string) error 
 	}
 
 	message := m.ms.Email.NewMessage()
-	message.SetFrom(from)
+	message.SetFrom(m.from)
 	message.SetRecipients(recipients)
 	message.SetSubject(subject)
 	message.SetHTML(html)

@@ -113,3 +113,21 @@ func (h *UserHandler) Me(ctx context.Context, _ *usersvc.MeRequest) (*usersvc.Me
 		User: dto.ToUserProto(user),
 	}, nil
 }
+
+func (h *UserHandler) SendActivationCode(ctx context.Context, _ *usersvc.SendActivationCodeRequest) (*usersvc.SendActivationCodeResponse, error) {
+	err := h.userService.SendActivationCode(ctx)
+	if err != nil {
+		return nil, dto.ToStatusCodeError(err)
+	}
+
+	return &usersvc.SendActivationCodeResponse{}, nil
+}
+
+func (h *UserHandler) CheckActivationCode(ctx context.Context, req *usersvc.CheckActivationCodeRequest) (*usersvc.CheckActivationCodeResponse, error) {
+	err := h.userService.CheckActivationCode(ctx, req.Code)
+	if err != nil {
+		return nil, dto.ToStatusCodeError(err)
+	}
+
+	return &usersvc.CheckActivationCodeResponse{}, nil
+}

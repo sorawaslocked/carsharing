@@ -16,7 +16,7 @@ type queryParamsValidation struct {
 }
 
 type activationCodeValidation struct {
-	Code string `validate:"required,len=6,alpha,uppercase"`
+	Code string `validate:"required,len=6,alphanum,uppercase"`
 }
 
 func validateInput(v *validator.Validate, input any) error {

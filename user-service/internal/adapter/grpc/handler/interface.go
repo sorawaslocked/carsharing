@@ -18,4 +18,6 @@ type UserService interface {
 	Update(ctx context.Context, filter model.UserFilter, data model.UserUpdateData) error
 	Delete(ctx context.Context, filter model.UserFilter) error
 	Me(ctx context.Context) (model.User, error)
+	SendActivationCode(ctx context.Context) error
+	CheckActivationCode(ctx context.Context, code string) error
 }

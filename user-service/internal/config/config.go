@@ -5,6 +5,7 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/grpc"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/jwt"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/mailer"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/postgres"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/redis"
 	"os"
@@ -12,12 +13,12 @@ import (
 
 type (
 	Config struct {
-		Env              string          `yaml:"env" env:"ENV" env-required:"true"`
-		Postgres         postgres.Config `yaml:"postgres" env-required:"true"`
-		Redis            redis.Config    `yaml:"redis" env-required:"true"`
-		GRPC             grpc.Config     `yaml:"grpc" env-required:"true"`
-		JWT              jwt.Config      `yaml:"jwt" env-required:"true"`
-		MailerSendAPIKey string          `env:"MAILER_SEND_API_KEY" env-required:"true"`
+		Env      string          `yaml:"env" env:"ENV" env-required:"true"`
+		Postgres postgres.Config `yaml:"postgres" env-required:"true"`
+		Redis    redis.Config    `yaml:"redis" env-required:"true"`
+		GRPC     grpc.Config     `yaml:"grpc" env-required:"true"`
+		JWT      jwt.Config      `yaml:"jwt" env-required:"true"`
+		Mailer   mailer.Config
 	}
 )
 

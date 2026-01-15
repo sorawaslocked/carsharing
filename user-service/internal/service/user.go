@@ -119,13 +119,9 @@ func (s *UserService) Update(ctx context.Context, filter model.UserFilter, data 
 	}
 	formatFilter(&filter)
 
-	user, err := s.FindOne(ctx, filter)
+	_, err = s.FindOne(ctx, filter)
 	if err != nil {
 		return err
-	}
-
-	if user.ID != ctx.Value("userID").(uint64) {
-		return model.ErrInsufficientPermissions
 	}
 
 	err = validateInput(s.validate, data)
@@ -267,6 +263,8 @@ func (s *UserService) SendActivationCode(ctx context.Context) error {
 
 	err = s.mailer.SendActivationCode(ctx, user.Email, code)
 	if err != nil {
+		s.log.Error("Mailer", logger.Err(err))
+
 		return err
 	}
 

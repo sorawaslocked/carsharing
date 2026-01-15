@@ -30,7 +30,7 @@ var (
 
 	ErrRequiredField         = errors.New("required")
 	ErrPasswordsDoNotMatch   = errors.New("passwords do not match")
-	ErrNotAlpha              = errors.New("must only contain ascii letters")
+	ErrNotAlphaNum           = errors.New("must only contain ascii letters and numbers")
 	ErrNotAlphaUnicode       = errors.New("must only contain letters")
 	ErrNotUppercase          = errors.New("must only contain uppercase letters")
 	ErrInvalidEmail          = errors.New("must be a valid email address")

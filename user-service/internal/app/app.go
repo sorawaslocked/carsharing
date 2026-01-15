@@ -60,7 +60,7 @@ func New(
 
 	activationCodeRedisCache := redis.NewActivationCodeRedisCache(rediscfg.Client(cfg.Redis))
 
-	msMailer := mailer.New(cfg.MailerSendAPIKey)
+	msMailer := mailer.New(cfg.Mailer)
 
 	userService := service.NewUserService(log, validate, jwtProvider, userRepo, activationCodeRedisCache, msMailer)
 	authService := service.NewAuthService(log, validate, jwtProvider, userService)

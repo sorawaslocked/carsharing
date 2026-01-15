@@ -616,7 +616,6 @@ func (*DeleteResponse) Descriptor() ([]byte, []int) {
 
 type MeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -649,13 +648,6 @@ func (x *MeRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use MeRequest.ProtoReflect.Descriptor instead.
 func (*MeRequest) Descriptor() ([]byte, []int) {
 	return file_service_user_user_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *MeRequest) GetToken() string {
-	if x != nil {
-		return x.Token
-	}
-	return ""
 }
 
 type MeResponse struct {
@@ -771,9 +763,8 @@ const file_service_user_user_proto_rawDesc = "" +
 	"\x05email\x18\x02 \x01(\tH\x01R\x05email\x88\x01\x01B\x05\n" +
 	"\x03_IDB\b\n" +
 	"\x06_email\"\x10\n" +
-	"\x0eDeleteResponse\"!\n" +
-	"\tMeRequest\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\",\n" +
+	"\x0eDeleteResponse\"\v\n" +
+	"\tMeRequest\",\n" +
 	"\n" +
 	"MeResponse\x12\x1e\n" +
 	"\x04user\x18\x01 \x01(\v2\n" +

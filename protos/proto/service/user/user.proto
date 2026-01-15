@@ -13,6 +13,8 @@ service UserService {
   rpc Update(UpdateRequest) returns (UpdateResponse);
   rpc Delete(DeleteRequest) returns (DeleteResponse);
   rpc Me(MeRequest) returns (MeResponse);
+  rpc SendActivationCode(SendActivationCodeRequest) returns (SendActivationCodeResponse);
+  rpc CheckActivationCode(CheckActivationCodeRequest) returns (CheckActivationCodeResponse);
 }
 
 message CreateRequest {
@@ -79,3 +81,13 @@ message MeRequest {}
 message MeResponse {
   base.User user = 1;
 }
+
+message SendActivationCodeRequest {}
+
+message SendActivationCodeResponse {}
+
+message CheckActivationCodeRequest {
+  string code = 1;
+}
+
+message CheckActivationCodeResponse {}

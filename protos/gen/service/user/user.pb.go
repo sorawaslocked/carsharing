@@ -694,6 +694,158 @@ func (x *MeResponse) GetUser() *base.User {
 	return nil
 }
 
+type SendActivationCodeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SendActivationCodeRequest) Reset() {
+	*x = SendActivationCodeRequest{}
+	mi := &file_service_user_user_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SendActivationCodeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendActivationCodeRequest) ProtoMessage() {}
+
+func (x *SendActivationCodeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_service_user_user_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SendActivationCodeRequest.ProtoReflect.Descriptor instead.
+func (*SendActivationCodeRequest) Descriptor() ([]byte, []int) {
+	return file_service_user_user_proto_rawDescGZIP(), []int{12}
+}
+
+type SendActivationCodeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SendActivationCodeResponse) Reset() {
+	*x = SendActivationCodeResponse{}
+	mi := &file_service_user_user_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SendActivationCodeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendActivationCodeResponse) ProtoMessage() {}
+
+func (x *SendActivationCodeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_service_user_user_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SendActivationCodeResponse.ProtoReflect.Descriptor instead.
+func (*SendActivationCodeResponse) Descriptor() ([]byte, []int) {
+	return file_service_user_user_proto_rawDescGZIP(), []int{13}
+}
+
+type CheckActivationCodeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckActivationCodeRequest) Reset() {
+	*x = CheckActivationCodeRequest{}
+	mi := &file_service_user_user_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckActivationCodeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckActivationCodeRequest) ProtoMessage() {}
+
+func (x *CheckActivationCodeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_service_user_user_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckActivationCodeRequest.ProtoReflect.Descriptor instead.
+func (*CheckActivationCodeRequest) Descriptor() ([]byte, []int) {
+	return file_service_user_user_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *CheckActivationCodeRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+type CheckActivationCodeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckActivationCodeResponse) Reset() {
+	*x = CheckActivationCodeResponse{}
+	mi := &file_service_user_user_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckActivationCodeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckActivationCodeResponse) ProtoMessage() {}
+
+func (x *CheckActivationCodeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_service_user_user_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckActivationCodeResponse.ProtoReflect.Descriptor instead.
+func (*CheckActivationCodeResponse) Descriptor() ([]byte, []int) {
+	return file_service_user_user_proto_rawDescGZIP(), []int{15}
+}
+
 var File_service_user_user_proto protoreflect.FileDescriptor
 
 const file_service_user_user_proto_rawDesc = "" +
@@ -768,14 +920,21 @@ const file_service_user_user_proto_rawDesc = "" +
 	"\n" +
 	"MeResponse\x12\x1e\n" +
 	"\x04user\x18\x01 \x01(\v2\n" +
-	".base.UserR\x04user2\x96\x03\n" +
+	".base.UserR\x04user\"\x1b\n" +
+	"\x19SendActivationCodeRequest\"\x1c\n" +
+	"\x1aSendActivationCodeResponse\"0\n" +
+	"\x1aCheckActivationCodeRequest\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\tR\x04code\"\x1d\n" +
+	"\x1bCheckActivationCodeResponse2\xeb\x04\n" +
 	"\vUserService\x12C\n" +
 	"\x06Create\x12\x1b.service.user.CreateRequest\x1a\x1c.service.user.CreateResponse\x12:\n" +
 	"\x03Get\x12\x18.service.user.GetRequest\x1a\x19.service.user.GetResponse\x12C\n" +
 	"\x06GetAll\x12\x1b.service.user.GetAllRequest\x1a\x1c.service.user.GetAllResponse\x12C\n" +
 	"\x06Update\x12\x1b.service.user.UpdateRequest\x1a\x1c.service.user.UpdateResponse\x12C\n" +
 	"\x06Delete\x12\x1b.service.user.DeleteRequest\x1a\x1c.service.user.DeleteResponse\x127\n" +
-	"\x02Me\x12\x17.service.user.MeRequest\x1a\x18.service.user.MeResponseB=Z;github.com/sorawaslocked/car-rental-protos/gen/service/userb\x06proto3"
+	"\x02Me\x12\x17.service.user.MeRequest\x1a\x18.service.user.MeResponse\x12g\n" +
+	"\x12SendActivationCode\x12'.service.user.SendActivationCodeRequest\x1a(.service.user.SendActivationCodeResponse\x12j\n" +
+	"\x13CheckActivationCode\x12(.service.user.CheckActivationCodeRequest\x1a).service.user.CheckActivationCodeResponseB=Z;github.com/sorawaslocked/car-rental-protos/gen/service/userb\x06proto3"
 
 var (
 	file_service_user_user_proto_rawDescOnce sync.Once
@@ -789,40 +948,48 @@ func file_service_user_user_proto_rawDescGZIP() []byte {
 	return file_service_user_user_proto_rawDescData
 }
 
-var file_service_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_service_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_service_user_user_proto_goTypes = []any{
-	(*CreateRequest)(nil),  // 0: service.user.CreateRequest
-	(*CreateResponse)(nil), // 1: service.user.CreateResponse
-	(*GetRequest)(nil),     // 2: service.user.GetRequest
-	(*GetResponse)(nil),    // 3: service.user.GetResponse
-	(*GetAllRequest)(nil),  // 4: service.user.GetAllRequest
-	(*GetAllResponse)(nil), // 5: service.user.GetAllResponse
-	(*UpdateRequest)(nil),  // 6: service.user.UpdateRequest
-	(*UpdateResponse)(nil), // 7: service.user.UpdateResponse
-	(*DeleteRequest)(nil),  // 8: service.user.DeleteRequest
-	(*DeleteResponse)(nil), // 9: service.user.DeleteResponse
-	(*MeRequest)(nil),      // 10: service.user.MeRequest
-	(*MeResponse)(nil),     // 11: service.user.MeResponse
-	(*base.User)(nil),      // 12: base.User
+	(*CreateRequest)(nil),               // 0: service.user.CreateRequest
+	(*CreateResponse)(nil),              // 1: service.user.CreateResponse
+	(*GetRequest)(nil),                  // 2: service.user.GetRequest
+	(*GetResponse)(nil),                 // 3: service.user.GetResponse
+	(*GetAllRequest)(nil),               // 4: service.user.GetAllRequest
+	(*GetAllResponse)(nil),              // 5: service.user.GetAllResponse
+	(*UpdateRequest)(nil),               // 6: service.user.UpdateRequest
+	(*UpdateResponse)(nil),              // 7: service.user.UpdateResponse
+	(*DeleteRequest)(nil),               // 8: service.user.DeleteRequest
+	(*DeleteResponse)(nil),              // 9: service.user.DeleteResponse
+	(*MeRequest)(nil),                   // 10: service.user.MeRequest
+	(*MeResponse)(nil),                  // 11: service.user.MeResponse
+	(*SendActivationCodeRequest)(nil),   // 12: service.user.SendActivationCodeRequest
+	(*SendActivationCodeResponse)(nil),  // 13: service.user.SendActivationCodeResponse
+	(*CheckActivationCodeRequest)(nil),  // 14: service.user.CheckActivationCodeRequest
+	(*CheckActivationCodeResponse)(nil), // 15: service.user.CheckActivationCodeResponse
+	(*base.User)(nil),                   // 16: base.User
 }
 var file_service_user_user_proto_depIdxs = []int32{
-	12, // 0: service.user.GetResponse.user:type_name -> base.User
-	12, // 1: service.user.GetAllResponse.users:type_name -> base.User
-	12, // 2: service.user.MeResponse.user:type_name -> base.User
+	16, // 0: service.user.GetResponse.user:type_name -> base.User
+	16, // 1: service.user.GetAllResponse.users:type_name -> base.User
+	16, // 2: service.user.MeResponse.user:type_name -> base.User
 	0,  // 3: service.user.UserService.Create:input_type -> service.user.CreateRequest
 	2,  // 4: service.user.UserService.Get:input_type -> service.user.GetRequest
 	4,  // 5: service.user.UserService.GetAll:input_type -> service.user.GetAllRequest
 	6,  // 6: service.user.UserService.Update:input_type -> service.user.UpdateRequest
 	8,  // 7: service.user.UserService.Delete:input_type -> service.user.DeleteRequest
 	10, // 8: service.user.UserService.Me:input_type -> service.user.MeRequest
-	1,  // 9: service.user.UserService.Create:output_type -> service.user.CreateResponse
-	3,  // 10: service.user.UserService.Get:output_type -> service.user.GetResponse
-	5,  // 11: service.user.UserService.GetAll:output_type -> service.user.GetAllResponse
-	7,  // 12: service.user.UserService.Update:output_type -> service.user.UpdateResponse
-	9,  // 13: service.user.UserService.Delete:output_type -> service.user.DeleteResponse
-	11, // 14: service.user.UserService.Me:output_type -> service.user.MeResponse
-	9,  // [9:15] is the sub-list for method output_type
-	3,  // [3:9] is the sub-list for method input_type
+	12, // 9: service.user.UserService.SendActivationCode:input_type -> service.user.SendActivationCodeRequest
+	14, // 10: service.user.UserService.CheckActivationCode:input_type -> service.user.CheckActivationCodeRequest
+	1,  // 11: service.user.UserService.Create:output_type -> service.user.CreateResponse
+	3,  // 12: service.user.UserService.Get:output_type -> service.user.GetResponse
+	5,  // 13: service.user.UserService.GetAll:output_type -> service.user.GetAllResponse
+	7,  // 14: service.user.UserService.Update:output_type -> service.user.UpdateResponse
+	9,  // 15: service.user.UserService.Delete:output_type -> service.user.DeleteResponse
+	11, // 16: service.user.UserService.Me:output_type -> service.user.MeResponse
+	13, // 17: service.user.UserService.SendActivationCode:output_type -> service.user.SendActivationCodeResponse
+	15, // 18: service.user.UserService.CheckActivationCode:output_type -> service.user.CheckActivationCodeResponse
+	11, // [11:19] is the sub-list for method output_type
+	3,  // [3:11] is the sub-list for method input_type
 	3,  // [3:3] is the sub-list for extension type_name
 	3,  // [3:3] is the sub-list for extension extendee
 	0,  // [0:3] is the sub-list for field type_name
@@ -845,7 +1012,7 @@ func file_service_user_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_service_user_user_proto_rawDesc), len(file_service_user_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -19,12 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_Create_FullMethodName = "/service.user.UserService/Create"
-	UserService_Get_FullMethodName    = "/service.user.UserService/Get"
-	UserService_GetAll_FullMethodName = "/service.user.UserService/GetAll"
-	UserService_Update_FullMethodName = "/service.user.UserService/Update"
-	UserService_Delete_FullMethodName = "/service.user.UserService/Delete"
-	UserService_Me_FullMethodName     = "/service.user.UserService/Me"
+	UserService_Create_FullMethodName              = "/service.user.UserService/Create"
+	UserService_Get_FullMethodName                 = "/service.user.UserService/Get"
+	UserService_GetAll_FullMethodName              = "/service.user.UserService/GetAll"
+	UserService_Update_FullMethodName              = "/service.user.UserService/Update"
+	UserService_Delete_FullMethodName              = "/service.user.UserService/Delete"
+	UserService_Me_FullMethodName                  = "/service.user.UserService/Me"
+	UserService_SendActivationCode_FullMethodName  = "/service.user.UserService/SendActivationCode"
+	UserService_CheckActivationCode_FullMethodName = "/service.user.UserService/CheckActivationCode"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -37,6 +39,8 @@ type UserServiceClient interface {
 	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 	Me(ctx context.Context, in *MeRequest, opts ...grpc.CallOption) (*MeResponse, error)
+	SendActivationCode(ctx context.Context, in *SendActivationCodeRequest, opts ...grpc.CallOption) (*SendActivationCodeResponse, error)
+	CheckActivationCode(ctx context.Context, in *CheckActivationCodeRequest, opts ...grpc.CallOption) (*CheckActivationCodeResponse, error)
 }
 
 type userServiceClient struct {
@@ -107,6 +111,26 @@ func (c *userServiceClient) Me(ctx context.Context, in *MeRequest, opts ...grpc.
 	return out, nil
 }
 
+func (c *userServiceClient) SendActivationCode(ctx context.Context, in *SendActivationCodeRequest, opts ...grpc.CallOption) (*SendActivationCodeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SendActivationCodeResponse)
+	err := c.cc.Invoke(ctx, UserService_SendActivationCode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) CheckActivationCode(ctx context.Context, in *CheckActivationCodeRequest, opts ...grpc.CallOption) (*CheckActivationCodeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CheckActivationCodeResponse)
+	err := c.cc.Invoke(ctx, UserService_CheckActivationCode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -117,6 +141,8 @@ type UserServiceServer interface {
 	Update(context.Context, *UpdateRequest) (*UpdateResponse, error)
 	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
 	Me(context.Context, *MeRequest) (*MeResponse, error)
+	SendActivationCode(context.Context, *SendActivationCodeRequest) (*SendActivationCodeResponse, error)
+	CheckActivationCode(context.Context, *CheckActivationCodeRequest) (*CheckActivationCodeResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -144,6 +170,12 @@ func (UnimplementedUserServiceServer) Delete(context.Context, *DeleteRequest) (*
 }
 func (UnimplementedUserServiceServer) Me(context.Context, *MeRequest) (*MeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Me not implemented")
+}
+func (UnimplementedUserServiceServer) SendActivationCode(context.Context, *SendActivationCodeRequest) (*SendActivationCodeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SendActivationCode not implemented")
+}
+func (UnimplementedUserServiceServer) CheckActivationCode(context.Context, *CheckActivationCodeRequest) (*CheckActivationCodeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CheckActivationCode not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -274,6 +306,42 @@ func _UserService_Me_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_SendActivationCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendActivationCodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).SendActivationCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_SendActivationCode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).SendActivationCode(ctx, req.(*SendActivationCodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_CheckActivationCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckActivationCodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).CheckActivationCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_CheckActivationCode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).CheckActivationCode(ctx, req.(*CheckActivationCodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -304,6 +372,14 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Me",
 			Handler:    _UserService_Me_Handler,
+		},
+		{
+			MethodName: "SendActivationCode",
+			Handler:    _UserService_SendActivationCode_Handler,
+		},
+		{
+			MethodName: "CheckActivationCode",
+			Handler:    _UserService_CheckActivationCode_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -2,12 +2,12 @@ package security
 
 import "golang.org/x/crypto/bcrypt"
 
-func HashPassword(password string) ([]byte, error) {
-	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+func HashString(s string) ([]byte, error) {
+	hashed, err := bcrypt.GenerateFromPassword([]byte(s), bcrypt.DefaultCost)
 
 	return hashed, err
 }
 
-func CheckPassword(password string, hash []byte) error {
-	return bcrypt.CompareHashAndPassword(hash, []byte(password))
+func CheckStringHash(s string, hash []byte) error {
+	return bcrypt.CompareHashAndPassword(hash, []byte(s))
 }

@@ -15,6 +15,10 @@ type queryParamsValidation struct {
 	Email string `validate:"required_without=ID"`
 }
 
+type activationCodeValidation struct {
+	Code string `validate:"required,len=6,alpha,uppercase"`
+}
+
 func validateInput(v *validator.Validate, input any) error {
 	err := v.Struct(input)
 	if err == nil {

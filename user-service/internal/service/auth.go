@@ -58,7 +58,7 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 		return model.Token{}, err
 	}
 
-	err = security.CheckPassword(cred.Password, user.PasswordHash)
+	err = security.CheckStringHash(cred.Password, user.PasswordHash)
 	if err != nil {
 		return model.Token{}, model.ValidationErrors{
 			"password": model.ErrPasswordsDoNotMatch,

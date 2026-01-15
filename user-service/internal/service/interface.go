@@ -18,3 +18,12 @@ type JwtProvider interface {
 	GenerateRefreshToken(id uint64, roles []string) (string, error)
 	VerifyAndParseClaims(token string) (uint64, []string, error)
 }
+
+type ActivationCodeStorage interface {
+	Create(ctx context.Context, userID uint64) (string, error)
+	Get(ctx context.Context, userID uint64) ([]byte, error)
+}
+
+type Mailer interface {
+	SendActivationCode(ctx context.Context, to, code string) error
+}

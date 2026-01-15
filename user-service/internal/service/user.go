@@ -12,10 +12,12 @@ import (
 )
 
 type UserService struct {
-	log         *slog.Logger
-	validate    *validator.Validate
-	jwtProvider JwtProvider
-	userRepo    UserRepository
+	log                   *slog.Logger
+	validate              *validator.Validate
+	jwtProvider           JwtProvider
+	userRepo              UserRepository
+	activationCodeStorage ActivationCodeStorage
+	mailer                Mailer
 }
 
 func NewUserService(
@@ -23,12 +25,16 @@ func NewUserService(
 	validate *validator.Validate,
 	jwtProvider JwtProvider,
 	userRepo UserRepository,
+	activationCodeStorage ActivationCodeStorage,
+	mailer Mailer,
 ) *UserService {
 	return &UserService{
-		log:         log,
-		validate:    validate,
-		jwtProvider: jwtProvider,
-		userRepo:    userRepo,
+		log:                   log,
+		validate:              validate,
+		jwtProvider:           jwtProvider,
+		userRepo:              userRepo,
+		activationCodeStorage: activationCodeStorage,
+		mailer:                mailer,
 	}
 }
 
@@ -43,7 +49,7 @@ func (s *UserService) Insert(ctx context.Context, data model.UserCreateData) (ui
 		return 0, model.ErrDuplicateEmail
 	}
 
-	passwordHash, err := security.HashPassword(data.Password)
+	passwordHash, err := security.HashString(data.Password)
 	if err != nil {
 		s.log.Error("bcrypt: hashing password", logger.Err(err))
 
@@ -140,7 +146,7 @@ func (s *UserService) Update(ctx context.Context, filter model.UserFilter, data 
 	}
 
 	if data.Password != nil {
-		passwordHash, err := security.HashPassword(*data.Password)
+		passwordHash, err := security.HashString(*data.Password)
 		if err != nil {
 			s.log.Error("bcrypt: hashing password", logger.Err(err))
 
@@ -185,4 +191,84 @@ func (s *UserService) Me(ctx context.Context) (model.User, error) {
 	}
 
 	return s.userRepo.FindOne(ctx, filter)
+}
+
+func (s *UserService) CheckActivationCode(ctx context.Context, code string) error {
+	id, ok := ctx.Value("userID").(uint64)
+	if !ok {
+		return model.ErrInvalidToken
+	}
+
+	filter := model.UserFilter{
+		ID: &id,
+	}
+
+	user, err := s.userRepo.FindOne(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	if user.IsActive {
+		return model.ErrActivatedUser
+	}
+
+	codeValidation := &activationCodeValidation{
+		Code: code,
+	}
+
+	err = validateInput(s.validate, codeValidation)
+	if err != nil {
+		return err
+	}
+
+	codeHash, err := s.activationCodeStorage.Get(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	err = security.CheckStringHash(code, codeHash)
+	if err != nil {
+		return model.ErrInvalidActivationCode
+	}
+
+	isActive := true
+	update := model.UserUpdate{
+		UpdatedAt: time.Now(),
+		IsActive:  &isActive,
+	}
+
+	err = s.userRepo.Update(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *UserService) SendActivationCode(ctx context.Context) error {
+	id, ok := ctx.Value("userID").(uint64)
+	if !ok {
+		return model.ErrInvalidToken
+	}
+
+	filter := model.UserFilter{
+		ID: &id,
+	}
+
+	user, err := s.userRepo.FindOne(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	code, err := s.activationCodeStorage.Create(ctx, user.ID)
+	if err != nil {
+		return err
+	}
+
+	err = s.mailer.SendActivationCode(ctx, user.Email, code)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -24,8 +24,14 @@ func validationError(fieldErr validator.FieldError) error {
 		param := uncapitalize(fieldErr.Param())
 
 		return fmt.Errorf("must be same value as %s", param)
+	case "alpha":
+		return model.ErrNotAlpha
 	case "alphaunicode":
 		return model.ErrNotAlphaUnicode
+	case "uppercase":
+		return model.ErrNotUppercase
+	case "len":
+		return fmt.Errorf("must be exactly %s characters long", fieldErr.Field())
 	case "max":
 		return fmt.Errorf("must be at most %s characters", fieldErr.Param())
 	case "min":

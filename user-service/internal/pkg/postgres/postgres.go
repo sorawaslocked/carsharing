@@ -8,7 +8,7 @@ import (
 )
 
 type Config struct {
-	Dsn                string        `yaml:"dsn" env:"POSTGRES_DSN" required:"true"`
+	Dsn                string        `yaml:"dsn" env:"POSTGRES_DSN" env-required:"true"`
 	MaxOpenConnections int           `yaml:"max_open_connections" env:"POSTGRES_MAX_OPEN_CONNECTIONS" env-default:"25"`
 	MaxIdleConnections int           `yaml:"max_idle_connections" env:"POSTGRES_MAX_IDLE_CONNECTIONS" env-default:"25"`
 	MaxIdleTime        time.Duration `yaml:"max_idle_time" env:"POSTGRES_MAX_IDLE_TIME" env-default:"15m"`

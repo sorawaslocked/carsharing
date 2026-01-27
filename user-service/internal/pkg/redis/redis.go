@@ -6,8 +6,8 @@ import (
 )
 
 type Config struct {
-	Host         string        `yaml:"host" env:"REDIS_HOST" required:"true"`
-	Password     string        `yaml:"password" env:"REDIS_PASSWORD" required:"true"`
+	Host         string        `yaml:"host" env:"REDIS_HOST" env-required:"true"`
+	Password     string        `yaml:"password" env:"REDIS_PASSWORD" env-required:"true"`
 	User         string        `yaml:"user" env:"REDIS_USER" env-default:"car_rental"`
 	MaxRetries   int           `yaml:"max_retries" env:"REDIS_MAX_RETRIES" env-default:"5"`
 	DialTimeout  time.Duration `yaml:"dial_timeout" env:"REDIS_DIAL_TIMEOUT" env-default:"10s"`

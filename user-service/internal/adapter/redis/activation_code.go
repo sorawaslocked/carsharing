@@ -33,7 +33,7 @@ func key(userID uint64) string {
 	return fmt.Sprintf("%s:%d", keyPrefix, userID)
 }
 
-func (rc *ActivationCodeRedisCache) Create(ctx context.Context, userID uint64) (string, error) {
+func (rc *ActivationCodeRedisCache) Save(ctx context.Context, userID uint64) (string, error) {
 	code := createCode()
 
 	codeHash, err := security.HashString(code)

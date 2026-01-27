@@ -26,7 +26,7 @@ func New(cfg mailer.Config) *Mailer {
 	}
 }
 
-func (m *Mailer) SendActivationCode(ctx context.Context, to, code string) error {
+func (m *Mailer) SendActivationCode(ctx context.Context, receiver, code string) error {
 	c, cancel := context.WithTimeout(ctx, time.Second*5)
 	defer cancel()
 
@@ -36,7 +36,7 @@ func (m *Mailer) SendActivationCode(ctx context.Context, to, code string) error 
 
 	recipients := []mailersend.Recipient{
 		{
-			Email: to,
+			Email: receiver,
 		},
 	}
 

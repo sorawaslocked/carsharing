@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 	"strings"
 )
@@ -25,4 +26,13 @@ func formatFilter(filter *model.UserFilter) {
 	if filter.Email != nil && *filter.Email != "" {
 		filter.ID = nil
 	}
+}
+
+func userIDFromCtx(ctx context.Context) (uint64, error) {
+	id, ok := ctx.Value("userID").(uint64)
+	if !ok {
+		return id, model.ErrInvalidToken
+	}
+
+	return id, nil
 }

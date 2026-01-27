@@ -3,7 +3,7 @@ package interceptor
 import "github.com/sorawaslocked/car-rental-user-service/internal/model"
 
 const (
-	UserServiceCreate              = "/service.user.UserService/Create"
+	UserServiceCreate              = "/service.user.UserService/Save"
 	UserServiceGet                 = "/service.user.UserService/Get"
 	UserServiceGetAll              = "/service.user.UserService/GetAll"
 	UserServiceUpdate              = "/service.user.UserService/Update"

@@ -19,11 +19,16 @@ type JwtProvider interface {
 	VerifyAndParseClaims(token string) (uint64, []string, error)
 }
 
+type TokenStorage interface {
+	Save(ctx context.Context, token string) error
+	Exists(ctx context.Context, token string) (bool, error)
+}
+
 type ActivationCodeStorage interface {
-	Create(ctx context.Context, userID uint64) (string, error)
+	Save(ctx context.Context, userID uint64) (string, error)
 	Get(ctx context.Context, userID uint64) ([]byte, error)
 }
 
 type Mailer interface {
-	SendActivationCode(ctx context.Context, to, code string) error
+	SendActivationCode(ctx context.Context, receiver, code string) error
 }

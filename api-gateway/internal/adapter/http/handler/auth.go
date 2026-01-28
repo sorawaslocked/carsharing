@@ -3,14 +3,21 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/dto"
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/config"
+	"log"
+	"net/http"
 )
 
 type Auth struct {
-	svc AuthService
+	svc    AuthService
+	cookie config.Cookie
 }
 
-func NewAuth(svc AuthService) *Auth {
-	return &Auth{svc: svc}
+func NewAuth(svc AuthService, cookie config.Cookie) *Auth {
+	return &Auth{
+		svc:    svc,
+		cookie: cookie,
+	}
 }
 
 func (h *Auth) Register(ctx *gin.Context) {
@@ -47,31 +54,67 @@ func (h *Auth) Login(ctx *gin.Context) {
 		return
 	}
 
+	h.setRefreshCookies(ctx, token.RefreshToken, token.RefreshTokenExpiresIn)
 	res := dto.LoginResponse{
-		AccessToken:  &token.AccessToken,
-		RefreshToken: &token.RefreshToken,
+		AccessToken: &token.AccessToken,
+		ExpiresIn:   &token.AccessTokenExpiresIn,
 	}
 	dto.Ok(ctx, res)
 }
 
 func (h *Auth) RefreshToken(ctx *gin.Context) {
-	cred, err := dto.FromRefreshTokenRequest(ctx)
+	refreshToken := h.getRefreshTokenFromRequest(ctx)
+
+	token, err := h.svc.RefreshToken(ctx, refreshToken)
 	if err != nil {
-		dto.MalformedJson(ctx)
+		dto.FromError(ctx, err)
+		h.clearRefreshCookies(ctx)
 
 		return
 	}
 
-	token, err := h.svc.RefreshToken(ctx, cred)
+	res := dto.RefreshTokenResponse{
+		AccessToken: &token.AccessToken,
+		ExpiresIn:   &token.AccessTokenExpiresIn,
+	}
+	h.setRefreshCookies(ctx, token.RefreshToken, token.RefreshTokenExpiresIn)
+	dto.Ok(ctx, res)
+}
+
+func (h *Auth) Logout(ctx *gin.Context) {
+	refreshToken := h.getRefreshTokenFromRequest(ctx)
+
+	h.clearRefreshCookies(ctx)
+	err := h.svc.Logout(ctx, refreshToken)
 	if err != nil {
 		dto.FromError(ctx, err)
 
 		return
 	}
 
-	res := dto.RefreshTokenResponse{
-		AccessToken:  &token.AccessToken,
-		RefreshToken: &token.RefreshToken,
-	}
-	dto.Ok(ctx, res)
+	dto.NoContent(ctx)
+}
+
+func (h *Auth) setRefreshCookies(ctx *gin.Context, refreshToken string, expiresIn int64) {
+	path := "/api/v1/auth"
+	maxAge := int(expiresIn)
+	httpOnly := true
+
+	ctx.SetSameSite(http.SameSiteLaxMode)
+	ctx.SetCookie("refresh_token", refreshToken, maxAge, path, h.cookie.Domain, h.cookie.Secure, httpOnly)
+}
+
+func (h *Auth) clearRefreshCookies(ctx *gin.Context) {
+	path := "/api/v1/auth"
+	httpOnly := true
+
+	ctx.SetSameSite(http.SameSiteLaxMode)
+	ctx.SetCookie("refresh_token", "", -1, path, h.cookie.Domain, h.cookie.Secure, httpOnly)
+}
+
+func (h *Auth) getRefreshTokenFromRequest(ctx *gin.Context) string {
+	refreshToken, err := ctx.Cookie("refresh_token")
+	log.Print(err)
+
+	return refreshToken
 }

@@ -15,24 +15,25 @@ import (
 
 type Server struct {
 	router      *gin.Engine
-	cfg         config.HTTPServer
+	httpCfg     config.HTTPServer
 	log         *slog.Logger
 	authHandler *handler.Auth
 	userHandler *handler.User
 }
 
 func New(
-	cfg config.HTTPServer,
+	httpCfg config.HTTPServer,
+	cookieCfg config.Cookie,
 	log *slog.Logger,
 	authService handler.AuthService,
 	userService handler.UserService,
 ) *Server {
 	httpLog := log.With(
-		slog.String("httpServerHost", cfg.Host),
-		slog.Int("httpServerPort", cfg.Port),
+		slog.String("httpServerHost", httpCfg.Host),
+		slog.Int("httpServerPort", httpCfg.Port),
 	)
 
-	gin.SetMode(cfg.GinMode)
+	gin.SetMode(httpCfg.GinMode)
 	router := gin.New()
 
 	// Middleware
@@ -43,12 +44,12 @@ func New(
 	router.Use(middleware.Logger(httpLog))
 
 	// Handlers
-	authHandler := handler.NewAuth(authService)
+	authHandler := handler.NewAuth(authService, cookieCfg)
 	userHandler := handler.NewUser(userService)
 
 	server := &Server{
 		router:      router,
-		cfg:         cfg,
+		httpCfg:     httpCfg,
 		log:         httpLog,
 		authHandler: authHandler,
 		userHandler: userHandler,
@@ -61,7 +62,7 @@ func New(
 
 func (s *Server) MustRun() {
 	go func() {
-		addr := fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
+		addr := fmt.Sprintf("%s:%d", s.httpCfg.Host, s.httpCfg.Port)
 
 		s.log.Info("starting http server")
 		err := s.router.Run(addr)

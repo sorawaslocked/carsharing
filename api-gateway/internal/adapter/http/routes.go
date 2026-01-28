@@ -8,6 +8,7 @@ func (s *Server) setupRoutes() {
 			auth.POST("/register", s.authHandler.Register)
 			auth.POST("/login", s.authHandler.Login)
 			auth.POST("/refresh-token", s.authHandler.RefreshToken)
+			auth.POST("/logout", s.authHandler.Logout)
 		}
 
 		users := v1.Group("/users")

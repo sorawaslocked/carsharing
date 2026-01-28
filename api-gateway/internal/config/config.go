@@ -11,6 +11,7 @@ type (
 	Config struct {
 		HTTPServer HTTPServer  `yaml:"http_server" env-required:"true"`
 		GRPCServer grpc.Config `yaml:"grpc_server" env-required:"true"`
+		Cookie     Cookie      `yaml:"cookie" env-required:"true"`
 		Env        string      `yaml:"env" env-required:"true"`
 	}
 
@@ -21,6 +22,11 @@ type (
 		WriteTimeout string `yaml:"write_timeout" env:"HTTP_SERVER_WRITE_TIMEOUT" env-default:"30s"`
 		IdleTimeout  string `yaml:"idle_timeout" env:"HTTP_SERVER_IDLE_TIMEOUT" env-default:"60s"`
 		GinMode      string `yaml:"gin_mode" env:"GIN_MODE" env-default:"debug"`
+	}
+
+	Cookie struct {
+		Secure bool   `yaml:"secure" env:"COOKIE_SECURE" env-default:"false"`
+		Domain string `yaml:"domain" env:"COOKIE_DOMAIN" env-default:""`
 	}
 )
 

@@ -8,7 +8,7 @@ require (
 	github.com/fatih/color v1.18.0
 	github.com/gin-gonic/gin v1.11.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
-	github.com/sorawaslocked/car-rental-protos v0.0.9
+	github.com/sorawaslocked/car-rental-protos v0.0.11
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250804133106-a7a43d27e69b
 	google.golang.org/grpc v1.76.0
 )

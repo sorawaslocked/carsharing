@@ -24,3 +24,7 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (model.Token, error) {
 	return s.presenter.RefreshToken(ctx, refreshToken)
 }
+
+func (s *AuthService) Logout(ctx context.Context, refreshToken string) error {
+	return s.presenter.Logout(ctx, refreshToken)
+}

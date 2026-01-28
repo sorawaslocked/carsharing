@@ -48,8 +48,10 @@ func (h *AuthHandler) Login(ctx context.Context, cred model.Credentials) (model.
 	}
 
 	return model.Token{
-		AccessToken:  *res.AccessToken,
-		RefreshToken: *res.RefreshToken,
+		AccessToken:           *res.AccessToken,
+		AccessTokenExpiresIn:  *res.AccessTokenExpiresIn,
+		RefreshToken:          *res.RefreshToken,
+		RefreshTokenExpiresIn: *res.RefreshTokenExpiresIn,
 	}, nil
 }
 
@@ -62,7 +64,21 @@ func (h *AuthHandler) RefreshToken(ctx context.Context, refreshToken string) (mo
 	}
 
 	return model.Token{
-		AccessToken:  *res.AccessToken,
-		RefreshToken: *res.RefreshToken,
+		AccessToken:           *res.AccessToken,
+		AccessTokenExpiresIn:  *res.AccessTokenExpiresIn,
+		RefreshToken:          *res.RefreshToken,
+		RefreshTokenExpiresIn: *res.RefreshTokenExpiresIn,
 	}, nil
+}
+
+func (h *AuthHandler) Logout(ctx context.Context, refreshToken string) error {
+	_, err := h.client.Logout(ctx, &authsvc.LogoutRequest{
+		RefreshToken: refreshToken,
+	})
+
+	if err != nil {
+		return fromGrpcErr(err)
+	}
+
+	return nil
 }

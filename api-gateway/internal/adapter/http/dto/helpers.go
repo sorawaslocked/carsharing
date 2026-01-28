@@ -14,6 +14,10 @@ func Created(ctx *gin.Context, body any) {
 	ctx.JSON(http.StatusCreated, body)
 }
 
+func NoContent(ctx *gin.Context) {
+	ctx.JSON(http.StatusNoContent, nil)
+}
+
 func badRequest(ctx *gin.Context, body any) {
 	ctx.JSON(http.StatusBadRequest, body)
 }

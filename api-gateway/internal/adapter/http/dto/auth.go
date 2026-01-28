@@ -26,8 +26,8 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	AccessToken  *string `json:"accessToken,omitempty"`
-	RefreshToken *string `json:"refreshToken,omitempty"`
+	AccessToken *string `json:"accessToken,omitempty"`
+	ExpiresIn   *int64  `json:"expiresIn,omitempty"`
 }
 
 type RefreshTokenRequest struct {
@@ -35,8 +35,8 @@ type RefreshTokenRequest struct {
 }
 
 type RefreshTokenResponse struct {
-	AccessToken  *string `json:"accessToken,omitempty"`
-	RefreshToken *string `json:"refreshToken,omitempty"`
+	AccessToken *string `json:"accessToken,omitempty"`
+	ExpiresIn   *int64  `json:"expiresIn,omitempty"`
 }
 
 func FromRegisterRequest(ctx *gin.Context) (model.UserCreateData, error) {

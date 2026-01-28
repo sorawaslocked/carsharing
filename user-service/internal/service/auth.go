@@ -7,6 +7,7 @@ import (
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/logger"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/security"
 	"log/slog"
+	"time"
 )
 
 type AuthService struct {
@@ -104,9 +105,9 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 
 	return model.Token{
 		AccessToken:           accessToken,
-		AccessTokenExpiresIn:  int64(accessTokenExp.Second()),
+		AccessTokenExpiresIn:  int64(time.Until(accessTokenExp).Seconds()),
 		RefreshToken:          refreshToken,
-		RefreshTokenExpiresIn: int64(refreshTokenExp.Second()),
+		RefreshTokenExpiresIn: int64(time.Until(refreshTokenExp).Seconds()),
 	}, nil
 }
 
@@ -175,9 +176,9 @@ func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (mo
 
 	return model.Token{
 		AccessToken:           newAccessToken,
-		AccessTokenExpiresIn:  int64(newAccessTokenExp.Second()),
+		AccessTokenExpiresIn:  int64(time.Until(newAccessTokenExp).Seconds()),
 		RefreshToken:          newRefreshToken,
-		RefreshTokenExpiresIn: int64(newRefreshTokenExp.Second()),
+		RefreshTokenExpiresIn: int64(time.Until(newRefreshTokenExp).Seconds()),
 	}, nil
 }
 

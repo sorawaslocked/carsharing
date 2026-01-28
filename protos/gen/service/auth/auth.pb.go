@@ -218,11 +218,13 @@ func (x *LoginRequest) GetPassword() string {
 }
 
 type LoginResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AccessToken   *string                `protobuf:"bytes,1,opt,name=accessToken,proto3,oneof" json:"accessToken,omitempty"`
-	RefreshToken  *string                `protobuf:"bytes,2,opt,name=refreshToken,proto3,oneof" json:"refreshToken,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	AccessToken           *string                `protobuf:"bytes,1,opt,name=accessToken,proto3,oneof" json:"accessToken,omitempty"`
+	AccessTokenExpiresIn  *int64                 `protobuf:"varint,2,opt,name=accessTokenExpiresIn,proto3,oneof" json:"accessTokenExpiresIn,omitempty"`
+	RefreshToken          *string                `protobuf:"bytes,3,opt,name=refreshToken,proto3,oneof" json:"refreshToken,omitempty"`
+	RefreshTokenExpiresIn *int64                 `protobuf:"varint,4,opt,name=refreshTokenExpiresIn,proto3,oneof" json:"refreshTokenExpiresIn,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *LoginResponse) Reset() {
@@ -262,11 +264,25 @@ func (x *LoginResponse) GetAccessToken() string {
 	return ""
 }
 
+func (x *LoginResponse) GetAccessTokenExpiresIn() int64 {
+	if x != nil && x.AccessTokenExpiresIn != nil {
+		return *x.AccessTokenExpiresIn
+	}
+	return 0
+}
+
 func (x *LoginResponse) GetRefreshToken() string {
 	if x != nil && x.RefreshToken != nil {
 		return *x.RefreshToken
 	}
 	return ""
+}
+
+func (x *LoginResponse) GetRefreshTokenExpiresIn() int64 {
+	if x != nil && x.RefreshTokenExpiresIn != nil {
+		return *x.RefreshTokenExpiresIn
+	}
+	return 0
 }
 
 type RefreshTokenRequest struct {
@@ -314,11 +330,13 @@ func (x *RefreshTokenRequest) GetRefreshToken() string {
 }
 
 type RefreshTokenResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AccessToken   *string                `protobuf:"bytes,1,opt,name=accessToken,proto3,oneof" json:"accessToken,omitempty"`
-	RefreshToken  *string                `protobuf:"bytes,2,opt,name=refreshToken,proto3,oneof" json:"refreshToken,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	AccessToken           *string                `protobuf:"bytes,1,opt,name=accessToken,proto3,oneof" json:"accessToken,omitempty"`
+	AccessTokenExpiresIn  *int64                 `protobuf:"varint,2,opt,name=accessTokenExpiresIn,proto3,oneof" json:"accessTokenExpiresIn,omitempty"`
+	RefreshToken          *string                `protobuf:"bytes,3,opt,name=refreshToken,proto3,oneof" json:"refreshToken,omitempty"`
+	RefreshTokenExpiresIn *int64                 `protobuf:"varint,4,opt,name=refreshTokenExpiresIn,proto3,oneof" json:"refreshTokenExpiresIn,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *RefreshTokenResponse) Reset() {
@@ -358,11 +376,25 @@ func (x *RefreshTokenResponse) GetAccessToken() string {
 	return ""
 }
 
+func (x *RefreshTokenResponse) GetAccessTokenExpiresIn() int64 {
+	if x != nil && x.AccessTokenExpiresIn != nil {
+		return *x.AccessTokenExpiresIn
+	}
+	return 0
+}
+
 func (x *RefreshTokenResponse) GetRefreshToken() string {
 	if x != nil && x.RefreshToken != nil {
 		return *x.RefreshToken
 	}
 	return ""
+}
+
+func (x *RefreshTokenResponse) GetRefreshTokenExpiresIn() int64 {
+	if x != nil && x.RefreshTokenExpiresIn != nil {
+		return *x.RefreshTokenExpiresIn
+	}
+	return 0
 }
 
 type LogoutRequest struct {
@@ -466,19 +498,27 @@ const file_service_auth_auth_proto_rawDesc = "" +
 	"\vphoneNumber\x18\x02 \x01(\tH\x01R\vphoneNumber\x88\x01\x01\x12\x1a\n" +
 	"\bpassword\x18\x03 \x01(\tR\bpasswordB\b\n" +
 	"\x06_emailB\x0e\n" +
-	"\f_phoneNumber\"\x80\x01\n" +
+	"\f_phoneNumber\"\xa7\x02\n" +
 	"\rLoginResponse\x12%\n" +
-	"\vaccessToken\x18\x01 \x01(\tH\x00R\vaccessToken\x88\x01\x01\x12'\n" +
-	"\frefreshToken\x18\x02 \x01(\tH\x01R\frefreshToken\x88\x01\x01B\x0e\n" +
-	"\f_accessTokenB\x0f\n" +
-	"\r_refreshToken\"9\n" +
+	"\vaccessToken\x18\x01 \x01(\tH\x00R\vaccessToken\x88\x01\x01\x127\n" +
+	"\x14accessTokenExpiresIn\x18\x02 \x01(\x03H\x01R\x14accessTokenExpiresIn\x88\x01\x01\x12'\n" +
+	"\frefreshToken\x18\x03 \x01(\tH\x02R\frefreshToken\x88\x01\x01\x129\n" +
+	"\x15refreshTokenExpiresIn\x18\x04 \x01(\x03H\x03R\x15refreshTokenExpiresIn\x88\x01\x01B\x0e\n" +
+	"\f_accessTokenB\x17\n" +
+	"\x15_accessTokenExpiresInB\x0f\n" +
+	"\r_refreshTokenB\x18\n" +
+	"\x16_refreshTokenExpiresIn\"9\n" +
 	"\x13RefreshTokenRequest\x12\"\n" +
-	"\frefreshToken\x18\x01 \x01(\tR\frefreshToken\"\x87\x01\n" +
+	"\frefreshToken\x18\x01 \x01(\tR\frefreshToken\"\xae\x02\n" +
 	"\x14RefreshTokenResponse\x12%\n" +
-	"\vaccessToken\x18\x01 \x01(\tH\x00R\vaccessToken\x88\x01\x01\x12'\n" +
-	"\frefreshToken\x18\x02 \x01(\tH\x01R\frefreshToken\x88\x01\x01B\x0e\n" +
-	"\f_accessTokenB\x0f\n" +
-	"\r_refreshToken\"3\n" +
+	"\vaccessToken\x18\x01 \x01(\tH\x00R\vaccessToken\x88\x01\x01\x127\n" +
+	"\x14accessTokenExpiresIn\x18\x02 \x01(\x03H\x01R\x14accessTokenExpiresIn\x88\x01\x01\x12'\n" +
+	"\frefreshToken\x18\x03 \x01(\tH\x02R\frefreshToken\x88\x01\x01\x129\n" +
+	"\x15refreshTokenExpiresIn\x18\x04 \x01(\x03H\x03R\x15refreshTokenExpiresIn\x88\x01\x01B\x0e\n" +
+	"\f_accessTokenB\x17\n" +
+	"\x15_accessTokenExpiresInB\x0f\n" +
+	"\r_refreshTokenB\x18\n" +
+	"\x16_refreshTokenExpiresIn\"3\n" +
 	"\rLogoutRequest\x12\"\n" +
 	"\frefreshToken\x18\x01 \x01(\tR\frefreshToken\"\x10\n" +
 	"\x0eLogoutResponse2\xb6\x02\n" +

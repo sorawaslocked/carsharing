@@ -33,7 +33,9 @@ message LoginRequest {
 
 message LoginResponse {
   optional string accessToken = 1;
-  optional string refreshToken = 2;
+  optional int64 accessTokenExpiresIn = 2;
+  optional string refreshToken = 3;
+  optional int64 refreshTokenExpiresIn = 4;
 }
 
 message RefreshTokenRequest {
@@ -42,7 +44,9 @@ message RefreshTokenRequest {
 
 message RefreshTokenResponse {
   optional string accessToken = 1;
-  optional string refreshToken = 2;
+  optional int64 accessTokenExpiresIn = 2;
+  optional string refreshToken = 3;
+  optional int64 refreshTokenExpiresIn = 4;
 }
 
 message LogoutRequest {

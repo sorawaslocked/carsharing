@@ -58,12 +58,14 @@ func New(
 
 	userRepo := postgres.NewUserRepository(log, db)
 
-	activationCodeRedisCache := redis.NewActivationCodeRedisCache(rediscfg.Client(cfg.Redis))
+	redisConn := rediscfg.Client(cfg.Redis)
+	sessionRedisCache := redis.NewSessionRedisCache(redisConn, cfg.JWT.RefreshTokenTTL)
+	activationCodeRedisCache := redis.NewActivationCodeRedisCache(redisConn)
 
 	msMailer := mailer.New(cfg.Mailer)
 
 	userService := service.NewUserService(log, validate, jwtProvider, userRepo, activationCodeRedisCache, msMailer)
-	authService := service.NewAuthService(log, validate, jwtProvider, userService)
+	authService := service.NewAuthService(log, validate, jwtProvider, userService, sessionRedisCache)
 
 	grpcServer := grpcserver.NewServer(cfg.GRPC, log, authService, userService, jwtProvider)
 

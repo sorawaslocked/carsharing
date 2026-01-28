@@ -43,6 +43,7 @@ var (
 	ErrActivatedUser         = errors.New("user is already activated")
 	ErrInvalidActivationCode = errors.New("invalid activation code")
 
+	ErrRedis          = errors.New("redis error")
 	ErrSqlTransaction = errors.New("sql transaction error")
 	ErrSql            = errors.New("sql error")
 	ErrJwt            = errors.New("jwt error")

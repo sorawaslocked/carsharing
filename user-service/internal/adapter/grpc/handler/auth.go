@@ -59,3 +59,12 @@ func (h *AuthHandler) RefreshToken(ctx context.Context, req *authsvc.RefreshToke
 		RefreshToken: &token.RefreshToken,
 	}, nil
 }
+
+func (h *AuthHandler) Logout(ctx context.Context, req *authsvc.LogoutRequest) (*authsvc.LogoutResponse, error) {
+	err := h.authService.Logout(ctx, req.RefreshToken)
+	if err != nil {
+		return &authsvc.LogoutResponse{}, dto.ToStatusCodeError(err)
+	}
+
+	return &authsvc.LogoutResponse{}, nil
+}

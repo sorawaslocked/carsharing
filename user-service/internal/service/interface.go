@@ -19,9 +19,10 @@ type JwtProvider interface {
 	VerifyAndParseClaims(token string) (uint64, []string, error)
 }
 
-type TokenStorage interface {
-	Save(ctx context.Context, token string) error
-	Exists(ctx context.Context, token string) (bool, error)
+type SessionStorage interface {
+	Save(ctx context.Context, userID uint64) error
+	Exists(ctx context.Context, userID uint64) (bool, error)
+	Delete(ctx context.Context, userID uint64) error
 }
 
 type ActivationCodeStorage interface {

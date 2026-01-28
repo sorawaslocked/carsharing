@@ -13,10 +13,10 @@ import (
 )
 
 const (
-	keyPrefix             = "user:activation:code"
-	codeExpiration        = 10 * time.Minute
-	activationCodeSymbols = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	activationCodeLength  = 6
+	activationCodeKeyPrefix = "user:code:activation"
+	codeExpiration          = 10 * time.Minute
+	activationCodeSymbols   = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	activationCodeLength    = 6
 )
 
 type ActivationCodeRedisCache struct {
@@ -29,8 +29,8 @@ func NewActivationCodeRedisCache(client *redis.Client) *ActivationCodeRedisCache
 	}
 }
 
-func key(userID uint64) string {
-	return fmt.Sprintf("%s:%d", keyPrefix, userID)
+func (rc *ActivationCodeRedisCache) key(userID uint64) string {
+	return fmt.Sprintf("%s:%d", activationCodeKeyPrefix, userID)
 }
 
 func (rc *ActivationCodeRedisCache) Save(ctx context.Context, userID uint64) (string, error) {
@@ -41,18 +41,19 @@ func (rc *ActivationCodeRedisCache) Save(ctx context.Context, userID uint64) (st
 		return "", err
 	}
 
-	err = rc.rdb.Set(ctx, key(userID), codeHash, codeExpiration).Err()
+	err = rc.rdb.Set(ctx, rc.key(userID), codeHash, codeExpiration).Err()
 
-	return code, err
+	return code, model.ErrRedis
 }
 
 func (rc *ActivationCodeRedisCache) Get(ctx context.Context, userID uint64) ([]byte, error) {
-	codeHash, err := rc.rdb.Get(ctx, key(userID)).Bytes()
-	if errors.Is(err, redis.Nil) {
-		return nil, model.ErrNotFound
-	}
+	codeHash, err := rc.rdb.Get(ctx, rc.key(userID)).Bytes()
 	if err != nil {
-		return nil, err
+		if errors.Is(err, redis.Nil) {
+			return nil, model.ErrNotFound
+		}
+
+		return nil, model.ErrRedis
 	}
 
 	return codeHash, nil

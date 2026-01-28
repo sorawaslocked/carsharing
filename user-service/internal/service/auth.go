@@ -10,10 +10,11 @@ import (
 )
 
 type AuthService struct {
-	log         *slog.Logger
-	validate    *validator.Validate
-	jwtProvider JwtProvider
-	userService *UserService
+	log            *slog.Logger
+	validate       *validator.Validate
+	jwtProvider    JwtProvider
+	userService    *UserService
+	sessionStorage SessionStorage
 }
 
 func NewAuthService(
@@ -21,12 +22,14 @@ func NewAuthService(
 	validate *validator.Validate,
 	jwtProvider JwtProvider,
 	userService *UserService,
+	sessionStorage SessionStorage,
 ) *AuthService {
 	return &AuthService{
-		log:         log,
-		validate:    validate,
-		jwtProvider: jwtProvider,
-		userService: userService,
+		log:            log,
+		validate:       validate,
+		jwtProvider:    jwtProvider,
+		userService:    userService,
+		sessionStorage: sessionStorage,
 	}
 }
 
@@ -88,13 +91,24 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 		return model.Token{}, model.ErrJwt
 	}
 
+	err = s.sessionStorage.Save(ctx, user.ID)
+	if err != nil {
+		s.log.Error(
+			"token storage: saving session",
+			logger.Err(err),
+			slog.Uint64("userId", user.ID),
+		)
+
+		return model.Token{}, err
+	}
+
 	return model.Token{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
 }
 
-func (s *AuthService) RefreshToken(_ context.Context, refreshToken string) (model.Token, error) {
+func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (model.Token, error) {
 	input := refreshTokenValidation{
 		RefreshToken: refreshToken,
 	}
@@ -111,7 +125,18 @@ func (s *AuthService) RefreshToken(_ context.Context, refreshToken string) (mode
 			slog.String("refreshToken", refreshToken),
 		)
 
-		return model.Token{}, model.ErrJwt
+		return model.Token{}, model.ErrInvalidToken
+	}
+
+	exists, err := s.sessionStorage.Exists(ctx, id)
+	if !exists {
+		s.log.Error(
+			"token storage: checking session",
+			logger.Err(err),
+			slog.Uint64("userID", id),
+		)
+
+		return model.Token{}, model.ErrInvalidToken
 	}
 
 	newAccessToken, err := s.jwtProvider.GenerateAccessToken(id, roles)
@@ -135,8 +160,53 @@ func (s *AuthService) RefreshToken(_ context.Context, refreshToken string) (mode
 		return model.Token{}, model.ErrJwt
 	}
 
+	err = s.sessionStorage.Save(ctx, id)
+	if err != nil {
+		s.log.Error(
+			"token storage: saving new session",
+			logger.Err(err),
+			slog.Uint64("userId", id),
+		)
+
+		return model.Token{}, err
+	}
+
 	return model.Token{
 		AccessToken:  newAccessToken,
 		RefreshToken: newRefreshToken,
 	}, nil
+}
+
+func (s *AuthService) Logout(ctx context.Context, refreshToken string) error {
+	input := refreshTokenValidation{
+		RefreshToken: refreshToken,
+	}
+	err := validateInput(s.validate, input)
+	if err != nil {
+		return err
+	}
+
+	id, _, err := s.jwtProvider.VerifyAndParseClaims(refreshToken)
+	if err != nil {
+		s.log.Error(
+			"jwt: verifying refresh token",
+			logger.Err(err),
+			slog.String("refreshToken", refreshToken),
+		)
+
+		return model.ErrInvalidToken
+	}
+
+	err = s.sessionStorage.Delete(ctx, id)
+	if err != nil {
+		s.log.Error(
+			"token storage: deleting session",
+			logger.Err(err),
+			slog.Uint64("userId", id),
+		)
+
+		return err
+	}
+
+	return nil
 }

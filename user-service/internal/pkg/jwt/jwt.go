@@ -29,30 +29,42 @@ func NewProvider(
 	}
 }
 
-func (jp *Provider) GenerateAccessToken(id uint64, roles []string) (string, error) {
+func (jp *Provider) GenerateAccessToken(id uint64, roles []string) (string, time.Time, error) {
+	exp := time.Now().Add(jp.accessTokenTTL)
 	claims := jwt.MapClaims{
 		"sub":   id,
 		"roles": roles,
 		"iat":   time.Now().Unix(),
-		"exp":   time.Now().Add(jp.accessTokenTTL).Unix(),
+		"exp":   exp.Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	return token.SignedString([]byte(jp.secretKey))
+	tokenString, err := token.SignedString([]byte(jp.secretKey))
+	if err != nil {
+		return "", time.Time{}, err
+	}
+
+	return tokenString, exp, nil
 }
 
-func (jp *Provider) GenerateRefreshToken(id uint64, roles []string) (string, error) {
+func (jp *Provider) GenerateRefreshToken(id uint64, roles []string) (string, time.Time, error) {
+	exp := time.Now().Add(jp.refreshTokenTTL)
 	claims := jwt.MapClaims{
 		"sub":   id,
 		"roles": roles,
 		"iat":   time.Now().Unix(),
-		"exp":   time.Now().Add(jp.refreshTokenTTL).Unix(),
+		"exp":   exp.Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	return token.SignedString([]byte(jp.secretKey))
+	tokenString, err := token.SignedString([]byte(jp.secretKey))
+	if err != nil {
+		return "", time.Time{}, err
+	}
+
+	return tokenString, exp, nil
 }
 
 func (jp *Provider) VerifyAndParseClaims(token string) (uint64, []string, error) {

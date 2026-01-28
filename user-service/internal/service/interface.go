@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
+	"time"
 )
 
 type UserRepository interface {
@@ -14,8 +15,8 @@ type UserRepository interface {
 }
 
 type JwtProvider interface {
-	GenerateAccessToken(id uint64, roles []string) (string, error)
-	GenerateRefreshToken(id uint64, roles []string) (string, error)
+	GenerateAccessToken(id uint64, roles []string) (string, time.Time, error)
+	GenerateRefreshToken(id uint64, roles []string) (string, time.Time, error)
 	VerifyAndParseClaims(token string) (uint64, []string, error)
 }
 

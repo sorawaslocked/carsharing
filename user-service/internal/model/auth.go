@@ -7,6 +7,8 @@ type Credentials struct {
 }
 
 type Token struct {
-	AccessToken  string
-	RefreshToken string
+	AccessToken           string
+	AccessTokenExpiresIn  int64
+	RefreshToken          string
+	RefreshTokenExpiresIn int64
 }

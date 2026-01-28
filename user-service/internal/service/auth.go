@@ -69,7 +69,7 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 	}
 
 	userRoles := toRoleStrings(user.Roles)
-	accessToken, err := s.jwtProvider.GenerateAccessToken(user.ID, userRoles)
+	accessToken, accessTokenExp, err := s.jwtProvider.GenerateAccessToken(user.ID, userRoles)
 	if err != nil {
 		s.log.Error(
 			"jwt: generating access token",
@@ -80,7 +80,7 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 		return model.Token{}, model.ErrJwt
 	}
 
-	refreshToken, err := s.jwtProvider.GenerateRefreshToken(user.ID, userRoles)
+	refreshToken, refreshTokenExp, err := s.jwtProvider.GenerateRefreshToken(user.ID, userRoles)
 	if err != nil {
 		s.log.Error(
 			"jwt: generating refresh token",
@@ -103,8 +103,10 @@ func (s *AuthService) Login(ctx context.Context, cred model.Credentials) (model.
 	}
 
 	return model.Token{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
+		AccessToken:           accessToken,
+		AccessTokenExpiresIn:  int64(accessTokenExp.Second()),
+		RefreshToken:          refreshToken,
+		RefreshTokenExpiresIn: int64(refreshTokenExp.Second()),
 	}, nil
 }
 
@@ -139,7 +141,7 @@ func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (mo
 		return model.Token{}, model.ErrInvalidToken
 	}
 
-	newAccessToken, err := s.jwtProvider.GenerateAccessToken(id, roles)
+	newAccessToken, newAccessTokenExp, err := s.jwtProvider.GenerateAccessToken(id, roles)
 	if err != nil {
 		s.log.Error(
 			"jwt: generating access token",
@@ -149,7 +151,7 @@ func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (mo
 
 		return model.Token{}, model.ErrJwt
 	}
-	newRefreshToken, err := s.jwtProvider.GenerateRefreshToken(id, roles)
+	newRefreshToken, newRefreshTokenExp, err := s.jwtProvider.GenerateRefreshToken(id, roles)
 	if err != nil {
 		s.log.Error(
 			"jwt: generating refresh token",
@@ -172,8 +174,10 @@ func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (mo
 	}
 
 	return model.Token{
-		AccessToken:  newAccessToken,
-		RefreshToken: newRefreshToken,
+		AccessToken:           newAccessToken,
+		AccessTokenExpiresIn:  int64(newAccessTokenExp.Second()),
+		RefreshToken:          newRefreshToken,
+		RefreshTokenExpiresIn: int64(newRefreshTokenExp.Second()),
 	}, nil
 }
 

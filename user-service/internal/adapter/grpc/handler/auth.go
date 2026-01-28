@@ -43,8 +43,10 @@ func (h *AuthHandler) Login(ctx context.Context, req *authsvc.LoginRequest) (*au
 	}
 
 	return &authsvc.LoginResponse{
-		AccessToken:  &token.AccessToken,
-		RefreshToken: &token.RefreshToken,
+		AccessToken:           &token.AccessToken,
+		AccessTokenExpiresIn:  &token.AccessTokenExpiresIn,
+		RefreshToken:          &token.RefreshToken,
+		RefreshTokenExpiresIn: &token.RefreshTokenExpiresIn,
 	}, nil
 }
 
@@ -55,8 +57,10 @@ func (h *AuthHandler) RefreshToken(ctx context.Context, req *authsvc.RefreshToke
 	}
 
 	return &authsvc.RefreshTokenResponse{
-		AccessToken:  &token.AccessToken,
-		RefreshToken: &token.RefreshToken,
+		AccessToken:           &token.AccessToken,
+		AccessTokenExpiresIn:  &token.AccessTokenExpiresIn,
+		RefreshToken:          &token.RefreshToken,
+		RefreshTokenExpiresIn: &token.RefreshTokenExpiresIn,
 	}, nil
 }
 

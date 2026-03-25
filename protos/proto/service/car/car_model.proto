@@ -10,8 +10,8 @@ service CarModelService {
   rpc CreateCarModel (CreateCarModelRequest) returns (CreateCarModelResponse);
   rpc GetCarModel (GetCarModelRequest) returns (GetCarModelResponse);
   rpc GetCarModels (GetCarModelsRequest) returns (GetCarModelsResponse);
-  rpc UpdateCarModels (UpdateCarModelRequest) returns (UpdateCarModelResponse);
-  rpc DeleteCarModels (DeleteCarModelRequest) returns (DeleteCarModelResponse);
+  rpc UpdateCarModel (UpdateCarModelRequest) returns (UpdateCarModelResponse);
+  rpc DeleteCarModel (DeleteCarModelRequest) returns (DeleteCarModelResponse);
 }
 
 // CreateCarModel

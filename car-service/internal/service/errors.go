@@ -18,11 +18,6 @@ func (e ErrInvalidStatusTransition) Error() string {
 }
 
 var (
-	ErrInternalServerError = errors.New("internal server error")
-)
-
-var (
-	ErrInvalidCtxValue    = errors.New("invalid context value")
 	ErrOdometerRegression = errors.New("incoming odometer value is lower than the current mileage")
 )
 
@@ -48,13 +43,13 @@ func handleError(logger *slog.Logger, err error) error {
 	}
 
 	switch {
-	case errors.Is(err, ErrInvalidCtxValue):
+	case errors.Is(err, model.ErrMissingMetadata):
 		logger.Error("invalid request source", log.Err(err))
 
 		return err
 	default:
 		logger.Error("internal server error", log.Err(err))
 
-		return ErrInternalServerError
+		return model.ErrInternalServerError
 	}
 }

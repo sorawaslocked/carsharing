@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	ctxRequestClientIPKey  = "x-client-ip"
 	ctxRequestIDKey        = "x-request-id"
+	ctxRequestClientIPKey  = "x-client-ip"
 	ctxRequestUserIDKey    = "x-user-id"
 	ctxRequestUserRoles    = "x-user-roles"
 	ctxRequestUserVerified = "x-user-verified"
@@ -36,33 +36,33 @@ func metadataFromCtx(ctx context.Context, method string) (metadata, error) {
 	}
 
 	clientIP, ok := ctx.Value(ctxRequestClientIPKey).(string)
-	if !ok {
-		return md, ErrInvalidCtxValue
+	if !ok || clientIP == "" {
+		return md, model.ErrMissingMetadata
 	}
 
 	requestID, ok := ctx.Value(ctxRequestIDKey).(string)
-	if !ok {
-		return md, ErrInvalidCtxValue
+	if !ok || requestID == "" {
+		return md, model.ErrMissingMetadata
 	}
 
 	userID, ok := ctx.Value(ctxRequestUserIDKey).(string)
-	if !ok {
-		return md, ErrInvalidCtxValue
+	if !ok || userID == "" {
+		return md, model.ErrMissingMetadata
 	}
 
 	userRolesStr, ok := ctx.Value(ctxRequestUserRoles).(string)
-	if !ok {
-		return md, ErrInvalidCtxValue
+	if !ok || userRolesStr == "" {
+		return md, model.ErrMissingMetadata
 	}
 	userRoles := strings.Split(userRolesStr, ",")
 
 	userVerifiedStr, ok := ctx.Value(ctxRequestUserVerified).(string)
-	if !ok {
-		return md, ErrInvalidCtxValue
+	if !ok || userVerifiedStr == "" {
+		return md, model.ErrMissingMetadata
 	}
 	userVerified, err := strconv.ParseBool(userVerifiedStr)
 	if err != nil {
-		return md, ErrInvalidCtxValue
+		return md, model.ErrMissingMetadata
 	}
 
 	md.ClientIP = clientIP

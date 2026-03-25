@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package service.car;
+
+import "base/car_model.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/car";
+
+service CarModelService {
+  rpc CreateCarModel (CreateCarModelRequest) returns (CreateCarModelResponse);
+  rpc GetCarModel (GetCarModelRequest) returns (GetCarModelResponse);
+  rpc GetCarModels (GetCarModelsRequest) returns (GetCarModelsResponse);
+  rpc UpdateCarModels (UpdateCarModelRequest) returns (UpdateCarModelResponse);
+  rpc DeleteCarModels (DeleteCarModelRequest) returns (DeleteCarModelResponse);
+}
+
+// CreateCarModel
+message CreateCarModelRequest {
+  string brand = 1;
+  string model = 2;
+  int32 year = 3;
+  string fuelType = 4;
+  string transmission = 5;
+  string bodyType = 6;
+  string class = 7;
+  int32 seats = 8;
+  optional float engineVolume = 9;
+  int32 rangeKM = 10;
+  repeated string features = 11;
+}
+
+message CreateCarModelResponse {
+  string ID = 1;
+}
+
+// GetCarModel
+message GetCarModelRequest {
+  string ID = 1;
+}
+
+message GetCarModelResponse {
+  base.CarModel carModel = 1;
+}
+
+// GetCarModels
+message GetCarModelsRequest {
+  optional string brand = 1;
+  optional string model = 2;
+  optional string fuelType = 3;
+  optional string transmission = 4;
+  optional string bodyType = 5;
+  optional string class = 6;
+  optional int32 minSeats = 7;
+
+  optional int64 limit = 8;
+  optional int64 offset = 9;
+}
+
+message GetCarModelsResponse {
+  repeated base.CarModel carModels = 1;
+}
+
+// UpdateCarModel
+message UpdateCarModelRequest {
+  string ID = 1;
+
+  optional string brand = 2;
+  optional string model = 3;
+  optional int32 year = 4;
+  optional string fuelType = 5;
+  optional string transmission = 6;
+  optional string bodyType = 7;
+  optional string class = 8;
+  optional int32 seats = 9;
+  optional float engineVolume = 10;
+  optional int32 rangeKM = 11;
+  repeated string features = 12;
+}
+
+message UpdateCarModelResponse {}
+
+// DeleteCarModel
+message DeleteCarModelRequest {
+  string ID = 1;
+}
+
+message DeleteCarModelResponse {}

@@ -37,8 +37,8 @@ func NewCarService(
 	return s
 }
 
-func (s *CarService) CreateCar(ctx context.Context, createInput model.CreateCarInput) (string, error) {
-	const method = "CreateCar"
+func (s *CarService) Create(ctx context.Context, createInput model.CreateCarInput) (string, error) {
+	const method = "Create"
 
 	md, err := metadataFromCtx(ctx, method)
 	logger := loggerWithMetadata(s.log, md)
@@ -77,8 +77,8 @@ func (s *CarService) CreateCar(ctx context.Context, createInput model.CreateCarI
 	return id, nil
 }
 
-func (s *CarService) GetCar(ctx context.Context, filterInput model.CarFilterInput) (model.Car, error) {
-	const method = "GetCar"
+func (s *CarService) Get(ctx context.Context, filterInput model.CarFilterInput) (model.Car, error) {
+	const method = "Get"
 
 	md, err := metadataFromCtx(ctx, method)
 	logger := loggerWithMetadata(s.log, md)
@@ -100,8 +100,8 @@ func (s *CarService) GetCar(ctx context.Context, filterInput model.CarFilterInpu
 	return car, nil
 }
 
-func (s *CarService) GetCars(ctx context.Context, filterInput model.CarFilterInput) ([]model.Car, error) {
-	const method = "GetCars"
+func (s *CarService) GetAll(ctx context.Context, filterInput model.CarFilterInput) ([]model.Car, error) {
+	const method = "GetAll"
 
 	md, err := metadataFromCtx(ctx, method)
 	logger := loggerWithMetadata(s.log, md)
@@ -123,8 +123,32 @@ func (s *CarService) GetCars(ctx context.Context, filterInput model.CarFilterInp
 	return cars, nil
 }
 
-func (s *CarService) UpdateCar(ctx context.Context, filterInput model.CarFilterInput, updateInput model.UpdateCarInput) error {
-	const method = "UpdateCar"
+func (s *CarService) GetAvailableCars(ctx context.Context, filterInput model.CarFilterInput) ([]model.Car, error) {
+	const method = "GetAvailableCars"
+
+	md, err := metadataFromCtx(ctx, method)
+	logger := loggerWithMetadata(s.log, md)
+	if err != nil {
+		return nil, handleError(logger, err)
+	}
+
+	if err = validation.ValidateInput(s.validate, filterInput); err != nil {
+		return nil, handleError(logger, err)
+	}
+	filter := carFilterFromInput(filterInput, false)
+
+	filter.Status = new(model.CarStatusAvailable)
+
+	cars, err := s.carRepo.Find(ctx, filter)
+	if err != nil {
+		return nil, handleError(logger, err)
+	}
+
+	return cars, nil
+}
+
+func (s *CarService) Update(ctx context.Context, filterInput model.CarFilterInput, updateInput model.UpdateCarInput) error {
+	const method = "Update"
 
 	md, err := metadataFromCtx(ctx, method)
 	logger := loggerWithMetadata(s.log, md)
@@ -204,32 +228,8 @@ func (s *CarService) UpdateCarStatus(ctx context.Context, filterInput model.CarF
 	return nil
 }
 
-func (s *CarService) GetAvailableCars(ctx context.Context, filterInput model.CarFilterInput) ([]model.Car, error) {
-	const method = "GetAvailableCars"
-
-	md, err := metadataFromCtx(ctx, method)
-	logger := loggerWithMetadata(s.log, md)
-	if err != nil {
-		return nil, handleError(logger, err)
-	}
-
-	if err = validation.ValidateInput(s.validate, filterInput); err != nil {
-		return nil, handleError(logger, err)
-	}
-	filter := carFilterFromInput(filterInput, false)
-
-	filter.Status = new(model.CarStatusAvailable)
-
-	cars, err := s.carRepo.Find(ctx, filter)
-	if err != nil {
-		return nil, handleError(logger, err)
-	}
-
-	return cars, nil
-}
-
-func (s *CarService) DeleteCar(ctx context.Context, filterInput model.CarFilterInput) error {
-	const method = "DeleteCar"
+func (s *CarService) Delete(ctx context.Context, filterInput model.CarFilterInput) error {
+	const method = "Delete"
 
 	md, err := metadataFromCtx(ctx, method)
 	logger := loggerWithMetadata(s.log, md)

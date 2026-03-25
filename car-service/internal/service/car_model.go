@@ -34,8 +34,8 @@ func NewCarModelService(
 	return s
 }
 
-func (s *CarModelService) CreateCarModel(ctx context.Context, createInput model.CarModelCreateInput) (string, error) {
-	const method = "CreateCarModel"
+func (s *CarModelService) Create(ctx context.Context, createInput model.CarModelCreateInput) (string, error) {
+	const method = "Create"
 
 	md, err := metadataFromCtx(ctx, method)
 	logger := loggerWithMetadata(s.log, md)
@@ -78,8 +78,8 @@ func (s *CarModelService) CreateCarModel(ctx context.Context, createInput model.
 	return id, nil
 }
 
-func (s *CarModelService) GetCarModel(ctx context.Context, filterInput model.CarModelFilterInput) (model.CarModel, error) {
-	const method = "GetCarModel"
+func (s *CarModelService) Get(ctx context.Context, filterInput model.CarModelFilterInput) (model.CarModel, error) {
+	const method = "Get"
 
 	md, err := metadataFromCtx(ctx, method)
 	logger := loggerWithMetadata(s.log, md)
@@ -101,8 +101,8 @@ func (s *CarModelService) GetCarModel(ctx context.Context, filterInput model.Car
 	return carModel, nil
 }
 
-func (s *CarModelService) GetCarModels(ctx context.Context, filterInput model.CarModelFilterInput) ([]model.CarModel, error) {
-	const method = "GetCarModels"
+func (s *CarModelService) GetAll(ctx context.Context, filterInput model.CarModelFilterInput) ([]model.CarModel, error) {
+	const method = "GetAll"
 
 	md, err := metadataFromCtx(ctx, method)
 	logger := loggerWithMetadata(s.log, md)
@@ -124,8 +124,8 @@ func (s *CarModelService) GetCarModels(ctx context.Context, filterInput model.Ca
 	return carModels, nil
 }
 
-func (s *CarModelService) UpdateCarModel(ctx context.Context, filterInput model.CarModelFilterInput, updateInput model.CarModelUpdateInput) error {
-	const method = "UpdateCarModel"
+func (s *CarModelService) Update(ctx context.Context, filterInput model.CarModelFilterInput, updateInput model.CarModelUpdateInput) error {
+	const method = "Update"
 
 	md, err := metadataFromCtx(ctx, method)
 	logger := loggerWithMetadata(s.log, md)
@@ -182,8 +182,8 @@ func (s *CarModelService) UpdateCarModel(ctx context.Context, filterInput model.
 	return nil
 }
 
-func (s *CarModelService) DeleteCarModel(ctx context.Context, filterInput model.CarModelFilterInput) error {
-	const method = "DeleteCarModel"
+func (s *CarModelService) Delete(ctx context.Context, filterInput model.CarModelFilterInput) error {
+	const method = "Delete"
 
 	md, err := metadataFromCtx(ctx, method)
 	logger := loggerWithMetadata(s.log, md)

@@ -202,13 +202,14 @@ func (s *CarService) UpdateCarStatus(ctx context.Context, filterInput model.CarF
 	if err = validation.ValidateInput(s.validate, statusInput); err != nil {
 		return handleError(logger, err)
 	}
+	status, _ := model.ParseCarStatus(statusInput.Status)
 
 	current, err := s.carRepo.FindOne(ctx, filter)
 	if err != nil {
 		return handleError(logger, err)
 	}
 
-	err = transitionCarStatus(current.Status, statusInput.Status)
+	err = transitionCarStatus(current.Status, status)
 	if err != nil {
 		return handleError(logger, err)
 	}
@@ -216,7 +217,7 @@ func (s *CarService) UpdateCarStatus(ctx context.Context, filterInput model.CarF
 	now := time.Now()
 
 	update := model.CarUpdate{
-		Status:    new(statusInput.Status),
+		Status:    &status,
 		UpdatedAt: now,
 	}
 

@@ -78,5 +78,5 @@ type UpdateCarInput struct {
 }
 
 type UpdateCarStatusInput struct {
-	Status CarStatus `validate:"required,carstatus"`
+	Status string `validate:"required,carstatus"`
 }

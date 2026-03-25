@@ -25,6 +25,8 @@ github.com/sorawaslocked/car-rental-protos v0.0.11 h1:e0KMhSj3dce421pyhI05Sg3vQx
 github.com/sorawaslocked/car-rental-protos v0.0.11/go.mod h1:ThSVtD+dtUfuaRpaZSzXPeF+RVNI6ii4AhcSH5hY7es=
 github.com/sorawaslocked/car-rental-protos v0.0.12 h1:KTzUz1aeOWlWx5txWzRq2RwkGqMkuoDPmM44xnH2B2U=
 github.com/sorawaslocked/car-rental-protos v0.0.12/go.mod h1:ThSVtD+dtUfuaRpaZSzXPeF+RVNI6ii4AhcSH5hY7es=
+github.com/sorawaslocked/car-rental-protos v0.0.13 h1:m3P3wq3HwU55PLiVzNhDS1aUyI8H7RpJeS7lKd0KwZ8=
+github.com/sorawaslocked/car-rental-protos v0.0.13/go.mod h1:ThSVtD+dtUfuaRpaZSzXPeF+RVNI6ii4AhcSH5hY7es=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
 golang.org/x/crypto v0.46.0 h1:cKRW/pmt1pKAfetfu+RCEvjvZkA9RimPbh7bhFjGVBU=

@@ -58,7 +58,7 @@ type CarFilterInput struct {
 	PaginationInput
 }
 
-type CreateCarInput struct {
+type CarCreateInput struct {
 	ModelID          string   `validate:"required"`
 	VIN              string   `validate:"required,min=17,max=17,alphanum"`
 	LicensePlate     string   `validate:"required,min=1,max=20"`
@@ -70,13 +70,13 @@ type CreateCarInput struct {
 	Notes            []string `validate:"omitempty,max=20,dive,min=1,max=500"`
 }
 
-type UpdateCarInput struct {
+type CarUpdateInput struct {
 	ModelID      *string  `validate:"omitempty"`
 	LicensePlate *string  `validate:"omitempty,min=1,max=20"`
 	Color        *string  `validate:"omitempty,min=1,max=50"`
 	Notes        []string `validate:"omitempty,max=20,dive,min=1,max=500"`
 }
 
-type UpdateCarStatusInput struct {
+type CarStatusUpdateInput struct {
 	Status string `validate:"required,carstatus"`
 }

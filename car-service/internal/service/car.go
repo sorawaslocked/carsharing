@@ -37,7 +37,7 @@ func NewCarService(
 	return s
 }
 
-func (s *CarService) Create(ctx context.Context, createInput model.CreateCarInput) (string, error) {
+func (s *CarService) Create(ctx context.Context, createInput model.CarCreateInput) (string, error) {
 	const method = "Create"
 
 	md, err := metadataFromCtx(ctx, method)
@@ -147,7 +147,7 @@ func (s *CarService) GetAvailableCars(ctx context.Context, filterInput model.Car
 	return cars, nil
 }
 
-func (s *CarService) Update(ctx context.Context, filterInput model.CarFilterInput, updateInput model.UpdateCarInput) error {
+func (s *CarService) Update(ctx context.Context, filterInput model.CarFilterInput, updateInput model.CarUpdateInput) error {
 	const method = "Update"
 
 	md, err := metadataFromCtx(ctx, method)
@@ -185,7 +185,7 @@ func (s *CarService) Update(ctx context.Context, filterInput model.CarFilterInpu
 	return nil
 }
 
-func (s *CarService) UpdateCarStatus(ctx context.Context, filterInput model.CarFilterInput, statusInput model.UpdateCarStatusInput) error {
+func (s *CarService) UpdateCarStatus(ctx context.Context, filterInput model.CarFilterInput, statusInput model.CarStatusUpdateInput) error {
 	const method = "UpdateCarStatus"
 
 	md, err := metadataFromCtx(ctx, method)

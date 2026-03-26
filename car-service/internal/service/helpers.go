@@ -11,15 +11,6 @@ const (
 	defaultPaginationOffset int64 = 0
 )
 
-type metadata struct {
-	ClientIP     string
-	RequestID    string
-	Method       string
-	UserID       string
-	UserRoles    []string
-	UserVerified bool
-}
-
 func defaultLogger(oldLog *slog.Logger, method string) *slog.Logger {
 	return oldLog.With(
 		slog.Group("src",

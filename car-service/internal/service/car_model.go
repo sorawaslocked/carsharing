@@ -2,6 +2,7 @@ package service
 
 import (
 	"car-rental-car-service/internal/model"
+	"car-rental-car-service/internal/pkg/utils"
 	"car-rental-car-service/internal/validation"
 	"context"
 	"log/slog"
@@ -36,14 +37,15 @@ func NewCarModelService(
 
 func (s *CarModelService) Create(ctx context.Context, createInput model.CarModelCreateInput) (string, error) {
 	const method = "Create"
+	logger := defaultLogger(s.log, method)
 
-	md, err := metadataFromCtx(ctx, method)
-	logger := loggerWithMetadata(s.log, md)
-	if err != nil {
-		return "", handleError(logger, err)
+	md, ok := utils.MetadataFromCtx(ctx)
+	if !ok {
+		return "", handleError(logger, model.ErrMissingMetadata)
 	}
+	logger = loggerWithMetadata(logger, md)
 
-	err = validation.ValidateInput(s.validate, createInput)
+	err := validation.ValidateInput(s.validate, createInput)
 	if err != nil {
 		return "", handleError(logger, err)
 	}
@@ -80,14 +82,15 @@ func (s *CarModelService) Create(ctx context.Context, createInput model.CarModel
 
 func (s *CarModelService) Get(ctx context.Context, filterInput model.CarModelFilterInput) (model.CarModel, error) {
 	const method = "Get"
+	logger := defaultLogger(s.log, method)
 
-	md, err := metadataFromCtx(ctx, method)
-	logger := loggerWithMetadata(s.log, md)
-	if err != nil {
-		return model.CarModel{}, handleError(logger, err)
+	md, ok := utils.MetadataFromCtx(ctx)
+	if !ok {
+		return model.CarModel{}, handleError(logger, model.ErrMissingMetadata)
 	}
+	logger = loggerWithMetadata(logger, md)
 
-	err = validation.ValidateInput(s.validate, filterInput)
+	err := validation.ValidateInput(s.validate, filterInput)
 	if err != nil {
 		return model.CarModel{}, handleError(logger, err)
 	}
@@ -103,14 +106,15 @@ func (s *CarModelService) Get(ctx context.Context, filterInput model.CarModelFil
 
 func (s *CarModelService) GetAll(ctx context.Context, filterInput model.CarModelFilterInput) ([]model.CarModel, error) {
 	const method = "GetAll"
+	logger := defaultLogger(s.log, method)
 
-	md, err := metadataFromCtx(ctx, method)
-	logger := loggerWithMetadata(s.log, md)
-	if err != nil {
-		return nil, handleError(logger, err)
+	md, ok := utils.MetadataFromCtx(ctx)
+	if !ok {
+		return []model.CarModel{}, handleError(logger, model.ErrMissingMetadata)
 	}
+	logger = loggerWithMetadata(logger, md)
 
-	err = validation.ValidateInput(s.validate, filterInput)
+	err := validation.ValidateInput(s.validate, filterInput)
 	if err != nil {
 		return nil, handleError(logger, err)
 	}
@@ -126,14 +130,15 @@ func (s *CarModelService) GetAll(ctx context.Context, filterInput model.CarModel
 
 func (s *CarModelService) Update(ctx context.Context, filterInput model.CarModelFilterInput, updateInput model.CarModelUpdateInput) error {
 	const method = "Update"
+	logger := defaultLogger(s.log, method)
 
-	md, err := metadataFromCtx(ctx, method)
-	logger := loggerWithMetadata(s.log, md)
-	if err != nil {
-		return handleError(logger, err)
+	md, ok := utils.MetadataFromCtx(ctx)
+	if !ok {
+		return handleError(logger, model.ErrMissingMetadata)
 	}
+	logger = loggerWithMetadata(logger, md)
 
-	err = validation.ValidateInput(s.validate, filterInput)
+	err := validation.ValidateInput(s.validate, filterInput)
 	if err != nil {
 		return handleError(logger, err)
 	}
@@ -184,14 +189,15 @@ func (s *CarModelService) Update(ctx context.Context, filterInput model.CarModel
 
 func (s *CarModelService) Delete(ctx context.Context, filterInput model.CarModelFilterInput) error {
 	const method = "Delete"
+	logger := defaultLogger(s.log, method)
 
-	md, err := metadataFromCtx(ctx, method)
-	logger := loggerWithMetadata(s.log, md)
-	if err != nil {
-		return handleError(logger, err)
+	md, ok := utils.MetadataFromCtx(ctx)
+	if !ok {
+		return handleError(logger, model.ErrMissingMetadata)
 	}
+	logger = loggerWithMetadata(logger, md)
 
-	err = validation.ValidateInput(s.validate, filterInput)
+	err := validation.ValidateInput(s.validate, filterInput)
 	if err != nil {
 		return handleError(logger, err)
 	}

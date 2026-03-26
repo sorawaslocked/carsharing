@@ -2,18 +2,8 @@ package service
 
 import (
 	"car-rental-car-service/internal/model"
-	"context"
+	"car-rental-car-service/internal/pkg/utils"
 	"log/slog"
-	"strconv"
-	"strings"
-)
-
-const (
-	ctxRequestIDKey        = "x-request-id"
-	ctxRequestClientIPKey  = "x-client-ip"
-	ctxRequestUserIDKey    = "x-user-id"
-	ctxRequestUserRoles    = "x-user-roles"
-	ctxRequestUserVerified = "x-user-verified"
 )
 
 const (
@@ -30,67 +20,26 @@ type metadata struct {
 	UserVerified bool
 }
 
-func metadataFromCtx(ctx context.Context, method string) (metadata, error) {
-	md := metadata{
-		Method: method,
-	}
-
-	clientIP, ok := ctx.Value(ctxRequestClientIPKey).(string)
-	if !ok || clientIP == "" {
-		return md, model.ErrMissingMetadata
-	}
-
-	requestID, ok := ctx.Value(ctxRequestIDKey).(string)
-	if !ok || requestID == "" {
-		return md, model.ErrMissingMetadata
-	}
-
-	userID, ok := ctx.Value(ctxRequestUserIDKey).(string)
-	if !ok || userID == "" {
-		return md, model.ErrMissingMetadata
-	}
-
-	userRolesStr, ok := ctx.Value(ctxRequestUserRoles).(string)
-	if !ok || userRolesStr == "" {
-		return md, model.ErrMissingMetadata
-	}
-	userRoles := strings.Split(userRolesStr, ",")
-
-	userVerifiedStr, ok := ctx.Value(ctxRequestUserVerified).(string)
-	if !ok || userVerifiedStr == "" {
-		return md, model.ErrMissingMetadata
-	}
-	userVerified, err := strconv.ParseBool(userVerifiedStr)
-	if err != nil {
-		return md, model.ErrMissingMetadata
-	}
-
-	md.ClientIP = clientIP
-	md.RequestID = requestID
-	md.UserID = userID
-	md.UserRoles = userRoles
-	md.UserVerified = userVerified
-
-	return md, nil
+func defaultLogger(oldLog *slog.Logger, method string) *slog.Logger {
+	return oldLog.With(
+		slog.Group("src",
+			slog.String("method", method),
+		),
+	)
 }
 
-func loggerWithMetadata(oldLog *slog.Logger, md metadata) *slog.Logger {
-	log := oldLog.With(
-		slog.Group("src",
-			slog.String("method", md.Method),
-		),
+func loggerWithMetadata(oldLog *slog.Logger, md utils.Metadata) *slog.Logger {
+	return oldLog.With(
 		slog.Group("metadata",
 			slog.String("clientIP", md.ClientIP),
 			slog.String("requestID", md.RequestID),
-		),
-		slog.Group("user",
-			slog.String("id", md.UserID),
-			slog.Any("roles", md.UserRoles),
-			slog.Bool("verified", md.UserVerified),
+			slog.Group("user",
+				slog.String("id", md.UserID),
+				slog.Any("roles", md.UserRoles),
+				slog.Bool("verified", md.UserVerified),
+			),
 		),
 	)
-
-	return log
 }
 
 func carModelFilterFromInput(filterInput model.CarModelFilterInput, ignoreNonUnique bool) model.CarModelFilter {

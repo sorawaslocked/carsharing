@@ -30,8 +30,10 @@ func handleError(logger *slog.Logger, err error) error {
 
 	if st, ok := errors.AsType[ErrInvalidStatusTransition](err); ok {
 		logger.Info("rejected status transition",
-			slog.String("from", string(st.From)),
-			slog.String("to", string(st.To)),
+			slog.Group("status",
+				slog.String("from", string(st.From)),
+				slog.String("to", string(st.To)),
+			),
 			log.Err(err),
 		)
 

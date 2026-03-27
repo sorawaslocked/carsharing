@@ -22,12 +22,10 @@ type CarService struct {
 
 func NewCarService(
 	carRepo CarRepository,
-	carModelRepo CarModelRepository,
 	log *slog.Logger,
 ) *CarService {
 	s := &CarService{
-		carRepo:      carRepo,
-		carModelRepo: carModelRepo,
+		carRepo: carRepo,
 	}
 
 	s.log = log.With(

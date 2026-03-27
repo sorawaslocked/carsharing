@@ -1,9 +1,9 @@
 package dto
 
 import (
-	"car-rental-car-service/internal/model"
 	"database/sql"
 	"fmt"
+	"github.com/sorawaslocked/car-rental-car-service/internal/model"
 	"time"
 
 	"github.com/lib/pq"

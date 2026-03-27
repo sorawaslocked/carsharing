@@ -1,9 +1,10 @@
 package dto
 
 import (
-	"car-rental-car-service/internal/model"
-	"car-rental-car-service/internal/validation"
 	"errors"
+
+	"github.com/sorawaslocked/car-rental-car-service/internal/model"
+	"github.com/sorawaslocked/car-rental-car-service/internal/validation"
 
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"

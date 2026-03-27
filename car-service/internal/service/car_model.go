@@ -1,10 +1,10 @@
 package service
 
 import (
-	"car-rental-car-service/internal/model"
-	"car-rental-car-service/internal/pkg/utils"
-	"car-rental-car-service/internal/validation"
 	"context"
+	"github.com/sorawaslocked/car-rental-car-service/internal/model"
+	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/utils"
+	"github.com/sorawaslocked/car-rental-car-service/internal/validation"
 	"log/slog"
 	"time"
 

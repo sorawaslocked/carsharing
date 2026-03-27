@@ -1,12 +1,12 @@
 package postgres
 
 import (
-	"car-rental-car-service/internal/adapter/postgres/dto"
-	"car-rental-car-service/internal/model"
 	"context"
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/sorawaslocked/car-rental-car-service/internal/adapter/postgres/dto"
+	"github.com/sorawaslocked/car-rental-car-service/internal/model"
 	"strings"
 
 	"github.com/lib/pq"

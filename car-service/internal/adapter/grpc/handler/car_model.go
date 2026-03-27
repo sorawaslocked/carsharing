@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"car-rental-car-service/internal/adapter/grpc/dto"
 	"context"
+	"github.com/sorawaslocked/car-rental-car-service/internal/adapter/grpc/dto"
 	"log/slog"
 
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"

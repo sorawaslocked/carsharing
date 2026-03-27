@@ -1,8 +1,8 @@
 package service
 
 import (
-	"car-rental-car-service/internal/model"
-	"car-rental-car-service/internal/pkg/utils"
+	"github.com/sorawaslocked/car-rental-car-service/internal/model"
+	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/utils"
 	"log/slog"
 )
 

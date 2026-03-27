@@ -1,10 +1,10 @@
 package auth
 
 import (
-	"car-rental-car-service/internal/adapter/grpc/dto"
-	"car-rental-car-service/internal/model"
-	"car-rental-car-service/internal/pkg/utils"
 	"context"
+	"github.com/sorawaslocked/car-rental-car-service/internal/adapter/grpc/dto"
+	"github.com/sorawaslocked/car-rental-car-service/internal/model"
+	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/utils"
 
 	"google.golang.org/grpc"
 )

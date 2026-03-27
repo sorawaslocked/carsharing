@@ -1,8 +1,9 @@
 package service
 
 import (
-	"car-rental-car-service/internal/model"
 	"context"
+
+	"github.com/sorawaslocked/car-rental-car-service/internal/model"
 )
 
 type CarModelRepository interface {

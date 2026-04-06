@@ -41,6 +41,8 @@ func FromError(ctx *gin.Context, err error) {
 		validationError(ctx, ve)
 	case errors.Is(err, model.ErrInvalidQueryParam):
 		InvalidQueryParams(ctx)
+	case errors.Is(err, model.ErrEmptyIDParam):
+		EmptyIDParam(ctx)
 	default:
 		internalServerError(ctx)
 	}

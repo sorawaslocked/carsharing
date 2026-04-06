@@ -2,6 +2,7 @@ package dto
 
 import (
 	"errors"
+
 	"github.com/gin-gonic/gin"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )

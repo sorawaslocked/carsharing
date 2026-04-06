@@ -1,7 +1,9 @@
-package grpc
+package handler
 
 import (
 	"context"
+
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/grpc"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 	authsvc "github.com/sorawaslocked/car-rental-protos/gen/service/auth"
 )
@@ -25,7 +27,7 @@ func (h *AuthHandler) Register(ctx context.Context, data model.UserCreateData) (
 		BirthDate:            data.BirthDate,
 	})
 	if err != nil {
-		return 0, fromGrpcErr(err)
+		return 0, grpc.FromGrpcErr(err)
 	}
 
 	return *res.Id, nil
@@ -44,7 +46,7 @@ func (h *AuthHandler) Login(ctx context.Context, cred model.Credentials) (model.
 
 	res, err := h.client.Login(ctx, req)
 	if err != nil {
-		return model.Token{}, fromGrpcErr(err)
+		return model.Token{}, grpc.FromGrpcErr(err)
 	}
 
 	return model.Token{
@@ -60,7 +62,7 @@ func (h *AuthHandler) RefreshToken(ctx context.Context, refreshToken string) (mo
 		RefreshToken: refreshToken,
 	})
 	if err != nil {
-		return model.Token{}, fromGrpcErr(err)
+		return model.Token{}, grpc.FromGrpcErr(err)
 	}
 
 	return model.Token{
@@ -77,7 +79,7 @@ func (h *AuthHandler) Logout(ctx context.Context, refreshToken string) error {
 	})
 
 	if err != nil {
-		return fromGrpcErr(err)
+		return grpc.FromGrpcErr(err)
 	}
 
 	return nil

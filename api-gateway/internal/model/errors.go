@@ -16,6 +16,7 @@ var (
 	ErrInternalServerError = errors.New("something went wrong")
 
 	ErrInvalidQueryParam = errors.New("invalid query param")
+	ErrEmptyIDParam      = errors.New("empty id param")
 )
 
 type ValidationErrors map[string]string

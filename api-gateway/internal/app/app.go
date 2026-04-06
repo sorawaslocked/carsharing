@@ -2,7 +2,13 @@ package app
 
 import (
 	"context"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/grpc"
+	"log/slog"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/grpc/handler"
 	httpserver "github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/config"
 	grpcconn "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/grpc"
@@ -10,11 +16,6 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/service"
 	authsvc "github.com/sorawaslocked/car-rental-protos/gen/service/auth"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
-	"log/slog"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 )
 
 type App struct {
@@ -57,14 +58,40 @@ func New(cfg config.Config, log *slog.Logger) *App {
 	}
 
 	authServiceGrpcClient := authsvc.NewAuthServiceClient(userServiceGrpcConn)
-	authServiceGrpcHandler := grpc.NewAuthHandler(authServiceGrpcClient)
+	authServiceGrpcHandler := handler.NewAuthHandler(authServiceGrpcClient)
 	authService := service.NewAuthService(authServiceGrpcHandler)
 
 	userServiceGrpcClient := usersvc.NewUserServiceClient(userServiceGrpcConn)
-	userServiceGrpcHandler := grpc.NewUserHandler(userServiceGrpcClient)
+	userServiceGrpcHandler := handler.NewUserHandler(userServiceGrpcClient)
 	userService := service.NewUserService(userServiceGrpcHandler)
 
-	httpServer := httpserver.New(cfg.HTTPServer, cfg.Cookie, log, authService, userService)
+	carModelServiceGrpcHandler := handler.NewCarModelHandler()
+	carModelService := service.NewCarModelService(carModelServiceGrpcHandler)
+
+	carServiceGrpcHandler := handler.NewCarHandler()
+	carService := service.NewCarService(carServiceGrpcHandler)
+
+	carInsuranceServiceGrpcHandler := handler.NewInsuranceHandler()
+	carInsuranceService := service.NewCarInsuranceService(carInsuranceServiceGrpcHandler)
+
+	carMaintenanceServiceGrpcHandler := handler.NewCarMaintenanceHandler()
+	carMaintenanceService := service.NewCarMaintenanceService(carMaintenanceServiceGrpcHandler)
+
+	zoneServiceGrpcHandler := handler.NewZoneHandler()
+	zoneService := service.NewZoneService(zoneServiceGrpcHandler)
+
+	httpServer := httpserver.New(
+		cfg.HTTPServer,
+		cfg.Cookie,
+		log,
+		authService,
+		userService,
+		carModelService,
+		carService,
+		carInsuranceService,
+		carMaintenanceService,
+		zoneService,
+	)
 
 	app := &App{
 		cfg:        cfg,

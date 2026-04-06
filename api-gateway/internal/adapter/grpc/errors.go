@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"errors"
+
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
@@ -12,7 +13,7 @@ var (
 	ErrInvalidStatusCode = errors.New("invalid status code")
 )
 
-func fromGrpcErr(err error) error {
+func FromGrpcErr(err error) error {
 	st, ok := status.FromError(err)
 
 	if !ok {

@@ -1,7 +1,9 @@
-package grpc
+package handler
 
 import (
 	"context"
+
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/grpc"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/grpc/dto"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
@@ -39,7 +41,7 @@ func (h *UserHandler) Create(ctx context.Context, data model.UserCreateData) (ui
 
 	res, err := h.client.Create(ctx, req)
 	if err != nil {
-		return 0, fromGrpcErr(err)
+		return 0, grpc.FromGrpcErr(err)
 	}
 
 	return *res.ID, nil
@@ -53,7 +55,7 @@ func (h *UserHandler) Get(ctx context.Context, filter model.UserFilter) (model.U
 
 	res, err := h.client.Get(ctx, req)
 	if err != nil {
-		return model.User{}, fromGrpcErr(err)
+		return model.User{}, grpc.FromGrpcErr(err)
 	}
 
 	return dto.FromProto(res.User), nil
@@ -64,7 +66,7 @@ func (h *UserHandler) GetAll(ctx context.Context, _ model.UserFilter) ([]model.U
 
 	res, err := h.client.GetAll(ctx, req)
 	if err != nil {
-		return nil, fromGrpcErr(err)
+		return nil, grpc.FromGrpcErr(err)
 	}
 
 	users := make([]model.User, len(res.Users))
@@ -95,7 +97,7 @@ func (h *UserHandler) Update(ctx context.Context, filter model.UserFilter, data 
 
 	_, err := h.client.Update(ctx, req)
 	if err != nil {
-		return fromGrpcErr(err)
+		return grpc.FromGrpcErr(err)
 	}
 
 	return nil
@@ -109,7 +111,7 @@ func (h *UserHandler) Delete(ctx context.Context, filter model.UserFilter) error
 
 	_, err := h.client.Delete(ctx, req)
 	if err != nil {
-		return fromGrpcErr(err)
+		return grpc.FromGrpcErr(err)
 	}
 
 	return nil
@@ -120,7 +122,7 @@ func (h *UserHandler) Me(ctx context.Context) (model.User, error) {
 
 	res, err := h.client.Me(ctx, req)
 	if err != nil {
-		return model.User{}, fromGrpcErr(err)
+		return model.User{}, grpc.FromGrpcErr(err)
 	}
 
 	return dto.FromProto(res.User), nil
@@ -131,7 +133,7 @@ func (h *UserHandler) SendActivationCode(ctx context.Context) error {
 
 	_, err := h.client.SendActivationCode(ctx, req)
 	if err != nil {
-		return fromGrpcErr(err)
+		return grpc.FromGrpcErr(err)
 	}
 
 	return nil
@@ -144,7 +146,7 @@ func (h *UserHandler) CheckActivationCode(ctx context.Context, code string) erro
 
 	_, err := h.client.CheckActivationCode(ctx, req)
 	if err != nil {
-		return fromGrpcErr(err)
+		return grpc.FromGrpcErr(err)
 	}
 
 	return nil

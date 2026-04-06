@@ -1,10 +1,29 @@
 package dto
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
-	"net/http"
 )
+
+type location struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+}
+
+type ImageUploadData struct {
+	PresignedUrl string `json:"presignedUrl"`
+	ObjectKey    string `json:"objectKey"`
+}
+
+func ToImageUploadDataResponse(m model.ImageUploadData) ImageUploadData {
+	return ImageUploadData{
+		PresignedUrl: m.PresignedUrl,
+		ObjectKey:    m.ObjectKey,
+	}
+}
 
 func Ok(ctx *gin.Context, body any) {
 	ctx.JSON(http.StatusOK, body)
@@ -33,7 +52,17 @@ func MalformedJson(ctx *gin.Context) {
 func InvalidQueryParams(ctx *gin.Context) {
 	body := gin.H{
 		"error": gin.H{
-			"message": "invalid query params",
+			"message": model.ErrInvalidQueryParam.Error(),
+		},
+	}
+
+	badRequest(ctx, body)
+}
+
+func EmptyIDParam(ctx *gin.Context) {
+	body := gin.H{
+		"error": gin.H{
+			"message": model.ErrEmptyIDParam.Error(),
 		},
 	}
 
@@ -77,4 +106,44 @@ func internalServerError(ctx *gin.Context) {
 	body := errorBody("something went wrong", nil)
 
 	ctx.JSON(http.StatusInternalServerError, body)
+}
+
+func pagination(ctx *gin.Context) (*model.Pagination, error) {
+	var p model.Pagination
+	paginationEmpty := true
+
+	if v := ctx.Query("limit"); v != "" {
+		vInt, err := strconv.Atoi(v)
+		if err != nil {
+			return nil, model.ErrInvalidQueryParam
+		}
+
+		p.Limit = int64(vInt)
+		paginationEmpty = false
+	}
+	if v := ctx.Query("offset"); v != "" {
+		vInt, err := strconv.Atoi(v)
+		if err != nil {
+			return nil, model.ErrInvalidQueryParam
+		}
+
+		p.Offset = int64(vInt)
+		paginationEmpty = false
+	}
+
+	if paginationEmpty {
+		return nil, nil
+	}
+
+	return &p, nil
+}
+
+func IDParam(ctx *gin.Context) (string, error) {
+	id := ctx.Param("id")
+
+	if id == "" {
+		return "", model.ErrEmptyIDParam
+	}
+
+	return id, nil
 }

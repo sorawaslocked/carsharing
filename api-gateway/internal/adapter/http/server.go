@@ -4,21 +4,27 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
+	"net/http"
+
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/handler"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/middleware"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/config"
-	"log/slog"
-	"net/http"
 )
 
 type Server struct {
-	router      *gin.Engine
-	httpCfg     config.HTTPServer
-	log         *slog.Logger
-	authHandler *handler.Auth
-	userHandler *handler.User
+	router                *gin.Engine
+	httpCfg               config.HTTPServer
+	log                   *slog.Logger
+	authHandler           *handler.Auth
+	userHandler           *handler.User
+	carModelHandler       *handler.CarModelHandler
+	carHandler            *handler.CarHandler
+	carInsuranceHandler   *handler.CarInsuranceHandler
+	carMaintenanceHandler *handler.CarMaintenanceHandler
+	zoneHandler           *handler.ZoneHandler
 }
 
 func New(
@@ -27,6 +33,11 @@ func New(
 	log *slog.Logger,
 	authService handler.AuthService,
 	userService handler.UserService,
+	carModelService handler.CarModelService,
+	carService handler.CarService,
+	carInsuranceService handler.CarInsuranceService,
+	carMaintenanceService handler.CarMaintenanceService,
+	zoneService handler.ZoneService,
 ) *Server {
 	httpLog := log.With(
 		slog.String("httpServerHost", httpCfg.Host),
@@ -46,13 +57,23 @@ func New(
 	// Handlers
 	authHandler := handler.NewAuth(authService, cookieCfg)
 	userHandler := handler.NewUser(userService)
+	carModelHandler := handler.NewCarModelHandler(carModelService)
+	carHandler := handler.NewCarHandler(carService)
+	carInsuranceHandler := handler.NewCarInsuranceHandler(carInsuranceService)
+	carMaintenanceHandler := handler.NewCarMaintenanceHandler(carMaintenanceService)
+	zoneHandler := handler.NewZoneHandler(zoneService)
 
 	server := &Server{
-		router:      router,
-		httpCfg:     httpCfg,
-		log:         httpLog,
-		authHandler: authHandler,
-		userHandler: userHandler,
+		router:                router,
+		httpCfg:               httpCfg,
+		log:                   httpLog,
+		authHandler:           authHandler,
+		userHandler:           userHandler,
+		carModelHandler:       carModelHandler,
+		carHandler:            carHandler,
+		carInsuranceHandler:   carInsuranceHandler,
+		carMaintenanceHandler: carMaintenanceHandler,
+		zoneHandler:           zoneHandler,
 	}
 
 	server.setupRoutes()

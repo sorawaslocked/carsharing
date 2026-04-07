@@ -1,5 +1,11 @@
 package http
 
+import (
+	_ "github.com/sorawaslocked/car-rental-api-gateway/docs"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+)
+
 func (s *Server) setupRoutes() {
 	v1 := s.router.Group("/api/v1")
 	{
@@ -82,4 +88,7 @@ func (s *Server) setupRoutes() {
 			zones.DELETE("/:id", s.zoneHandler.Delete)
 		}
 	}
+
+	// Swagger
+	s.router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }

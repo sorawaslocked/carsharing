@@ -1,0 +1,2138 @@
+basePath: /api/v1
+definitions:
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Car:
+    properties:
+      batteryLevel:
+        type: number
+      color:
+        type: string
+      createdAt:
+        type: string
+      fuelLevel:
+        type: number
+      fuelStatus:
+        type: string
+      id:
+        type: string
+      imageStorageUrls:
+        items:
+          type: string
+        type: array
+      lastSeenAt:
+        type: string
+      licensePlate:
+        type: string
+      location:
+        $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.location'
+      mileageKm:
+        type: integer
+      modelId:
+        type: string
+      notes:
+        type: string
+      status:
+        type: string
+      telematicsId:
+        type: string
+      updatedAt:
+        type: string
+      vin:
+        type: string
+      yearManufactured:
+        type: integer
+      zoneId:
+        type: string
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarCreateRequest:
+    properties:
+      batteryLevel:
+        type: number
+      color:
+        type: string
+      fuelLevel:
+        type: number
+      imageStorageKeys:
+        items:
+          type: string
+        type: array
+      latitude:
+        type: number
+      licensePlate:
+        type: string
+      longitude:
+        type: number
+      mileageKm:
+        type: integer
+      modelID:
+        type: string
+      notes:
+        type: string
+      telematicsID:
+        type: string
+      vin:
+        type: string
+      yearManufactured:
+        type: integer
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceCreateRequest:
+    properties:
+      carId:
+        type: string
+      costTenge:
+        type: integer
+      expiresAt:
+        type: string
+      imageStorageKeys:
+        items:
+          type: string
+        type: array
+      notes:
+        type: string
+      policyNum:
+        type: string
+      provider:
+        type: string
+      startsAt:
+        type: string
+      type:
+        type: string
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceUpdateRequest:
+    properties:
+      costTenge:
+        type: integer
+      expiresAt:
+        type: string
+      imageStorageKeys:
+        items:
+          type: string
+        type: array
+      notes:
+        type: string
+      policyNum:
+        type: string
+      provider:
+        type: string
+      startsAt:
+        type: string
+      status:
+        type: string
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceRecordCompleteRequest:
+    properties:
+      completedKm:
+        type: integer
+      costTenge:
+        type: integer
+      notes:
+        type: string
+      receiptImageStorageKeys:
+        items:
+          type: string
+        type: array
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateCreateRequest:
+    properties:
+      dayInterval:
+        type: integer
+      isMandatory:
+        type: boolean
+      kmInterval:
+        type: integer
+      name:
+        type: string
+      pullPct:
+        type: number
+      warnPct:
+        type: number
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateUpdateRequest:
+    properties:
+      dayInterval:
+        type: integer
+      isMandatory:
+        type: boolean
+      kmInterval:
+        type: integer
+      name:
+        type: string
+      pullPct:
+        type: number
+      warnPct:
+        type: number
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelCreateRequest:
+    properties:
+      bodyType:
+        type: string
+      brand:
+        type: string
+      class:
+        type: string
+      engineVolume:
+        type: number
+      features:
+        items:
+          type: string
+        type: array
+      fuelType:
+        type: string
+      imageStorageKeys:
+        items:
+          type: string
+        type: array
+      model:
+        type: string
+      rangeKm:
+        type: integer
+      seats:
+        type: integer
+      transmission:
+        type: string
+      year:
+        type: integer
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelUpdateRequest:
+    properties:
+      bodyType:
+        type: string
+      brand:
+        type: string
+      class:
+        type: string
+      engineVolume:
+        type: number
+      features:
+        items:
+          type: string
+        type: array
+      fuelType:
+        type: string
+      imageStorageKeys:
+        items:
+          type: string
+        type: array
+      model:
+        type: string
+      rangeKm:
+        type: integer
+      seats:
+        type: integer
+      transmission:
+        type: string
+      year:
+        type: integer
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarUpdateRequest:
+    properties:
+      batteryLevel:
+        type: number
+      color:
+        type: string
+      fuelLevel:
+        type: number
+      imageStorageKeys:
+        items:
+          type: string
+        type: array
+      latitude:
+        type: number
+      licensePlate:
+        type: string
+      longitude:
+        type: number
+      mileageKm:
+        type: integer
+      modelId:
+        type: string
+      notes:
+        type: string
+      status:
+        type: string
+      telematicsId:
+        type: string
+      zoneId:
+        type: string
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CheckActivationCodeRequest:
+    properties:
+      code:
+        type: string
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      phoneNumber:
+        type: string
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.LoginResponse:
+    properties:
+      accessToken:
+        type: string
+      expiresIn:
+        type: integer
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RefreshTokenResponse:
+    properties:
+      accessToken:
+        type: string
+      expiresIn:
+        type: integer
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RegisterRequest:
+    properties:
+      birthDate:
+        type: string
+      email:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      password:
+        type: string
+      passwordConfirmation:
+        type: string
+      phoneNumber:
+        type: string
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RegisterResponse:
+    properties:
+      id:
+        type: integer
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserCreateRequest:
+    properties:
+      birthDate:
+        type: string
+      email:
+        type: string
+      firstName:
+        type: string
+      isActive:
+        type: boolean
+      isConfirmed:
+        type: boolean
+      lastName:
+        type: string
+      password:
+        type: string
+      passwordConfirmation:
+        type: string
+      phoneNumber:
+        type: string
+      roles:
+        items:
+          type: string
+        type: array
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserCreateResponse:
+    properties:
+      id:
+        type: integer
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserUpdateRequest:
+    properties:
+      birthDate:
+        type: string
+      email:
+        type: string
+      firstName:
+        type: string
+      isActive:
+        type: boolean
+      isConfirmed:
+        type: boolean
+      lastName:
+        type: string
+      password:
+        type: string
+      passwordConfirmation:
+        type: string
+      phoneNumber:
+        type: string
+      roles:
+        items:
+          type: string
+        type: array
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZoneCreateRequest:
+    properties:
+      boundary:
+        type: string
+      feeAdjustment:
+        type: integer
+      name:
+        type: string
+      type:
+        type: string
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZoneUpdateRequest:
+    properties:
+      boundary:
+        type: string
+      feeAdjustment:
+        type: integer
+      isActive:
+        type: boolean
+      name:
+        type: string
+      type:
+        type: string
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.location:
+    properties:
+      latitude:
+        type: number
+      longitude:
+        type: number
+    type: object
+host: localhost:4000
+info:
+  contact:
+    email: support@carrental.kz
+    name: API Support
+  description: API Gateway for the Kazakhstan carsharing platform. Handles auth, users,
+    fleet, zones, insurance, and maintenance.
+  license:
+    name: Proprietary
+  termsOfService: http://swagger.io/terms/
+  title: Car Rental API Gateway
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user by email or phone + password. Returns an access
+        token and sets an HttpOnly refresh token cookie.
+      parameters:
+      - description: Login credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.LoginResponse'
+        "400":
+          description: Malformed JSON
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Invalid credentials
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      description: Invalidates the refresh token and clears the cookie.
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Logout
+      tags:
+      - auth
+  /auth/refresh-token:
+    post:
+      description: Issues a new access token using the refresh token stored in the
+        HttpOnly cookie.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RefreshTokenResponse'
+        "401":
+          description: Invalid or expired refresh token
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Refresh access token
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user account. Returns the new user's ID.
+      parameters:
+      - description: Registration payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RegisterResponse'
+        "400":
+          description: Malformed JSON or validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: User already exists
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register a new user
+      tags:
+      - auth
+  /car-insurances:
+    get:
+      description: Returns insurance records filtered by car, type, status, or expiry
+        window.
+      parameters:
+      - description: Filter by car UUID
+        in: query
+        name: carID
+        type: string
+      - description: Insurance type (osago, kasko)
+        in: query
+        name: type
+        type: string
+      - description: Status (active, expired, cancelled)
+        in: query
+        name: status
+        type: string
+      - description: Return policies expiring within N days
+        in: query
+        name: expiringWithinDays
+        type: integer
+      - description: Pagination limit
+        in: query
+        name: limit
+        type: integer
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: insurances
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List insurance records
+      tags:
+      - car-insurances
+    post:
+      consumes:
+      - application/json
+      description: Records an ОСАГО or КАСКО policy for a specific car.
+      parameters:
+      - description: Insurance payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: id
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create car insurance record
+      tags:
+      - car-insurances
+  /car-insurances/{id}:
+    delete:
+      parameters:
+      - description: Insurance UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete insurance record
+      tags:
+      - car-insurances
+    get:
+      parameters:
+      - description: Insurance UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: insurance
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get insurance record by ID
+      tags:
+      - car-insurances
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Insurance UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update insurance record
+      tags:
+      - car-insurances
+  /car-insurances/image-upload:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: uploadData
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get pre-signed upload URL for insurance document images
+      tags:
+      - car-insurances
+  /car-maintenance/records:
+    get:
+      description: Returns work orders for cars. Filter by car, template, or status
+        (pending, in_progress, completed).
+      parameters:
+      - description: Filter by car UUID
+        in: query
+        name: carID
+        type: string
+      - description: Filter by template UUID
+        in: query
+        name: templateID
+        type: string
+      - description: Filter by status (pending, in_progress, completed)
+        in: query
+        name: status
+        type: string
+      - description: Pagination limit
+        in: query
+        name: limit
+        type: integer
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: records
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List maintenance records
+      tags:
+      - car-maintenance
+  /car-maintenance/records/complete/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Marks a maintenance record as completed, resets the service interval
+        clock, and transitions the car back to available.
+      parameters:
+      - description: Maintenance record UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Completion details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceRecordCompleteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Complete a maintenance work order
+      tags:
+      - car-maintenance
+  /car-maintenance/records/receipt-image-upload:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: uploadData
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get pre-signed upload URL for maintenance receipts
+      tags:
+      - car-maintenance
+  /car-maintenance/template:
+    get:
+      parameters:
+      - description: Pagination limit
+        in: query
+        name: limit
+        type: integer
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: templates
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List maintenance templates
+      tags:
+      - car-maintenance
+    post:
+      consumes:
+      - application/json
+      description: Defines a recurring service interval (e.g. oil change every 8,000
+        km / 180 days).
+      parameters:
+      - description: Template payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: id
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create maintenance template
+      tags:
+      - car-maintenance
+  /car-maintenance/template/{id}:
+    delete:
+      parameters:
+      - description: Template UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete maintenance template
+      tags:
+      - car-maintenance
+    get:
+      parameters:
+      - description: Template UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: template
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get maintenance template by ID
+      tags:
+      - car-maintenance
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Template UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update maintenance template
+      tags:
+      - car-maintenance
+  /car-models:
+    get:
+      description: Returns a filtered, paginated list of car models.
+      parameters:
+      - description: Brand filter (e.g. Hyundai)
+        in: query
+        name: brand
+        type: string
+      - description: Model name filter
+        in: query
+        name: model
+        type: string
+      - description: Fuel type (petrol, diesel, electric, hybrid)
+        in: query
+        name: fuelType
+        type: string
+      - description: Transmission (automatic, manual)
+        in: query
+        name: transmission
+        type: string
+      - description: Body type (sedan, suv, hatchback…)
+        in: query
+        name: bodyType
+        type: string
+      - description: Class (economy, comfort, business)
+        in: query
+        name: class
+        type: string
+      - description: Minimum seat count
+        in: query
+        name: minSeats
+        type: integer
+      - description: Pagination limit
+        in: query
+        name: limit
+        type: integer
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: carModels
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List car models
+      tags:
+      - car-models
+    post:
+      consumes:
+      - application/json
+      description: Registers a new car model (e.g. Hyundai Solaris 2022). Returns
+        the new model's UUID.
+      parameters:
+      - description: Car model payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: id
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create car model
+      tags:
+      - car-models
+  /car-models/{id}:
+    delete:
+      parameters:
+      - description: Car model UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete car model
+      tags:
+      - car-models
+    get:
+      parameters:
+      - description: Car model UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: carModel
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get car model by ID
+      tags:
+      - car-models
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Car model UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update car model
+      tags:
+      - car-models
+  /car-models/image-upload:
+    get:
+      description: Returns a pre-signed S3-compatible URL and object key for uploading
+        a car model image.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: uploadData
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get pre-signed image upload URL
+      tags:
+      - car-models
+  /cars:
+    get:
+      description: Returns cars filtered by status, location radius, fuel level, zone,
+        and model attributes. Pass latitude+longitude+radiusM to get nearby cars sorted
+        by distance.
+      parameters:
+      - description: Brand filter
+        in: query
+        name: brand
+        type: string
+      - description: Model name filter
+        in: query
+        name: model
+        type: string
+      - description: Fuel type
+        in: query
+        name: fuelType
+        type: string
+      - description: Transmission
+        in: query
+        name: transmission
+        type: string
+      - description: Body type
+        in: query
+        name: bodyType
+        type: string
+      - description: Class
+        in: query
+        name: class
+        type: string
+      - description: Minimum seats
+        in: query
+        name: minSeats
+        type: integer
+      - description: User latitude (for proximity search)
+        in: query
+        name: latitude
+        type: number
+      - description: User longitude (for proximity search)
+        in: query
+        name: longitude
+        type: number
+      - description: Search radius in metres
+        in: query
+        name: radiusM
+        type: integer
+      - description: Filter by zone UUID
+        in: query
+        name: zoneId
+        type: string
+      - description: Minimum fuel level (0–100)
+        in: query
+        name: minFuelLevel
+        type: number
+      - description: Car status (available, reserved, in_trip, …)
+        in: query
+        name: status
+        type: string
+      - description: Pagination limit
+        in: query
+        name: limit
+        type: integer
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: cars
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List available cars
+      tags:
+      - cars
+    post:
+      consumes:
+      - application/json
+      description: Creates a new physical car record linked to a car model and telematics
+        device.
+      parameters:
+      - description: Car create payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: id
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Register a car in the fleet
+      tags:
+      - cars
+  /cars/{id}:
+    delete:
+      parameters:
+      - description: Car UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete car
+      tags:
+      - cars
+    get:
+      parameters:
+      - description: Car UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Car'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get car by ID
+      tags:
+      - cars
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Car UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update car
+      tags:
+      - cars
+  /cars/fuel-history:
+    get:
+      description: Returns time-series fuel readings for a car. Useful for detecting
+        theft (sudden drops) or verifying refuels.
+      parameters:
+      - description: Filter by car UUID
+        in: query
+        name: carID
+        type: string
+      - description: Start date (YYYY-MM-DD)
+        in: query
+        name: from
+        type: string
+      - description: End date (YYYY-MM-DD)
+        in: query
+        name: to
+        type: string
+      - description: Pagination limit
+        in: query
+        name: limit
+        type: integer
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: fuelHistory
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get car fuel reading history
+      tags:
+      - cars
+  /cars/image-upload:
+    get:
+      description: Returns a pre-signed S3-compatible URL and object key for uploading
+        a car or trip photo.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: uploadData
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get pre-signed image upload URL for car photos
+      tags:
+      - cars
+  /cars/status-log:
+    get:
+      description: Returns the immutable audit trail of every car state transition
+        (available → reserved → in_trip → …).
+      parameters:
+      - description: Filter by car UUID
+        in: query
+        name: carID
+        type: string
+      - description: Pagination limit
+        in: query
+        name: limit
+        type: integer
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: logs
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get car status change log
+      tags:
+      - cars
+  /users:
+    delete:
+      description: Deletes a user matched by id or email query param.
+      parameters:
+      - description: User ID
+        in: query
+        name: id
+        type: integer
+      - description: User email
+        in: query
+        name: email
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete user
+      tags:
+      - users
+    get:
+      description: Returns all users.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: users
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all users
+      tags:
+      - users
+    patch:
+      consumes:
+      - application/json
+      description: Partially updates a user matched by id or email query param.
+      parameters:
+      - description: User ID
+        in: query
+        name: id
+        type: integer
+      - description: User email
+        in: query
+        name: email
+        type: string
+      - description: Fields to update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Admin endpoint to create a user with explicit roles and activation
+        state.
+      parameters:
+      - description: User create payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserCreateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create user (admin)
+      tags:
+      - users
+  /users/activation-code/check:
+    post:
+      consumes:
+      - application/json
+      description: Verifies the activation code submitted by the user.
+      parameters:
+      - description: Activation code
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CheckActivationCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Check activation code
+      tags:
+      - users
+  /users/activation-code/send:
+    post:
+      description: Sends an SMS/email activation code to the current user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Send activation code
+      tags:
+      - users
+  /users/me:
+    get:
+      description: Returns the profile of the authenticated user extracted from the
+        JWT.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get current user
+      tags:
+      - users
+  /zones:
+    get:
+      description: Returns zones filtered by type and active status.
+      parameters:
+      - description: Zone type (operating, no_drop, parking_hub, surcharge)
+        in: query
+        name: type
+        type: string
+      - description: Filter by active flag
+        in: query
+        name: isActive
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: zones
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List zones
+      tags:
+      - zones
+    post:
+      consumes:
+      - application/json
+      description: Creates a geographic zone polygon (operating area, no-drop, parking
+        hub, or surcharge zone).
+      parameters:
+      - description: Zone payload (boundary as GeoJSON polygon string)
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZoneCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: id
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create zone
+      tags:
+      - zones
+  /zones/{id}:
+    delete:
+      parameters:
+      - description: Zone UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete zone
+      tags:
+      - zones
+    get:
+      parameters:
+      - description: Zone UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: zone
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get zone by ID
+      tags:
+      - zones
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Zone UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZoneUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update zone
+      tags:
+      - zones
+securityDefinitions:
+  BearerAuth:
+    description: 'Enter: Bearer <access_token>'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

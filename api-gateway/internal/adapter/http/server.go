@@ -7,10 +7,8 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/handler"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/middleware"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/config"
 )
 
@@ -38,6 +36,8 @@ func New(
 	carInsuranceService handler.CarInsuranceService,
 	carMaintenanceService handler.CarMaintenanceService,
 	zoneService handler.ZoneService,
+	tokenManager TokenManager,
+	userPermissionsCache UserPermissionsCache,
 ) *Server {
 	httpLog := log.With(
 		slog.String("httpServerHost", httpCfg.Host),
@@ -46,13 +46,6 @@ func New(
 
 	gin.SetMode(httpCfg.GinMode)
 	router := gin.New()
-
-	// Middleware
-	router.Use(gin.Recovery())
-	router.Use(middleware.Cors())
-	router.Use(requestid.New())
-	router.Use(middleware.Base())
-	router.Use(middleware.Logger(httpLog))
 
 	// Handlers
 	authHandler := handler.NewAuth(authService, cookieCfg)
@@ -76,7 +69,8 @@ func New(
 		zoneHandler:           zoneHandler,
 	}
 
-	server.setupRoutes()
+	server.setupMiddleware()
+	server.setupRoutes(tokenManager, userPermissionsCache)
 
 	return server
 }

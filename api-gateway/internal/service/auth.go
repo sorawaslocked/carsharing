@@ -2,11 +2,13 @@ package service
 
 import (
 	"context"
+
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )
 
 type AuthService struct {
-	presenter AuthPresenter
+	presenter    AuthPresenter
+	tokenManager TokenManager
 }
 
 func NewAuthService(presenter AuthPresenter) *AuthService {

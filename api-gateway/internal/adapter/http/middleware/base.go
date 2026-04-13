@@ -5,14 +5,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	ctxRequestIDKey = "x-request-id"
+	ctxClientIPKey  = "x-client-ip"
+)
+
 func Base() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if authHeader := c.GetHeader("Authorization"); authHeader != "" {
-			c.Set("authorization", authHeader)
-		}
-
-		c.Set("x-request-id", requestid.Get(c))
-		c.Set("x-client-ip", c.ClientIP())
+		c.Set(ctxRequestIDKey, requestid.Get(c))
+		c.Set(ctxClientIPKey, c.ClientIP())
 
 		c.Next()
 	}

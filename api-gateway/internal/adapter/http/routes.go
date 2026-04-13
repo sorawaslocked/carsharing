@@ -1,23 +1,45 @@
 package http
 
 import (
+	"github.com/gin-contrib/requestid"
+	"github.com/gin-gonic/gin"
 	_ "github.com/sorawaslocked/car-rental-api-gateway/docs"
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/middleware"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func (s *Server) setupRoutes() {
-	v1 := s.router.Group("/api/v1")
+func (s *Server) setupMiddleware() {
+	s.router.Use(gin.Recovery())
+	s.router.Use(middleware.Cors())
+	s.router.Use(requestid.New())
+	s.router.Use(middleware.Base())
+	s.router.Use(middleware.Logger(s.log))
+}
+
+func (s *Server) setupRoutes(tokenManager TokenManager, userPermissionsCache UserPermissionsCache) {
+	publicV1 := s.router.Group("/api/v1")
 	{
-		auth := v1.Group("/auth")
+		auth := publicV1.Group("/auth")
 		{
 			auth.POST("/register", s.authHandler.Register)
 			auth.POST("/login", s.authHandler.Login)
 			auth.POST("/refresh-token", s.authHandler.RefreshToken)
+		}
+	}
+
+	authentication := middleware.NewAuthentication(tokenManager, userPermissionsCache)
+
+	protectedV1 := s.router.Group("/api/v1")
+	protectedV1.Use(authentication.Middleware())
+	protectedV1.Use(middleware.SuspensionChecker())
+	{
+		auth := protectedV1.Group("/auth")
+		{
 			auth.POST("/logout", s.authHandler.Logout)
 		}
 
-		users := v1.Group("/users")
+		users := protectedV1.Group("/users")
 		{
 			users.POST("", s.userHandler.Create)
 			users.GET("", s.userHandler.Get)
@@ -28,7 +50,7 @@ func (s *Server) setupRoutes() {
 			users.POST("/activation-code/check", s.userHandler.CheckActivationCode)
 		}
 
-		carModels := v1.Group("/car-models")
+		carModels := protectedV1.Group("/car-models")
 		{
 			carModels.POST("", s.carModelHandler.Create)
 			carModels.GET("/:id", s.carModelHandler.Get)
@@ -38,54 +60,58 @@ func (s *Server) setupRoutes() {
 			carModels.GET("/image-upload", s.carModelHandler.GetImageUploadUrl)
 		}
 
-		cars := v1.Group("/cars")
+		verified := protectedV1.Group("")
+		verified.Use(middleware.VerificationChecker())
 		{
-			cars.POST("", s.carHandler.Create)
-			cars.GET("/:id", s.carHandler.Get)
-			cars.GET("", s.carHandler.GetAll)
-			cars.PATCH("/:id", s.carHandler.Update)
-			cars.DELETE("/:id", s.carHandler.Delete)
-			cars.GET("/status-log", s.carHandler.GetCarStatusLog)
-			cars.GET("/fuel-history", s.carHandler.GetCarFuelHistory)
-			cars.GET("/image-upload", s.carHandler.GetImageUploadUrl)
-		}
-
-		carInsurances := v1.Group("/car-insurances")
-		{
-			carInsurances.POST("", s.carInsuranceHandler.Create)
-			carInsurances.GET("/:id", s.carInsuranceHandler.Get)
-			carInsurances.GET("", s.carInsuranceHandler.GetAll)
-			carInsurances.PATCH("/:id", s.carInsuranceHandler.Update)
-			carInsurances.DELETE("/:id", s.carInsuranceHandler.Delete)
-			carInsurances.GET("/image-upload", s.carInsuranceHandler.GetImageUploadUrl)
-		}
-
-		carMaintenance := v1.Group("/car-maintenance")
-		{
-			template := carMaintenance.Group("/template")
+			cars := verified.Group("/cars")
 			{
-				template.POST("", s.carMaintenanceHandler.CreateTemplate)
-				template.GET("/:id", s.carMaintenanceHandler.GetTemplate)
-				template.GET("", s.carMaintenanceHandler.GetAllTemplates)
-				template.PATCH("/:id", s.carMaintenanceHandler.UpdateTemplate)
-				template.DELETE("/:id", s.carMaintenanceHandler.DeleteTemplate)
+				cars.POST("", s.carHandler.Create)
+				cars.GET("/:id", s.carHandler.Get)
+				cars.GET("", s.carHandler.GetAll)
+				cars.PATCH("/:id", s.carHandler.Update)
+				cars.DELETE("/:id", s.carHandler.Delete)
+				cars.GET("/status-log", s.carHandler.GetCarStatusLog)
+				cars.GET("/fuel-history", s.carHandler.GetCarFuelHistory)
+				cars.GET("/image-upload", s.carHandler.GetImageUploadUrl)
 			}
 
-			records := carMaintenance.Group("/records")
+			carInsurances := verified.Group("/car-insurances")
 			{
-				records.GET("", s.carMaintenanceHandler.GetRecords)
-				records.POST("/complete/:id", s.carMaintenanceHandler.CompleteRecord)
-				records.GET("/receipt-image-upload", s.carMaintenanceHandler.GetReceiptImageUploadUrl)
+				carInsurances.POST("", s.carInsuranceHandler.Create)
+				carInsurances.GET("/:id", s.carInsuranceHandler.Get)
+				carInsurances.GET("", s.carInsuranceHandler.GetAll)
+				carInsurances.PATCH("/:id", s.carInsuranceHandler.Update)
+				carInsurances.DELETE("/:id", s.carInsuranceHandler.Delete)
+				carInsurances.GET("/image-upload", s.carInsuranceHandler.GetImageUploadUrl)
 			}
-		}
 
-		zones := v1.Group("/zones")
-		{
-			zones.POST("", s.zoneHandler.Create)
-			zones.GET("/:id", s.zoneHandler.Get)
-			zones.GET("", s.zoneHandler.GetAll)
-			zones.PATCH("/:id", s.zoneHandler.Update)
-			zones.DELETE("/:id", s.zoneHandler.Delete)
+			carMaintenance := verified.Group("/car-maintenance")
+			{
+				template := carMaintenance.Group("/template")
+				{
+					template.POST("", s.carMaintenanceHandler.CreateTemplate)
+					template.GET("/:id", s.carMaintenanceHandler.GetTemplate)
+					template.GET("", s.carMaintenanceHandler.GetAllTemplates)
+					template.PATCH("/:id", s.carMaintenanceHandler.UpdateTemplate)
+					template.DELETE("/:id", s.carMaintenanceHandler.DeleteTemplate)
+				}
+
+				records := carMaintenance.Group("/records")
+				{
+					records.GET("", s.carMaintenanceHandler.GetRecords)
+					records.POST("/complete/:id", s.carMaintenanceHandler.CompleteRecord)
+					records.GET("/receipt-image-upload", s.carMaintenanceHandler.GetReceiptImageUploadUrl)
+				}
+			}
+
+			zones := verified.Group("/zones")
+			{
+				zones.POST("", s.zoneHandler.Create)
+				zones.GET("/:id", s.zoneHandler.Get)
+				zones.GET("", s.zoneHandler.GetAll)
+				zones.PATCH("/:id", s.zoneHandler.Update)
+				zones.DELETE("/:id", s.zoneHandler.Delete)
+			}
 		}
 	}
 

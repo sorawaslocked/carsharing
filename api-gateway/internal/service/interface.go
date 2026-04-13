@@ -2,9 +2,16 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )
+
+type TokenManager interface {
+	GenerateAccessToken(userID, deviceID string) (token string, exp time.Time, err error)
+	GenerateRefreshToken(userID, deviceID string) (token string, exp time.Time, err error)
+	ParseToken(token string) (userID, deviceID string, err error)
+}
 
 type AuthPresenter interface {
 	Register(ctx context.Context, data model.UserCreateData) (uint64, error)

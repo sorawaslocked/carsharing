@@ -25,15 +25,14 @@ func NewManager(
 	}
 }
 
-func (m *Manager) GenerateAccessToken(userID, deviceID string) (token string, exp time.Time, err error) {
+func (m *Manager) GenerateAccessToken(userID string) (token string, exp time.Time, err error) {
 	now := time.Now()
 	exp = now.Add(m.accessTokenTTL)
 
 	claims := jwt.MapClaims{
-		"sub":       userID,
-		"device_id": deviceID,
-		"iat":       now.Unix(),
-		"exp":       exp.Unix(),
+		"sub": userID,
+		"iat": now.Unix(),
+		"exp": exp.Unix(),
 	}
 
 	tokenWithClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -46,15 +45,14 @@ func (m *Manager) GenerateAccessToken(userID, deviceID string) (token string, ex
 	return token, exp, nil
 }
 
-func (m *Manager) GenerateRefreshToken(userID, deviceID string) (token string, exp time.Time, err error) {
+func (m *Manager) GenerateRefreshToken(userID string) (token string, exp time.Time, err error) {
 	now := time.Now()
 	exp = now.Add(m.refreshTokenTTL)
 
 	claims := jwt.MapClaims{
-		"sub":       userID,
-		"device_id": deviceID,
-		"iat":       now.Unix(),
-		"exp":       exp.Unix(),
+		"sub": userID,
+		"iat": now.Unix(),
+		"exp": exp.Unix(),
 	}
 
 	tokenWithClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -67,9 +65,9 @@ func (m *Manager) GenerateRefreshToken(userID, deviceID string) (token string, e
 	return token, exp, nil
 }
 
-func (m *Manager) ParseToken(token string) (userID, deviceID string, err error) {
+func (m *Manager) ParseToken(token string) (string, error) {
 	var tokenWithClaims *jwt.Token
-	tokenWithClaims, err = jwt.ParseWithClaims(token, &customClaims{}, func(token *jwt.Token) (any, error) {
+	tokenWithClaims, err := jwt.ParseWithClaims(token, &jwt.MapClaims{}, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
@@ -77,13 +75,13 @@ func (m *Manager) ParseToken(token string) (userID, deviceID string, err error) 
 		return m.secret, nil
 	})
 	if err != nil {
-		return "", "", ErrInvalidToken
+		return "", ErrInvalidToken
 	}
 
-	claims, ok := tokenWithClaims.Claims.(*customClaims)
+	claims, ok := tokenWithClaims.Claims.(*jwt.RegisteredClaims)
 	if !ok {
-		return "", "", ErrInvalidToken
+		return "", ErrInvalidToken
 	}
 
-	return claims.Subject, claims.DeviceID, nil
+	return claims.Subject, nil
 }

@@ -9,7 +9,6 @@ import (
 )
 
 const (
-	ctxDeviceIDKey      = "x-device-id"
 	ctxUserIDKey        = "x-user-id"
 	ctxUserRolesKey     = "x-user-roles"
 	ctxUserVerifiedKey  = "x-user-verified"
@@ -37,7 +36,7 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 			return
 		}
 
-		userID, deviceID, err := a.parseClaims(header)
+		userID, err := a.parseClaims(header)
 		if err != nil {
 			dto.FromError(c, err)
 
@@ -67,7 +66,6 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 			return
 		}
 
-		c.Set(ctxDeviceIDKey, deviceID)
 		c.Set(ctxUserIDKey, userID)
 		c.Set(ctxUserRolesKey, roles)
 		c.Set(ctxUserVerifiedKey, verified)
@@ -86,13 +84,13 @@ func authHeader(c *gin.Context) (string, error) {
 	return header, nil
 }
 
-func (a *Authentication) parseClaims(authHeader string) (userID, deviceID string, err error) {
+func (a *Authentication) parseClaims(authHeader string) (userID string, err error) {
 	token := strings.TrimPrefix(authHeader, "Bearer ")
 
-	userID, deviceID, err = a.tokenManager.ParseToken(token)
+	userID, err = a.tokenManager.ParseToken(token)
 	if err != nil {
-		return "", "", model.ErrUnauthorized
+		return "", model.ErrUnauthorized
 	}
 
-	return userID, deviceID, nil
+	return userID, nil
 }

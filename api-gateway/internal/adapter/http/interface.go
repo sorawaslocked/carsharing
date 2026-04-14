@@ -12,7 +12,7 @@ type UserPermissionsCache interface {
 }
 
 type TokenManager interface {
-	GenerateAccessToken(userID, deviceID string) (token string, exp time.Time, err error)
-	GenerateRefreshToken(userID, deviceID string) (token string, exp time.Time, err error)
-	ParseToken(token string) (userID, deviceID string, err error)
+	GenerateAccessToken(userID string) (token string, exp time.Time, err error)
+	GenerateRefreshToken(userID string) (token string, exp time.Time, err error)
+	ParseToken(token string) (string, error)
 }

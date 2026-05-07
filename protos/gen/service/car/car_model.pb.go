@@ -757,13 +757,13 @@ const file_service_car_car_model_proto_rawDesc = "" +
 	"\x16UpdateCarModelResponse\"'\n" +
 	"\x15DeleteCarModelRequest\x12\x0e\n" +
 	"\x02ID\x18\x01 \x01(\tR\x02ID\"\x18\n" +
-	"\x16DeleteCarModelResponse2\xcb\x03\n" +
+	"\x16DeleteCarModelResponse2\xc9\x03\n" +
 	"\x0fCarModelService\x12Y\n" +
 	"\x0eCreateCarModel\x12\".service.car.CreateCarModelRequest\x1a#.service.car.CreateCarModelResponse\x12P\n" +
 	"\vGetCarModel\x12\x1f.service.car.GetCarModelRequest\x1a .service.car.GetCarModelResponse\x12S\n" +
-	"\fGetCarModels\x12 .service.car.GetCarModelsRequest\x1a!.service.car.GetCarModelsResponse\x12Z\n" +
-	"\x0fUpdateCarModels\x12\".service.car.UpdateCarModelRequest\x1a#.service.car.UpdateCarModelResponse\x12Z\n" +
-	"\x0fDeleteCarModels\x12\".service.car.DeleteCarModelRequest\x1a#.service.car.DeleteCarModelResponseB<Z:github.com/sorawaslocked/car-rental-protos/gen/service/carb\x06proto3"
+	"\fGetCarModels\x12 .service.car.GetCarModelsRequest\x1a!.service.car.GetCarModelsResponse\x12Y\n" +
+	"\x0eUpdateCarModel\x12\".service.car.UpdateCarModelRequest\x1a#.service.car.UpdateCarModelResponse\x12Y\n" +
+	"\x0eDeleteCarModel\x12\".service.car.DeleteCarModelRequest\x1a#.service.car.DeleteCarModelResponseB<Z:github.com/sorawaslocked/car-rental-protos/gen/service/carb\x06proto3"
 
 var (
 	file_service_car_car_model_proto_rawDescOnce sync.Once
@@ -797,13 +797,13 @@ var file_service_car_car_model_proto_depIdxs = []int32{
 	0,  // 2: service.car.CarModelService.CreateCarModel:input_type -> service.car.CreateCarModelRequest
 	2,  // 3: service.car.CarModelService.GetCarModel:input_type -> service.car.GetCarModelRequest
 	4,  // 4: service.car.CarModelService.GetCarModels:input_type -> service.car.GetCarModelsRequest
-	6,  // 5: service.car.CarModelService.UpdateCarModels:input_type -> service.car.UpdateCarModelRequest
-	8,  // 6: service.car.CarModelService.DeleteCarModels:input_type -> service.car.DeleteCarModelRequest
+	6,  // 5: service.car.CarModelService.UpdateCarModel:input_type -> service.car.UpdateCarModelRequest
+	8,  // 6: service.car.CarModelService.DeleteCarModel:input_type -> service.car.DeleteCarModelRequest
 	1,  // 7: service.car.CarModelService.CreateCarModel:output_type -> service.car.CreateCarModelResponse
 	3,  // 8: service.car.CarModelService.GetCarModel:output_type -> service.car.GetCarModelResponse
 	5,  // 9: service.car.CarModelService.GetCarModels:output_type -> service.car.GetCarModelsResponse
-	7,  // 10: service.car.CarModelService.UpdateCarModels:output_type -> service.car.UpdateCarModelResponse
-	9,  // 11: service.car.CarModelService.DeleteCarModels:output_type -> service.car.DeleteCarModelResponse
+	7,  // 10: service.car.CarModelService.UpdateCarModel:output_type -> service.car.UpdateCarModelResponse
+	9,  // 11: service.car.CarModelService.DeleteCarModel:output_type -> service.car.DeleteCarModelResponse
 	7,  // [7:12] is the sub-list for method output_type
 	2,  // [2:7] is the sub-list for method input_type
 	2,  // [2:2] is the sub-list for extension type_name

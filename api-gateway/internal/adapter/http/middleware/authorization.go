@@ -11,12 +11,14 @@ func DocumentVerificationChecker() gin.HandlerFunc {
 		isVerified, exists := c.Get(ctxUserDocumentVerifiedKey)
 		if !exists {
 			dto.FromError(c, model.ErrInternalServerError)
+			c.Abort()
 
 			return
 		}
 
 		if !isVerified.(bool) {
 			dto.FromError(c, model.ErrForbidden)
+			c.Abort()
 
 			return
 		}
@@ -30,12 +32,14 @@ func EmailVerificationChecker() gin.HandlerFunc {
 		isVerified, exists := c.Get(ctxUserEmailVerifiedKey)
 		if !exists {
 			dto.FromError(c, model.ErrInternalServerError)
+			c.Abort()
 
 			return
 		}
 
 		if !isVerified.(bool) {
 			dto.FromError(c, model.ErrForbidden)
+			c.Abort()
 
 			return
 		}
@@ -49,12 +53,14 @@ func SuspensionChecker() gin.HandlerFunc {
 		isSuspended, exists := c.Get(ctxUserSuspendedKey)
 		if !exists {
 			dto.FromError(c, model.ErrInternalServerError)
+			c.Abort()
 
 			return
 		}
 
 		if isSuspended.(bool) {
 			dto.FromError(c, model.ErrForbidden)
+			c.Abort()
 
 			return
 		}

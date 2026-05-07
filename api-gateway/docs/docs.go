@@ -22,92 +22,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/auth/login": {
-            "post": {
-                "description": "Authenticates a user by email or phone + password. Returns an access token and sets an HttpOnly refresh token cookie.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Login",
-                "parameters": [
-                    {
-                        "description": "Login credentials",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.LoginRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.LoginResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Malformed JSON",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Invalid credentials",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/auth/logout": {
-            "post": {
-                "description": "Invalidates the refresh token and clears the cookie.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Logout",
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
         "/auth/refresh-token": {
             "post": {
                 "description": "Issues a new access token using the refresh token stored in the HttpOnly cookie.",
@@ -122,21 +36,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RefreshTokenResponse"
+                            "$ref": "#/definitions/dto.AccessTokenResponse"
                         }
                     },
                     "401": {
-                        "description": "Invalid or expired refresh token",
+                        "description": "Unauthorized",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -162,7 +74,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RegisterRequest"
+                            "$ref": "#/definitions/dto.RegisterRequest"
                         }
                     }
                 ],
@@ -170,28 +82,111 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RegisterResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
-                        "description": "Malformed JSON or validation error",
+                        "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
-                        "description": "User already exists",
+                        "description": "Conflict",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/sign-in": {
+            "post": {
+                "description": "Authenticates a user by email or phone + password. Returns an access token and sets an HttpOnly refresh token cookie.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Sign in",
+                "parameters": [
+                    {
+                        "description": "Sign-in credentials",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.AccessTokenResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/sign-out": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Invalidates the current session and clears the refresh token cookie.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Sign out",
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -298,7 +293,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceCreateRequest"
+                            "$ref": "#/definitions/dto.CarInsuranceCreateRequest"
                         }
                     }
                 ],
@@ -517,7 +512,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceUpdateRequest"
+                            "$ref": "#/definitions/dto.CarInsuranceUpdateRequest"
                         }
                     }
                 ],
@@ -657,7 +652,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceRecordCompleteRequest"
+                            "$ref": "#/definitions/dto.CarMaintenanceRecordCompleteRequest"
                         }
                     }
                 ],
@@ -808,7 +803,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateCreateRequest"
+                            "$ref": "#/definitions/dto.CarMaintenanceTemplateCreateRequest"
                         }
                     }
                 ],
@@ -981,7 +976,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateUpdateRequest"
+                            "$ref": "#/definitions/dto.CarMaintenanceTemplateUpdateRequest"
                         }
                     }
                 ],
@@ -1136,7 +1131,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelCreateRequest"
+                            "$ref": "#/definitions/dto.CarModelCreateRequest"
                         }
                     }
                 ],
@@ -1356,7 +1351,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelUpdateRequest"
+                            "$ref": "#/definitions/dto.CarModelUpdateRequest"
                         }
                     }
                 ],
@@ -1452,13 +1447,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "number",
-                        "description": "User latitude (for proximity search)",
+                        "description": "UserHandler latitude (for proximity search)",
                         "name": "latitude",
                         "in": "query"
                     },
                     {
                         "type": "number",
-                        "description": "User longitude (for proximity search)",
+                        "description": "UserHandler longitude (for proximity search)",
                         "name": "longitude",
                         "in": "query"
                     },
@@ -1547,7 +1542,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarCreateRequest"
+                            "$ref": "#/definitions/dto.CarCreateRequest"
                         }
                     }
                 ],
@@ -1789,7 +1784,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Car"
+                            "$ref": "#/definitions/dto.Car"
                         }
                     },
                     "400": {
@@ -1898,7 +1893,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarUpdateRequest"
+                            "$ref": "#/definitions/dto.CarUpdateRequest"
                         }
                     }
                 ],
@@ -1934,6 +1929,26 @@ const docTemplate = `{
                 }
             }
         },
+        "/health": {
+            "get": {
+                "description": "Returns the health status of the API gateway and all upstream services.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Gateway health",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HealthResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "security": [
@@ -1941,34 +1956,93 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns all users.",
+                "description": "Returns a list of users, optionally filtered by query params.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "users"
                 ],
-                "summary": "Get all users",
+                "summary": "Get users with filter",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by email",
+                        "name": "email",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by phone number",
+                        "name": "phoneNumber",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by first name",
+                        "name": "firstName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by last name",
+                        "name": "lastName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by document verification status",
+                        "name": "isDocumentVerified",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by email verification status",
+                        "name": "isEmailVerified",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by suspension status",
+                        "name": "isSuspended",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "users",
+                        "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.UsersResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1992,12 +2066,12 @@ const docTemplate = `{
                 "summary": "Create user (admin)",
                 "parameters": [
                     {
-                        "description": "User create payload",
+                        "description": "Create payload",
                         "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserCreateRequest"
+                            "$ref": "#/definitions/dto.UserCreateRequest"
                         }
                     }
                 ],
@@ -2005,179 +2079,31 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserCreateResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Deletes a user matched by id or email query param.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Delete user",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "User email",
-                        "name": "email",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "patch": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Partially updates a user matched by id or email query param.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Update user",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "User email",
-                        "name": "email",
-                        "in": "query"
-                    },
-                    {
-                        "description": "Fields to update",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserUpdateRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2208,37 +2134,30 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CheckActivationCodeRequest"
+                            "$ref": "#/definitions/dto.CheckActivationCodeRequest"
                         }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
+                    "204": {
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2251,7 +2170,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Sends an SMS/email activation code to the current user.",
+                "description": "Sends an activation code to the current user's email or phone.",
                 "produces": [
                     "application/json"
                 ],
@@ -2260,25 +2179,200 @@ const docTemplate = `{
                 ],
                 "summary": "Send activation code",
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
+                    "204": {
+                        "description": "No Content"
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/documents": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates a document record after the image has been uploaded to object storage.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Create document record",
+                "parameters": [
+                    {
+                        "description": "Document payload",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateDocumentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.IDResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/documents/check/{id}": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Sets the review status of a document (e.g. approved or rejected) and optionally provides a rejection reason.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Review a document",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Document ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Review payload",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CheckDocumentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/documents/upload": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a presigned PUT URL for uploading a document image to object storage.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get document upload URL",
+                "parameters": [
+                    {
+                        "description": "Image type",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetUploadDocumentDataRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ImageUploadResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2291,7 +2385,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns the profile of the authenticated user extracted from the JWT.",
+                "description": "Returns the profile of the authenticated user.",
                 "produces": [
                     "application/json"
                 ],
@@ -2303,22 +2397,253 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.UserResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a single user by their ID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get user by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deletes a user by ID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Delete user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Partially updates a user by ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Update user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fields to update",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}/documents/processed": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns all processed documents belonging to the specified user.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get processed documents for a user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DocumentsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2401,7 +2726,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZoneCreateRequest"
+                            "$ref": "#/definitions/dto.ZoneCreateRequest"
                         }
                     }
                 ],
@@ -2581,7 +2906,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZoneUpdateRequest"
+                            "$ref": "#/definitions/dto.ZoneUpdateRequest"
                         }
                     }
                 ],
@@ -2619,7 +2944,26 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Car": {
+        "dto.AccessTokenData": {
+            "type": "object",
+            "properties": {
+                "expiresIn": {
+                    "type": "integer"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.AccessTokenResponse": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "$ref": "#/definitions/dto.AccessTokenData"
+                }
+            }
+        },
+        "dto.Car": {
             "type": "object",
             "properties": {
                 "batteryLevel": {
@@ -2653,7 +2997,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "location": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.location"
+                    "$ref": "#/definitions/dto.location"
                 },
                 "mileageKm": {
                     "type": "integer"
@@ -2684,7 +3028,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarCreateRequest": {
+        "dto.CarCreateRequest": {
             "type": "object",
             "properties": {
                 "batteryLevel": {
@@ -2731,7 +3075,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceCreateRequest": {
+        "dto.CarInsuranceCreateRequest": {
             "type": "object",
             "properties": {
                 "carId": {
@@ -2766,7 +3110,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceUpdateRequest": {
+        "dto.CarInsuranceUpdateRequest": {
             "type": "object",
             "properties": {
                 "costTenge": {
@@ -2798,7 +3142,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceRecordCompleteRequest": {
+        "dto.CarMaintenanceRecordCompleteRequest": {
             "type": "object",
             "properties": {
                 "completedKm": {
@@ -2818,7 +3162,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateCreateRequest": {
+        "dto.CarMaintenanceTemplateCreateRequest": {
             "type": "object",
             "properties": {
                 "dayInterval": {
@@ -2841,7 +3185,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateUpdateRequest": {
+        "dto.CarMaintenanceTemplateUpdateRequest": {
             "type": "object",
             "properties": {
                 "dayInterval": {
@@ -2864,7 +3208,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelCreateRequest": {
+        "dto.CarModelCreateRequest": {
             "type": "object",
             "properties": {
                 "bodyType": {
@@ -2911,7 +3255,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelUpdateRequest": {
+        "dto.CarModelUpdateRequest": {
             "type": "object",
             "properties": {
                 "bodyType": {
@@ -2958,7 +3302,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarUpdateRequest": {
+        "dto.CarUpdateRequest": {
             "type": "object",
             "properties": {
                 "batteryLevel": {
@@ -3005,7 +3349,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CheckActivationCodeRequest": {
+        "dto.CheckActivationCodeRequest": {
             "type": "object",
             "properties": {
                 "code": {
@@ -3013,77 +3357,165 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.LoginRequest": {
+        "dto.CheckDocumentRequest": {
             "type": "object",
             "properties": {
-                "email": {
+                "error": {
                     "type": "string"
                 },
-                "password": {
-                    "type": "string"
-                },
-                "phoneNumber": {
+                "status": {
                     "type": "string"
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.LoginResponse": {
+        "dto.CreateDocumentRequest": {
             "type": "object",
             "properties": {
-                "accessToken": {
+                "imageType": {
                     "type": "string"
                 },
-                "expiresIn": {
+                "objectKey": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DependencyHealthResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "latencyMS": {
                     "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RefreshTokenResponse": {
+        "dto.Document": {
             "type": "object",
             "properties": {
-                "accessToken": {
+                "createdAt": {
                     "type": "string"
                 },
-                "expiresIn": {
-                    "type": "integer"
+                "id": {
+                    "type": "string"
+                },
+                "imageType": {
+                    "type": "string"
+                },
+                "imageURL": {
+                    "type": "string"
+                },
+                "reason": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "userID": {
+                    "type": "string"
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RegisterRequest": {
+        "dto.DocumentsResponse": {
             "type": "object",
             "properties": {
-                "birthDate": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "firstName": {
-                    "type": "string"
-                },
-                "lastName": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "passwordConfirmation": {
-                    "type": "string"
-                },
-                "phoneNumber": {
+                "documents": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.Document"
+                    }
+                }
+            }
+        },
+        "dto.ErrorDetail": {
+            "type": "object",
+            "properties": {
+                "message": {
                     "type": "string"
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RegisterResponse": {
+        "dto.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/dto.ErrorDetail"
+                }
+            }
+        },
+        "dto.GetUploadDocumentDataRequest": {
+            "type": "object",
+            "properties": {
+                "imageType": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.HealthResponse": {
+            "type": "object",
+            "properties": {
+                "services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ServiceHealthResponse"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.IDResponse": {
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserCreateRequest": {
+        "dto.ImageUploadData": {
+            "type": "object",
+            "properties": {
+                "objectKey": {
+                    "type": "string"
+                },
+                "presignedPutURL": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ImageUploadResponse": {
+            "type": "object",
+            "properties": {
+                "uploadData": {
+                    "$ref": "#/definitions/dto.ImageUploadData"
+                }
+            }
+        },
+        "dto.LoginRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.RegisterRequest": {
             "type": "object",
             "properties": {
                 "birthDate": {
@@ -3095,10 +3527,149 @@ const docTemplate = `{
                 "firstName": {
                     "type": "string"
                 },
-                "isActive": {
+                "lastName": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "passwordConfirmation": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ServiceHealthResponse": {
+            "type": "object",
+            "properties": {
+                "dependencies": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.DependencyHealthResponse"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "uptimeSeconds": {
+                    "type": "integer"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.User": {
+            "type": "object",
+            "properties": {
+                "birthDate": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isDocumentVerified": {
                     "type": "boolean"
                 },
-                "isConfirmed": {
+                "isEmailVerified": {
+                    "type": "boolean"
+                },
+                "isSuspended": {
+                    "type": "boolean"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "passwordHash": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "profileImageURL": {
+                    "type": "string"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UserCreateRequest": {
+            "type": "object",
+            "properties": {
+                "birthDate": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "passwordConfirmation": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UserResponse": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/dto.User"
+                }
+            }
+        },
+        "dto.UserUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "birthDate": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "isDocumentVerified": {
+                    "type": "boolean"
+                },
+                "isEmailVerified": {
+                    "type": "boolean"
+                },
+                "isSuspended": {
                     "type": "boolean"
                 },
                 "lastName": {
@@ -3111,6 +3682,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "phoneNumber": {
+                    "type": "string"
+                },
+                "profileImageKey": {
                     "type": "string"
                 },
                 "roles": {
@@ -3121,53 +3695,18 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserCreateResponse": {
+        "dto.UsersResponse": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserUpdateRequest": {
-            "type": "object",
-            "properties": {
-                "birthDate": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "firstName": {
-                    "type": "string"
-                },
-                "isActive": {
-                    "type": "boolean"
-                },
-                "isConfirmed": {
-                    "type": "boolean"
-                },
-                "lastName": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "passwordConfirmation": {
-                    "type": "string"
-                },
-                "phoneNumber": {
-                    "type": "string"
-                },
-                "roles": {
+                "users": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/dto.User"
                     }
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZoneCreateRequest": {
+        "dto.ZoneCreateRequest": {
             "type": "object",
             "properties": {
                 "boundary": {
@@ -3184,7 +3723,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZoneUpdateRequest": {
+        "dto.ZoneUpdateRequest": {
             "type": "object",
             "properties": {
                 "boundary": {
@@ -3204,7 +3743,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.location": {
+        "dto.location": {
             "type": "object",
             "properties": {
                 "latitude": {

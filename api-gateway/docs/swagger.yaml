@@ -1,6 +1,18 @@
 basePath: /api/v1
 definitions:
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Car:
+  dto.AccessTokenData:
+    properties:
+      expiresIn:
+        type: integer
+      token:
+        type: string
+    type: object
+  dto.AccessTokenResponse:
+    properties:
+      accessToken:
+        $ref: '#/definitions/dto.AccessTokenData'
+    type: object
+  dto.Car:
     properties:
       batteryLevel:
         type: number
@@ -23,7 +35,7 @@ definitions:
       licensePlate:
         type: string
       location:
-        $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.location'
+        $ref: '#/definitions/dto.location'
       mileageKm:
         type: integer
       modelId:
@@ -43,7 +55,7 @@ definitions:
       zoneId:
         type: string
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarCreateRequest:
+  dto.CarCreateRequest:
     properties:
       batteryLevel:
         type: number
@@ -74,7 +86,7 @@ definitions:
       yearManufactured:
         type: integer
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceCreateRequest:
+  dto.CarInsuranceCreateRequest:
     properties:
       carId:
         type: string
@@ -97,7 +109,7 @@ definitions:
       type:
         type: string
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceUpdateRequest:
+  dto.CarInsuranceUpdateRequest:
     properties:
       costTenge:
         type: integer
@@ -118,7 +130,7 @@ definitions:
       status:
         type: string
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceRecordCompleteRequest:
+  dto.CarMaintenanceRecordCompleteRequest:
     properties:
       completedKm:
         type: integer
@@ -131,7 +143,7 @@ definitions:
           type: string
         type: array
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateCreateRequest:
+  dto.CarMaintenanceTemplateCreateRequest:
     properties:
       dayInterval:
         type: integer
@@ -146,7 +158,7 @@ definitions:
       warnPct:
         type: number
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateUpdateRequest:
+  dto.CarMaintenanceTemplateUpdateRequest:
     properties:
       dayInterval:
         type: integer
@@ -161,7 +173,7 @@ definitions:
       warnPct:
         type: number
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelCreateRequest:
+  dto.CarModelCreateRequest:
     properties:
       bodyType:
         type: string
@@ -192,7 +204,7 @@ definitions:
       year:
         type: integer
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelUpdateRequest:
+  dto.CarModelUpdateRequest:
     properties:
       bodyType:
         type: string
@@ -223,7 +235,7 @@ definitions:
       year:
         type: integer
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarUpdateRequest:
+  dto.CarUpdateRequest:
     properties:
       batteryLevel:
         type: number
@@ -254,57 +266,113 @@ definitions:
       zoneId:
         type: string
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CheckActivationCodeRequest:
+  dto.CheckActivationCodeRequest:
     properties:
       code:
         type: string
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.LoginRequest:
+  dto.CheckDocumentRequest:
     properties:
-      email:
+      error:
         type: string
-      password:
-        type: string
-      phoneNumber:
+      status:
         type: string
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.LoginResponse:
+  dto.CreateDocumentRequest:
     properties:
-      accessToken:
+      imageType:
         type: string
-      expiresIn:
+      objectKey:
+        type: string
+    type: object
+  dto.DependencyHealthResponse:
+    properties:
+      error:
+        type: string
+      latencyMS:
         type: integer
+      name:
+        type: string
+      status:
+        type: string
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RefreshTokenResponse:
+  dto.Document:
     properties:
-      accessToken:
+      createdAt:
         type: string
-      expiresIn:
-        type: integer
+      id:
+        type: string
+      imageType:
+        type: string
+      imageURL:
+        type: string
+      reason:
+        type: string
+      status:
+        type: string
+      updatedAt:
+        type: string
+      userID:
+        type: string
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RegisterRequest:
+  dto.DocumentsResponse:
     properties:
-      birthDate:
-        type: string
-      email:
-        type: string
-      firstName:
-        type: string
-      lastName:
-        type: string
-      password:
-        type: string
-      passwordConfirmation:
-        type: string
-      phoneNumber:
+      documents:
+        items:
+          $ref: '#/definitions/dto.Document'
+        type: array
+    type: object
+  dto.ErrorDetail:
+    properties:
+      message:
         type: string
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RegisterResponse:
+  dto.ErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/dto.ErrorDetail'
+    type: object
+  dto.GetUploadDocumentDataRequest:
+    properties:
+      imageType:
+        type: string
+    type: object
+  dto.HealthResponse:
+    properties:
+      services:
+        items:
+          $ref: '#/definitions/dto.ServiceHealthResponse'
+        type: array
+      status:
+        type: string
+    type: object
+  dto.IDResponse:
     properties:
       id:
-        type: integer
+        type: string
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserCreateRequest:
+  dto.ImageUploadData:
+    properties:
+      objectKey:
+        type: string
+      presignedPutURL:
+        type: string
+    type: object
+  dto.ImageUploadResponse:
+    properties:
+      uploadData:
+        $ref: '#/definitions/dto.ImageUploadData'
+    type: object
+  dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      phoneNumber:
+        type: string
+    type: object
+  dto.RegisterRequest:
     properties:
       birthDate:
         type: string
@@ -312,9 +380,100 @@ definitions:
         type: string
       firstName:
         type: string
-      isActive:
+      lastName:
+        type: string
+      password:
+        type: string
+      passwordConfirmation:
+        type: string
+      phoneNumber:
+        type: string
+    type: object
+  dto.ServiceHealthResponse:
+    properties:
+      dependencies:
+        items:
+          $ref: '#/definitions/dto.DependencyHealthResponse'
+        type: array
+      name:
+        type: string
+      status:
+        type: string
+      uptimeSeconds:
+        type: integer
+      version:
+        type: string
+    type: object
+  dto.User:
+    properties:
+      birthDate:
+        type: string
+      createdAt:
+        type: string
+      email:
+        type: string
+      firstName:
+        type: string
+      id:
+        type: string
+      isDocumentVerified:
         type: boolean
-      isConfirmed:
+      isEmailVerified:
+        type: boolean
+      isSuspended:
+        type: boolean
+      lastName:
+        type: string
+      passwordHash:
+        items:
+          type: integer
+        type: array
+      phoneNumber:
+        type: string
+      profileImageURL:
+        type: string
+      roles:
+        items:
+          type: string
+        type: array
+      updatedAt:
+        type: string
+    type: object
+  dto.UserCreateRequest:
+    properties:
+      birthDate:
+        type: string
+      email:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      password:
+        type: string
+      passwordConfirmation:
+        type: string
+      phoneNumber:
+        type: string
+    type: object
+  dto.UserResponse:
+    properties:
+      user:
+        $ref: '#/definitions/dto.User'
+    type: object
+  dto.UserUpdateRequest:
+    properties:
+      birthDate:
+        type: string
+      email:
+        type: string
+      firstName:
+        type: string
+      isDocumentVerified:
+        type: boolean
+      isEmailVerified:
+        type: boolean
+      isSuspended:
         type: boolean
       lastName:
         type: string
@@ -323,43 +482,22 @@ definitions:
       passwordConfirmation:
         type: string
       phoneNumber:
+        type: string
+      profileImageKey:
         type: string
       roles:
         items:
           type: string
         type: array
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserCreateResponse:
+  dto.UsersResponse:
     properties:
-      id:
-        type: integer
-    type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserUpdateRequest:
-    properties:
-      birthDate:
-        type: string
-      email:
-        type: string
-      firstName:
-        type: string
-      isActive:
-        type: boolean
-      isConfirmed:
-        type: boolean
-      lastName:
-        type: string
-      password:
-        type: string
-      passwordConfirmation:
-        type: string
-      phoneNumber:
-        type: string
-      roles:
+      users:
         items:
-          type: string
+          $ref: '#/definitions/dto.User'
         type: array
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZoneCreateRequest:
+  dto.ZoneCreateRequest:
     properties:
       boundary:
         type: string
@@ -370,7 +508,7 @@ definitions:
       type:
         type: string
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZoneUpdateRequest:
+  dto.ZoneUpdateRequest:
     properties:
       boundary:
         type: string
@@ -383,7 +521,7 @@ definitions:
       type:
         type: string
     type: object
-  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.location:
+  dto.location:
     properties:
       latitude:
         type: number
@@ -403,65 +541,6 @@ info:
   title: Car Rental API Gateway
   version: "1.0"
 paths:
-  /auth/login:
-    post:
-      consumes:
-      - application/json
-      description: Authenticates a user by email or phone + password. Returns an access
-        token and sets an HttpOnly refresh token cookie.
-      parameters:
-      - description: Login credentials
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.LoginRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.LoginResponse'
-        "400":
-          description: Malformed JSON
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Invalid credentials
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Login
-      tags:
-      - auth
-  /auth/logout:
-    post:
-      description: Invalidates the refresh token and clears the cookie.
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Logout
-      tags:
-      - auth
   /auth/refresh-token:
     post:
       description: Issues a new access token using the refresh token stored in the
@@ -472,17 +551,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RefreshTokenResponse'
+            $ref: '#/definitions/dto.AccessTokenResponse'
         "401":
-          description: Invalid or expired refresh token
+          description: Unauthorized
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
       summary: Refresh access token
       tags:
       - auth
@@ -497,30 +574,83 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RegisterRequest'
+          $ref: '#/definitions/dto.RegisterRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RegisterResponse'
+            $ref: '#/definitions/dto.IDResponse'
         "400":
-          description: Malformed JSON or validation error
+          description: Bad Request
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
         "409":
-          description: User already exists
+          description: Conflict
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
       summary: Register a new user
+      tags:
+      - auth
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user by email or phone + password. Returns an access
+        token and sets an HttpOnly refresh token cookie.
+      parameters:
+      - description: Sign-in credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AccessTokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Sign in
+      tags:
+      - auth
+  /auth/sign-out:
+    post:
+      description: Invalidates the current session and clears the refresh token cookie.
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Sign out
       tags:
       - auth
   /car-insurances:
@@ -585,7 +715,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceCreateRequest'
+          $ref: '#/definitions/dto.CarInsuranceCreateRequest'
       produces:
       - application/json
       responses:
@@ -704,7 +834,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceUpdateRequest'
+          $ref: '#/definitions/dto.CarInsuranceUpdateRequest'
       produces:
       - application/json
       responses:
@@ -823,7 +953,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceRecordCompleteRequest'
+          $ref: '#/definitions/dto.CarMaintenanceRecordCompleteRequest'
       produces:
       - application/json
       responses:
@@ -922,7 +1052,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateCreateRequest'
+          $ref: '#/definitions/dto.CarMaintenanceTemplateCreateRequest'
       produces:
       - application/json
       responses:
@@ -1036,7 +1166,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateUpdateRequest'
+          $ref: '#/definitions/dto.CarMaintenanceTemplateUpdateRequest'
       produces:
       - application/json
       responses:
@@ -1139,7 +1269,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelCreateRequest'
+          $ref: '#/definitions/dto.CarModelCreateRequest'
       produces:
       - application/json
       responses:
@@ -1258,7 +1388,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelUpdateRequest'
+          $ref: '#/definitions/dto.CarModelUpdateRequest'
       produces:
       - application/json
       responses:
@@ -1348,11 +1478,11 @@ paths:
         in: query
         name: minSeats
         type: integer
-      - description: User latitude (for proximity search)
+      - description: UserHandler latitude (for proximity search)
         in: query
         name: latitude
         type: number
-      - description: User longitude (for proximity search)
+      - description: UserHandler longitude (for proximity search)
         in: query
         name: longitude
         type: number
@@ -1414,7 +1544,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarCreateRequest'
+          $ref: '#/definitions/dto.CarCreateRequest'
       produces:
       - application/json
       responses:
@@ -1497,7 +1627,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Car'
+            $ref: '#/definitions/dto.Car'
         "400":
           description: Bad Request
           schema:
@@ -1532,7 +1662,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarUpdateRequest'
+          $ref: '#/definitions/dto.CarUpdateRequest'
       produces:
       - application/json
       responses:
@@ -1676,126 +1806,81 @@ paths:
       summary: Get car status change log
       tags:
       - cars
-  /users:
-    delete:
-      description: Deletes a user matched by id or email query param.
-      parameters:
-      - description: User ID
-        in: query
-        name: id
-        type: integer
-      - description: User email
-        in: query
-        name: email
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Delete user
-      tags:
-      - users
+  /health:
     get:
-      description: Returns all users.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: users
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get all users
-      tags:
-      - users
-    patch:
-      consumes:
-      - application/json
-      description: Partially updates a user matched by id or email query param.
-      parameters:
-      - description: User ID
-        in: query
-        name: id
-        type: integer
-      - description: User email
-        in: query
-        name: email
-        type: string
-      - description: Fields to update
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserUpdateRequest'
+      description: Returns the health status of the API gateway and all upstream services.
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.HealthResponse'
+      summary: Gateway health
+      tags:
+      - health
+  /users:
+    get:
+      description: Returns a list of users, optionally filtered by query params.
+      parameters:
+      - description: Filter by email
+        in: query
+        name: email
+        type: string
+      - description: Filter by phone number
+        in: query
+        name: phoneNumber
+        type: string
+      - description: Filter by first name
+        in: query
+        name: firstName
+        type: string
+      - description: Filter by last name
+        in: query
+        name: lastName
+        type: string
+      - description: Filter by document verification status
+        in: query
+        name: isDocumentVerified
+        type: boolean
+      - description: Filter by email verification status
+        in: query
+        name: isEmailVerified
+        type: boolean
+      - description: Filter by suspension status
+        in: query
+        name: isSuspended
+        type: boolean
+      - description: Pagination limit
+        in: query
+        name: limit
+        type: integer
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UsersResponse'
         "400":
           description: Bad Request
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
-      summary: Update user
+      summary: Get users with filter
       tags:
       - users
     post:
@@ -1804,42 +1889,188 @@ paths:
       description: Admin endpoint to create a user with explicit roles and activation
         state.
       parameters:
-      - description: User create payload
+      - description: Create payload
         in: body
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserCreateRequest'
+          $ref: '#/definitions/dto.UserCreateRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserCreateResponse'
+            $ref: '#/definitions/dto.IDResponse'
         "400":
           description: Bad Request
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create user (admin)
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      description: Deletes a user by ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete user
+      tags:
+      - users
+    get:
+      description: Returns a single user by their ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user by ID
+      tags:
+      - users
+    patch:
+      consumes:
+      - application/json
+      description: Partially updates a user by ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update user
+      tags:
+      - users
+  /users/{id}/documents/processed:
+    get:
+      description: Returns all processed documents belonging to the specified user.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DocumentsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get processed documents for a user
       tags:
       - users
   /users/activation-code/check:
@@ -1853,30 +2084,24 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CheckActivationCodeRequest'
+          $ref: '#/definitions/dto.CheckActivationCodeRequest'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
+        "204":
+          description: No Content
         "400":
           description: Bad Request
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Check activation code
@@ -1884,52 +2109,161 @@ paths:
       - users
   /users/activation-code/send:
     post:
-      description: Sends an SMS/email activation code to the current user.
+      description: Sends an activation code to the current user's email or phone.
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
+        "204":
+          description: No Content
         "401":
           description: Unauthorized
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Send activation code
       tags:
       - users
-  /users/me:
-    get:
-      description: Returns the profile of the authenticated user extracted from the
-        JWT.
+  /users/documents:
+    post:
+      consumes:
+      - application/json
+      description: Creates a document record after the image has been uploaded to
+        object storage.
+      parameters:
+      - description: Document payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateDocumentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.IDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create document record
+      tags:
+      - users
+  /users/documents/check/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Sets the review status of a document (e.g. approved or rejected)
+        and optionally provides a rejection reason.
+      parameters:
+      - description: Document ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Review payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CheckDocumentRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Review a document
+      tags:
+      - users
+  /users/documents/upload:
+    post:
+      consumes:
+      - application/json
+      description: Returns a presigned PUT URL for uploading a document image to object
+        storage.
+      parameters:
+      - description: Image type
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GetUploadDocumentDataRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ImageUploadResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get document upload URL
+      tags:
+      - users
+  /users/me:
+    get:
+      description: Returns the profile of the authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get current user
@@ -1981,7 +2315,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZoneCreateRequest'
+          $ref: '#/definitions/dto.ZoneCreateRequest'
       produces:
       - application/json
       responses:
@@ -2100,7 +2434,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZoneUpdateRequest'
+          $ref: '#/definitions/dto.ZoneUpdateRequest'
       produces:
       - application/json
       responses:

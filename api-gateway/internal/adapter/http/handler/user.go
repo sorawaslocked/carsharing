@@ -27,12 +27,12 @@ func NewUser(svc UserService, cookie config.Cookie) *UserHandler {
 // @Accept       json
 // @Produce      json
 // @Security     BearerAuth
-// @Param        body  body      dto.UserCreateRequest   true  "UserHandler create payload"
-// @Success      201   {object}  dto.UserCreateResponse
-// @Failure      400   {object}  map[string]any
-// @Failure      401   {object}  map[string]any
-// @Failure      409   {object}  map[string]any
-// @Failure      500   {object}  map[string]any
+// @Param        body  body      dto.UserCreateRequest  true  "Create payload"
+// @Success      201   {object}  dto.IDResponse
+// @Failure      400   {object}  dto.ErrorResponse
+// @Failure      401   {object}  dto.ErrorResponse
+// @Failure      409   {object}  dto.ErrorResponse
+// @Failure      500   {object}  dto.ErrorResponse
 // @Router       /users [post]
 func (h *UserHandler) Create(c *gin.Context) {
 	data, err := dto.FromCreateUserRequest(c)
@@ -53,19 +53,18 @@ func (h *UserHandler) Create(c *gin.Context) {
 }
 
 // Get (UserHandler) godoc
-// @Summary      Get user(s)
-// @Description  Returns a single user when id or email query param is provided, otherwise returns all users.
+// @Summary      Get user by ID
+// @Description  Returns a single user by their ID.
 // @Tags         users
 // @Produce      json
 // @Security     BearerAuth
-// @Param        id     query     integer  false  "UserHandler ID"
-// @Param        email  query     string   false  "UserHandler email"
-// @Success      200    {object}  map[string]any  "user or users"
-// @Failure      400    {object}  map[string]any
-// @Failure      401    {object}  map[string]any
-// @Failure      404    {object}  map[string]any
-// @Failure      500    {object}  map[string]any
-// @Router       /users [get]
+// @Param        id    path      string  true  "User ID"
+// @Success      200   {object}  dto.UserResponse
+// @Failure      400   {object}  dto.ErrorResponse
+// @Failure      401   {object}  dto.ErrorResponse
+// @Failure      404   {object}  dto.ErrorResponse
+// @Failure      500   {object}  dto.ErrorResponse
+// @Router       /users/{id} [get]
 func (h *UserHandler) Get(c *gin.Context) {
 	id, err := dto.IDParam(c)
 
@@ -80,14 +79,24 @@ func (h *UserHandler) Get(c *gin.Context) {
 }
 
 // GetAllWithFilter (UserHandler) godoc
-// @Summary      Get all users
-// @Description  Returns all users.
+// @Summary      Get users with filter
+// @Description  Returns a list of users, optionally filtered by query params.
 // @Tags         users
 // @Produce      json
 // @Security     BearerAuth
-// @Success      200    {object}  map[string]any  "users"
-// @Failure      401    {object}  map[string]any
-// @Failure      500    {object}  map[string]any
+// @Param        email               query     string   false  "Filter by email"
+// @Param        phoneNumber         query     string   false  "Filter by phone number"
+// @Param        firstName           query     string   false  "Filter by first name"
+// @Param        lastName            query     string   false  "Filter by last name"
+// @Param        isDocumentVerified  query     boolean  false  "Filter by document verification status"
+// @Param        isEmailVerified     query     boolean  false  "Filter by email verification status"
+// @Param        isSuspended         query     boolean  false  "Filter by suspension status"
+// @Param        limit               query     integer  false  "Pagination limit"
+// @Param        offset              query     integer  false  "Pagination offset"
+// @Success      200   {object}  dto.UsersResponse
+// @Failure      400   {object}  dto.ErrorResponse
+// @Failure      401   {object}  dto.ErrorResponse
+// @Failure      500   {object}  dto.ErrorResponse
 // @Router       /users [get]
 func (h *UserHandler) GetAllWithFilter(c *gin.Context) {
 	filter, err := dto.UserFilterFromCtx(c)
@@ -114,20 +123,19 @@ func (h *UserHandler) GetAllWithFilter(c *gin.Context) {
 
 // Update (UserHandler) godoc
 // @Summary      Update user
-// @Description  Partially updates a user matched by id or email query param.
+// @Description  Partially updates a user by ID.
 // @Tags         users
 // @Accept       json
 // @Produce      json
 // @Security     BearerAuth
-// @Param        id     query     integer              false  "UserHandler ID"
-// @Param        email  query     string               false  "UserHandler email"
-// @Param        body   body      dto.UserUpdateRequest  true   "Fields to update"
-// @Success      200    {object}  map[string]any
-// @Failure      400    {object}  map[string]any
-// @Failure      401    {object}  map[string]any
-// @Failure      404    {object}  map[string]any
-// @Failure      500    {object}  map[string]any
-// @Router       /users [patch]
+// @Param        id    path      string                 true  "User ID"
+// @Param        body  body      dto.UserUpdateRequest  true  "Fields to update"
+// @Success      204
+// @Failure      400   {object}  dto.ErrorResponse
+// @Failure      401   {object}  dto.ErrorResponse
+// @Failure      404   {object}  dto.ErrorResponse
+// @Failure      500   {object}  dto.ErrorResponse
+// @Router       /users/{id} [patch]
 func (h *UserHandler) Update(c *gin.Context) {
 	id, err := dto.IDParam(c)
 	if err != nil {
@@ -155,18 +163,17 @@ func (h *UserHandler) Update(c *gin.Context) {
 
 // Delete (UserHandler) godoc
 // @Summary      Delete user
-// @Description  Deletes a user matched by id or email query param.
+// @Description  Deletes a user by ID.
 // @Tags         users
 // @Produce      json
 // @Security     BearerAuth
-// @Param        id     query     integer  false  "UserHandler ID"
-// @Param        email  query     string   false  "UserHandler email"
-// @Success      200    {object}  map[string]any
-// @Failure      400    {object}  map[string]any
-// @Failure      401    {object}  map[string]any
-// @Failure      404    {object}  map[string]any
-// @Failure      500    {object}  map[string]any
-// @Router       /users [delete]
+// @Param        id    path      string  true  "User ID"
+// @Success      204
+// @Failure      400   {object}  dto.ErrorResponse
+// @Failure      401   {object}  dto.ErrorResponse
+// @Failure      404   {object}  dto.ErrorResponse
+// @Failure      500   {object}  dto.ErrorResponse
+// @Router       /users/{id} [delete]
 func (h *UserHandler) Delete(c *gin.Context) {
 	id, err := dto.IDParam(c)
 	if err != nil {
@@ -191,11 +198,11 @@ func (h *UserHandler) Delete(c *gin.Context) {
 // @Tags         auth
 // @Accept       json
 // @Produce      json
-// @Param        body  body      dto.RegisterRequest   true  "Registration payload"
-// @Success      201   {object}  dto.RegisterResponse
-// @Failure      400   {object}  map[string]any  "Malformed JSON or validation error"
-// @Failure      409   {object}  map[string]any  "UserHandler already exists"
-// @Failure      500   {object}  map[string]any
+// @Param        body  body      dto.RegisterRequest  true  "Registration payload"
+// @Success      201   {object}  dto.IDResponse
+// @Failure      400   {object}  dto.ErrorResponse
+// @Failure      409   {object}  dto.ErrorResponse
+// @Failure      500   {object}  dto.ErrorResponse
 // @Router       /auth/register [post]
 func (h *UserHandler) Register(c *gin.Context) {
 	data, err := dto.FromRegisterRequest(c)
@@ -221,11 +228,11 @@ func (h *UserHandler) Register(c *gin.Context) {
 // @Tags         auth
 // @Accept       json
 // @Produce      json
-// @Param        body  body      dto.LoginRequest   true  "Sign-in credentials"
-// @Success      200   {object}  dto.LoginResponse
-// @Failure      400   {object}  map[string]any  "Malformed JSON"
-// @Failure      401   {object}  map[string]any  "Invalid credentials"
-// @Failure      500   {object}  map[string]any
+// @Param        body  body      dto.LoginRequest  true  "Sign-in credentials"
+// @Success      200   {object}  dto.AccessTokenResponse
+// @Failure      400   {object}  dto.ErrorResponse
+// @Failure      401   {object}  dto.ErrorResponse
+// @Failure      500   {object}  dto.ErrorResponse
 // @Router       /auth/sign-in [post]
 func (h *UserHandler) SignIn(c *gin.Context) {
 	creds, err := dto.FromLoginRequest(c)
@@ -257,9 +264,9 @@ func (h *UserHandler) SignIn(c *gin.Context) {
 // @Description  Issues a new access token using the refresh token stored in the HttpOnly cookie.
 // @Tags         auth
 // @Produce      json
-// @Success      200  {object}  dto.RefreshTokenResponse
-// @Failure      401  {object}  map[string]any  "Invalid or expired refresh token"
-// @Failure      500  {object}  map[string]any
+// @Success      200  {object}  dto.AccessTokenResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
 // @Router       /auth/refresh-token [post]
 func (h *UserHandler) RefreshToken(c *gin.Context) {
 	refreshToken, err := h.getRefreshTokenFromRequest(c)
@@ -290,12 +297,13 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 
 // SignOut godoc
 // @Summary      Sign out
-// @Description  Invalidates the refresh token and clears the cookie.
+// @Description  Invalidates the current session and clears the refresh token cookie.
 // @Tags         auth
 // @Produce      json
-// @Success      204  "No Content"
-// @Failure      401  {object}  map[string]any
-// @Failure      500  {object}  map[string]any
+// @Security     BearerAuth
+// @Success      204
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
 // @Router       /auth/sign-out [post]
 func (h *UserHandler) SignOut(c *gin.Context) {
 	h.clearRefreshCookies(c)
@@ -312,13 +320,13 @@ func (h *UserHandler) SignOut(c *gin.Context) {
 
 // Me godoc
 // @Summary      Get current user
-// @Description  Returns the profile of the authenticated user extracted from the JWT.
+// @Description  Returns the profile of the authenticated user.
 // @Tags         users
 // @Produce      json
 // @Security     BearerAuth
-// @Success      200  {object}  map[string]any
-// @Failure      401  {object}  map[string]any
-// @Failure      500  {object}  map[string]any
+// @Success      200  {object}  dto.UserResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
 // @Router       /users/me [get]
 func (h *UserHandler) Me(c *gin.Context) {
 	user, err := h.svc.Me(c)
@@ -333,13 +341,13 @@ func (h *UserHandler) Me(c *gin.Context) {
 
 // SendActivationCode godoc
 // @Summary      Send activation code
-// @Description  Sends an SMS/email activation code to the current user.
+// @Description  Sends an activation code to the current user's email or phone.
 // @Tags         users
 // @Produce      json
 // @Security     BearerAuth
-// @Success      200  {object}  map[string]any
-// @Failure      401  {object}  map[string]any
-// @Failure      500  {object}  map[string]any
+// @Success      204
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
 // @Router       /users/activation-code/send [post]
 func (h *UserHandler) SendActivationCode(c *gin.Context) {
 	err := h.svc.SendActivationCode(c)
@@ -360,10 +368,10 @@ func (h *UserHandler) SendActivationCode(c *gin.Context) {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        body  body      dto.CheckActivationCodeRequest  true  "Activation code"
-// @Success      200   {object}  map[string]any
-// @Failure      400   {object}  map[string]any
-// @Failure      401   {object}  map[string]any
-// @Failure      500   {object}  map[string]any
+// @Success      204
+// @Failure      400   {object}  dto.ErrorResponse
+// @Failure      401   {object}  dto.ErrorResponse
+// @Failure      500   {object}  dto.ErrorResponse
 // @Router       /users/activation-code/check [post]
 func (h *UserHandler) CheckActivationCode(c *gin.Context) {
 	code, err := dto.FromCheckActivationCodeRequest(c)
@@ -383,6 +391,19 @@ func (h *UserHandler) CheckActivationCode(c *gin.Context) {
 	dto.NoContent(c)
 }
 
+// CreateDocument godoc
+// @Summary      Create document record
+// @Description  Creates a document record after the image has been uploaded to object storage.
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        body  body      dto.CreateDocumentRequest  true  "Document payload"
+// @Success      201   {object}  dto.IDResponse
+// @Failure      400   {object}  dto.ErrorResponse
+// @Failure      401   {object}  dto.ErrorResponse
+// @Failure      500   {object}  dto.ErrorResponse
+// @Router       /users/documents [post]
 func (h *UserHandler) CreateDocument(c *gin.Context) {
 	imageType, objectKey, err := dto.FromCreateDocumentRequest(c)
 	if err != nil {
@@ -401,6 +422,19 @@ func (h *UserHandler) CreateDocument(c *gin.Context) {
 	dto.Created(c, gin.H{"id": id})
 }
 
+// GetUploadDocumentData godoc
+// @Summary      Get document upload URL
+// @Description  Returns a presigned PUT URL for uploading a document image to object storage.
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        body  body      dto.GetUploadDocumentDataRequest  true  "Image type"
+// @Success      200   {object}  dto.ImageUploadResponse
+// @Failure      400   {object}  dto.ErrorResponse
+// @Failure      401   {object}  dto.ErrorResponse
+// @Failure      500   {object}  dto.ErrorResponse
+// @Router       /users/documents/upload [post]
 func (h *UserHandler) GetUploadDocumentData(c *gin.Context) {
 	imageType, err := dto.FromGetUploadDocumentDataRequest(c)
 	if err != nil {
@@ -419,6 +453,19 @@ func (h *UserHandler) GetUploadDocumentData(c *gin.Context) {
 	dto.Ok(c, gin.H{"uploadData": dto.ToImageUploadDataResponse(data)})
 }
 
+// GetProcessedDocumentsForUser godoc
+// @Summary      Get processed documents for a user
+// @Description  Returns all processed documents belonging to the specified user.
+// @Tags         users
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id    path      string  true  "User ID"
+// @Success      200   {object}  dto.DocumentsResponse
+// @Failure      400   {object}  dto.ErrorResponse
+// @Failure      401   {object}  dto.ErrorResponse
+// @Failure      404   {object}  dto.ErrorResponse
+// @Failure      500   {object}  dto.ErrorResponse
+// @Router       /users/{id}/documents/processed [get]
 func (h *UserHandler) GetProcessedDocumentsForUser(c *gin.Context) {
 	userID, err := dto.IDParam(c)
 	if err != nil {
@@ -442,6 +489,21 @@ func (h *UserHandler) GetProcessedDocumentsForUser(c *gin.Context) {
 	dto.Ok(c, gin.H{"documents": documentResponse})
 }
 
+// CheckDocument godoc
+// @Summary      Review a document
+// @Description  Sets the review status of a document (e.g. approved or rejected) and optionally provides a rejection reason.
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id    path      string                    true  "Document ID"
+// @Param        body  body      dto.CheckDocumentRequest  true  "Review payload"
+// @Success      204
+// @Failure      400   {object}  dto.ErrorResponse
+// @Failure      401   {object}  dto.ErrorResponse
+// @Failure      404   {object}  dto.ErrorResponse
+// @Failure      500   {object}  dto.ErrorResponse
+// @Router       /users/documents/check/{id} [post]
 func (h *UserHandler) CheckDocument(c *gin.Context) {
 	docID, err := dto.IDParam(c)
 	if err != nil {

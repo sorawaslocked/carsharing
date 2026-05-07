@@ -8,6 +8,33 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )
 
+// Response envelope types used in swagger annotations.
+
+type IDResponse struct {
+	ID string `json:"id"`
+}
+
+type UserResponse struct {
+	User User `json:"user"`
+}
+
+type UsersResponse struct {
+	Users []User `json:"users"`
+}
+
+type AccessTokenData struct {
+	Token     string `json:"token"`
+	ExpiresIn int64  `json:"expiresIn"`
+}
+
+type AccessTokenResponse struct {
+	AccessToken AccessTokenData `json:"accessToken"`
+}
+
+type DocumentsResponse struct {
+	Documents []Document `json:"documents"`
+}
+
 type User struct {
 	ID              string  `json:"id"`
 	Email           string  `json:"email"`

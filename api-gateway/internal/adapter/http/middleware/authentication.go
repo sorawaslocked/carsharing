@@ -39,6 +39,7 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 		header, err := authHeader(c)
 		if err != nil {
 			dto.FromError(c, err)
+			c.Abort()
 
 			return
 		}
@@ -46,6 +47,7 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 		userID, err := a.parseClaims(header)
 		if err != nil {
 			dto.FromError(c, err)
+			c.Abort()
 
 			return
 		}
@@ -55,11 +57,13 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 		isSignedIn, err := a.userSessionCache.IsSignedIn(c, userID, deviceID)
 		if err != nil {
 			dto.FromError(c, err)
+			c.Abort()
 
 			return
 		}
 		if !isSignedIn {
 			dto.FromError(c, model.ErrUnauthorized)
+			c.Abort()
 
 			return
 		}
@@ -67,6 +71,7 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 		roles, err := a.userPermissionsCache.GetRoles(c, userID)
 		if err != nil {
 			dto.FromError(c, model.ErrInternalServerError)
+			c.Abort()
 
 			return
 		}
@@ -74,6 +79,7 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 		isDocumentVerified, err := a.userPermissionsCache.IsDocumentVerified(c, userID)
 		if err != nil {
 			dto.FromError(c, model.ErrInternalServerError)
+			c.Abort()
 
 			return
 		}
@@ -81,6 +87,7 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 		isEmailVerified, err := a.userPermissionsCache.IsEmailVerified(c, userID)
 		if err != nil {
 			dto.FromError(c, model.ErrInternalServerError)
+			c.Abort()
 
 			return
 		}
@@ -88,6 +95,7 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 		isSuspended, err := a.userPermissionsCache.IsSuspended(c, userID)
 		if err != nil {
 			dto.FromError(c, model.ErrInternalServerError)
+			c.Abort()
 
 			return
 		}

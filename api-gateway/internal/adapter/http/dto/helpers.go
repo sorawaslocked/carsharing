@@ -17,6 +17,10 @@ type ImageUploadData struct {
 	ObjectKey       string `json:"objectKey"`
 }
 
+type ImageUploadResponse struct {
+	UploadData ImageUploadData `json:"uploadData"`
+}
+
 func ToImageUploadDataResponse(m model.ImageUploadData) ImageUploadData {
 	return ImageUploadData{
 		PresignedPutURL: m.PresignedPutURL,

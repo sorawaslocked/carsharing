@@ -8,6 +8,14 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/jwt"
 )
 
+type ErrorDetail struct {
+	Message string `json:"message"`
+}
+
+type ErrorResponse struct {
+	Error ErrorDetail `json:"error"`
+}
+
 func errorBody(message string, metadata map[string]any) map[string]any {
 	body := map[string]any{
 		"error": map[string]any{

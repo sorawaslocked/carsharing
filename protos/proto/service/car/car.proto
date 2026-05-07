@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package service.car;
 
-import "base/car.proto";
+import "base/car/car.proto";
 
 option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/car";
 
@@ -39,7 +39,7 @@ message GetCarRequest {
 }
 
 message GetCarResponse {
-  base.Car car = 1;
+  base.car.Car car = 1;
 }
 
 // GetCars
@@ -62,7 +62,7 @@ message GetCarsRequest {
 }
 
 message GetCarsResponse {
-  repeated base.Car cars = 1;
+  repeated base.car.Car cars = 1;
 }
 
 // GetAvailableCars
@@ -84,7 +84,7 @@ message GetAvailableCarsRequest {
 }
 
 message GetAvailableCarsResponse {
-  repeated base.Car cars = 1;
+  repeated base.car.Car cars = 1;
 }
 
 // UpdateCar

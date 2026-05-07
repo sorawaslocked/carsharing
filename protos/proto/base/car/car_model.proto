@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package base;
+package base.car;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base";
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base/car";
 
 message CarModel {
   string ID = 1;

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package base;
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base";
+
+message ImageUploadData {
+  string presignedPutURL = 1;
+  string objectKey = 2;
+}
+
+message Pagination {
+  int64 limit = 1;
+  int64 offset = 2;
+}

@@ -26,7 +26,7 @@ func (h *ZoneHandler) Get(_ context.Context, id string) (model.Zone, error) {
 
 func (h *ZoneHandler) GetAll(_ context.Context, filter model.ZoneFilter) ([]model.Zone, error) {
 	_ = filter
-	return nil, errNotImplemented("ZoneHandler.GetAll")
+	return nil, errNotImplemented("ZoneHandler.GetAllWithFilter")
 }
 
 func (h *ZoneHandler) Update(_ context.Context, id string, data model.ZoneUpdate) error {

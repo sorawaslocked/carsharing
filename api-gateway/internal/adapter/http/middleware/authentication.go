@@ -9,21 +9,28 @@ import (
 )
 
 const (
-	ctxUserIDKey        = "x-user-id"
-	ctxUserRolesKey     = "x-user-roles"
-	ctxUserVerifiedKey  = "x-user-verified"
-	ctxUserSuspendedKey = "x-user-suspended"
+	ctxUserIDKey               = "x-user-id"
+	ctxUserRolesKey            = "x-user-roles"
+	ctxUserDocumentVerifiedKey = "x-user-document-verified"
+	ctxUserEmailVerifiedKey    = "x-user-email-verified"
+	ctxUserSuspendedKey        = "x-user-suspended"
 )
 
 type Authentication struct {
-	tokenManager         TokenManager
+	tokenParser          TokenParser
 	userPermissionsCache UserPermissionsCache
+	userSessionCache     UserSessionCache
 }
 
-func NewAuthentication(tokenManager TokenManager, userPermissionsCache UserPermissionsCache) *Authentication {
+func NewAuthentication(
+	tokenParser TokenParser,
+	userPermissionsCache UserPermissionsCache,
+	userSessionCache UserSessionCache,
+) *Authentication {
 	return &Authentication{
-		tokenManager:         tokenManager,
+		tokenParser:          tokenParser,
 		userPermissionsCache: userPermissionsCache,
+		userSessionCache:     userSessionCache,
 	}
 }
 
@@ -43,23 +50,42 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 			return
 		}
 
-		ctx := c.Request.Context()
+		deviceID := c.GetString(ctxDeviceIDKey)
 
-		roles, err := a.userPermissionsCache.GetRoles(ctx, userID)
+		isSignedIn, err := a.userSessionCache.IsSignedIn(c, userID, deviceID)
+		if err != nil {
+			dto.FromError(c, err)
+
+			return
+		}
+		if !isSignedIn {
+			dto.FromError(c, model.ErrUnauthorized)
+
+			return
+		}
+
+		roles, err := a.userPermissionsCache.GetRoles(c, userID)
 		if err != nil {
 			dto.FromError(c, model.ErrInternalServerError)
 
 			return
 		}
 
-		verified, err := a.userPermissionsCache.GetVerified(ctx, userID)
+		isDocumentVerified, err := a.userPermissionsCache.IsDocumentVerified(c, userID)
 		if err != nil {
 			dto.FromError(c, model.ErrInternalServerError)
 
 			return
 		}
 
-		suspended, err := a.userPermissionsCache.GetSuspended(ctx, userID)
+		isEmailVerified, err := a.userPermissionsCache.IsEmailVerified(c, userID)
+		if err != nil {
+			dto.FromError(c, model.ErrInternalServerError)
+
+			return
+		}
+
+		isSuspended, err := a.userPermissionsCache.IsSuspended(c, userID)
 		if err != nil {
 			dto.FromError(c, model.ErrInternalServerError)
 
@@ -68,8 +94,9 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 
 		c.Set(ctxUserIDKey, userID)
 		c.Set(ctxUserRolesKey, roles)
-		c.Set(ctxUserVerifiedKey, verified)
-		c.Set(ctxUserSuspendedKey, suspended)
+		c.Set(ctxUserDocumentVerifiedKey, isDocumentVerified)
+		c.Set(ctxUserEmailVerifiedKey, isEmailVerified)
+		c.Set(ctxUserSuspendedKey, isSuspended)
 
 		c.Next()
 	}
@@ -87,7 +114,7 @@ func authHeader(c *gin.Context) (string, error) {
 func (a *Authentication) parseClaims(authHeader string) (userID string, err error) {
 	token := strings.TrimPrefix(authHeader, "Bearer ")
 
-	userID, err = a.tokenManager.ParseToken(token)
+	userID, err = a.tokenParser.ParseToken(token)
 	if err != nil {
 		return "", model.ErrUnauthorized
 	}

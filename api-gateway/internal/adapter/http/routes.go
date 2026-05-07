@@ -17,18 +17,24 @@ func (s *Server) setupMiddleware() {
 	s.router.Use(middleware.Logger(s.log))
 }
 
-func (s *Server) setupRoutes(tokenManager TokenManager, userPermissionsCache UserPermissionsCache) {
+func (s *Server) setupRoutes(
+	tokenManager TokenParser,
+	userPermissionsCache UserPermissionsCache,
+	userSessionCache UserSessionCache,
+) {
 	publicV1 := s.router.Group("/api/v1")
 	{
+		publicV1.GET("/health", s.healthHandler.Health)
+
 		auth := publicV1.Group("/auth")
 		{
-			auth.POST("/register", s.authHandler.Register)
-			auth.POST("/login", s.authHandler.Login)
-			auth.POST("/refresh-token", s.authHandler.RefreshToken)
+			auth.POST("/register", s.userHandler.Register)
+			auth.POST("/sign-in", s.userHandler.SignIn)
+			auth.POST("/refresh-token", s.userHandler.RefreshToken)
 		}
 	}
 
-	authentication := middleware.NewAuthentication(tokenManager, userPermissionsCache)
+	authentication := middleware.NewAuthentication(tokenManager, userPermissionsCache, userSessionCache)
 
 	protectedV1 := s.router.Group("/api/v1")
 	protectedV1.Use(authentication.Middleware())
@@ -36,18 +42,26 @@ func (s *Server) setupRoutes(tokenManager TokenManager, userPermissionsCache Use
 	{
 		auth := protectedV1.Group("/auth")
 		{
-			auth.POST("/logout", s.authHandler.Logout)
+			auth.POST("/sign-out", s.userHandler.SignOut)
 		}
 
 		users := protectedV1.Group("/users")
 		{
 			users.POST("", s.userHandler.Create)
-			users.GET("", s.userHandler.Get)
-			users.PATCH("", s.userHandler.Update)
-			users.DELETE("", s.userHandler.Delete)
+			users.GET("/:id", s.userHandler.Get)
+			users.GET("", s.userHandler.GetAllWithFilter)
+			users.PATCH("/:id", s.userHandler.Update)
+			users.DELETE("/:id", s.userHandler.Delete)
+
 			users.GET("/me", s.userHandler.Me)
+
 			users.POST("/activation-code/send", s.userHandler.SendActivationCode)
 			users.POST("/activation-code/check", s.userHandler.CheckActivationCode)
+
+			users.POST("/documents", s.userHandler.CreateDocument)
+			users.POST("/documents/upload", s.userHandler.GetUploadDocumentData)
+			users.GET("/:id/documents/processed", s.userHandler.GetProcessedDocumentsForUser)
+			users.POST("/documents/check/:id", s.userHandler.CheckDocument)
 		}
 
 		carModels := protectedV1.Group("/car-models")
@@ -61,7 +75,8 @@ func (s *Server) setupRoutes(tokenManager TokenManager, userPermissionsCache Use
 		}
 
 		verified := protectedV1.Group("")
-		verified.Use(middleware.VerificationChecker())
+		verified.Use(middleware.EmailVerificationChecker())
+		verified.Use(middleware.DocumentVerificationChecker())
 		{
 			cars := verified.Group("/cars")
 			{

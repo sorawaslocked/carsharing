@@ -16,8 +16,8 @@ type Server struct {
 	router                *gin.Engine
 	httpCfg               config.HTTPServer
 	log                   *slog.Logger
-	authHandler           *handler.Auth
-	userHandler           *handler.User
+	healthHandler         *handler.HealthHandler
+	userHandler           *handler.UserHandler
 	carModelHandler       *handler.CarModelHandler
 	carHandler            *handler.CarHandler
 	carInsuranceHandler   *handler.CarInsuranceHandler
@@ -29,15 +29,16 @@ func New(
 	httpCfg config.HTTPServer,
 	cookieCfg config.Cookie,
 	log *slog.Logger,
-	authService handler.AuthService,
+	healthCheckers []handler.HealthChecker,
 	userService handler.UserService,
 	carModelService handler.CarModelService,
 	carService handler.CarService,
 	carInsuranceService handler.CarInsuranceService,
 	carMaintenanceService handler.CarMaintenanceService,
 	zoneService handler.ZoneService,
-	tokenManager TokenManager,
+	tokenManager TokenParser,
 	userPermissionsCache UserPermissionsCache,
+	userSessionCache UserSessionCache,
 ) *Server {
 	httpLog := log.With(
 		slog.String("httpServerHost", httpCfg.Host),
@@ -48,8 +49,8 @@ func New(
 	router := gin.New()
 
 	// Handlers
-	authHandler := handler.NewAuth(authService, cookieCfg)
-	userHandler := handler.NewUser(userService)
+	userHandler := handler.NewUser(userService, cookieCfg)
+	healthHandler := handler.NewHealthHandler(healthCheckers)
 	carModelHandler := handler.NewCarModelHandler(carModelService)
 	carHandler := handler.NewCarHandler(carService)
 	carInsuranceHandler := handler.NewCarInsuranceHandler(carInsuranceService)
@@ -60,8 +61,8 @@ func New(
 		router:                router,
 		httpCfg:               httpCfg,
 		log:                   httpLog,
-		authHandler:           authHandler,
 		userHandler:           userHandler,
+		healthHandler:         healthHandler,
 		carModelHandler:       carModelHandler,
 		carHandler:            carHandler,
 		carInsuranceHandler:   carInsuranceHandler,
@@ -70,7 +71,7 @@ func New(
 	}
 
 	server.setupMiddleware()
-	server.setupRoutes(tokenManager, userPermissionsCache)
+	server.setupRoutes(tokenManager, userPermissionsCache, userSessionCache)
 
 	return server
 }

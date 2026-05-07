@@ -8,27 +8,33 @@ import (
 )
 
 type TokenManager interface {
-	GenerateAccessToken(userID, deviceID string) (token string, exp time.Time, err error)
-	GenerateRefreshToken(userID, deviceID string) (token string, exp time.Time, err error)
-	ParseToken(token string) (userID, deviceID string, err error)
+	GenerateAccessToken(userID string) (token string, exp time.Time, err error)
+	GenerateRefreshToken(userID string) (token string, exp time.Time, err error)
+	ParseToken(token string) (userID string, err error)
 }
 
-type AuthPresenter interface {
-	Register(ctx context.Context, data model.UserCreateData) (uint64, error)
-	Login(ctx context.Context, cred model.Credentials) (model.Token, error)
-	RefreshToken(ctx context.Context, refreshToken string) (model.Token, error)
-	Logout(ctx context.Context, refreshToken string) error
+type UserSessionCache interface {
+	IsSignedIn(ctx context.Context, userID, deviceID string) (bool, error)
+	SetSignedIn(ctx context.Context, userID, deviceID string, loggedIn bool) error
 }
 
 type UserPresenter interface {
-	Create(ctx context.Context, data model.UserCreateData) (uint64, error)
-	Get(ctx context.Context, filter model.UserFilter) (model.User, error)
-	GetAll(ctx context.Context, filter model.UserFilter) ([]model.User, error)
-	Update(ctx context.Context, filter model.UserFilter, data model.UserUpdateData) error
-	Delete(ctx context.Context, filter model.UserFilter) error
-	Me(ctx context.Context) (model.User, error)
+	Create(ctx context.Context, data model.UserCreate) (string, error)
+	Get(ctx context.Context, id string) (model.User, error)
+	GetAllWithFilter(ctx context.Context, filter model.UserFilter) ([]model.User, error)
+	Update(ctx context.Context, id string, data model.UserUpdate) error
+	Delete(ctx context.Context, id string) error
+
+	Register(ctx context.Context, data model.UserCreate) (string, error)
+	SignIn(ctx context.Context, creds model.Credentials) (id string, err error)
+
 	SendActivationCode(ctx context.Context) error
 	CheckActivationCode(ctx context.Context, code string) error
+
+	CreateDocument(ctx context.Context, objectKey, imageType string) (string, error)
+	GetUploadDocumentData(ctx context.Context, imageType string) (model.ImageUploadData, error)
+	GetProcessedDocumentsForUser(ctx context.Context, userID string) ([]model.Document, error)
+	CheckDocument(ctx context.Context, docID string, status string, documentError *string) error
 }
 
 type CarModelPresenter interface {

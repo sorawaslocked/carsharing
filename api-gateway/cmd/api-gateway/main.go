@@ -20,7 +20,7 @@ package main
 import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/app"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/config"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/logger"
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
 
 	_ "github.com/sorawaslocked/car-rental-api-gateway/docs"
 )
@@ -28,9 +28,9 @@ import (
 func main() {
 	cfg := config.MustLoad()
 
-	log := logger.SetupLogger(cfg.Env)
+	logger := log.SetupLogger(cfg.Env)
 
-	application := app.New(cfg, log)
+	application := app.New(cfg, logger)
 
 	if application != nil {
 		application.Run()

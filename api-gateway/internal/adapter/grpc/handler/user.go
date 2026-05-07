@@ -2,152 +2,331 @@ package handler
 
 import (
 	"context"
+	"log/slog"
 
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/grpc"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/grpc/dto"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
+	pkglog "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
+	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type UserHandler struct {
 	client usersvc.UserServiceClient
+	log    *slog.Logger
 }
 
-func NewUserHandler(client usersvc.UserServiceClient) *UserHandler {
-	return &UserHandler{client: client}
+func NewUserHandler(client usersvc.UserServiceClient, logger *slog.Logger) *UserHandler {
+	return &UserHandler{
+		client: client,
+		log:    pkglog.WithComponent(logger, "grpc.UserHandler"),
+	}
 }
 
-func (h *UserHandler) Create(ctx context.Context, data model.UserCreateData) (uint64, error) {
+func (h *UserHandler) Create(ctx context.Context, data model.UserCreate) (string, error) {
+	logger := pkglog.WithMethod(h.log, "Create")
+
 	req := &usersvc.CreateRequest{
-		Email:                data.Email,
-		Password:             data.Password,
-		PasswordConfirmation: data.PasswordConfirmation,
-		FirstName:            data.FirstName,
-		LastName:             data.LastName,
-		BirthDate:            data.BirthDate,
+		Email:       data.Email,
+		FirstName:   data.FirstName,
+		LastName:    data.LastName,
+		BirthDate:   data.BirthDate,
+		PhoneNumber: data.PhoneNumber,
 	}
-	if data.PhoneNumber != "" {
-		req.PhoneNumber = &data.PhoneNumber
+	if data.Password.Text != nil {
+		req.Password = *data.Password.Text
 	}
-	if data.Roles != nil {
-		req.Roles = *data.Roles
-	}
-	if data.IsActive != nil {
-		req.IsActive = *data.IsActive
-	}
-	if data.IsConfirmed != nil {
-		req.IsConfirmed = *data.IsConfirmed
+	if data.Password.TextConfirmation != nil {
+		req.PasswordConfirmation = *data.Password.TextConfirmation
 	}
 
 	res, err := h.client.Create(ctx, req)
 	if err != nil {
-		return 0, grpc.FromGrpcErr(err)
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return "", dto.FromGrpcErr(err)
 	}
 
-	return *res.ID, nil
+	return res.GetID(), nil
 }
 
-func (h *UserHandler) Get(ctx context.Context, filter model.UserFilter) (model.User, error) {
-	req := &usersvc.GetRequest{
-		ID:    filter.ID,
-		Email: filter.Email,
-	}
+func (h *UserHandler) Get(ctx context.Context, id string) (model.User, error) {
+	logger := pkglog.WithMethod(h.log, "Get")
 
-	res, err := h.client.Get(ctx, req)
+	res, err := h.client.Get(ctx, &usersvc.GetRequest{ID: id})
 	if err != nil {
-		return model.User{}, grpc.FromGrpcErr(err)
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return model.User{}, dto.FromGrpcErr(err)
 	}
 
-	return dto.FromProto(res.User), nil
+	return dto.UserFromProto(res.GetUser()), nil
 }
 
-func (h *UserHandler) GetAll(ctx context.Context, _ model.UserFilter) ([]model.User, error) {
-	req := &usersvc.GetAllRequest{}
+func (h *UserHandler) GetAllWithFilter(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
+	logger := pkglog.WithMethod(h.log, "GetAllWithFilter")
 
-	res, err := h.client.GetAll(ctx, req)
-	if err != nil {
-		return nil, grpc.FromGrpcErr(err)
+	req := &usersvc.GetAllWithFilterRequest{
+		Email:              filter.Email,
+		PhoneNumber:        filter.PhoneNumber,
+		FirstName:          filter.FirstName,
+		LastName:           filter.LastName,
+		IsDocumentVerified: filter.IsDocumentVerified,
+		IsEmailVerified:    filter.IsEmailVerified,
+		IsSuspended:        filter.IsSuspended,
+	}
+	if filter.Pagination != nil {
+		req.Pagination = &basepb.Pagination{
+			Limit:  filter.Pagination.Limit,
+			Offset: filter.Pagination.Offset,
+		}
 	}
 
-	users := make([]model.User, len(res.Users))
-	for i, user := range res.Users {
-		users[i] = dto.FromProto(user)
+	res, err := h.client.GetAllWithFilter(ctx, req)
+	if err != nil {
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return nil, dto.FromGrpcErr(err)
+	}
+
+	users := make([]model.User, len(res.GetUsers()))
+	for i, u := range res.GetUsers() {
+		users[i] = dto.UserFromProto(u)
 	}
 
 	return users, nil
 }
 
-func (h *UserHandler) Update(ctx context.Context, filter model.UserFilter, data model.UserUpdateData) error {
+func (h *UserHandler) Update(ctx context.Context, id string, data model.UserUpdate) error {
+	logger := pkglog.WithMethod(h.log, "Update")
+
 	req := &usersvc.UpdateRequest{
-		ID:                   filter.ID,
-		Email:                filter.Email,
-		NewEmail:             data.Email,
-		PhoneNumber:          data.PhoneNumber,
-		FirstName:            data.FirstName,
-		LastName:             data.LastName,
-		BirthDate:            data.BirthDate,
-		Password:             data.Password,
-		PasswordConfirmation: data.PasswordConfirmation,
-		IsActive:             data.IsActive,
-		IsConfirmed:          data.IsConfirmed,
+		ID:                 id,
+		Email:              data.Email,
+		PhoneNumber:        data.PhoneNumber,
+		FirstName:          data.FirstName,
+		LastName:           data.LastName,
+		BirthDate:          data.BirthDate,
+		ProfileImageKey:    data.ProfileImageKey,
+		Roles:              data.Roles,
+		IsDocumentVerified: data.IsDocumentVerified,
+		IsEmailVerified:    data.IsEmailVerified,
+		IsSuspended:        data.IsSuspended,
 	}
-	if data.Roles != nil {
-		req.Roles = *data.Roles
+	if data.Password.Text != nil {
+		req.Password = data.Password.Text
+	}
+	if data.Password.TextConfirmation != nil {
+		req.PasswordConfirmation = data.Password.TextConfirmation
 	}
 
 	_, err := h.client.Update(ctx, req)
 	if err != nil {
-		return grpc.FromGrpcErr(err)
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return dto.FromGrpcErr(err)
 	}
 
 	return nil
 }
 
-func (h *UserHandler) Delete(ctx context.Context, filter model.UserFilter) error {
-	req := &usersvc.DeleteRequest{
-		ID:    filter.ID,
-		Email: filter.Email,
-	}
+func (h *UserHandler) Delete(ctx context.Context, id string) error {
+	logger := pkglog.WithMethod(h.log, "Delete")
 
-	_, err := h.client.Delete(ctx, req)
+	_, err := h.client.Delete(ctx, &usersvc.DeleteRequest{ID: id})
 	if err != nil {
-		return grpc.FromGrpcErr(err)
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return dto.FromGrpcErr(err)
 	}
 
 	return nil
 }
 
-func (h *UserHandler) Me(ctx context.Context) (model.User, error) {
-	req := &usersvc.MeRequest{}
+func (h *UserHandler) Register(ctx context.Context, data model.UserCreate) (string, error) {
+	logger := pkglog.WithMethod(h.log, "Register")
 
-	res, err := h.client.Me(ctx, req)
-	if err != nil {
-		return model.User{}, grpc.FromGrpcErr(err)
+	req := &usersvc.RegisterRequest{
+		Email:       data.Email,
+		FirstName:   data.FirstName,
+		LastName:    data.LastName,
+		BirthDate:   data.BirthDate,
+		PhoneNumber: data.PhoneNumber,
+	}
+	if data.Password.Text != nil {
+		req.Password = *data.Password.Text
+	}
+	if data.Password.TextConfirmation != nil {
+		req.PasswordConfirmation = *data.Password.TextConfirmation
 	}
 
-	return dto.FromProto(res.User), nil
+	res, err := h.client.Register(ctx, req)
+	if err != nil {
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return "", dto.FromGrpcErr(err)
+	}
+
+	return res.GetID(), nil
+}
+
+func (h *UserHandler) SignIn(ctx context.Context, creds model.Credentials) (string, error) {
+	logger := pkglog.WithMethod(h.log, "SignIn")
+
+	req := &usersvc.SignInRequest{
+		Email:       creds.Email,
+		PhoneNumber: creds.PhoneNumber,
+	}
+	if creds.Password.Text != nil {
+		req.Password = *creds.Password.Text
+	}
+
+	res, err := h.client.SignIn(ctx, req)
+	if err != nil {
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return "", dto.FromGrpcErr(err)
+	}
+
+	return res.GetID(), nil
 }
 
 func (h *UserHandler) SendActivationCode(ctx context.Context) error {
-	req := &usersvc.SendActivationCodeRequest{}
+	logger := pkglog.WithMethod(h.log, "SendActivationCode")
 
-	_, err := h.client.SendActivationCode(ctx, req)
+	_, err := h.client.SendActivationCode(ctx, &emptypb.Empty{})
 	if err != nil {
-		return grpc.FromGrpcErr(err)
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return dto.FromGrpcErr(err)
 	}
 
 	return nil
 }
 
 func (h *UserHandler) CheckActivationCode(ctx context.Context, code string) error {
-	req := &usersvc.CheckActivationCodeRequest{
-		Code: code,
-	}
+	logger := pkglog.WithMethod(h.log, "CheckActivationCode")
 
-	_, err := h.client.CheckActivationCode(ctx, req)
+	_, err := h.client.CheckActivationCode(ctx, &usersvc.CheckActivationCodeRequest{Code: code})
 	if err != nil {
-		return grpc.FromGrpcErr(err)
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return dto.FromGrpcErr(err)
 	}
 
 	return nil
+}
+
+func (h *UserHandler) CreateDocument(ctx context.Context, objectKey, imageType string) (string, error) {
+	logger := pkglog.WithMethod(h.log, "CreateDocument")
+
+	res, err := h.client.CreateDocument(ctx, &usersvc.CreateDocumentRequest{
+		ObjectKey: objectKey,
+		ImageType: imageType,
+	})
+	if err != nil {
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return "", dto.FromGrpcErr(err)
+	}
+
+	return res.GetID(), nil
+}
+
+func (h *UserHandler) GetUploadDocumentData(ctx context.Context, imageType string) (model.ImageUploadData, error) {
+	logger := pkglog.WithMethod(h.log, "GetUploadDocumentData")
+
+	res, err := h.client.GetUploadDocumentData(ctx, &usersvc.GetUploadDocumentDataRequest{ImageType: imageType})
+	if err != nil {
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return model.ImageUploadData{}, dto.FromGrpcErr(err)
+	}
+
+	ud := res.GetUploadData()
+	if ud == nil {
+		return model.ImageUploadData{}, nil
+	}
+
+	return model.ImageUploadData{
+		PresignedPutURL: ud.GetPresignedPutURL(),
+		ObjectKey:       ud.GetObjectKey(),
+	}, nil
+}
+
+func (h *UserHandler) GetProcessedDocumentsForUser(ctx context.Context, userID string) ([]model.Document, error) {
+	logger := pkglog.WithMethod(h.log, "GetProcessedDocumentsForUser")
+
+	res, err := h.client.GetProcessedDocumentsForUser(ctx, &usersvc.GetProcessedDocumentsForUserRequest{UserID: userID})
+	if err != nil {
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return nil, dto.FromGrpcErr(err)
+	}
+
+	docs := make([]model.Document, len(res.GetDocuments()))
+	for i, d := range res.GetDocuments() {
+		docs[i] = dto.DocumentFromProto(d)
+	}
+
+	return docs, nil
+}
+
+func (h *UserHandler) CheckDocument(ctx context.Context, docID, status string, reason *string) error {
+	logger := pkglog.WithMethod(h.log, "CheckDocument")
+
+	_, err := h.client.CheckDocument(ctx, &usersvc.CheckDocumentRequest{
+		DocID:  docID,
+		Status: status,
+		Error:  reason,
+	})
+	if err != nil {
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return dto.FromGrpcErr(err)
+	}
+
+	return nil
+}
+
+func (h *UserHandler) Health(ctx context.Context) (model.ServiceHealth, error) {
+	logger := pkglog.WithMethod(h.log, "Health")
+
+	res, err := h.client.Health(ctx, &emptypb.Empty{})
+	if err != nil {
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return model.ServiceHealth{}, dto.FromGrpcErr(err)
+	}
+
+	return dto.ServiceHealthFromProto(res), nil
 }

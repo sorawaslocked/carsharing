@@ -26,7 +26,7 @@ func (h *CarHandler) Get(_ context.Context, id string) (model.Car, error) {
 
 func (h *CarHandler) GetAll(_ context.Context, filter model.CarFilter) ([]model.Car, error) {
 	_ = filter
-	return nil, errNotImplemented("CarHandler.GetAll")
+	return nil, errNotImplemented("CarHandler.GetAllWithFilter")
 }
 
 func (h *CarHandler) Update(_ context.Context, id string, data model.CarUpdate) error {

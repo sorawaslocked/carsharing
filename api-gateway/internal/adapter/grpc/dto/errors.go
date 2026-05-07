@@ -1,4 +1,4 @@
-package grpc
+package dto
 
 import (
 	"errors"
@@ -9,13 +9,15 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var (
-	ErrInvalidStatusCode = errors.New("invalid status code")
-)
+var ErrInvalidStatusCode = errors.New("invalid status code")
+
+func IsSystemErr(err error) bool {
+	st, ok := status.FromError(err)
+	return !ok || st.Code() == codes.Internal
+}
 
 func FromGrpcErr(err error) error {
 	st, ok := status.FromError(err)
-
 	if !ok {
 		return ErrInvalidStatusCode
 	}
@@ -42,13 +44,10 @@ func fromInvalidArgument(st *status.Status) error {
 	for _, d := range st.Details() {
 		switch info := d.(type) {
 		case *errdetails.BadRequest:
-			var ve model.ValidationErrors
-			ve = make(map[string]string)
-
+			ve := make(model.ValidationErrors)
 			for _, fv := range info.FieldViolations {
 				ve[fv.Field] = fv.Description
 			}
-
 			return ve
 		}
 	}

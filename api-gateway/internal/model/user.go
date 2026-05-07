@@ -3,57 +3,91 @@ package model
 import "time"
 
 type User struct {
-	ID           uint64
-	Email        string
-	PhoneNumber  string
-	FirstName    string
-	LastName     string
-	BirthDate    string
-	PasswordHash []byte
-	Roles        []string
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
+	ID              string
+	Email           string
+	PhoneNumber     *string
+	FirstName       string
+	LastName        string
+	BirthDate       string
+	Password        Password
+	ProfileImageURL *string
 
-	IsActive    bool
-	IsConfirmed bool
+	Roles              []string
+	IsDocumentVerified bool
+	IsEmailVerified    bool
+	IsSuspended        bool
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type UserFilter struct {
-	ID          *uint64
 	Email       *string
 	PhoneNumber *string
 	FirstName   *string
 	LastName    *string
-	Roles       []string
 
-	IsActive    *bool
-	IsConfirmed *bool
+	IsDocumentVerified *bool
+	IsEmailVerified    *bool
+	IsSuspended        *bool
+
+	Pagination *Pagination
 }
 
-type UserCreateData struct {
-	Email                string
-	PhoneNumber          string
-	Password             string
-	PasswordConfirmation string
-	FirstName            string
-	LastName             string
-	BirthDate            string
-	Roles                *[]string
-
-	IsActive    *bool
-	IsConfirmed *bool
+type UserCreate struct {
+	Email       string
+	PhoneNumber *string
+	FirstName   string
+	LastName    string
+	BirthDate   string
+	Password    Password
 }
 
-type UserUpdateData struct {
-	Email                *string
-	PhoneNumber          *string
-	FirstName            *string
-	LastName             *string
-	BirthDate            *string
-	Password             *string
-	PasswordConfirmation *string
-	Roles                *[]string
+type UserUpdate struct {
+	Email           *string
+	PhoneNumber     *string
+	FirstName       *string
+	LastName        *string
+	BirthDate       *string
+	Password        Password
+	ProfileImageKey *string
 
-	IsActive    *bool
-	IsConfirmed *bool
+	Roles              []string
+	IsDocumentVerified *bool
+	IsEmailVerified    *bool
+	IsSuspended        *bool
+}
+
+type Password struct {
+	Hash             []byte
+	Text             *string
+	TextConfirmation *string
+}
+
+type Credentials struct {
+	Email       *string
+	PhoneNumber *string
+	Password    Password
+}
+
+type AccessToken struct {
+	Token     string
+	ExpiresIn int64
+}
+
+type RefreshToken struct {
+	Token     string
+	ExpiresIn int64
+}
+
+type Document struct {
+	ID        string
+	UserID    string
+	ImageType string
+	Status    string
+	Reason    *string
+	ImageURL  string
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

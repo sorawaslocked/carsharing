@@ -1,31 +1,45 @@
 package jwt
 
 import (
+	"errors"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	pkglog "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
 )
+
+type Config struct {
+	Secret          string        `yaml:"secret" env:"JWT_SECRET" env-required:"true"`
+	AccessTokenTTL  time.Duration `yaml:"access_token_ttl" env:"JWT_ACCESS_TOKEN_TTL" env-default:"15m"`
+	RefreshTokenTTL time.Duration `yaml:"refresh_token_ttl" env:"JWT_REFRESH_TOKEN_TTL" env-default:"720h"`
+}
 
 type Manager struct {
 	secret          string
 	accessTokenTTL  time.Duration
 	refreshTokenTTL time.Duration
+
+	log *slog.Logger
 }
 
-func NewManager(
-	secret string,
-	accessTokenTTL time.Duration,
-	refreshTokenTTL time.Duration,
-) *Manager {
-	return &Manager{
-		secret:          secret,
-		accessTokenTTL:  accessTokenTTL,
-		refreshTokenTTL: refreshTokenTTL,
+func NewManager(cfg Config, logger *slog.Logger) *Manager {
+	m := &Manager{
+		secret:          cfg.Secret,
+		accessTokenTTL:  cfg.AccessTokenTTL,
+		refreshTokenTTL: cfg.RefreshTokenTTL,
 	}
+
+	m.log = pkglog.WithComponent(logger, "jwt.Manager")
+
+	return m
 }
 
 func (m *Manager) GenerateAccessToken(userID string) (token string, exp time.Time, err error) {
+	const method = "GenerateAccessToken"
+	logger := pkglog.WithMethod(m.log, method)
+
 	now := time.Now()
 	exp = now.Add(m.accessTokenTTL)
 
@@ -39,13 +53,18 @@ func (m *Manager) GenerateAccessToken(userID string) (token string, exp time.Tim
 
 	token, err = tokenWithClaims.SignedString(m.secret)
 	if err != nil {
-		return "", time.Time{}, err
+		logger.Error("generating access token", pkglog.Err(err))
+
+		return "", time.Time{}, ErrTokenGenerationFailed
 	}
 
 	return token, exp, nil
 }
 
 func (m *Manager) GenerateRefreshToken(userID string) (token string, exp time.Time, err error) {
+	const method = "GenerateRefreshToken"
+	logger := pkglog.WithMethod(m.log, method)
+
 	now := time.Now()
 	exp = now.Add(m.refreshTokenTTL)
 
@@ -59,15 +78,20 @@ func (m *Manager) GenerateRefreshToken(userID string) (token string, exp time.Ti
 
 	token, err = tokenWithClaims.SignedString(m.secret)
 	if err != nil {
-		return "", time.Time{}, err
+		logger.Error("generating refresh token", pkglog.Err(err))
+
+		return "", time.Time{}, ErrTokenGenerationFailed
 	}
 
 	return token, exp, nil
 }
 
-func (m *Manager) ParseToken(token string) (string, error) {
+func (m *Manager) ParseToken(token string) (userID string, err error) {
+	const method = "ParseToken"
+	logger := pkglog.WithMethod(m.log, method)
+
 	var tokenWithClaims *jwt.Token
-	tokenWithClaims, err := jwt.ParseWithClaims(token, &jwt.MapClaims{}, func(token *jwt.Token) (any, error) {
+	tokenWithClaims, err = jwt.ParseWithClaims(token, &jwt.MapClaims{}, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
@@ -75,13 +99,28 @@ func (m *Manager) ParseToken(token string) (string, error) {
 		return m.secret, nil
 	})
 	if err != nil {
+		if errors.Is(err, jwt.ErrTokenExpired) {
+			return "", ErrExpiredToken
+		}
+
+		logger.Warn("parsing token", pkglog.Err(err))
+
 		return "", ErrInvalidToken
 	}
 
-	claims, ok := tokenWithClaims.Claims.(*jwt.RegisteredClaims)
+	claims, ok := tokenWithClaims.Claims.(*jwt.MapClaims)
 	if !ok {
+		logger.Error("unexpected claims type in token")
+
 		return "", ErrInvalidToken
 	}
 
-	return claims.Subject, nil
+	subject, err := claims.GetSubject()
+	if err != nil {
+		logger.Error("getting subject from token claims", pkglog.Err(err))
+
+		return "", ErrInvalidToken
+	}
+
+	return subject, nil
 }

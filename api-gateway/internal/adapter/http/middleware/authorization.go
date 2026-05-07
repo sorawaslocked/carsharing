@@ -6,16 +6,35 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )
 
-func VerificationChecker() gin.HandlerFunc {
+func DocumentVerificationChecker() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		verified, exists := c.Get(ctxUserVerifiedKey)
+		isVerified, exists := c.Get(ctxUserDocumentVerifiedKey)
 		if !exists {
 			dto.FromError(c, model.ErrInternalServerError)
 
 			return
 		}
 
-		if !verified.(bool) {
+		if !isVerified.(bool) {
+			dto.FromError(c, model.ErrForbidden)
+
+			return
+		}
+
+		c.Next()
+	}
+}
+
+func EmailVerificationChecker() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		isVerified, exists := c.Get(ctxUserEmailVerifiedKey)
+		if !exists {
+			dto.FromError(c, model.ErrInternalServerError)
+
+			return
+		}
+
+		if !isVerified.(bool) {
 			dto.FromError(c, model.ErrForbidden)
 
 			return
@@ -27,14 +46,14 @@ func VerificationChecker() gin.HandlerFunc {
 
 func SuspensionChecker() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		suspended, exists := c.Get(ctxUserSuspendedKey)
+		isSuspended, exists := c.Get(ctxUserSuspendedKey)
 		if !exists {
 			dto.FromError(c, model.ErrInternalServerError)
 
 			return
 		}
 
-		if suspended.(bool) {
+		if isSuspended.(bool) {
 			dto.FromError(c, model.ErrForbidden)
 
 			return

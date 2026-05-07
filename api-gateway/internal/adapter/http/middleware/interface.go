@@ -2,17 +2,19 @@ package middleware
 
 import (
 	"context"
-	"time"
 )
+
+type TokenParser interface {
+	ParseToken(token string) (userID string, err error)
+}
 
 type UserPermissionsCache interface {
 	GetRoles(ctx context.Context, userID string) ([]string, error)
-	GetVerified(ctx context.Context, userID string) (bool, error)
-	GetSuspended(ctx context.Context, userID string) (bool, error)
+	IsDocumentVerified(ctx context.Context, userID string) (bool, error)
+	IsEmailVerified(ctx context.Context, userID string) (bool, error)
+	IsSuspended(ctx context.Context, userID string) (bool, error)
 }
 
-type TokenManager interface {
-	GenerateAccessToken(userID string) (token string, exp time.Time, err error)
-	GenerateRefreshToken(userID string) (token string, exp time.Time, err error)
-	ParseToken(token string) (string, error)
+type UserSessionCache interface {
+	IsSignedIn(ctx context.Context, userID, deviceID string) (bool, error)
 }

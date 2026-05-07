@@ -11,6 +11,6 @@ type Location struct {
 }
 
 type ImageUploadData struct {
-	PresignedUrl string
-	ObjectKey    string
+	PresignedPutURL string
+	ObjectKey       string
 }

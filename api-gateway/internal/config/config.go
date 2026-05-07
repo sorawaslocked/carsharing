@@ -2,17 +2,23 @@ package config
 
 import (
 	"flag"
-	"github.com/ilyakaznacheev/cleanenv"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/grpc"
 	"os"
+
+	"github.com/ilyakaznacheev/cleanenv"
+	pkggrpc "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/grpc"
+	pkgjwt "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/jwt"
+	pkgnats "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/nats"
+	pkgredis "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/redis"
 )
 
 type (
 	Config struct {
-		HTTPServer HTTPServer  `yaml:"http_server" env-required:"true"`
-		GRPCServer grpc.Config `yaml:"grpc_server" env-required:"true"`
-		Cookie     Cookie      `yaml:"cookie" env-required:"true"`
-		Env        string      `yaml:"env" env-required:"true"`
+		HTTPServer HTTPServer      `yaml:"http_server" env-required:"true"`
+		GRPCServer pkggrpc.Config  `yaml:"grpc_server" env-required:"true"`
+		Redis      pkgredis.Config `yaml:"redis" env-required:"true"`
+		NATS       pkgnats.Config  `yaml:"nats" env-required:"true"`
+		JWT        pkgjwt.Config   `yaml:"jwt" env-required:"true"`
+		Env        string          `yaml:"env" env-required:"true"`
 	}
 
 	HTTPServer struct {
@@ -22,6 +28,7 @@ type (
 		WriteTimeout string `yaml:"write_timeout" env:"HTTP_SERVER_WRITE_TIMEOUT" env-default:"30s"`
 		IdleTimeout  string `yaml:"idle_timeout" env:"HTTP_SERVER_IDLE_TIMEOUT" env-default:"60s"`
 		GinMode      string `yaml:"gin_mode" env:"GIN_MODE" env-default:"debug"`
+		Cookie       Cookie `yaml:"cookie" env-required:"true"`
 	}
 
 	Cookie struct {

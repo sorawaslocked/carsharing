@@ -26,7 +26,7 @@ func (h *CarInsuranceHandler) Get(_ context.Context, id string) (model.CarInsura
 
 func (h *CarInsuranceHandler) GetAll(_ context.Context, filter model.CarInsuranceFilter) ([]model.CarInsurance, error) {
 	_ = filter
-	return nil, errNotImplemented("CarInsuranceHandler.GetAll")
+	return nil, errNotImplemented("CarInsuranceHandler.GetAllWithFilter")
 }
 
 func (h *CarInsuranceHandler) Update(_ context.Context, id string, data model.CarInsuranceUpdate) error {

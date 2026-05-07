@@ -23,7 +23,7 @@ const (
 
 type CreateEvent struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -58,17 +58,17 @@ func (*CreateEvent) Descriptor() ([]byte, []int) {
 	return file_event_user_user_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *CreateEvent) GetID() string {
+func (x *CreateEvent) GetId() string {
 	if x != nil {
-		return x.ID
+		return x.Id
 	}
 	return ""
 }
 
 type UpdateEvent struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
-	ID               string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
-	IsSecurityUpdate bool                   `protobuf:"varint,2,opt,name=isSecurityUpdate,proto3" json:"isSecurityUpdate,omitempty"`
+	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	IsSecurityUpdate bool                   `protobuf:"varint,2,opt,name=is_security_update,json=isSecurityUpdate,proto3" json:"is_security_update,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -103,9 +103,9 @@ func (*UpdateEvent) Descriptor() ([]byte, []int) {
 	return file_event_user_user_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *UpdateEvent) GetID() string {
+func (x *UpdateEvent) GetId() string {
 	if x != nil {
-		return x.ID
+		return x.Id
 	}
 	return ""
 }
@@ -119,7 +119,7 @@ func (x *UpdateEvent) GetIsSecurityUpdate() bool {
 
 type DeleteEvent struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -154,9 +154,9 @@ func (*DeleteEvent) Descriptor() ([]byte, []int) {
 	return file_event_user_user_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *DeleteEvent) GetID() string {
+func (x *DeleteEvent) GetId() string {
 	if x != nil {
-		return x.ID
+		return x.Id
 	}
 	return ""
 }
@@ -168,12 +168,12 @@ const file_event_user_user_proto_rawDesc = "" +
 	"\x15event/user/user.proto\x12\n" +
 	"event.user\"\x1d\n" +
 	"\vCreateEvent\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\"I\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"K\n" +
 	"\vUpdateEvent\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\x12*\n" +
-	"\x10isSecurityUpdate\x18\x02 \x01(\bR\x10isSecurityUpdate\"\x1d\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12,\n" +
+	"\x12is_security_update\x18\x02 \x01(\bR\x10isSecurityUpdate\"\x1d\n" +
 	"\vDeleteEvent\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02IDB;Z9github.com/sorawaslocked/car-rental-protos/gen/event/userb\x06proto3"
+	"\x02id\x18\x01 \x01(\tR\x02idB;Z9github.com/sorawaslocked/car-rental-protos/gen/event/userb\x06proto3"
 
 var (
 	file_event_user_user_proto_rawDescOnce sync.Once

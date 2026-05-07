@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,11 +20,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CarModelService_CreateCarModel_FullMethodName = "/service.car.CarModelService/CreateCarModel"
-	CarModelService_GetCarModel_FullMethodName    = "/service.car.CarModelService/GetCarModel"
-	CarModelService_GetCarModels_FullMethodName   = "/service.car.CarModelService/GetCarModels"
-	CarModelService_UpdateCarModel_FullMethodName = "/service.car.CarModelService/UpdateCarModel"
-	CarModelService_DeleteCarModel_FullMethodName = "/service.car.CarModelService/DeleteCarModel"
+	CarModelService_CreateCarModel_FullMethodName             = "/service.car.CarModelService/CreateCarModel"
+	CarModelService_GetCarModel_FullMethodName                = "/service.car.CarModelService/GetCarModel"
+	CarModelService_ListCarModels_FullMethodName              = "/service.car.CarModelService/ListCarModels"
+	CarModelService_UpdateCarModel_FullMethodName             = "/service.car.CarModelService/UpdateCarModel"
+	CarModelService_DeleteCarModel_FullMethodName             = "/service.car.CarModelService/DeleteCarModel"
+	CarModelService_GetCarModelImageUploadData_FullMethodName = "/service.car.CarModelService/GetCarModelImageUploadData"
 )
 
 // CarModelServiceClient is the client API for CarModelService service.
@@ -32,9 +34,10 @@ const (
 type CarModelServiceClient interface {
 	CreateCarModel(ctx context.Context, in *CreateCarModelRequest, opts ...grpc.CallOption) (*CreateCarModelResponse, error)
 	GetCarModel(ctx context.Context, in *GetCarModelRequest, opts ...grpc.CallOption) (*GetCarModelResponse, error)
-	GetCarModels(ctx context.Context, in *GetCarModelsRequest, opts ...grpc.CallOption) (*GetCarModelsResponse, error)
-	UpdateCarModel(ctx context.Context, in *UpdateCarModelRequest, opts ...grpc.CallOption) (*UpdateCarModelResponse, error)
-	DeleteCarModel(ctx context.Context, in *DeleteCarModelRequest, opts ...grpc.CallOption) (*DeleteCarModelResponse, error)
+	ListCarModels(ctx context.Context, in *ListCarModelsRequest, opts ...grpc.CallOption) (*ListCarModelsResponse, error)
+	UpdateCarModel(ctx context.Context, in *UpdateCarModelRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteCarModel(ctx context.Context, in *DeleteCarModelRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetCarModelImageUploadData(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetCarModelImageUploadDataResponse, error)
 }
 
 type carModelServiceClient struct {
@@ -65,19 +68,19 @@ func (c *carModelServiceClient) GetCarModel(ctx context.Context, in *GetCarModel
 	return out, nil
 }
 
-func (c *carModelServiceClient) GetCarModels(ctx context.Context, in *GetCarModelsRequest, opts ...grpc.CallOption) (*GetCarModelsResponse, error) {
+func (c *carModelServiceClient) ListCarModels(ctx context.Context, in *ListCarModelsRequest, opts ...grpc.CallOption) (*ListCarModelsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetCarModelsResponse)
-	err := c.cc.Invoke(ctx, CarModelService_GetCarModels_FullMethodName, in, out, cOpts...)
+	out := new(ListCarModelsResponse)
+	err := c.cc.Invoke(ctx, CarModelService_ListCarModels_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *carModelServiceClient) UpdateCarModel(ctx context.Context, in *UpdateCarModelRequest, opts ...grpc.CallOption) (*UpdateCarModelResponse, error) {
+func (c *carModelServiceClient) UpdateCarModel(ctx context.Context, in *UpdateCarModelRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpdateCarModelResponse)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, CarModelService_UpdateCarModel_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -85,10 +88,20 @@ func (c *carModelServiceClient) UpdateCarModel(ctx context.Context, in *UpdateCa
 	return out, nil
 }
 
-func (c *carModelServiceClient) DeleteCarModel(ctx context.Context, in *DeleteCarModelRequest, opts ...grpc.CallOption) (*DeleteCarModelResponse, error) {
+func (c *carModelServiceClient) DeleteCarModel(ctx context.Context, in *DeleteCarModelRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteCarModelResponse)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, CarModelService_DeleteCarModel_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *carModelServiceClient) GetCarModelImageUploadData(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetCarModelImageUploadDataResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCarModelImageUploadDataResponse)
+	err := c.cc.Invoke(ctx, CarModelService_GetCarModelImageUploadData_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -101,9 +114,10 @@ func (c *carModelServiceClient) DeleteCarModel(ctx context.Context, in *DeleteCa
 type CarModelServiceServer interface {
 	CreateCarModel(context.Context, *CreateCarModelRequest) (*CreateCarModelResponse, error)
 	GetCarModel(context.Context, *GetCarModelRequest) (*GetCarModelResponse, error)
-	GetCarModels(context.Context, *GetCarModelsRequest) (*GetCarModelsResponse, error)
-	UpdateCarModel(context.Context, *UpdateCarModelRequest) (*UpdateCarModelResponse, error)
-	DeleteCarModel(context.Context, *DeleteCarModelRequest) (*DeleteCarModelResponse, error)
+	ListCarModels(context.Context, *ListCarModelsRequest) (*ListCarModelsResponse, error)
+	UpdateCarModel(context.Context, *UpdateCarModelRequest) (*emptypb.Empty, error)
+	DeleteCarModel(context.Context, *DeleteCarModelRequest) (*emptypb.Empty, error)
+	GetCarModelImageUploadData(context.Context, *emptypb.Empty) (*GetCarModelImageUploadDataResponse, error)
 	mustEmbedUnimplementedCarModelServiceServer()
 }
 
@@ -120,14 +134,17 @@ func (UnimplementedCarModelServiceServer) CreateCarModel(context.Context, *Creat
 func (UnimplementedCarModelServiceServer) GetCarModel(context.Context, *GetCarModelRequest) (*GetCarModelResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetCarModel not implemented")
 }
-func (UnimplementedCarModelServiceServer) GetCarModels(context.Context, *GetCarModelsRequest) (*GetCarModelsResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetCarModels not implemented")
+func (UnimplementedCarModelServiceServer) ListCarModels(context.Context, *ListCarModelsRequest) (*ListCarModelsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListCarModels not implemented")
 }
-func (UnimplementedCarModelServiceServer) UpdateCarModel(context.Context, *UpdateCarModelRequest) (*UpdateCarModelResponse, error) {
+func (UnimplementedCarModelServiceServer) UpdateCarModel(context.Context, *UpdateCarModelRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateCarModel not implemented")
 }
-func (UnimplementedCarModelServiceServer) DeleteCarModel(context.Context, *DeleteCarModelRequest) (*DeleteCarModelResponse, error) {
+func (UnimplementedCarModelServiceServer) DeleteCarModel(context.Context, *DeleteCarModelRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteCarModel not implemented")
+}
+func (UnimplementedCarModelServiceServer) GetCarModelImageUploadData(context.Context, *emptypb.Empty) (*GetCarModelImageUploadDataResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetCarModelImageUploadData not implemented")
 }
 func (UnimplementedCarModelServiceServer) mustEmbedUnimplementedCarModelServiceServer() {}
 func (UnimplementedCarModelServiceServer) testEmbeddedByValue()                         {}
@@ -186,20 +203,20 @@ func _CarModelService_GetCarModel_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CarModelService_GetCarModels_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetCarModelsRequest)
+func _CarModelService_ListCarModels_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListCarModelsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CarModelServiceServer).GetCarModels(ctx, in)
+		return srv.(CarModelServiceServer).ListCarModels(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CarModelService_GetCarModels_FullMethodName,
+		FullMethod: CarModelService_ListCarModels_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CarModelServiceServer).GetCarModels(ctx, req.(*GetCarModelsRequest))
+		return srv.(CarModelServiceServer).ListCarModels(ctx, req.(*ListCarModelsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -240,6 +257,24 @@ func _CarModelService_DeleteCarModel_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CarModelService_GetCarModelImageUploadData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CarModelServiceServer).GetCarModelImageUploadData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CarModelService_GetCarModelImageUploadData_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CarModelServiceServer).GetCarModelImageUploadData(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CarModelService_ServiceDesc is the grpc.ServiceDesc for CarModelService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -256,8 +291,8 @@ var CarModelService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CarModelService_GetCarModel_Handler,
 		},
 		{
-			MethodName: "GetCarModels",
-			Handler:    _CarModelService_GetCarModels_Handler,
+			MethodName: "ListCarModels",
+			Handler:    _CarModelService_ListCarModels_Handler,
 		},
 		{
 			MethodName: "UpdateCarModel",
@@ -266,6 +301,10 @@ var CarModelService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteCarModel",
 			Handler:    _CarModelService_DeleteCarModel_Handler,
+		},
+		{
+			MethodName: "GetCarModelImageUploadData",
+			Handler:    _CarModelService_GetCarModelImageUploadData_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

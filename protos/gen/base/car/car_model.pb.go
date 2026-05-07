@@ -24,20 +24,21 @@ const (
 
 type CarModel struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Brand         string                 `protobuf:"bytes,2,opt,name=brand,proto3" json:"brand,omitempty"`
 	Model         string                 `protobuf:"bytes,3,opt,name=model,proto3" json:"model,omitempty"`
 	Year          int32                  `protobuf:"varint,4,opt,name=year,proto3" json:"year,omitempty"`
-	FuelType      string                 `protobuf:"bytes,5,opt,name=fuelType,proto3" json:"fuelType,omitempty"`
+	FuelType      string                 `protobuf:"bytes,5,opt,name=fuel_type,json=fuelType,proto3" json:"fuel_type,omitempty"`
 	Transmission  string                 `protobuf:"bytes,6,opt,name=transmission,proto3" json:"transmission,omitempty"`
-	BodyType      string                 `protobuf:"bytes,7,opt,name=bodyType,proto3" json:"bodyType,omitempty"`
+	BodyType      string                 `protobuf:"bytes,7,opt,name=body_type,json=bodyType,proto3" json:"body_type,omitempty"`
 	Class         string                 `protobuf:"bytes,8,opt,name=class,proto3" json:"class,omitempty"`
 	Seats         int32                  `protobuf:"varint,9,opt,name=seats,proto3" json:"seats,omitempty"`
-	EngineVolume  *float32               `protobuf:"fixed32,10,opt,name=engineVolume,proto3,oneof" json:"engineVolume,omitempty"`
-	RangeKM       int32                  `protobuf:"varint,11,opt,name=rangeKM,proto3" json:"rangeKM,omitempty"`
+	EngineVolume  *float32               `protobuf:"fixed32,10,opt,name=engine_volume,json=engineVolume,proto3,oneof" json:"engine_volume,omitempty"`
+	RangeKm       int32                  `protobuf:"varint,11,opt,name=range_km,json=rangeKm,proto3" json:"range_km,omitempty"`
 	Features      []string               `protobuf:"bytes,12,rep,name=features,proto3" json:"features,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	ImageUrls     []string               `protobuf:"bytes,13,rep,name=image_urls,json=imageUrls,proto3" json:"image_urls,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,15,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -72,9 +73,9 @@ func (*CarModel) Descriptor() ([]byte, []int) {
 	return file_base_car_car_model_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *CarModel) GetID() string {
+func (x *CarModel) GetId() string {
 	if x != nil {
-		return x.ID
+		return x.Id
 	}
 	return ""
 }
@@ -142,9 +143,9 @@ func (x *CarModel) GetEngineVolume() float32 {
 	return 0
 }
 
-func (x *CarModel) GetRangeKM() int32 {
+func (x *CarModel) GetRangeKm() int32 {
 	if x != nil {
-		return x.RangeKM
+		return x.RangeKm
 	}
 	return 0
 }
@@ -152,6 +153,13 @@ func (x *CarModel) GetRangeKM() int32 {
 func (x *CarModel) GetFeatures() []string {
 	if x != nil {
 		return x.Features
+	}
+	return nil
+}
+
+func (x *CarModel) GetImageUrls() []string {
+	if x != nil {
+		return x.ImageUrls
 	}
 	return nil
 }
@@ -174,24 +182,28 @@ var File_base_car_car_model_proto protoreflect.FileDescriptor
 
 const file_base_car_car_model_proto_rawDesc = "" +
 	"\n" +
-	"\x18base/car/car_model.proto\x12\bbase.car\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc6\x03\n" +
+	"\x18base/car/car_model.proto\x12\bbase.car\x1a\x1fgoogle/protobuf/timestamp.proto\"\xec\x03\n" +
 	"\bCarModel\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\x12\x14\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05brand\x18\x02 \x01(\tR\x05brand\x12\x14\n" +
 	"\x05model\x18\x03 \x01(\tR\x05model\x12\x12\n" +
-	"\x04year\x18\x04 \x01(\x05R\x04year\x12\x1a\n" +
-	"\bfuelType\x18\x05 \x01(\tR\bfuelType\x12\"\n" +
-	"\ftransmission\x18\x06 \x01(\tR\ftransmission\x12\x1a\n" +
-	"\bbodyType\x18\a \x01(\tR\bbodyType\x12\x14\n" +
+	"\x04year\x18\x04 \x01(\x05R\x04year\x12\x1b\n" +
+	"\tfuel_type\x18\x05 \x01(\tR\bfuelType\x12\"\n" +
+	"\ftransmission\x18\x06 \x01(\tR\ftransmission\x12\x1b\n" +
+	"\tbody_type\x18\a \x01(\tR\bbodyType\x12\x14\n" +
 	"\x05class\x18\b \x01(\tR\x05class\x12\x14\n" +
-	"\x05seats\x18\t \x01(\x05R\x05seats\x12'\n" +
-	"\fengineVolume\x18\n" +
-	" \x01(\x02H\x00R\fengineVolume\x88\x01\x01\x12\x18\n" +
-	"\arangeKM\x18\v \x01(\x05R\arangeKM\x12\x1a\n" +
-	"\bfeatures\x18\f \x03(\tR\bfeatures\x128\n" +
-	"\tcreatedAt\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x128\n" +
-	"\tupdatedAt\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\x0f\n" +
-	"\r_engineVolumeB9Z7github.com/sorawaslocked/car-rental-protos/gen/base/carb\x06proto3"
+	"\x05seats\x18\t \x01(\x05R\x05seats\x12(\n" +
+	"\rengine_volume\x18\n" +
+	" \x01(\x02H\x00R\fengineVolume\x88\x01\x01\x12\x19\n" +
+	"\brange_km\x18\v \x01(\x05R\arangeKm\x12\x1a\n" +
+	"\bfeatures\x18\f \x03(\tR\bfeatures\x12\x1d\n" +
+	"\n" +
+	"image_urls\x18\r \x03(\tR\timageUrls\x129\n" +
+	"\n" +
+	"created_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"\n" +
+	"updated_at\x18\x0f \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\x10\n" +
+	"\x0e_engine_volumeB9Z7github.com/sorawaslocked/car-rental-protos/gen/base/carb\x06proto3"
 
 var (
 	file_base_car_car_model_proto_rawDescOnce sync.Once
@@ -211,8 +223,8 @@ var file_base_car_car_model_proto_goTypes = []any{
 	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
 }
 var file_base_car_car_model_proto_depIdxs = []int32{
-	1, // 0: base.car.CarModel.createdAt:type_name -> google.protobuf.Timestamp
-	1, // 1: base.car.CarModel.updatedAt:type_name -> google.protobuf.Timestamp
+	1, // 0: base.car.CarModel.created_at:type_name -> google.protobuf.Timestamp
+	1, // 1: base.car.CarModel.updated_at:type_name -> google.protobuf.Timestamp
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name

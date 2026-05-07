@@ -24,20 +24,20 @@ const (
 
 type User struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
-	ID                 string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Id                 string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Email              string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	PhoneNumber        *string                `protobuf:"bytes,3,opt,name=phoneNumber,proto3,oneof" json:"phoneNumber,omitempty"`
-	FirstName          string                 `protobuf:"bytes,4,opt,name=firstName,proto3" json:"firstName,omitempty"`
-	LastName           string                 `protobuf:"bytes,5,opt,name=lastName,proto3" json:"lastName,omitempty"`
-	BirthDate          string                 `protobuf:"bytes,6,opt,name=birthDate,proto3" json:"birthDate,omitempty"`
-	PasswordHash       []byte                 `protobuf:"bytes,7,opt,name=passwordHash,proto3" json:"passwordHash,omitempty"`
-	ProfileImageURL    *string                `protobuf:"bytes,8,opt,name=profileImageURL,proto3,oneof" json:"profileImageURL,omitempty"`
+	PhoneNumber        *string                `protobuf:"bytes,3,opt,name=phone_number,json=phoneNumber,proto3,oneof" json:"phone_number,omitempty"`
+	FirstName          string                 `protobuf:"bytes,4,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
+	LastName           string                 `protobuf:"bytes,5,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
+	BirthDate          string                 `protobuf:"bytes,6,opt,name=birth_date,json=birthDate,proto3" json:"birth_date,omitempty"`
+	PasswordHash       []byte                 `protobuf:"bytes,7,opt,name=password_hash,json=passwordHash,proto3" json:"password_hash,omitempty"`
+	ProfileImageUrl    *string                `protobuf:"bytes,8,opt,name=profile_image_url,json=profileImageUrl,proto3,oneof" json:"profile_image_url,omitempty"`
 	Roles              []string               `protobuf:"bytes,9,rep,name=roles,proto3" json:"roles,omitempty"`
-	IsDocumentVerified bool                   `protobuf:"varint,10,opt,name=isDocumentVerified,proto3" json:"isDocumentVerified,omitempty"`
-	IsEmailVerified    bool                   `protobuf:"varint,11,opt,name=isEmailVerified,proto3" json:"isEmailVerified,omitempty"`
-	IsSuspended        bool                   `protobuf:"varint,12,opt,name=isSuspended,proto3" json:"isSuspended,omitempty"`
-	CreatedAt          *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
-	UpdatedAt          *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	IsDocumentVerified bool                   `protobuf:"varint,10,opt,name=is_document_verified,json=isDocumentVerified,proto3" json:"is_document_verified,omitempty"`
+	IsEmailVerified    bool                   `protobuf:"varint,11,opt,name=is_email_verified,json=isEmailVerified,proto3" json:"is_email_verified,omitempty"`
+	IsSuspended        bool                   `protobuf:"varint,12,opt,name=is_suspended,json=isSuspended,proto3" json:"is_suspended,omitempty"`
+	CreatedAt          *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt          *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -72,9 +72,9 @@ func (*User) Descriptor() ([]byte, []int) {
 	return file_base_user_user_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *User) GetID() string {
+func (x *User) GetId() string {
 	if x != nil {
-		return x.ID
+		return x.Id
 	}
 	return ""
 }
@@ -121,9 +121,9 @@ func (x *User) GetPasswordHash() []byte {
 	return nil
 }
 
-func (x *User) GetProfileImageURL() string {
-	if x != nil && x.ProfileImageURL != nil {
-		return *x.ProfileImageURL
+func (x *User) GetProfileImageUrl() string {
+	if x != nil && x.ProfileImageUrl != nil {
+		return *x.ProfileImageUrl
 	}
 	return ""
 }
@@ -172,14 +172,14 @@ func (x *User) GetUpdatedAt() *timestamppb.Timestamp {
 
 type Document struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
-	UserID        string                 `protobuf:"bytes,2,opt,name=userID,proto3" json:"userID,omitempty"`
-	ImageType     string                 `protobuf:"bytes,3,opt,name=imageType,proto3" json:"imageType,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	ImageType     string                 `protobuf:"bytes,3,opt,name=image_type,json=imageType,proto3" json:"image_type,omitempty"`
 	Status        string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
 	Error         *string                `protobuf:"bytes,5,opt,name=error,proto3,oneof" json:"error,omitempty"`
-	ImageURL      string                 `protobuf:"bytes,6,opt,name=imageURL,proto3" json:"imageURL,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	ImageUrl      string                 `protobuf:"bytes,6,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -214,16 +214,16 @@ func (*Document) Descriptor() ([]byte, []int) {
 	return file_base_user_user_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *Document) GetID() string {
+func (x *Document) GetId() string {
 	if x != nil {
-		return x.ID
+		return x.Id
 	}
 	return ""
 }
 
-func (x *Document) GetUserID() string {
+func (x *Document) GetUserId() string {
 	if x != nil {
-		return x.UserID
+		return x.UserId
 	}
 	return ""
 }
@@ -249,9 +249,9 @@ func (x *Document) GetError() string {
 	return ""
 }
 
-func (x *Document) GetImageURL() string {
+func (x *Document) GetImageUrl() string {
 	if x != nil {
-		return x.ImageURL
+		return x.ImageUrl
 	}
 	return ""
 }
@@ -274,34 +274,41 @@ var File_base_user_user_proto protoreflect.FileDescriptor
 
 const file_base_user_user_proto_rawDesc = "" +
 	"\n" +
-	"\x14base/user/user.proto\x12\tbase.user\x1a\x1fgoogle/protobuf/timestamp.proto\"\xa8\x04\n" +
+	"\x14base/user/user.proto\x12\tbase.user\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb9\x04\n" +
 	"\x04User\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05email\x12%\n" +
-	"\vphoneNumber\x18\x03 \x01(\tH\x00R\vphoneNumber\x88\x01\x01\x12\x1c\n" +
-	"\tfirstName\x18\x04 \x01(\tR\tfirstName\x12\x1a\n" +
-	"\blastName\x18\x05 \x01(\tR\blastName\x12\x1c\n" +
-	"\tbirthDate\x18\x06 \x01(\tR\tbirthDate\x12\"\n" +
-	"\fpasswordHash\x18\a \x01(\fR\fpasswordHash\x12-\n" +
-	"\x0fprofileImageURL\x18\b \x01(\tH\x01R\x0fprofileImageURL\x88\x01\x01\x12\x14\n" +
-	"\x05roles\x18\t \x03(\tR\x05roles\x12.\n" +
-	"\x12isDocumentVerified\x18\n" +
-	" \x01(\bR\x12isDocumentVerified\x12(\n" +
-	"\x0fisEmailVerified\x18\v \x01(\bR\x0fisEmailVerified\x12 \n" +
-	"\visSuspended\x18\f \x01(\bR\visSuspended\x128\n" +
-	"\tcreatedAt\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x128\n" +
-	"\tupdatedAt\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\x0e\n" +
-	"\f_phoneNumberB\x12\n" +
-	"\x10_profileImageURL\"\x9d\x02\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05email\x18\x02 \x01(\tR\x05email\x12&\n" +
+	"\fphone_number\x18\x03 \x01(\tH\x00R\vphoneNumber\x88\x01\x01\x12\x1d\n" +
+	"\n" +
+	"first_name\x18\x04 \x01(\tR\tfirstName\x12\x1b\n" +
+	"\tlast_name\x18\x05 \x01(\tR\blastName\x12\x1d\n" +
+	"\n" +
+	"birth_date\x18\x06 \x01(\tR\tbirthDate\x12#\n" +
+	"\rpassword_hash\x18\a \x01(\fR\fpasswordHash\x12/\n" +
+	"\x11profile_image_url\x18\b \x01(\tH\x01R\x0fprofileImageUrl\x88\x01\x01\x12\x14\n" +
+	"\x05roles\x18\t \x03(\tR\x05roles\x120\n" +
+	"\x14is_document_verified\x18\n" +
+	" \x01(\bR\x12isDocumentVerified\x12*\n" +
+	"\x11is_email_verified\x18\v \x01(\bR\x0fisEmailVerified\x12!\n" +
+	"\fis_suspended\x18\f \x01(\bR\visSuspended\x129\n" +
+	"\n" +
+	"created_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"\n" +
+	"updated_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\x0f\n" +
+	"\r_phone_numberB\x14\n" +
+	"\x12_profile_image_url\"\xa2\x02\n" +
 	"\bDocument\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\x12\x16\n" +
-	"\x06userID\x18\x02 \x01(\tR\x06userID\x12\x1c\n" +
-	"\timageType\x18\x03 \x01(\tR\timageType\x12\x16\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x1d\n" +
+	"\n" +
+	"image_type\x18\x03 \x01(\tR\timageType\x12\x16\n" +
 	"\x06status\x18\x04 \x01(\tR\x06status\x12\x19\n" +
-	"\x05error\x18\x05 \x01(\tH\x00R\x05error\x88\x01\x01\x12\x1a\n" +
-	"\bimageURL\x18\x06 \x01(\tR\bimageURL\x128\n" +
-	"\tcreatedAt\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x128\n" +
-	"\tupdatedAt\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\b\n" +
+	"\x05error\x18\x05 \x01(\tH\x00R\x05error\x88\x01\x01\x12\x1b\n" +
+	"\timage_url\x18\x06 \x01(\tR\bimageUrl\x129\n" +
+	"\n" +
+	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"\n" +
+	"updated_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\b\n" +
 	"\x06_errorB:Z8github.com/sorawaslocked/car-rental-protos/gen/base/userb\x06proto3"
 
 var (
@@ -323,10 +330,10 @@ var file_base_user_user_proto_goTypes = []any{
 	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
 }
 var file_base_user_user_proto_depIdxs = []int32{
-	2, // 0: base.user.User.createdAt:type_name -> google.protobuf.Timestamp
-	2, // 1: base.user.User.updatedAt:type_name -> google.protobuf.Timestamp
-	2, // 2: base.user.Document.createdAt:type_name -> google.protobuf.Timestamp
-	2, // 3: base.user.Document.updatedAt:type_name -> google.protobuf.Timestamp
+	2, // 0: base.user.User.created_at:type_name -> google.protobuf.Timestamp
+	2, // 1: base.user.User.updated_at:type_name -> google.protobuf.Timestamp
+	2, // 2: base.user.Document.created_at:type_name -> google.protobuf.Timestamp
+	2, // 3: base.user.Document.updated_at:type_name -> google.protobuf.Timestamp
 	4, // [4:4] is the sub-list for method output_type
 	4, // [4:4] is the sub-list for method input_type
 	4, // [4:4] is the sub-list for extension type_name

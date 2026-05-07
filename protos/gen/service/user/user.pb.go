@@ -26,33 +26,33 @@ const (
 )
 
 // CRUD
-type CreateRequest struct {
+type CreateUserRequest struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
 	Email                string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	PhoneNumber          *string                `protobuf:"bytes,2,opt,name=phoneNumber,proto3,oneof" json:"phoneNumber,omitempty"`
-	FirstName            string                 `protobuf:"bytes,3,opt,name=firstName,proto3" json:"firstName,omitempty"`
-	LastName             string                 `protobuf:"bytes,4,opt,name=lastName,proto3" json:"lastName,omitempty"`
-	BirthDate            string                 `protobuf:"bytes,5,opt,name=birthDate,proto3" json:"birthDate,omitempty"`
+	PhoneNumber          *string                `protobuf:"bytes,2,opt,name=phone_number,json=phoneNumber,proto3,oneof" json:"phone_number,omitempty"`
+	FirstName            string                 `protobuf:"bytes,3,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
+	LastName             string                 `protobuf:"bytes,4,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
+	BirthDate            string                 `protobuf:"bytes,5,opt,name=birth_date,json=birthDate,proto3" json:"birth_date,omitempty"`
 	Password             string                 `protobuf:"bytes,6,opt,name=password,proto3" json:"password,omitempty"`
-	PasswordConfirmation string                 `protobuf:"bytes,7,opt,name=passwordConfirmation,proto3" json:"passwordConfirmation,omitempty"`
+	PasswordConfirmation string                 `protobuf:"bytes,7,opt,name=password_confirmation,json=passwordConfirmation,proto3" json:"password_confirmation,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
 
-func (x *CreateRequest) Reset() {
-	*x = CreateRequest{}
+func (x *CreateUserRequest) Reset() {
+	*x = CreateUserRequest{}
 	mi := &file_service_user_user_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CreateRequest) String() string {
+func (x *CreateUserRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateRequest) ProtoMessage() {}
+func (*CreateUserRequest) ProtoMessage() {}
 
-func (x *CreateRequest) ProtoReflect() protoreflect.Message {
+func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_service_user_user_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -64,81 +64,81 @@ func (x *CreateRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateRequest.ProtoReflect.Descriptor instead.
-func (*CreateRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use CreateUserRequest.ProtoReflect.Descriptor instead.
+func (*CreateUserRequest) Descriptor() ([]byte, []int) {
 	return file_service_user_user_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *CreateRequest) GetEmail() string {
+func (x *CreateUserRequest) GetEmail() string {
 	if x != nil {
 		return x.Email
 	}
 	return ""
 }
 
-func (x *CreateRequest) GetPhoneNumber() string {
+func (x *CreateUserRequest) GetPhoneNumber() string {
 	if x != nil && x.PhoneNumber != nil {
 		return *x.PhoneNumber
 	}
 	return ""
 }
 
-func (x *CreateRequest) GetFirstName() string {
+func (x *CreateUserRequest) GetFirstName() string {
 	if x != nil {
 		return x.FirstName
 	}
 	return ""
 }
 
-func (x *CreateRequest) GetLastName() string {
+func (x *CreateUserRequest) GetLastName() string {
 	if x != nil {
 		return x.LastName
 	}
 	return ""
 }
 
-func (x *CreateRequest) GetBirthDate() string {
+func (x *CreateUserRequest) GetBirthDate() string {
 	if x != nil {
 		return x.BirthDate
 	}
 	return ""
 }
 
-func (x *CreateRequest) GetPassword() string {
+func (x *CreateUserRequest) GetPassword() string {
 	if x != nil {
 		return x.Password
 	}
 	return ""
 }
 
-func (x *CreateRequest) GetPasswordConfirmation() string {
+func (x *CreateUserRequest) GetPasswordConfirmation() string {
 	if x != nil {
 		return x.PasswordConfirmation
 	}
 	return ""
 }
 
-type CreateResponse struct {
+type CreateUserResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            *string                `protobuf:"bytes,1,opt,name=ID,proto3,oneof" json:"ID,omitempty"`
+	Id            *string                `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CreateResponse) Reset() {
-	*x = CreateResponse{}
+func (x *CreateUserResponse) Reset() {
+	*x = CreateUserResponse{}
 	mi := &file_service_user_user_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CreateResponse) String() string {
+func (x *CreateUserResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateResponse) ProtoMessage() {}
+func (*CreateUserResponse) ProtoMessage() {}
 
-func (x *CreateResponse) ProtoReflect() protoreflect.Message {
+func (x *CreateUserResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_service_user_user_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -150,39 +150,39 @@ func (x *CreateResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateResponse.ProtoReflect.Descriptor instead.
-func (*CreateResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use CreateUserResponse.ProtoReflect.Descriptor instead.
+func (*CreateUserResponse) Descriptor() ([]byte, []int) {
 	return file_service_user_user_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *CreateResponse) GetID() string {
-	if x != nil && x.ID != nil {
-		return *x.ID
+func (x *CreateUserResponse) GetId() string {
+	if x != nil && x.Id != nil {
+		return *x.Id
 	}
 	return ""
 }
 
-type GetRequest struct {
+type GetUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetRequest) Reset() {
-	*x = GetRequest{}
+func (x *GetUserRequest) Reset() {
+	*x = GetUserRequest{}
 	mi := &file_service_user_user_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetRequest) String() string {
+func (x *GetUserRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetRequest) ProtoMessage() {}
+func (*GetUserRequest) ProtoMessage() {}
 
-func (x *GetRequest) ProtoReflect() protoreflect.Message {
+func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_service_user_user_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -194,39 +194,39 @@ func (x *GetRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetRequest.ProtoReflect.Descriptor instead.
-func (*GetRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetUserRequest.ProtoReflect.Descriptor instead.
+func (*GetUserRequest) Descriptor() ([]byte, []int) {
 	return file_service_user_user_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *GetRequest) GetID() string {
+func (x *GetUserRequest) GetId() string {
 	if x != nil {
-		return x.ID
+		return x.Id
 	}
 	return ""
 }
 
-type GetResponse struct {
+type GetUserResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	User          *user.User             `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetResponse) Reset() {
-	*x = GetResponse{}
+func (x *GetUserResponse) Reset() {
+	*x = GetUserResponse{}
 	mi := &file_service_user_user_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetResponse) String() string {
+func (x *GetUserResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetResponse) ProtoMessage() {}
+func (*GetUserResponse) ProtoMessage() {}
 
-func (x *GetResponse) ProtoReflect() protoreflect.Message {
+func (x *GetUserResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_service_user_user_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -238,46 +238,46 @@ func (x *GetResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetResponse.ProtoReflect.Descriptor instead.
-func (*GetResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetUserResponse.ProtoReflect.Descriptor instead.
+func (*GetUserResponse) Descriptor() ([]byte, []int) {
 	return file_service_user_user_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *GetResponse) GetUser() *user.User {
+func (x *GetUserResponse) GetUser() *user.User {
 	if x != nil {
 		return x.User
 	}
 	return nil
 }
 
-type GetAllWithFilterRequest struct {
+type ListUsersRequest struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	Email              *string                `protobuf:"bytes,1,opt,name=email,proto3,oneof" json:"email,omitempty"`
-	PhoneNumber        *string                `protobuf:"bytes,2,opt,name=phoneNumber,proto3,oneof" json:"phoneNumber,omitempty"`
-	FirstName          *string                `protobuf:"bytes,3,opt,name=firstName,proto3,oneof" json:"firstName,omitempty"`
-	LastName           *string                `protobuf:"bytes,4,opt,name=lastName,proto3,oneof" json:"lastName,omitempty"`
-	IsDocumentVerified *bool                  `protobuf:"varint,5,opt,name=isDocumentVerified,proto3,oneof" json:"isDocumentVerified,omitempty"`
-	IsEmailVerified    *bool                  `protobuf:"varint,6,opt,name=isEmailVerified,proto3,oneof" json:"isEmailVerified,omitempty"`
-	IsSuspended        *bool                  `protobuf:"varint,7,opt,name=isSuspended,proto3,oneof" json:"isSuspended,omitempty"`
+	PhoneNumber        *string                `protobuf:"bytes,2,opt,name=phone_number,json=phoneNumber,proto3,oneof" json:"phone_number,omitempty"`
+	FirstName          *string                `protobuf:"bytes,3,opt,name=first_name,json=firstName,proto3,oneof" json:"first_name,omitempty"`
+	LastName           *string                `protobuf:"bytes,4,opt,name=last_name,json=lastName,proto3,oneof" json:"last_name,omitempty"`
+	IsDocumentVerified *bool                  `protobuf:"varint,5,opt,name=is_document_verified,json=isDocumentVerified,proto3,oneof" json:"is_document_verified,omitempty"`
+	IsEmailVerified    *bool                  `protobuf:"varint,6,opt,name=is_email_verified,json=isEmailVerified,proto3,oneof" json:"is_email_verified,omitempty"`
+	IsSuspended        *bool                  `protobuf:"varint,7,opt,name=is_suspended,json=isSuspended,proto3,oneof" json:"is_suspended,omitempty"`
 	Pagination         *base.Pagination       `protobuf:"bytes,8,opt,name=pagination,proto3,oneof" json:"pagination,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
 
-func (x *GetAllWithFilterRequest) Reset() {
-	*x = GetAllWithFilterRequest{}
+func (x *ListUsersRequest) Reset() {
+	*x = ListUsersRequest{}
 	mi := &file_service_user_user_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetAllWithFilterRequest) String() string {
+func (x *ListUsersRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetAllWithFilterRequest) ProtoMessage() {}
+func (*ListUsersRequest) ProtoMessage() {}
 
-func (x *GetAllWithFilterRequest) ProtoReflect() protoreflect.Message {
+func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_service_user_user_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -289,88 +289,88 @@ func (x *GetAllWithFilterRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetAllWithFilterRequest.ProtoReflect.Descriptor instead.
-func (*GetAllWithFilterRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use ListUsersRequest.ProtoReflect.Descriptor instead.
+func (*ListUsersRequest) Descriptor() ([]byte, []int) {
 	return file_service_user_user_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *GetAllWithFilterRequest) GetEmail() string {
+func (x *ListUsersRequest) GetEmail() string {
 	if x != nil && x.Email != nil {
 		return *x.Email
 	}
 	return ""
 }
 
-func (x *GetAllWithFilterRequest) GetPhoneNumber() string {
+func (x *ListUsersRequest) GetPhoneNumber() string {
 	if x != nil && x.PhoneNumber != nil {
 		return *x.PhoneNumber
 	}
 	return ""
 }
 
-func (x *GetAllWithFilterRequest) GetFirstName() string {
+func (x *ListUsersRequest) GetFirstName() string {
 	if x != nil && x.FirstName != nil {
 		return *x.FirstName
 	}
 	return ""
 }
 
-func (x *GetAllWithFilterRequest) GetLastName() string {
+func (x *ListUsersRequest) GetLastName() string {
 	if x != nil && x.LastName != nil {
 		return *x.LastName
 	}
 	return ""
 }
 
-func (x *GetAllWithFilterRequest) GetIsDocumentVerified() bool {
+func (x *ListUsersRequest) GetIsDocumentVerified() bool {
 	if x != nil && x.IsDocumentVerified != nil {
 		return *x.IsDocumentVerified
 	}
 	return false
 }
 
-func (x *GetAllWithFilterRequest) GetIsEmailVerified() bool {
+func (x *ListUsersRequest) GetIsEmailVerified() bool {
 	if x != nil && x.IsEmailVerified != nil {
 		return *x.IsEmailVerified
 	}
 	return false
 }
 
-func (x *GetAllWithFilterRequest) GetIsSuspended() bool {
+func (x *ListUsersRequest) GetIsSuspended() bool {
 	if x != nil && x.IsSuspended != nil {
 		return *x.IsSuspended
 	}
 	return false
 }
 
-func (x *GetAllWithFilterRequest) GetPagination() *base.Pagination {
+func (x *ListUsersRequest) GetPagination() *base.Pagination {
 	if x != nil {
 		return x.Pagination
 	}
 	return nil
 }
 
-type GetAllWithFilterResponse struct {
+type ListUsersResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Users         []*user.User           `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetAllWithFilterResponse) Reset() {
-	*x = GetAllWithFilterResponse{}
+func (x *ListUsersResponse) Reset() {
+	*x = ListUsersResponse{}
 	mi := &file_service_user_user_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetAllWithFilterResponse) String() string {
+func (x *ListUsersResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetAllWithFilterResponse) ProtoMessage() {}
+func (*ListUsersResponse) ProtoMessage() {}
 
-func (x *GetAllWithFilterResponse) ProtoReflect() protoreflect.Message {
+func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_service_user_user_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -382,51 +382,51 @@ func (x *GetAllWithFilterResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetAllWithFilterResponse.ProtoReflect.Descriptor instead.
-func (*GetAllWithFilterResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use ListUsersResponse.ProtoReflect.Descriptor instead.
+func (*ListUsersResponse) Descriptor() ([]byte, []int) {
 	return file_service_user_user_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *GetAllWithFilterResponse) GetUsers() []*user.User {
+func (x *ListUsersResponse) GetUsers() []*user.User {
 	if x != nil {
 		return x.Users
 	}
 	return nil
 }
 
-type UpdateRequest struct {
+type UpdateUserRequest struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
-	ID                   string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Id                   string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Email                *string                `protobuf:"bytes,2,opt,name=email,proto3,oneof" json:"email,omitempty"`
-	PhoneNumber          *string                `protobuf:"bytes,3,opt,name=phoneNumber,proto3,oneof" json:"phoneNumber,omitempty"`
-	FirstName            *string                `protobuf:"bytes,4,opt,name=firstName,proto3,oneof" json:"firstName,omitempty"`
-	LastName             *string                `protobuf:"bytes,5,opt,name=lastName,proto3,oneof" json:"lastName,omitempty"`
-	BirthDate            *string                `protobuf:"bytes,6,opt,name=birthDate,proto3,oneof" json:"birthDate,omitempty"`
+	PhoneNumber          *string                `protobuf:"bytes,3,opt,name=phone_number,json=phoneNumber,proto3,oneof" json:"phone_number,omitempty"`
+	FirstName            *string                `protobuf:"bytes,4,opt,name=first_name,json=firstName,proto3,oneof" json:"first_name,omitempty"`
+	LastName             *string                `protobuf:"bytes,5,opt,name=last_name,json=lastName,proto3,oneof" json:"last_name,omitempty"`
+	BirthDate            *string                `protobuf:"bytes,6,opt,name=birth_date,json=birthDate,proto3,oneof" json:"birth_date,omitempty"`
 	Password             *string                `protobuf:"bytes,7,opt,name=password,proto3,oneof" json:"password,omitempty"`
-	PasswordConfirmation *string                `protobuf:"bytes,8,opt,name=passwordConfirmation,proto3,oneof" json:"passwordConfirmation,omitempty"`
-	ProfileImageKey      *string                `protobuf:"bytes,9,opt,name=profileImageKey,proto3,oneof" json:"profileImageKey,omitempty"`
+	PasswordConfirmation *string                `protobuf:"bytes,8,opt,name=password_confirmation,json=passwordConfirmation,proto3,oneof" json:"password_confirmation,omitempty"`
+	ProfileImageKey      *string                `protobuf:"bytes,9,opt,name=profile_image_key,json=profileImageKey,proto3,oneof" json:"profile_image_key,omitempty"`
 	Roles                []string               `protobuf:"bytes,10,rep,name=roles,proto3" json:"roles,omitempty"`
-	IsDocumentVerified   *bool                  `protobuf:"varint,11,opt,name=isDocumentVerified,proto3,oneof" json:"isDocumentVerified,omitempty"`
-	IsEmailVerified      *bool                  `protobuf:"varint,12,opt,name=isEmailVerified,proto3,oneof" json:"isEmailVerified,omitempty"`
-	IsSuspended          *bool                  `protobuf:"varint,13,opt,name=isSuspended,proto3,oneof" json:"isSuspended,omitempty"`
+	IsDocumentVerified   *bool                  `protobuf:"varint,11,opt,name=is_document_verified,json=isDocumentVerified,proto3,oneof" json:"is_document_verified,omitempty"`
+	IsEmailVerified      *bool                  `protobuf:"varint,12,opt,name=is_email_verified,json=isEmailVerified,proto3,oneof" json:"is_email_verified,omitempty"`
+	IsSuspended          *bool                  `protobuf:"varint,13,opt,name=is_suspended,json=isSuspended,proto3,oneof" json:"is_suspended,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
 
-func (x *UpdateRequest) Reset() {
-	*x = UpdateRequest{}
+func (x *UpdateUserRequest) Reset() {
+	*x = UpdateUserRequest{}
 	mi := &file_service_user_user_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UpdateRequest) String() string {
+func (x *UpdateUserRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UpdateRequest) ProtoMessage() {}
+func (*UpdateUserRequest) ProtoMessage() {}
 
-func (x *UpdateRequest) ProtoReflect() protoreflect.Message {
+func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_service_user_user_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -438,123 +438,123 @@ func (x *UpdateRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateRequest.ProtoReflect.Descriptor instead.
-func (*UpdateRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use UpdateUserRequest.ProtoReflect.Descriptor instead.
+func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
 	return file_service_user_user_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *UpdateRequest) GetID() string {
+func (x *UpdateUserRequest) GetId() string {
 	if x != nil {
-		return x.ID
+		return x.Id
 	}
 	return ""
 }
 
-func (x *UpdateRequest) GetEmail() string {
+func (x *UpdateUserRequest) GetEmail() string {
 	if x != nil && x.Email != nil {
 		return *x.Email
 	}
 	return ""
 }
 
-func (x *UpdateRequest) GetPhoneNumber() string {
+func (x *UpdateUserRequest) GetPhoneNumber() string {
 	if x != nil && x.PhoneNumber != nil {
 		return *x.PhoneNumber
 	}
 	return ""
 }
 
-func (x *UpdateRequest) GetFirstName() string {
+func (x *UpdateUserRequest) GetFirstName() string {
 	if x != nil && x.FirstName != nil {
 		return *x.FirstName
 	}
 	return ""
 }
 
-func (x *UpdateRequest) GetLastName() string {
+func (x *UpdateUserRequest) GetLastName() string {
 	if x != nil && x.LastName != nil {
 		return *x.LastName
 	}
 	return ""
 }
 
-func (x *UpdateRequest) GetBirthDate() string {
+func (x *UpdateUserRequest) GetBirthDate() string {
 	if x != nil && x.BirthDate != nil {
 		return *x.BirthDate
 	}
 	return ""
 }
 
-func (x *UpdateRequest) GetPassword() string {
+func (x *UpdateUserRequest) GetPassword() string {
 	if x != nil && x.Password != nil {
 		return *x.Password
 	}
 	return ""
 }
 
-func (x *UpdateRequest) GetPasswordConfirmation() string {
+func (x *UpdateUserRequest) GetPasswordConfirmation() string {
 	if x != nil && x.PasswordConfirmation != nil {
 		return *x.PasswordConfirmation
 	}
 	return ""
 }
 
-func (x *UpdateRequest) GetProfileImageKey() string {
+func (x *UpdateUserRequest) GetProfileImageKey() string {
 	if x != nil && x.ProfileImageKey != nil {
 		return *x.ProfileImageKey
 	}
 	return ""
 }
 
-func (x *UpdateRequest) GetRoles() []string {
+func (x *UpdateUserRequest) GetRoles() []string {
 	if x != nil {
 		return x.Roles
 	}
 	return nil
 }
 
-func (x *UpdateRequest) GetIsDocumentVerified() bool {
+func (x *UpdateUserRequest) GetIsDocumentVerified() bool {
 	if x != nil && x.IsDocumentVerified != nil {
 		return *x.IsDocumentVerified
 	}
 	return false
 }
 
-func (x *UpdateRequest) GetIsEmailVerified() bool {
+func (x *UpdateUserRequest) GetIsEmailVerified() bool {
 	if x != nil && x.IsEmailVerified != nil {
 		return *x.IsEmailVerified
 	}
 	return false
 }
 
-func (x *UpdateRequest) GetIsSuspended() bool {
+func (x *UpdateUserRequest) GetIsSuspended() bool {
 	if x != nil && x.IsSuspended != nil {
 		return *x.IsSuspended
 	}
 	return false
 }
 
-type DeleteRequest struct {
+type DeleteUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *DeleteRequest) Reset() {
-	*x = DeleteRequest{}
+func (x *DeleteUserRequest) Reset() {
+	*x = DeleteUserRequest{}
 	mi := &file_service_user_user_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *DeleteRequest) String() string {
+func (x *DeleteUserRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*DeleteRequest) ProtoMessage() {}
+func (*DeleteUserRequest) ProtoMessage() {}
 
-func (x *DeleteRequest) ProtoReflect() protoreflect.Message {
+func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_service_user_user_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -566,14 +566,14 @@ func (x *DeleteRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteRequest.ProtoReflect.Descriptor instead.
-func (*DeleteRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use DeleteUserRequest.ProtoReflect.Descriptor instead.
+func (*DeleteUserRequest) Descriptor() ([]byte, []int) {
 	return file_service_user_user_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *DeleteRequest) GetID() string {
+func (x *DeleteUserRequest) GetId() string {
 	if x != nil {
-		return x.ID
+		return x.Id
 	}
 	return ""
 }
@@ -582,12 +582,12 @@ func (x *DeleteRequest) GetID() string {
 type RegisterRequest struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
 	Email                string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	PhoneNumber          *string                `protobuf:"bytes,2,opt,name=phoneNumber,proto3,oneof" json:"phoneNumber,omitempty"`
-	FirstName            string                 `protobuf:"bytes,3,opt,name=firstName,proto3" json:"firstName,omitempty"`
-	LastName             string                 `protobuf:"bytes,4,opt,name=lastName,proto3" json:"lastName,omitempty"`
-	BirthDate            string                 `protobuf:"bytes,5,opt,name=birthDate,proto3" json:"birthDate,omitempty"`
+	PhoneNumber          *string                `protobuf:"bytes,2,opt,name=phone_number,json=phoneNumber,proto3,oneof" json:"phone_number,omitempty"`
+	FirstName            string                 `protobuf:"bytes,3,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
+	LastName             string                 `protobuf:"bytes,4,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
+	BirthDate            string                 `protobuf:"bytes,5,opt,name=birth_date,json=birthDate,proto3" json:"birth_date,omitempty"`
 	Password             string                 `protobuf:"bytes,6,opt,name=password,proto3" json:"password,omitempty"`
-	PasswordConfirmation string                 `protobuf:"bytes,7,opt,name=passwordConfirmation,proto3" json:"passwordConfirmation,omitempty"`
+	PasswordConfirmation string                 `protobuf:"bytes,7,opt,name=password_confirmation,json=passwordConfirmation,proto3" json:"password_confirmation,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -673,7 +673,7 @@ func (x *RegisterRequest) GetPasswordConfirmation() string {
 
 type RegisterResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -708,9 +708,9 @@ func (*RegisterResponse) Descriptor() ([]byte, []int) {
 	return file_service_user_user_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *RegisterResponse) GetID() string {
+func (x *RegisterResponse) GetId() string {
 	if x != nil {
-		return x.ID
+		return x.Id
 	}
 	return ""
 }
@@ -718,7 +718,7 @@ func (x *RegisterResponse) GetID() string {
 type SignInRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Email         *string                `protobuf:"bytes,1,opt,name=email,proto3,oneof" json:"email,omitempty"`
-	PhoneNumber   *string                `protobuf:"bytes,2,opt,name=phoneNumber,proto3,oneof" json:"phoneNumber,omitempty"`
+	PhoneNumber   *string                `protobuf:"bytes,2,opt,name=phone_number,json=phoneNumber,proto3,oneof" json:"phone_number,omitempty"`
 	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -777,7 +777,7 @@ func (x *SignInRequest) GetPassword() string {
 
 type SignInResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -812,9 +812,9 @@ func (*SignInResponse) Descriptor() ([]byte, []int) {
 	return file_service_user_user_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *SignInResponse) GetID() string {
+func (x *SignInResponse) GetId() string {
 	if x != nil {
-		return x.ID
+		return x.Id
 	}
 	return ""
 }
@@ -867,8 +867,8 @@ func (x *CheckActivationCodeRequest) GetCode() string {
 // Document
 type CreateDocumentRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ObjectKey     string                 `protobuf:"bytes,2,opt,name=objectKey,proto3" json:"objectKey,omitempty"`
-	ImageType     string                 `protobuf:"bytes,3,opt,name=imageType,proto3" json:"imageType,omitempty"`
+	ObjectKey     string                 `protobuf:"bytes,2,opt,name=object_key,json=objectKey,proto3" json:"object_key,omitempty"`
+	ImageType     string                 `protobuf:"bytes,3,opt,name=image_type,json=imageType,proto3" json:"image_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -919,7 +919,7 @@ func (x *CreateDocumentRequest) GetImageType() string {
 
 type CreateDocumentResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -954,16 +954,16 @@ func (*CreateDocumentResponse) Descriptor() ([]byte, []int) {
 	return file_service_user_user_proto_rawDescGZIP(), []int{14}
 }
 
-func (x *CreateDocumentResponse) GetID() string {
+func (x *CreateDocumentResponse) GetId() string {
 	if x != nil {
-		return x.ID
+		return x.Id
 	}
 	return ""
 }
 
 type GetUploadDocumentDataRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ImageType     string                 `protobuf:"bytes,1,opt,name=imageType,proto3" json:"imageType,omitempty"`
+	ImageType     string                 `protobuf:"bytes,1,opt,name=image_type,json=imageType,proto3" json:"image_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1007,7 +1007,7 @@ func (x *GetUploadDocumentDataRequest) GetImageType() string {
 
 type GetUploadDocumentDataResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UploadData    *base.ImageUploadData  `protobuf:"bytes,1,opt,name=uploadData,proto3" json:"uploadData,omitempty"`
+	UploadData    *base.ImageUploadData  `protobuf:"bytes,1,opt,name=upload_data,json=uploadData,proto3" json:"upload_data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1051,7 +1051,7 @@ func (x *GetUploadDocumentDataResponse) GetUploadData() *base.ImageUploadData {
 
 type GetProcessedDocumentsForUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserID        string                 `protobuf:"bytes,1,opt,name=userID,proto3" json:"userID,omitempty"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1086,9 +1086,9 @@ func (*GetProcessedDocumentsForUserRequest) Descriptor() ([]byte, []int) {
 	return file_service_user_user_proto_rawDescGZIP(), []int{17}
 }
 
-func (x *GetProcessedDocumentsForUserRequest) GetUserID() string {
+func (x *GetProcessedDocumentsForUserRequest) GetUserId() string {
 	if x != nil {
-		return x.UserID
+		return x.UserId
 	}
 	return ""
 }
@@ -1139,7 +1139,7 @@ func (x *GetProcessedDocumentsForUserResponse) GetDocuments() []*user.Document {
 
 type CheckDocumentRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	DocID         string                 `protobuf:"bytes,1,opt,name=docID,proto3" json:"docID,omitempty"`
+	DocId         string                 `protobuf:"bytes,1,opt,name=doc_id,json=docId,proto3" json:"doc_id,omitempty"`
 	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
 	Error         *string                `protobuf:"bytes,3,opt,name=error,proto3,oneof" json:"error,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1176,9 +1176,9 @@ func (*CheckDocumentRequest) Descriptor() ([]byte, []int) {
 	return file_service_user_user_proto_rawDescGZIP(), []int{19}
 }
 
-func (x *CheckDocumentRequest) GetDocID() string {
+func (x *CheckDocumentRequest) GetDocId() string {
 	if x != nil {
-		return x.DocID
+		return x.DocId
 	}
 	return ""
 }
@@ -1201,125 +1201,135 @@ var File_service_user_user_proto protoreflect.FileDescriptor
 
 const file_service_user_user_proto_rawDesc = "" +
 	"\n" +
-	"\x17service/user/user.proto\x12\fservice.user\x1a\x14base/user/user.proto\x1a\x12base/common.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x15service/common.proto\"\x84\x02\n" +
-	"\rCreateRequest\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email\x12%\n" +
-	"\vphoneNumber\x18\x02 \x01(\tH\x00R\vphoneNumber\x88\x01\x01\x12\x1c\n" +
-	"\tfirstName\x18\x03 \x01(\tR\tfirstName\x12\x1a\n" +
-	"\blastName\x18\x04 \x01(\tR\blastName\x12\x1c\n" +
-	"\tbirthDate\x18\x05 \x01(\tR\tbirthDate\x12\x1a\n" +
-	"\bpassword\x18\x06 \x01(\tR\bpassword\x122\n" +
-	"\x14passwordConfirmation\x18\a \x01(\tR\x14passwordConfirmationB\x0e\n" +
-	"\f_phoneNumber\",\n" +
-	"\x0eCreateResponse\x12\x13\n" +
-	"\x02ID\x18\x01 \x01(\tH\x00R\x02ID\x88\x01\x01B\x05\n" +
-	"\x03_ID\"\x1c\n" +
+	"\x17service/user/user.proto\x12\fservice.user\x1a\x14base/user/user.proto\x1a\x11base/common.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x14service/common.proto\"\x8e\x02\n" +
+	"\x11CreateUserRequest\x12\x14\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x12&\n" +
+	"\fphone_number\x18\x02 \x01(\tH\x00R\vphoneNumber\x88\x01\x01\x12\x1d\n" +
 	"\n" +
-	"GetRequest\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\"2\n" +
-	"\vGetResponse\x12#\n" +
-	"\x04user\x18\x01 \x01(\v2\x0f.base.user.UserR\x04user\"\xe0\x03\n" +
-	"\x17GetAllWithFilterRequest\x12\x19\n" +
-	"\x05email\x18\x01 \x01(\tH\x00R\x05email\x88\x01\x01\x12%\n" +
-	"\vphoneNumber\x18\x02 \x01(\tH\x01R\vphoneNumber\x88\x01\x01\x12!\n" +
-	"\tfirstName\x18\x03 \x01(\tH\x02R\tfirstName\x88\x01\x01\x12\x1f\n" +
-	"\blastName\x18\x04 \x01(\tH\x03R\blastName\x88\x01\x01\x123\n" +
-	"\x12isDocumentVerified\x18\x05 \x01(\bH\x04R\x12isDocumentVerified\x88\x01\x01\x12-\n" +
-	"\x0fisEmailVerified\x18\x06 \x01(\bH\x05R\x0fisEmailVerified\x88\x01\x01\x12%\n" +
-	"\visSuspended\x18\a \x01(\bH\x06R\visSuspended\x88\x01\x01\x125\n" +
+	"first_name\x18\x03 \x01(\tR\tfirstName\x12\x1b\n" +
+	"\tlast_name\x18\x04 \x01(\tR\blastName\x12\x1d\n" +
+	"\n" +
+	"birth_date\x18\x05 \x01(\tR\tbirthDate\x12\x1a\n" +
+	"\bpassword\x18\x06 \x01(\tR\bpassword\x123\n" +
+	"\x15password_confirmation\x18\a \x01(\tR\x14passwordConfirmationB\x0f\n" +
+	"\r_phone_number\"0\n" +
+	"\x12CreateUserResponse\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01B\x05\n" +
+	"\x03_id\" \n" +
+	"\x0eGetUserRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"6\n" +
+	"\x0fGetUserResponse\x12#\n" +
+	"\x04user\x18\x01 \x01(\v2\x0f.base.user.UserR\x04user\"\xe9\x03\n" +
+	"\x10ListUsersRequest\x12\x19\n" +
+	"\x05email\x18\x01 \x01(\tH\x00R\x05email\x88\x01\x01\x12&\n" +
+	"\fphone_number\x18\x02 \x01(\tH\x01R\vphoneNumber\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"first_name\x18\x03 \x01(\tH\x02R\tfirstName\x88\x01\x01\x12 \n" +
+	"\tlast_name\x18\x04 \x01(\tH\x03R\blastName\x88\x01\x01\x125\n" +
+	"\x14is_document_verified\x18\x05 \x01(\bH\x04R\x12isDocumentVerified\x88\x01\x01\x12/\n" +
+	"\x11is_email_verified\x18\x06 \x01(\bH\x05R\x0fisEmailVerified\x88\x01\x01\x12&\n" +
+	"\fis_suspended\x18\a \x01(\bH\x06R\visSuspended\x88\x01\x01\x125\n" +
 	"\n" +
 	"pagination\x18\b \x01(\v2\x10.base.PaginationH\aR\n" +
 	"pagination\x88\x01\x01B\b\n" +
-	"\x06_emailB\x0e\n" +
-	"\f_phoneNumberB\f\n" +
+	"\x06_emailB\x0f\n" +
+	"\r_phone_numberB\r\n" +
+	"\v_first_nameB\f\n" +
 	"\n" +
-	"_firstNameB\v\n" +
-	"\t_lastNameB\x15\n" +
-	"\x13_isDocumentVerifiedB\x12\n" +
-	"\x10_isEmailVerifiedB\x0e\n" +
-	"\f_isSuspendedB\r\n" +
-	"\v_pagination\"A\n" +
-	"\x18GetAllWithFilterResponse\x12%\n" +
-	"\x05users\x18\x01 \x03(\v2\x0f.base.user.UserR\x05users\"\xaa\x05\n" +
-	"\rUpdateRequest\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\x12\x19\n" +
-	"\x05email\x18\x02 \x01(\tH\x00R\x05email\x88\x01\x01\x12%\n" +
-	"\vphoneNumber\x18\x03 \x01(\tH\x01R\vphoneNumber\x88\x01\x01\x12!\n" +
-	"\tfirstName\x18\x04 \x01(\tH\x02R\tfirstName\x88\x01\x01\x12\x1f\n" +
-	"\blastName\x18\x05 \x01(\tH\x03R\blastName\x88\x01\x01\x12!\n" +
-	"\tbirthDate\x18\x06 \x01(\tH\x04R\tbirthDate\x88\x01\x01\x12\x1f\n" +
-	"\bpassword\x18\a \x01(\tH\x05R\bpassword\x88\x01\x01\x127\n" +
-	"\x14passwordConfirmation\x18\b \x01(\tH\x06R\x14passwordConfirmation\x88\x01\x01\x12-\n" +
-	"\x0fprofileImageKey\x18\t \x01(\tH\aR\x0fprofileImageKey\x88\x01\x01\x12\x14\n" +
+	"_last_nameB\x17\n" +
+	"\x15_is_document_verifiedB\x14\n" +
+	"\x12_is_email_verifiedB\x0f\n" +
+	"\r_is_suspendedB\r\n" +
+	"\v_pagination\":\n" +
+	"\x11ListUsersResponse\x12%\n" +
+	"\x05users\x18\x01 \x03(\v2\x0f.base.user.UserR\x05users\"\xc6\x05\n" +
+	"\x11UpdateUserRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
+	"\x05email\x18\x02 \x01(\tH\x00R\x05email\x88\x01\x01\x12&\n" +
+	"\fphone_number\x18\x03 \x01(\tH\x01R\vphoneNumber\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"first_name\x18\x04 \x01(\tH\x02R\tfirstName\x88\x01\x01\x12 \n" +
+	"\tlast_name\x18\x05 \x01(\tH\x03R\blastName\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"birth_date\x18\x06 \x01(\tH\x04R\tbirthDate\x88\x01\x01\x12\x1f\n" +
+	"\bpassword\x18\a \x01(\tH\x05R\bpassword\x88\x01\x01\x128\n" +
+	"\x15password_confirmation\x18\b \x01(\tH\x06R\x14passwordConfirmation\x88\x01\x01\x12/\n" +
+	"\x11profile_image_key\x18\t \x01(\tH\aR\x0fprofileImageKey\x88\x01\x01\x12\x14\n" +
 	"\x05roles\x18\n" +
-	" \x03(\tR\x05roles\x123\n" +
-	"\x12isDocumentVerified\x18\v \x01(\bH\bR\x12isDocumentVerified\x88\x01\x01\x12-\n" +
-	"\x0fisEmailVerified\x18\f \x01(\bH\tR\x0fisEmailVerified\x88\x01\x01\x12%\n" +
-	"\visSuspended\x18\r \x01(\bH\n" +
+	" \x03(\tR\x05roles\x125\n" +
+	"\x14is_document_verified\x18\v \x01(\bH\bR\x12isDocumentVerified\x88\x01\x01\x12/\n" +
+	"\x11is_email_verified\x18\f \x01(\bH\tR\x0fisEmailVerified\x88\x01\x01\x12&\n" +
+	"\fis_suspended\x18\r \x01(\bH\n" +
 	"R\visSuspended\x88\x01\x01B\b\n" +
-	"\x06_emailB\x0e\n" +
-	"\f_phoneNumberB\f\n" +
+	"\x06_emailB\x0f\n" +
+	"\r_phone_numberB\r\n" +
+	"\v_first_nameB\f\n" +
 	"\n" +
-	"_firstNameB\v\n" +
-	"\t_lastNameB\f\n" +
-	"\n" +
-	"_birthDateB\v\n" +
-	"\t_passwordB\x17\n" +
-	"\x15_passwordConfirmationB\x12\n" +
-	"\x10_profileImageKeyB\x15\n" +
-	"\x13_isDocumentVerifiedB\x12\n" +
-	"\x10_isEmailVerifiedB\x0e\n" +
-	"\f_isSuspended\"\x1f\n" +
-	"\rDeleteRequest\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\"\x86\x02\n" +
+	"_last_nameB\r\n" +
+	"\v_birth_dateB\v\n" +
+	"\t_passwordB\x18\n" +
+	"\x16_password_confirmationB\x14\n" +
+	"\x12_profile_image_keyB\x17\n" +
+	"\x15_is_document_verifiedB\x14\n" +
+	"\x12_is_email_verifiedB\x0f\n" +
+	"\r_is_suspended\"#\n" +
+	"\x11DeleteUserRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x8c\x02\n" +
 	"\x0fRegisterRequest\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email\x12%\n" +
-	"\vphoneNumber\x18\x02 \x01(\tH\x00R\vphoneNumber\x88\x01\x01\x12\x1c\n" +
-	"\tfirstName\x18\x03 \x01(\tR\tfirstName\x12\x1a\n" +
-	"\blastName\x18\x04 \x01(\tR\blastName\x12\x1c\n" +
-	"\tbirthDate\x18\x05 \x01(\tR\tbirthDate\x12\x1a\n" +
-	"\bpassword\x18\x06 \x01(\tR\bpassword\x122\n" +
-	"\x14passwordConfirmation\x18\a \x01(\tR\x14passwordConfirmationB\x0e\n" +
-	"\f_phoneNumber\"\"\n" +
-	"\x10RegisterResponse\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\"\x87\x01\n" +
-	"\rSignInRequest\x12\x19\n" +
-	"\x05email\x18\x01 \x01(\tH\x00R\x05email\x88\x01\x01\x12%\n" +
-	"\vphoneNumber\x18\x02 \x01(\tH\x01R\vphoneNumber\x88\x01\x01\x12\x1a\n" +
-	"\bpassword\x18\x03 \x01(\tR\bpasswordB\b\n" +
-	"\x06_emailB\x0e\n" +
-	"\f_phoneNumber\" \n" +
-	"\x0eSignInResponse\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\"0\n" +
-	"\x1aCheckActivationCodeRequest\x12\x12\n" +
-	"\x04code\x18\x01 \x01(\tR\x04code\"S\n" +
-	"\x15CreateDocumentRequest\x12\x1c\n" +
-	"\tobjectKey\x18\x02 \x01(\tR\tobjectKey\x12\x1c\n" +
-	"\timageType\x18\x03 \x01(\tR\timageType\"(\n" +
-	"\x16CreateDocumentResponse\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\"<\n" +
-	"\x1cGetUploadDocumentDataRequest\x12\x1c\n" +
-	"\timageType\x18\x01 \x01(\tR\timageType\"V\n" +
-	"\x1dGetUploadDocumentDataResponse\x125\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x12&\n" +
+	"\fphone_number\x18\x02 \x01(\tH\x00R\vphoneNumber\x88\x01\x01\x12\x1d\n" +
 	"\n" +
-	"uploadData\x18\x01 \x01(\v2\x15.base.ImageUploadDataR\n" +
-	"uploadData\"=\n" +
-	"#GetProcessedDocumentsForUserRequest\x12\x16\n" +
-	"\x06userID\x18\x01 \x01(\tR\x06userID\"Y\n" +
+	"first_name\x18\x03 \x01(\tR\tfirstName\x12\x1b\n" +
+	"\tlast_name\x18\x04 \x01(\tR\blastName\x12\x1d\n" +
+	"\n" +
+	"birth_date\x18\x05 \x01(\tR\tbirthDate\x12\x1a\n" +
+	"\bpassword\x18\x06 \x01(\tR\bpassword\x123\n" +
+	"\x15password_confirmation\x18\a \x01(\tR\x14passwordConfirmationB\x0f\n" +
+	"\r_phone_number\"\"\n" +
+	"\x10RegisterResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x89\x01\n" +
+	"\rSignInRequest\x12\x19\n" +
+	"\x05email\x18\x01 \x01(\tH\x00R\x05email\x88\x01\x01\x12&\n" +
+	"\fphone_number\x18\x02 \x01(\tH\x01R\vphoneNumber\x88\x01\x01\x12\x1a\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpasswordB\b\n" +
+	"\x06_emailB\x0f\n" +
+	"\r_phone_number\" \n" +
+	"\x0eSignInResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"0\n" +
+	"\x1aCheckActivationCodeRequest\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\tR\x04code\"U\n" +
+	"\x15CreateDocumentRequest\x12\x1d\n" +
+	"\n" +
+	"object_key\x18\x02 \x01(\tR\tobjectKey\x12\x1d\n" +
+	"\n" +
+	"image_type\x18\x03 \x01(\tR\timageType\"(\n" +
+	"\x16CreateDocumentResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"=\n" +
+	"\x1cGetUploadDocumentDataRequest\x12\x1d\n" +
+	"\n" +
+	"image_type\x18\x01 \x01(\tR\timageType\"W\n" +
+	"\x1dGetUploadDocumentDataResponse\x126\n" +
+	"\vupload_data\x18\x01 \x01(\v2\x15.base.ImageUploadDataR\n" +
+	"uploadData\">\n" +
+	"#GetProcessedDocumentsForUserRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"Y\n" +
 	"$GetProcessedDocumentsForUserResponse\x121\n" +
-	"\tdocuments\x18\x01 \x03(\v2\x13.base.user.DocumentR\tdocuments\"i\n" +
-	"\x14CheckDocumentRequest\x12\x14\n" +
-	"\x05docID\x18\x01 \x01(\tR\x05docID\x12\x16\n" +
+	"\tdocuments\x18\x01 \x03(\v2\x13.base.user.DocumentR\tdocuments\"j\n" +
+	"\x14CheckDocumentRequest\x12\x15\n" +
+	"\x06doc_id\x18\x01 \x01(\tR\x05docId\x12\x16\n" +
 	"\x06status\x18\x02 \x01(\tR\x06status\x12\x19\n" +
 	"\x05error\x18\x03 \x01(\tH\x00R\x05error\x88\x01\x01B\b\n" +
-	"\x06_error2\x84\t\n" +
+	"\x06_error2\x97\t\n" +
 	"\vUserService\x12@\n" +
-	"\x06Health\x12\x16.google.protobuf.Empty\x1a\x1e.service.ServiceHealthResponse\x12C\n" +
-	"\x06Create\x12\x1b.service.user.CreateRequest\x1a\x1c.service.user.CreateResponse\x12:\n" +
-	"\x03Get\x12\x18.service.user.GetRequest\x1a\x19.service.user.GetResponse\x12a\n" +
-	"\x10GetAllWithFilter\x12%.service.user.GetAllWithFilterRequest\x1a&.service.user.GetAllWithFilterResponse\x12=\n" +
-	"\x06Update\x12\x1b.service.user.UpdateRequest\x1a\x16.google.protobuf.Empty\x12=\n" +
-	"\x06Delete\x12\x1b.service.user.DeleteRequest\x1a\x16.google.protobuf.Empty\x12I\n" +
+	"\x06Health\x12\x16.google.protobuf.Empty\x1a\x1e.service.ServiceHealthResponse\x12O\n" +
+	"\n" +
+	"CreateUser\x12\x1f.service.user.CreateUserRequest\x1a .service.user.CreateUserResponse\x12F\n" +
+	"\aGetUser\x12\x1c.service.user.GetUserRequest\x1a\x1d.service.user.GetUserResponse\x12L\n" +
+	"\tListUsers\x12\x1e.service.user.ListUsersRequest\x1a\x1f.service.user.ListUsersResponse\x12E\n" +
+	"\n" +
+	"UpdateUser\x12\x1f.service.user.UpdateUserRequest\x1a\x16.google.protobuf.Empty\x12E\n" +
+	"\n" +
+	"DeleteUser\x12\x1f.service.user.DeleteUserRequest\x1a\x16.google.protobuf.Empty\x12I\n" +
 	"\bRegister\x12\x1d.service.user.RegisterRequest\x1a\x1e.service.user.RegisterResponse\x12C\n" +
 	"\x06SignIn\x12\x1b.service.user.SignInRequest\x1a\x1c.service.user.SignInResponse\x12D\n" +
 	"\x12SendActivationCode\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\x12W\n" +
@@ -1343,14 +1353,14 @@ func file_service_user_user_proto_rawDescGZIP() []byte {
 
 var file_service_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_service_user_user_proto_goTypes = []any{
-	(*CreateRequest)(nil),                        // 0: service.user.CreateRequest
-	(*CreateResponse)(nil),                       // 1: service.user.CreateResponse
-	(*GetRequest)(nil),                           // 2: service.user.GetRequest
-	(*GetResponse)(nil),                          // 3: service.user.GetResponse
-	(*GetAllWithFilterRequest)(nil),              // 4: service.user.GetAllWithFilterRequest
-	(*GetAllWithFilterResponse)(nil),             // 5: service.user.GetAllWithFilterResponse
-	(*UpdateRequest)(nil),                        // 6: service.user.UpdateRequest
-	(*DeleteRequest)(nil),                        // 7: service.user.DeleteRequest
+	(*CreateUserRequest)(nil),                    // 0: service.user.CreateUserRequest
+	(*CreateUserResponse)(nil),                   // 1: service.user.CreateUserResponse
+	(*GetUserRequest)(nil),                       // 2: service.user.GetUserRequest
+	(*GetUserResponse)(nil),                      // 3: service.user.GetUserResponse
+	(*ListUsersRequest)(nil),                     // 4: service.user.ListUsersRequest
+	(*ListUsersResponse)(nil),                    // 5: service.user.ListUsersResponse
+	(*UpdateUserRequest)(nil),                    // 6: service.user.UpdateUserRequest
+	(*DeleteUserRequest)(nil),                    // 7: service.user.DeleteUserRequest
 	(*RegisterRequest)(nil),                      // 8: service.user.RegisterRequest
 	(*RegisterResponse)(nil),                     // 9: service.user.RegisterResponse
 	(*SignInRequest)(nil),                        // 10: service.user.SignInRequest
@@ -1371,17 +1381,17 @@ var file_service_user_user_proto_goTypes = []any{
 	(*service.ServiceHealthResponse)(nil),        // 25: service.ServiceHealthResponse
 }
 var file_service_user_user_proto_depIdxs = []int32{
-	20, // 0: service.user.GetResponse.user:type_name -> base.user.User
-	21, // 1: service.user.GetAllWithFilterRequest.pagination:type_name -> base.Pagination
-	20, // 2: service.user.GetAllWithFilterResponse.users:type_name -> base.user.User
-	22, // 3: service.user.GetUploadDocumentDataResponse.uploadData:type_name -> base.ImageUploadData
+	20, // 0: service.user.GetUserResponse.user:type_name -> base.user.User
+	21, // 1: service.user.ListUsersRequest.pagination:type_name -> base.Pagination
+	20, // 2: service.user.ListUsersResponse.users:type_name -> base.user.User
+	22, // 3: service.user.GetUploadDocumentDataResponse.upload_data:type_name -> base.ImageUploadData
 	23, // 4: service.user.GetProcessedDocumentsForUserResponse.documents:type_name -> base.user.Document
 	24, // 5: service.user.UserService.Health:input_type -> google.protobuf.Empty
-	0,  // 6: service.user.UserService.Create:input_type -> service.user.CreateRequest
-	2,  // 7: service.user.UserService.Get:input_type -> service.user.GetRequest
-	4,  // 8: service.user.UserService.GetAllWithFilter:input_type -> service.user.GetAllWithFilterRequest
-	6,  // 9: service.user.UserService.Update:input_type -> service.user.UpdateRequest
-	7,  // 10: service.user.UserService.Delete:input_type -> service.user.DeleteRequest
+	0,  // 6: service.user.UserService.CreateUser:input_type -> service.user.CreateUserRequest
+	2,  // 7: service.user.UserService.GetUser:input_type -> service.user.GetUserRequest
+	4,  // 8: service.user.UserService.ListUsers:input_type -> service.user.ListUsersRequest
+	6,  // 9: service.user.UserService.UpdateUser:input_type -> service.user.UpdateUserRequest
+	7,  // 10: service.user.UserService.DeleteUser:input_type -> service.user.DeleteUserRequest
 	8,  // 11: service.user.UserService.Register:input_type -> service.user.RegisterRequest
 	10, // 12: service.user.UserService.SignIn:input_type -> service.user.SignInRequest
 	24, // 13: service.user.UserService.SendActivationCode:input_type -> google.protobuf.Empty
@@ -1391,11 +1401,11 @@ var file_service_user_user_proto_depIdxs = []int32{
 	17, // 17: service.user.UserService.GetProcessedDocumentsForUser:input_type -> service.user.GetProcessedDocumentsForUserRequest
 	19, // 18: service.user.UserService.CheckDocument:input_type -> service.user.CheckDocumentRequest
 	25, // 19: service.user.UserService.Health:output_type -> service.ServiceHealthResponse
-	1,  // 20: service.user.UserService.Create:output_type -> service.user.CreateResponse
-	3,  // 21: service.user.UserService.Get:output_type -> service.user.GetResponse
-	5,  // 22: service.user.UserService.GetAllWithFilter:output_type -> service.user.GetAllWithFilterResponse
-	24, // 23: service.user.UserService.Update:output_type -> google.protobuf.Empty
-	24, // 24: service.user.UserService.Delete:output_type -> google.protobuf.Empty
+	1,  // 20: service.user.UserService.CreateUser:output_type -> service.user.CreateUserResponse
+	3,  // 21: service.user.UserService.GetUser:output_type -> service.user.GetUserResponse
+	5,  // 22: service.user.UserService.ListUsers:output_type -> service.user.ListUsersResponse
+	24, // 23: service.user.UserService.UpdateUser:output_type -> google.protobuf.Empty
+	24, // 24: service.user.UserService.DeleteUser:output_type -> google.protobuf.Empty
 	9,  // 25: service.user.UserService.Register:output_type -> service.user.RegisterResponse
 	11, // 26: service.user.UserService.SignIn:output_type -> service.user.SignInResponse
 	24, // 27: service.user.UserService.SendActivationCode:output_type -> google.protobuf.Empty

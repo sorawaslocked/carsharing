@@ -7,9 +7,11 @@
 package car
 
 import (
+	base "github.com/sorawaslocked/car-rental-protos/gen/base"
 	car "github.com/sorawaslocked/car-rental-protos/gen/base/car"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -22,19 +24,18 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// CreateCarModel
 type CreateCarModelRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Brand         string                 `protobuf:"bytes,1,opt,name=brand,proto3" json:"brand,omitempty"`
 	Model         string                 `protobuf:"bytes,2,opt,name=model,proto3" json:"model,omitempty"`
 	Year          int32                  `protobuf:"varint,3,opt,name=year,proto3" json:"year,omitempty"`
-	FuelType      string                 `protobuf:"bytes,4,opt,name=fuelType,proto3" json:"fuelType,omitempty"`
+	FuelType      string                 `protobuf:"bytes,4,opt,name=fuel_type,json=fuelType,proto3" json:"fuel_type,omitempty"`
 	Transmission  string                 `protobuf:"bytes,5,opt,name=transmission,proto3" json:"transmission,omitempty"`
-	BodyType      string                 `protobuf:"bytes,6,opt,name=bodyType,proto3" json:"bodyType,omitempty"`
+	BodyType      string                 `protobuf:"bytes,6,opt,name=body_type,json=bodyType,proto3" json:"body_type,omitempty"`
 	Class         string                 `protobuf:"bytes,7,opt,name=class,proto3" json:"class,omitempty"`
 	Seats         int32                  `protobuf:"varint,8,opt,name=seats,proto3" json:"seats,omitempty"`
-	EngineVolume  *float32               `protobuf:"fixed32,9,opt,name=engineVolume,proto3,oneof" json:"engineVolume,omitempty"`
-	RangeKM       int32                  `protobuf:"varint,10,opt,name=rangeKM,proto3" json:"rangeKM,omitempty"`
+	EngineVolume  *float32               `protobuf:"fixed32,9,opt,name=engine_volume,json=engineVolume,proto3,oneof" json:"engine_volume,omitempty"`
+	RangeKm       int32                  `protobuf:"varint,10,opt,name=range_km,json=rangeKm,proto3" json:"range_km,omitempty"`
 	Features      []string               `protobuf:"bytes,11,rep,name=features,proto3" json:"features,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -133,9 +134,9 @@ func (x *CreateCarModelRequest) GetEngineVolume() float32 {
 	return 0
 }
 
-func (x *CreateCarModelRequest) GetRangeKM() int32 {
+func (x *CreateCarModelRequest) GetRangeKm() int32 {
 	if x != nil {
-		return x.RangeKM
+		return x.RangeKm
 	}
 	return 0
 }
@@ -149,7 +150,7 @@ func (x *CreateCarModelRequest) GetFeatures() []string {
 
 type CreateCarModelResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -184,17 +185,16 @@ func (*CreateCarModelResponse) Descriptor() ([]byte, []int) {
 	return file_service_car_car_model_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *CreateCarModelResponse) GetID() string {
+func (x *CreateCarModelResponse) GetId() string {
 	if x != nil {
-		return x.ID
+		return x.Id
 	}
 	return ""
 }
 
-// GetCarModel
 type GetCarModelRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -229,16 +229,16 @@ func (*GetCarModelRequest) Descriptor() ([]byte, []int) {
 	return file_service_car_car_model_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *GetCarModelRequest) GetID() string {
+func (x *GetCarModelRequest) GetId() string {
 	if x != nil {
-		return x.ID
+		return x.Id
 	}
 	return ""
 }
 
 type GetCarModelResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CarModel      *car.CarModel          `protobuf:"bytes,1,opt,name=carModel,proto3" json:"carModel,omitempty"`
+	CarModel      *car.CarModel          `protobuf:"bytes,1,opt,name=car_model,json=carModel,proto3" json:"car_model,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -280,36 +280,34 @@ func (x *GetCarModelResponse) GetCarModel() *car.CarModel {
 	return nil
 }
 
-// GetCarModels
-type GetCarModelsRequest struct {
+type ListCarModelsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Brand         *string                `protobuf:"bytes,1,opt,name=brand,proto3,oneof" json:"brand,omitempty"`
 	Model         *string                `protobuf:"bytes,2,opt,name=model,proto3,oneof" json:"model,omitempty"`
-	FuelType      *string                `protobuf:"bytes,3,opt,name=fuelType,proto3,oneof" json:"fuelType,omitempty"`
+	FuelType      *string                `protobuf:"bytes,3,opt,name=fuel_type,json=fuelType,proto3,oneof" json:"fuel_type,omitempty"`
 	Transmission  *string                `protobuf:"bytes,4,opt,name=transmission,proto3,oneof" json:"transmission,omitempty"`
-	BodyType      *string                `protobuf:"bytes,5,opt,name=bodyType,proto3,oneof" json:"bodyType,omitempty"`
+	BodyType      *string                `protobuf:"bytes,5,opt,name=body_type,json=bodyType,proto3,oneof" json:"body_type,omitempty"`
 	Class         *string                `protobuf:"bytes,6,opt,name=class,proto3,oneof" json:"class,omitempty"`
-	MinSeats      *int32                 `protobuf:"varint,7,opt,name=minSeats,proto3,oneof" json:"minSeats,omitempty"`
-	Limit         *int64                 `protobuf:"varint,8,opt,name=limit,proto3,oneof" json:"limit,omitempty"`
-	Offset        *int64                 `protobuf:"varint,9,opt,name=offset,proto3,oneof" json:"offset,omitempty"`
+	MinSeats      *int32                 `protobuf:"varint,7,opt,name=min_seats,json=minSeats,proto3,oneof" json:"min_seats,omitempty"`
+	Pagination    *base.Pagination       `protobuf:"bytes,8,opt,name=pagination,proto3,oneof" json:"pagination,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetCarModelsRequest) Reset() {
-	*x = GetCarModelsRequest{}
+func (x *ListCarModelsRequest) Reset() {
+	*x = ListCarModelsRequest{}
 	mi := &file_service_car_car_model_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetCarModelsRequest) String() string {
+func (x *ListCarModelsRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetCarModelsRequest) ProtoMessage() {}
+func (*ListCarModelsRequest) ProtoMessage() {}
 
-func (x *GetCarModelsRequest) ProtoReflect() protoreflect.Message {
+func (x *ListCarModelsRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_service_car_car_model_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -321,95 +319,88 @@ func (x *GetCarModelsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetCarModelsRequest.ProtoReflect.Descriptor instead.
-func (*GetCarModelsRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use ListCarModelsRequest.ProtoReflect.Descriptor instead.
+func (*ListCarModelsRequest) Descriptor() ([]byte, []int) {
 	return file_service_car_car_model_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *GetCarModelsRequest) GetBrand() string {
+func (x *ListCarModelsRequest) GetBrand() string {
 	if x != nil && x.Brand != nil {
 		return *x.Brand
 	}
 	return ""
 }
 
-func (x *GetCarModelsRequest) GetModel() string {
+func (x *ListCarModelsRequest) GetModel() string {
 	if x != nil && x.Model != nil {
 		return *x.Model
 	}
 	return ""
 }
 
-func (x *GetCarModelsRequest) GetFuelType() string {
+func (x *ListCarModelsRequest) GetFuelType() string {
 	if x != nil && x.FuelType != nil {
 		return *x.FuelType
 	}
 	return ""
 }
 
-func (x *GetCarModelsRequest) GetTransmission() string {
+func (x *ListCarModelsRequest) GetTransmission() string {
 	if x != nil && x.Transmission != nil {
 		return *x.Transmission
 	}
 	return ""
 }
 
-func (x *GetCarModelsRequest) GetBodyType() string {
+func (x *ListCarModelsRequest) GetBodyType() string {
 	if x != nil && x.BodyType != nil {
 		return *x.BodyType
 	}
 	return ""
 }
 
-func (x *GetCarModelsRequest) GetClass() string {
+func (x *ListCarModelsRequest) GetClass() string {
 	if x != nil && x.Class != nil {
 		return *x.Class
 	}
 	return ""
 }
 
-func (x *GetCarModelsRequest) GetMinSeats() int32 {
+func (x *ListCarModelsRequest) GetMinSeats() int32 {
 	if x != nil && x.MinSeats != nil {
 		return *x.MinSeats
 	}
 	return 0
 }
 
-func (x *GetCarModelsRequest) GetLimit() int64 {
-	if x != nil && x.Limit != nil {
-		return *x.Limit
+func (x *ListCarModelsRequest) GetPagination() *base.Pagination {
+	if x != nil {
+		return x.Pagination
 	}
-	return 0
+	return nil
 }
 
-func (x *GetCarModelsRequest) GetOffset() int64 {
-	if x != nil && x.Offset != nil {
-		return *x.Offset
-	}
-	return 0
-}
-
-type GetCarModelsResponse struct {
+type ListCarModelsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CarModels     []*car.CarModel        `protobuf:"bytes,1,rep,name=carModels,proto3" json:"carModels,omitempty"`
+	CarModels     []*car.CarModel        `protobuf:"bytes,1,rep,name=car_models,json=carModels,proto3" json:"car_models,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetCarModelsResponse) Reset() {
-	*x = GetCarModelsResponse{}
+func (x *ListCarModelsResponse) Reset() {
+	*x = ListCarModelsResponse{}
 	mi := &file_service_car_car_model_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetCarModelsResponse) String() string {
+func (x *ListCarModelsResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetCarModelsResponse) ProtoMessage() {}
+func (*ListCarModelsResponse) ProtoMessage() {}
 
-func (x *GetCarModelsResponse) ProtoReflect() protoreflect.Message {
+func (x *ListCarModelsResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_service_car_car_model_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -421,33 +412,33 @@ func (x *GetCarModelsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetCarModelsResponse.ProtoReflect.Descriptor instead.
-func (*GetCarModelsResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use ListCarModelsResponse.ProtoReflect.Descriptor instead.
+func (*ListCarModelsResponse) Descriptor() ([]byte, []int) {
 	return file_service_car_car_model_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *GetCarModelsResponse) GetCarModels() []*car.CarModel {
+func (x *ListCarModelsResponse) GetCarModels() []*car.CarModel {
 	if x != nil {
 		return x.CarModels
 	}
 	return nil
 }
 
-// UpdateCarModel
 type UpdateCarModelRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Brand         *string                `protobuf:"bytes,2,opt,name=brand,proto3,oneof" json:"brand,omitempty"`
 	Model         *string                `protobuf:"bytes,3,opt,name=model,proto3,oneof" json:"model,omitempty"`
 	Year          *int32                 `protobuf:"varint,4,opt,name=year,proto3,oneof" json:"year,omitempty"`
-	FuelType      *string                `protobuf:"bytes,5,opt,name=fuelType,proto3,oneof" json:"fuelType,omitempty"`
+	FuelType      *string                `protobuf:"bytes,5,opt,name=fuel_type,json=fuelType,proto3,oneof" json:"fuel_type,omitempty"`
 	Transmission  *string                `protobuf:"bytes,6,opt,name=transmission,proto3,oneof" json:"transmission,omitempty"`
-	BodyType      *string                `protobuf:"bytes,7,opt,name=bodyType,proto3,oneof" json:"bodyType,omitempty"`
+	BodyType      *string                `protobuf:"bytes,7,opt,name=body_type,json=bodyType,proto3,oneof" json:"body_type,omitempty"`
 	Class         *string                `protobuf:"bytes,8,opt,name=class,proto3,oneof" json:"class,omitempty"`
 	Seats         *int32                 `protobuf:"varint,9,opt,name=seats,proto3,oneof" json:"seats,omitempty"`
-	EngineVolume  *float32               `protobuf:"fixed32,10,opt,name=engineVolume,proto3,oneof" json:"engineVolume,omitempty"`
-	RangeKM       *int32                 `protobuf:"varint,11,opt,name=rangeKM,proto3,oneof" json:"rangeKM,omitempty"`
+	EngineVolume  *float32               `protobuf:"fixed32,10,opt,name=engine_volume,json=engineVolume,proto3,oneof" json:"engine_volume,omitempty"`
+	RangeKm       *int32                 `protobuf:"varint,11,opt,name=range_km,json=rangeKm,proto3,oneof" json:"range_km,omitempty"`
 	Features      []string               `protobuf:"bytes,12,rep,name=features,proto3" json:"features,omitempty"`
+	ImageKeys     []string               `protobuf:"bytes,13,rep,name=image_keys,json=imageKeys,proto3" json:"image_keys,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -482,9 +473,9 @@ func (*UpdateCarModelRequest) Descriptor() ([]byte, []int) {
 	return file_service_car_car_model_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *UpdateCarModelRequest) GetID() string {
+func (x *UpdateCarModelRequest) GetId() string {
 	if x != nil {
-		return x.ID
+		return x.Id
 	}
 	return ""
 }
@@ -552,9 +543,9 @@ func (x *UpdateCarModelRequest) GetEngineVolume() float32 {
 	return 0
 }
 
-func (x *UpdateCarModelRequest) GetRangeKM() int32 {
-	if x != nil && x.RangeKM != nil {
-		return *x.RangeKM
+func (x *UpdateCarModelRequest) GetRangeKm() int32 {
+	if x != nil && x.RangeKm != nil {
+		return *x.RangeKm
 	}
 	return 0
 }
@@ -566,53 +557,23 @@ func (x *UpdateCarModelRequest) GetFeatures() []string {
 	return nil
 }
 
-type UpdateCarModelResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateCarModelResponse) Reset() {
-	*x = UpdateCarModelResponse{}
-	mi := &file_service_car_car_model_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateCarModelResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateCarModelResponse) ProtoMessage() {}
-
-func (x *UpdateCarModelResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_car_car_model_proto_msgTypes[7]
+func (x *UpdateCarModelRequest) GetImageKeys() []string {
 	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
+		return x.ImageKeys
 	}
-	return mi.MessageOf(x)
+	return nil
 }
 
-// Deprecated: Use UpdateCarModelResponse.ProtoReflect.Descriptor instead.
-func (*UpdateCarModelResponse) Descriptor() ([]byte, []int) {
-	return file_service_car_car_model_proto_rawDescGZIP(), []int{7}
-}
-
-// DeleteCarModel
 type DeleteCarModelRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            string                 `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DeleteCarModelRequest) Reset() {
 	*x = DeleteCarModelRequest{}
-	mi := &file_service_car_car_model_proto_msgTypes[8]
+	mi := &file_service_car_car_model_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -624,7 +585,7 @@ func (x *DeleteCarModelRequest) String() string {
 func (*DeleteCarModelRequest) ProtoMessage() {}
 
 func (x *DeleteCarModelRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_car_car_model_proto_msgTypes[8]
+	mi := &file_service_car_car_model_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -637,37 +598,38 @@ func (x *DeleteCarModelRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteCarModelRequest.ProtoReflect.Descriptor instead.
 func (*DeleteCarModelRequest) Descriptor() ([]byte, []int) {
-	return file_service_car_car_model_proto_rawDescGZIP(), []int{8}
+	return file_service_car_car_model_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *DeleteCarModelRequest) GetID() string {
+func (x *DeleteCarModelRequest) GetId() string {
 	if x != nil {
-		return x.ID
+		return x.Id
 	}
 	return ""
 }
 
-type DeleteCarModelResponse struct {
+type GetCarModelImageUploadDataResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	UploadData    *base.ImageUploadData  `protobuf:"bytes,1,opt,name=upload_data,json=uploadData,proto3" json:"upload_data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *DeleteCarModelResponse) Reset() {
-	*x = DeleteCarModelResponse{}
-	mi := &file_service_car_car_model_proto_msgTypes[9]
+func (x *GetCarModelImageUploadDataResponse) Reset() {
+	*x = GetCarModelImageUploadDataResponse{}
+	mi := &file_service_car_car_model_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *DeleteCarModelResponse) String() string {
+func (x *GetCarModelImageUploadDataResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*DeleteCarModelResponse) ProtoMessage() {}
+func (*GetCarModelImageUploadDataResponse) ProtoMessage() {}
 
-func (x *DeleteCarModelResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_car_car_model_proto_msgTypes[9]
+func (x *GetCarModelImageUploadDataResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_service_car_car_model_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -678,92 +640,108 @@ func (x *DeleteCarModelResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteCarModelResponse.ProtoReflect.Descriptor instead.
-func (*DeleteCarModelResponse) Descriptor() ([]byte, []int) {
-	return file_service_car_car_model_proto_rawDescGZIP(), []int{9}
+// Deprecated: Use GetCarModelImageUploadDataResponse.ProtoReflect.Descriptor instead.
+func (*GetCarModelImageUploadDataResponse) Descriptor() ([]byte, []int) {
+	return file_service_car_car_model_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *GetCarModelImageUploadDataResponse) GetUploadData() *base.ImageUploadData {
+	if x != nil {
+		return x.UploadData
+	}
+	return nil
 }
 
 var File_service_car_car_model_proto protoreflect.FileDescriptor
 
 const file_service_car_car_model_proto_rawDesc = "" +
 	"\n" +
-	"\x1bservice/car/car_model.proto\x12\vservice.car\x1a\x18base/car/car_model.proto\"\xcf\x02\n" +
+	"\x1bservice/car/car_model.proto\x12\vservice.car\x1a\x18base/car/car_model.proto\x1a\x11base/common.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xd4\x02\n" +
 	"\x15CreateCarModelRequest\x12\x14\n" +
 	"\x05brand\x18\x01 \x01(\tR\x05brand\x12\x14\n" +
 	"\x05model\x18\x02 \x01(\tR\x05model\x12\x12\n" +
-	"\x04year\x18\x03 \x01(\x05R\x04year\x12\x1a\n" +
-	"\bfuelType\x18\x04 \x01(\tR\bfuelType\x12\"\n" +
-	"\ftransmission\x18\x05 \x01(\tR\ftransmission\x12\x1a\n" +
-	"\bbodyType\x18\x06 \x01(\tR\bbodyType\x12\x14\n" +
+	"\x04year\x18\x03 \x01(\x05R\x04year\x12\x1b\n" +
+	"\tfuel_type\x18\x04 \x01(\tR\bfuelType\x12\"\n" +
+	"\ftransmission\x18\x05 \x01(\tR\ftransmission\x12\x1b\n" +
+	"\tbody_type\x18\x06 \x01(\tR\bbodyType\x12\x14\n" +
 	"\x05class\x18\a \x01(\tR\x05class\x12\x14\n" +
-	"\x05seats\x18\b \x01(\x05R\x05seats\x12'\n" +
-	"\fengineVolume\x18\t \x01(\x02H\x00R\fengineVolume\x88\x01\x01\x12\x18\n" +
-	"\arangeKM\x18\n" +
-	" \x01(\x05R\arangeKM\x12\x1a\n" +
-	"\bfeatures\x18\v \x03(\tR\bfeaturesB\x0f\n" +
-	"\r_engineVolume\"(\n" +
+	"\x05seats\x18\b \x01(\x05R\x05seats\x12(\n" +
+	"\rengine_volume\x18\t \x01(\x02H\x00R\fengineVolume\x88\x01\x01\x12\x19\n" +
+	"\brange_km\x18\n" +
+	" \x01(\x05R\arangeKm\x12\x1a\n" +
+	"\bfeatures\x18\v \x03(\tR\bfeaturesB\x10\n" +
+	"\x0e_engine_volume\"(\n" +
 	"\x16CreateCarModelResponse\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\"$\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"$\n" +
 	"\x12GetCarModelRequest\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\"E\n" +
-	"\x13GetCarModelResponse\x12.\n" +
-	"\bcarModel\x18\x01 \x01(\v2\x12.base.car.CarModelR\bcarModel\"\x95\x03\n" +
-	"\x13GetCarModelsRequest\x12\x19\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"F\n" +
+	"\x13GetCarModelResponse\x12/\n" +
+	"\tcar_model\x18\x01 \x01(\v2\x12.base.car.CarModelR\bcarModel\"\x95\x03\n" +
+	"\x14ListCarModelsRequest\x12\x19\n" +
 	"\x05brand\x18\x01 \x01(\tH\x00R\x05brand\x88\x01\x01\x12\x19\n" +
-	"\x05model\x18\x02 \x01(\tH\x01R\x05model\x88\x01\x01\x12\x1f\n" +
-	"\bfuelType\x18\x03 \x01(\tH\x02R\bfuelType\x88\x01\x01\x12'\n" +
-	"\ftransmission\x18\x04 \x01(\tH\x03R\ftransmission\x88\x01\x01\x12\x1f\n" +
-	"\bbodyType\x18\x05 \x01(\tH\x04R\bbodyType\x88\x01\x01\x12\x19\n" +
-	"\x05class\x18\x06 \x01(\tH\x05R\x05class\x88\x01\x01\x12\x1f\n" +
-	"\bminSeats\x18\a \x01(\x05H\x06R\bminSeats\x88\x01\x01\x12\x19\n" +
-	"\x05limit\x18\b \x01(\x03H\aR\x05limit\x88\x01\x01\x12\x1b\n" +
-	"\x06offset\x18\t \x01(\x03H\bR\x06offset\x88\x01\x01B\b\n" +
+	"\x05model\x18\x02 \x01(\tH\x01R\x05model\x88\x01\x01\x12 \n" +
+	"\tfuel_type\x18\x03 \x01(\tH\x02R\bfuelType\x88\x01\x01\x12'\n" +
+	"\ftransmission\x18\x04 \x01(\tH\x03R\ftransmission\x88\x01\x01\x12 \n" +
+	"\tbody_type\x18\x05 \x01(\tH\x04R\bbodyType\x88\x01\x01\x12\x19\n" +
+	"\x05class\x18\x06 \x01(\tH\x05R\x05class\x88\x01\x01\x12 \n" +
+	"\tmin_seats\x18\a \x01(\x05H\x06R\bminSeats\x88\x01\x01\x125\n" +
+	"\n" +
+	"pagination\x18\b \x01(\v2\x10.base.PaginationH\aR\n" +
+	"pagination\x88\x01\x01B\b\n" +
 	"\x06_brandB\b\n" +
-	"\x06_modelB\v\n" +
-	"\t_fuelTypeB\x0f\n" +
-	"\r_transmissionB\v\n" +
-	"\t_bodyTypeB\b\n" +
-	"\x06_classB\v\n" +
-	"\t_minSeatsB\b\n" +
-	"\x06_limitB\t\n" +
-	"\a_offset\"H\n" +
-	"\x14GetCarModelsResponse\x120\n" +
-	"\tcarModels\x18\x01 \x03(\v2\x12.base.car.CarModelR\tcarModels\"\xf4\x03\n" +
+	"\x06_modelB\f\n" +
+	"\n" +
+	"_fuel_typeB\x0f\n" +
+	"\r_transmissionB\f\n" +
+	"\n" +
+	"_body_typeB\b\n" +
+	"\x06_classB\f\n" +
+	"\n" +
+	"_min_seatsB\r\n" +
+	"\v_pagination\"J\n" +
+	"\x15ListCarModelsResponse\x121\n" +
+	"\n" +
+	"car_models\x18\x01 \x03(\v2\x12.base.car.CarModelR\tcarModels\"\x9b\x04\n" +
 	"\x15UpdateCarModelRequest\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\x12\x19\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
 	"\x05brand\x18\x02 \x01(\tH\x00R\x05brand\x88\x01\x01\x12\x19\n" +
 	"\x05model\x18\x03 \x01(\tH\x01R\x05model\x88\x01\x01\x12\x17\n" +
-	"\x04year\x18\x04 \x01(\x05H\x02R\x04year\x88\x01\x01\x12\x1f\n" +
-	"\bfuelType\x18\x05 \x01(\tH\x03R\bfuelType\x88\x01\x01\x12'\n" +
-	"\ftransmission\x18\x06 \x01(\tH\x04R\ftransmission\x88\x01\x01\x12\x1f\n" +
-	"\bbodyType\x18\a \x01(\tH\x05R\bbodyType\x88\x01\x01\x12\x19\n" +
+	"\x04year\x18\x04 \x01(\x05H\x02R\x04year\x88\x01\x01\x12 \n" +
+	"\tfuel_type\x18\x05 \x01(\tH\x03R\bfuelType\x88\x01\x01\x12'\n" +
+	"\ftransmission\x18\x06 \x01(\tH\x04R\ftransmission\x88\x01\x01\x12 \n" +
+	"\tbody_type\x18\a \x01(\tH\x05R\bbodyType\x88\x01\x01\x12\x19\n" +
 	"\x05class\x18\b \x01(\tH\x06R\x05class\x88\x01\x01\x12\x19\n" +
-	"\x05seats\x18\t \x01(\x05H\aR\x05seats\x88\x01\x01\x12'\n" +
-	"\fengineVolume\x18\n" +
-	" \x01(\x02H\bR\fengineVolume\x88\x01\x01\x12\x1d\n" +
-	"\arangeKM\x18\v \x01(\x05H\tR\arangeKM\x88\x01\x01\x12\x1a\n" +
-	"\bfeatures\x18\f \x03(\tR\bfeaturesB\b\n" +
+	"\x05seats\x18\t \x01(\x05H\aR\x05seats\x88\x01\x01\x12(\n" +
+	"\rengine_volume\x18\n" +
+	" \x01(\x02H\bR\fengineVolume\x88\x01\x01\x12\x1e\n" +
+	"\brange_km\x18\v \x01(\x05H\tR\arangeKm\x88\x01\x01\x12\x1a\n" +
+	"\bfeatures\x18\f \x03(\tR\bfeatures\x12\x1d\n" +
+	"\n" +
+	"image_keys\x18\r \x03(\tR\timageKeysB\b\n" +
 	"\x06_brandB\b\n" +
 	"\x06_modelB\a\n" +
-	"\x05_yearB\v\n" +
-	"\t_fuelTypeB\x0f\n" +
-	"\r_transmissionB\v\n" +
-	"\t_bodyTypeB\b\n" +
-	"\x06_classB\b\n" +
-	"\x06_seatsB\x0f\n" +
-	"\r_engineVolumeB\n" +
+	"\x05_yearB\f\n" +
 	"\n" +
-	"\b_rangeKM\"\x18\n" +
-	"\x16UpdateCarModelResponse\"'\n" +
+	"_fuel_typeB\x0f\n" +
+	"\r_transmissionB\f\n" +
+	"\n" +
+	"_body_typeB\b\n" +
+	"\x06_classB\b\n" +
+	"\x06_seatsB\x10\n" +
+	"\x0e_engine_volumeB\v\n" +
+	"\t_range_km\"'\n" +
 	"\x15DeleteCarModelRequest\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\"\x18\n" +
-	"\x16DeleteCarModelResponse2\xc9\x03\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\\\n" +
+	"\"GetCarModelImageUploadDataResponse\x126\n" +
+	"\vupload_data\x18\x01 \x01(\v2\x15.base.ImageUploadDataR\n" +
+	"uploadData2\x99\x04\n" +
 	"\x0fCarModelService\x12Y\n" +
 	"\x0eCreateCarModel\x12\".service.car.CreateCarModelRequest\x1a#.service.car.CreateCarModelResponse\x12P\n" +
-	"\vGetCarModel\x12\x1f.service.car.GetCarModelRequest\x1a .service.car.GetCarModelResponse\x12S\n" +
-	"\fGetCarModels\x12 .service.car.GetCarModelsRequest\x1a!.service.car.GetCarModelsResponse\x12Y\n" +
-	"\x0eUpdateCarModel\x12\".service.car.UpdateCarModelRequest\x1a#.service.car.UpdateCarModelResponse\x12Y\n" +
-	"\x0eDeleteCarModel\x12\".service.car.DeleteCarModelRequest\x1a#.service.car.DeleteCarModelResponseB<Z:github.com/sorawaslocked/car-rental-protos/gen/service/carb\x06proto3"
+	"\vGetCarModel\x12\x1f.service.car.GetCarModelRequest\x1a .service.car.GetCarModelResponse\x12V\n" +
+	"\rListCarModels\x12!.service.car.ListCarModelsRequest\x1a\".service.car.ListCarModelsResponse\x12L\n" +
+	"\x0eUpdateCarModel\x12\".service.car.UpdateCarModelRequest\x1a\x16.google.protobuf.Empty\x12L\n" +
+	"\x0eDeleteCarModel\x12\".service.car.DeleteCarModelRequest\x1a\x16.google.protobuf.Empty\x12e\n" +
+	"\x1aGetCarModelImageUploadData\x12\x16.google.protobuf.Empty\x1a/.service.car.GetCarModelImageUploadDataResponseB<Z:github.com/sorawaslocked/car-rental-protos/gen/service/carb\x06proto3"
 
 var (
 	file_service_car_car_model_proto_rawDescOnce sync.Once
@@ -777,38 +755,44 @@ func file_service_car_car_model_proto_rawDescGZIP() []byte {
 	return file_service_car_car_model_proto_rawDescData
 }
 
-var file_service_car_car_model_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_service_car_car_model_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_service_car_car_model_proto_goTypes = []any{
-	(*CreateCarModelRequest)(nil),  // 0: service.car.CreateCarModelRequest
-	(*CreateCarModelResponse)(nil), // 1: service.car.CreateCarModelResponse
-	(*GetCarModelRequest)(nil),     // 2: service.car.GetCarModelRequest
-	(*GetCarModelResponse)(nil),    // 3: service.car.GetCarModelResponse
-	(*GetCarModelsRequest)(nil),    // 4: service.car.GetCarModelsRequest
-	(*GetCarModelsResponse)(nil),   // 5: service.car.GetCarModelsResponse
-	(*UpdateCarModelRequest)(nil),  // 6: service.car.UpdateCarModelRequest
-	(*UpdateCarModelResponse)(nil), // 7: service.car.UpdateCarModelResponse
-	(*DeleteCarModelRequest)(nil),  // 8: service.car.DeleteCarModelRequest
-	(*DeleteCarModelResponse)(nil), // 9: service.car.DeleteCarModelResponse
-	(*car.CarModel)(nil),           // 10: base.car.CarModel
+	(*CreateCarModelRequest)(nil),              // 0: service.car.CreateCarModelRequest
+	(*CreateCarModelResponse)(nil),             // 1: service.car.CreateCarModelResponse
+	(*GetCarModelRequest)(nil),                 // 2: service.car.GetCarModelRequest
+	(*GetCarModelResponse)(nil),                // 3: service.car.GetCarModelResponse
+	(*ListCarModelsRequest)(nil),               // 4: service.car.ListCarModelsRequest
+	(*ListCarModelsResponse)(nil),              // 5: service.car.ListCarModelsResponse
+	(*UpdateCarModelRequest)(nil),              // 6: service.car.UpdateCarModelRequest
+	(*DeleteCarModelRequest)(nil),              // 7: service.car.DeleteCarModelRequest
+	(*GetCarModelImageUploadDataResponse)(nil), // 8: service.car.GetCarModelImageUploadDataResponse
+	(*car.CarModel)(nil),                       // 9: base.car.CarModel
+	(*base.Pagination)(nil),                    // 10: base.Pagination
+	(*base.ImageUploadData)(nil),               // 11: base.ImageUploadData
+	(*emptypb.Empty)(nil),                      // 12: google.protobuf.Empty
 }
 var file_service_car_car_model_proto_depIdxs = []int32{
-	10, // 0: service.car.GetCarModelResponse.carModel:type_name -> base.car.CarModel
-	10, // 1: service.car.GetCarModelsResponse.carModels:type_name -> base.car.CarModel
-	0,  // 2: service.car.CarModelService.CreateCarModel:input_type -> service.car.CreateCarModelRequest
-	2,  // 3: service.car.CarModelService.GetCarModel:input_type -> service.car.GetCarModelRequest
-	4,  // 4: service.car.CarModelService.GetCarModels:input_type -> service.car.GetCarModelsRequest
-	6,  // 5: service.car.CarModelService.UpdateCarModel:input_type -> service.car.UpdateCarModelRequest
-	8,  // 6: service.car.CarModelService.DeleteCarModel:input_type -> service.car.DeleteCarModelRequest
-	1,  // 7: service.car.CarModelService.CreateCarModel:output_type -> service.car.CreateCarModelResponse
-	3,  // 8: service.car.CarModelService.GetCarModel:output_type -> service.car.GetCarModelResponse
-	5,  // 9: service.car.CarModelService.GetCarModels:output_type -> service.car.GetCarModelsResponse
-	7,  // 10: service.car.CarModelService.UpdateCarModel:output_type -> service.car.UpdateCarModelResponse
-	9,  // 11: service.car.CarModelService.DeleteCarModel:output_type -> service.car.DeleteCarModelResponse
-	7,  // [7:12] is the sub-list for method output_type
-	2,  // [2:7] is the sub-list for method input_type
-	2,  // [2:2] is the sub-list for extension type_name
-	2,  // [2:2] is the sub-list for extension extendee
-	0,  // [0:2] is the sub-list for field type_name
+	9,  // 0: service.car.GetCarModelResponse.car_model:type_name -> base.car.CarModel
+	10, // 1: service.car.ListCarModelsRequest.pagination:type_name -> base.Pagination
+	9,  // 2: service.car.ListCarModelsResponse.car_models:type_name -> base.car.CarModel
+	11, // 3: service.car.GetCarModelImageUploadDataResponse.upload_data:type_name -> base.ImageUploadData
+	0,  // 4: service.car.CarModelService.CreateCarModel:input_type -> service.car.CreateCarModelRequest
+	2,  // 5: service.car.CarModelService.GetCarModel:input_type -> service.car.GetCarModelRequest
+	4,  // 6: service.car.CarModelService.ListCarModels:input_type -> service.car.ListCarModelsRequest
+	6,  // 7: service.car.CarModelService.UpdateCarModel:input_type -> service.car.UpdateCarModelRequest
+	7,  // 8: service.car.CarModelService.DeleteCarModel:input_type -> service.car.DeleteCarModelRequest
+	12, // 9: service.car.CarModelService.GetCarModelImageUploadData:input_type -> google.protobuf.Empty
+	1,  // 10: service.car.CarModelService.CreateCarModel:output_type -> service.car.CreateCarModelResponse
+	3,  // 11: service.car.CarModelService.GetCarModel:output_type -> service.car.GetCarModelResponse
+	5,  // 12: service.car.CarModelService.ListCarModels:output_type -> service.car.ListCarModelsResponse
+	12, // 13: service.car.CarModelService.UpdateCarModel:output_type -> google.protobuf.Empty
+	12, // 14: service.car.CarModelService.DeleteCarModel:output_type -> google.protobuf.Empty
+	8,  // 15: service.car.CarModelService.GetCarModelImageUploadData:output_type -> service.car.GetCarModelImageUploadDataResponse
+	10, // [10:16] is the sub-list for method output_type
+	4,  // [4:10] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_service_car_car_model_proto_init() }
@@ -825,7 +809,7 @@ func file_service_car_car_model_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_service_car_car_model_proto_rawDesc), len(file_service_car_car_model_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

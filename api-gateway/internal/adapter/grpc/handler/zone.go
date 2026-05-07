@@ -2,40 +2,117 @@ package handler
 
 import (
 	"context"
+	"log/slog"
 
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/grpc/dto"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
+	pkglog "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
+	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 )
 
 type ZoneHandler struct {
-	// client fleetsvc.ZoneServiceClient
+	client carsvc.ZoneServiceClient
+	log    *slog.Logger
 }
 
-func NewZoneHandler() *ZoneHandler {
-	return &ZoneHandler{}
+func NewZoneHandler(client carsvc.ZoneServiceClient, logger *slog.Logger) *ZoneHandler {
+	return &ZoneHandler{
+		client: client,
+		log:    pkglog.WithComponent(logger, "grpc.ZoneHandler"),
+	}
 }
 
-func (h *ZoneHandler) Create(_ context.Context, data model.ZoneCreate) (string, error) {
-	_ = data
-	return "", errNotImplemented("ZoneHandler.Create")
+func (h *ZoneHandler) Create(ctx context.Context, data model.ZoneCreate) (string, error) {
+	logger := pkglog.WithMethod(h.log, "Create")
+
+	res, err := h.client.CreateZone(ctx, &carsvc.CreateZoneRequest{
+		Name:            data.Name,
+		Type:            data.Type,
+		BoundaryGeoJson: data.BoundaryGeoJSON,
+		FeeAdjustment:   data.FeeAdjustment,
+	})
+	if err != nil {
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return "", dto.FromGrpcErr(err)
+	}
+
+	return res.GetId(), nil
 }
 
-func (h *ZoneHandler) Get(_ context.Context, id string) (model.Zone, error) {
-	_ = id
-	return model.Zone{}, errNotImplemented("ZoneHandler.Get")
+func (h *ZoneHandler) Get(ctx context.Context, id string) (model.Zone, error) {
+	logger := pkglog.WithMethod(h.log, "Get")
+
+	res, err := h.client.GetZone(ctx, &carsvc.GetZoneRequest{Id: id})
+	if err != nil {
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return model.Zone{}, dto.FromGrpcErr(err)
+	}
+
+	return dto.ZoneFromProto(res.GetZone()), nil
 }
 
-func (h *ZoneHandler) GetAll(_ context.Context, filter model.ZoneFilter) ([]model.Zone, error) {
-	_ = filter
-	return nil, errNotImplemented("ZoneHandler.GetAllWithFilter")
+func (h *ZoneHandler) List(ctx context.Context, filter model.ZoneFilter) ([]model.Zone, error) {
+	logger := pkglog.WithMethod(h.log, "List")
+
+	res, err := h.client.ListZones(ctx, &carsvc.ListZonesRequest{
+		Type:     filter.Type,
+		IsActive: filter.IsActive,
+	})
+	if err != nil {
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return nil, dto.FromGrpcErr(err)
+	}
+
+	zones := make([]model.Zone, len(res.GetZones()))
+	for i, z := range res.GetZones() {
+		zones[i] = dto.ZoneFromProto(z)
+	}
+
+	return zones, nil
 }
 
-func (h *ZoneHandler) Update(_ context.Context, id string, data model.ZoneUpdate) error {
-	_ = id
-	_ = data
-	return errNotImplemented("ZoneHandler.Update")
+func (h *ZoneHandler) Update(ctx context.Context, id string, data model.ZoneUpdate) error {
+	logger := pkglog.WithMethod(h.log, "Update")
+
+	_, err := h.client.UpdateZone(ctx, &carsvc.UpdateZoneRequest{
+		Id:              id,
+		Name:            data.Name,
+		Type:            data.Type,
+		BoundaryGeoJson: data.BoundaryGeoJSON,
+		FeeAdjustment:   data.FeeAdjustment,
+		IsActive:        data.IsActive,
+	})
+	if err != nil {
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return dto.FromGrpcErr(err)
+	}
+
+	return nil
 }
 
-func (h *ZoneHandler) Delete(_ context.Context, id string) error {
-	_ = id
-	return errNotImplemented("ZoneHandler.Delete")
+func (h *ZoneHandler) Delete(ctx context.Context, id string) error {
+	logger := pkglog.WithMethod(h.log, "Delete")
+
+	_, err := h.client.DeleteZone(ctx, &carsvc.DeleteZoneRequest{Id: id})
+	if err != nil {
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return dto.FromGrpcErr(err)
+	}
+
+	return nil
 }

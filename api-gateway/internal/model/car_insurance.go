@@ -15,8 +15,8 @@ type CarInsurance struct {
 	CostTenge int32
 	Status    string
 
-	ImageStorageUrls []string
-	Notes            *string
+	ImageURLs []string
+	Notes     *string
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -33,24 +33,23 @@ type CarInsuranceFilter struct {
 }
 
 type CarInsuranceCreate struct {
-	CarID            string
-	Type             string
-	Provider         string
-	PolicyNum        string
-	StartsAt         time.Time
-	ExpiresAt        time.Time
-	CostTenge        int32
-	Notes            *string
-	ImageStorageKeys []string
+	CarID     string
+	Type      string
+	Provider  string
+	PolicyNum string
+	StartsAt  time.Time
+	ExpiresAt time.Time
+	CostTenge int32
+	Notes     *string
 }
 
 type CarInsuranceUpdate struct {
-	Provider         *string
-	PolicyNum        *string
-	StartsAt         *time.Time
-	ExpiresAt        *time.Time
-	CostTenge        *int32
-	Status           *string
-	Notes            *string
-	ImageStorageKeys []string
+	Provider  *string
+	PolicyNum *string
+	StartsAt  *time.Time
+	ExpiresAt *time.Time
+	CostTenge *int32
+	Status    *string
+	Notes     *string
+	ImageKeys []string
 }

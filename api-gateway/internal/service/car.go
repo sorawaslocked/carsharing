@@ -14,6 +14,10 @@ func NewCarService(presenter CarPresenter) *CarService {
 	return &CarService{presenter: presenter}
 }
 
+func (s *CarService) Health(ctx context.Context) (model.ServiceHealth, error) {
+	return s.presenter.Health(ctx)
+}
+
 func (s *CarService) Create(ctx context.Context, data model.CarCreate) (string, error) {
 	return s.presenter.Create(ctx, data)
 }
@@ -22,8 +26,8 @@ func (s *CarService) Get(ctx context.Context, id string) (model.Car, error) {
 	return s.presenter.Get(ctx, id)
 }
 
-func (s *CarService) GetAll(ctx context.Context, filter model.CarFilter) ([]model.Car, error) {
-	return s.presenter.GetAll(ctx, filter)
+func (s *CarService) List(ctx context.Context, filter model.CarFilter) ([]model.Car, error) {
+	return s.presenter.List(ctx, filter)
 }
 
 func (s *CarService) Update(ctx context.Context, id string, data model.CarUpdate) error {
@@ -34,12 +38,28 @@ func (s *CarService) Delete(ctx context.Context, id string) error {
 	return s.presenter.Delete(ctx, id)
 }
 
-func (s *CarService) GetCarStatusLog(ctx context.Context, filter model.CarStatusLogFilter) ([]model.CarStatusLogEntry, error) {
-	return s.presenter.GetCarStatusLog(ctx, filter)
+func (s *CarService) ElevatedUpdate(ctx context.Context, carID string, data model.CarElevatedUpdate) error {
+	return s.presenter.ElevatedUpdate(ctx, carID, data)
 }
 
-func (s *CarService) GetCarFuelHistory(ctx context.Context, filter model.CarFuelReadingFilter) ([]model.CarFuelReading, error) {
-	return s.presenter.GetCarFuelHistory(ctx, filter)
+func (s *CarService) GetCarStatusHistory(ctx context.Context, carID string, filter model.CarStatusReadingFilter) ([]model.CarStatusReading, error) {
+	return s.presenter.GetCarStatusHistory(ctx, carID, filter)
+}
+
+func (s *CarService) GetCarFuelHistory(ctx context.Context, carID string, filter model.CarFuelReadingFilter) ([]model.CarFuelReading, error) {
+	return s.presenter.GetCarFuelHistory(ctx, carID, filter)
+}
+
+func (s *CarService) GetCarLocationHistory(ctx context.Context, carID string, filter model.CarLocationReadingFilter) ([]model.CarLocationReading, error) {
+	return s.presenter.GetCarLocationHistory(ctx, carID, filter)
+}
+
+func (s *CarService) GetCarBatteryHistory(ctx context.Context, carID string, filter model.CarBatteryReadingFilter) ([]model.CarBatteryReading, error) {
+	return s.presenter.GetCarBatteryHistory(ctx, carID, filter)
+}
+
+func (s *CarService) GetCarMileageHistory(ctx context.Context, carID string, filter model.CarMileageReadingFilter) ([]model.CarMileageReading, error) {
+	return s.presenter.GetCarMileageHistory(ctx, carID, filter)
 }
 
 func (s *CarService) GetImageUploadData(ctx context.Context) (model.ImageUploadData, error) {

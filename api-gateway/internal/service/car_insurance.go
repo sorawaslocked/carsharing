@@ -22,8 +22,8 @@ func (s *CarInsuranceService) Get(ctx context.Context, id string) (model.CarInsu
 	return s.presenter.Get(ctx, id)
 }
 
-func (s *CarInsuranceService) GetAll(ctx context.Context, filter model.CarInsuranceFilter) ([]model.CarInsurance, error) {
-	return s.presenter.GetAll(ctx, filter)
+func (s *CarInsuranceService) List(ctx context.Context, filter model.CarInsuranceFilter) ([]model.CarInsurance, error) {
+	return s.presenter.List(ctx, filter)
 }
 
 func (s *CarInsuranceService) Update(ctx context.Context, id string, data model.CarInsuranceUpdate) error {

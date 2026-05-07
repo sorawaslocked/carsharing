@@ -24,7 +24,7 @@ func DependencyHealthFromProto(d *svchelpers.DependencyHealth) model.DependencyH
 	return model.DependencyHealth{
 		Name:      d.GetName(),
 		Status:    d.GetStatus(),
-		LatencyMS: d.LatencyMS,
+		LatencyMS: d.LatencyMs,
 		Error:     d.Error,
 	}
 }

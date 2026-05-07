@@ -21,7 +21,7 @@ type UserSessionCache interface {
 type UserPresenter interface {
 	Create(ctx context.Context, data model.UserCreate) (string, error)
 	Get(ctx context.Context, id string) (model.User, error)
-	GetAllWithFilter(ctx context.Context, filter model.UserFilter) ([]model.User, error)
+	List(ctx context.Context, filter model.UserFilter) ([]model.User, error)
 	Update(ctx context.Context, id string, data model.UserUpdate) error
 	Delete(ctx context.Context, id string) error
 
@@ -32,7 +32,7 @@ type UserPresenter interface {
 	CheckActivationCode(ctx context.Context, code string) error
 
 	CreateDocument(ctx context.Context, objectKey, imageType string) (string, error)
-	GetUploadDocumentData(ctx context.Context, imageType string) (model.ImageUploadData, error)
+	GetDocumentImageUploadData(ctx context.Context, imageType string) (model.ImageUploadData, error)
 	GetProcessedDocumentsForUser(ctx context.Context, userID string) ([]model.Document, error)
 	CheckDocument(ctx context.Context, docID string, status string, documentError *string) error
 }
@@ -40,7 +40,7 @@ type UserPresenter interface {
 type CarModelPresenter interface {
 	Create(ctx context.Context, data model.CarModelCreate) (string, error)
 	Get(ctx context.Context, id string) (model.CarModel, error)
-	GetAll(ctx context.Context, filter model.CarModelFilter) ([]model.CarModel, error)
+	List(ctx context.Context, filter model.CarModelFilter) ([]model.CarModel, error)
 	Update(ctx context.Context, id string, data model.CarModelUpdate) error
 	Delete(ctx context.Context, id string) error
 
@@ -48,22 +48,37 @@ type CarModelPresenter interface {
 }
 
 type CarPresenter interface {
+	Health(ctx context.Context) (model.ServiceHealth, error)
+
 	Create(ctx context.Context, data model.CarCreate) (string, error)
 	Get(ctx context.Context, id string) (model.Car, error)
-	GetAll(ctx context.Context, filter model.CarFilter) ([]model.Car, error)
+	List(ctx context.Context, filter model.CarFilter) ([]model.Car, error)
 	Update(ctx context.Context, id string, data model.CarUpdate) error
 	Delete(ctx context.Context, id string) error
 
-	GetCarStatusLog(ctx context.Context, filter model.CarStatusLogFilter) ([]model.CarStatusLogEntry, error)
-	GetCarFuelHistory(ctx context.Context, filter model.CarFuelReadingFilter) ([]model.CarFuelReading, error)
+	ElevatedUpdate(ctx context.Context, carID string, data model.CarElevatedUpdate) error
+
+	GetCarStatusHistory(ctx context.Context, carID string, filter model.CarStatusReadingFilter) ([]model.CarStatusReading, error)
+	GetCarFuelHistory(ctx context.Context, carID string, filter model.CarFuelReadingFilter) ([]model.CarFuelReading, error)
+	GetCarLocationHistory(ctx context.Context, carID string, filter model.CarLocationReadingFilter) ([]model.CarLocationReading, error)
+	GetCarBatteryHistory(ctx context.Context, carID string, filter model.CarBatteryReadingFilter) ([]model.CarBatteryReading, error)
+	GetCarMileageHistory(ctx context.Context, carID string, filter model.CarMileageReadingFilter) ([]model.CarMileageReading, error)
 
 	GetImageUploadData(ctx context.Context) (model.ImageUploadData, error)
+}
+
+type CarPricingRulePresenter interface {
+	Create(ctx context.Context, data model.CarPricingRuleCreate) (string, error)
+	Get(ctx context.Context, id string) (model.CarPricingRule, error)
+	List(ctx context.Context, filter model.CarPricingRuleFilter) ([]model.CarPricingRule, error)
+	Update(ctx context.Context, id string, data model.CarPricingRuleUpdate) error
+	Delete(ctx context.Context, id string) error
 }
 
 type CarInsurancePresenter interface {
 	Create(ctx context.Context, data model.CarInsuranceCreate) (string, error)
 	Get(ctx context.Context, id string) (model.CarInsurance, error)
-	GetAll(ctx context.Context, filter model.CarInsuranceFilter) ([]model.CarInsurance, error)
+	List(ctx context.Context, filter model.CarInsuranceFilter) ([]model.CarInsurance, error)
 	Update(ctx context.Context, id string, data model.CarInsuranceUpdate) error
 	Delete(ctx context.Context, id string) error
 
@@ -73,7 +88,7 @@ type CarInsurancePresenter interface {
 type ZonePresenter interface {
 	Create(ctx context.Context, data model.ZoneCreate) (string, error)
 	Get(ctx context.Context, id string) (model.Zone, error)
-	GetAll(ctx context.Context, filter model.ZoneFilter) ([]model.Zone, error)
+	List(ctx context.Context, filter model.ZoneFilter) ([]model.Zone, error)
 	Update(ctx context.Context, id string, data model.ZoneUpdate) error
 	Delete(ctx context.Context, id string) error
 }
@@ -81,11 +96,11 @@ type ZonePresenter interface {
 type CarMaintenancePresenter interface {
 	CreateTemplate(ctx context.Context, data model.CarMaintenanceTemplateCreate) (string, error)
 	GetTemplate(ctx context.Context, id string) (model.CarMaintenanceTemplate, error)
-	GetAllTemplates(ctx context.Context, filter model.CarMaintenanceTemplateFilter) ([]model.CarMaintenanceTemplate, error)
+	ListTemplates(ctx context.Context, filter model.CarMaintenanceTemplateFilter) ([]model.CarMaintenanceTemplate, error)
 	UpdateTemplate(ctx context.Context, id string, data model.CarMaintenanceTemplateUpdate) error
 	DeleteTemplate(ctx context.Context, id string) error
 
-	GetRecords(ctx context.Context, filter model.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error)
+	ListRecords(ctx context.Context, filter model.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error)
 	CompleteRecord(ctx context.Context, recordID string, data model.CarMaintenanceRecordComplete) error
 
 	GetReceiptImageUploadData(ctx context.Context) (model.ImageUploadData, error)

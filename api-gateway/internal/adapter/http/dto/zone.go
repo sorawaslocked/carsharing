@@ -8,6 +8,14 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )
 
+type ZoneResponse struct {
+	Zone Zone `json:"zone"`
+}
+
+type ZonesResponse struct {
+	Zones []Zone `json:"zones"`
+}
+
 type Zone struct {
 	ID              string    `json:"id"`
 	Name            string    `json:"name"`

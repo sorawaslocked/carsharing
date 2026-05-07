@@ -21,11 +21,11 @@ func NewCarModelHandler(svc CarModelService) *CarModelHandler {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        body  body      dto.CarModelCreateRequest  true  "Car model payload"
-// @Success      201   {object}  map[string]any             "id"
-// @Failure      400   {object}  map[string]any
-// @Failure      401   {object}  map[string]any
-// @Failure      409   {object}  map[string]any
-// @Failure      500   {object}  map[string]any
+// @Success      201   {object}  dto.IDResponse
+// @Failure      400   {object}  dto.ErrorResponse
+// @Failure      401   {object}  dto.ErrorResponse
+// @Failure      409   {object}  dto.ErrorResponse
+// @Failure      500   {object}  dto.ErrorResponse
 // @Router       /car-models [post]
 func (h *CarModelHandler) Create(ctx *gin.Context) {
 	data, err := dto.FromCarModelCreateRequest(ctx)
@@ -51,10 +51,11 @@ func (h *CarModelHandler) Create(ctx *gin.Context) {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        id   path      string  true  "Car model UUID"
-// @Success      200  {object}  map[string]any  "carModel"
-// @Failure      400  {object}  map[string]any
-// @Failure      404  {object}  map[string]any
-// @Failure      500  {object}  map[string]any
+// @Success      200  {object}  dto.CarModelGetResponse
+// @Failure      400  {object}  dto.ErrorResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      404  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
 // @Router       /car-models/{id} [get]
 func (h *CarModelHandler) Get(ctx *gin.Context) {
 	id, err := dto.IDParam(ctx)
@@ -74,7 +75,7 @@ func (h *CarModelHandler) Get(ctx *gin.Context) {
 	dto.Ok(ctx, gin.H{"carModel": dto.ToCarModelResponse(carModel)})
 }
 
-// GetAll (CarModel) godoc
+// List (CarModel) godoc
 // @Summary      List car models
 // @Description  Returns a filtered, paginated list of car models.
 // @Tags         car-models
@@ -89,11 +90,12 @@ func (h *CarModelHandler) Get(ctx *gin.Context) {
 // @Param        minSeats      query     integer  false  "Minimum seat count"
 // @Param        limit         query     integer  false  "Pagination limit"
 // @Param        offset        query     integer  false  "Pagination offset"
-// @Success      200           {object}  map[string]any  "carModels"
-// @Failure      400           {object}  map[string]any
-// @Failure      500           {object}  map[string]any
+// @Success      200           {object}  dto.CarModelsResponse
+// @Failure      400           {object}  dto.ErrorResponse
+// @Failure      401           {object}  dto.ErrorResponse
+// @Failure      500           {object}  dto.ErrorResponse
 // @Router       /car-models [get]
-func (h *CarModelHandler) GetAll(ctx *gin.Context) {
+func (h *CarModelHandler) List(ctx *gin.Context) {
 	filter, err := dto.CarModelFilterFromCtx(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -101,7 +103,7 @@ func (h *CarModelHandler) GetAll(ctx *gin.Context) {
 		return
 	}
 
-	carModels, err := h.svc.GetAll(ctx, filter)
+	carModels, err := h.svc.List(ctx, filter)
 	if err != nil {
 		dto.FromError(ctx, err)
 
@@ -124,10 +126,11 @@ func (h *CarModelHandler) GetAll(ctx *gin.Context) {
 // @Security     BearerAuth
 // @Param        id    path      string                     true  "Car model UUID"
 // @Param        body  body      dto.CarModelUpdateRequest  true  "Fields to update"
-// @Success      200   {object}  map[string]any
-// @Failure      400   {object}  map[string]any
-// @Failure      404   {object}  map[string]any
-// @Failure      500   {object}  map[string]any
+// @Success      200
+// @Failure      400  {object}  dto.ErrorResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      404  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
 // @Router       /car-models/{id} [patch]
 func (h *CarModelHandler) Update(ctx *gin.Context) {
 	id, err := dto.IDParam(ctx)
@@ -160,10 +163,11 @@ func (h *CarModelHandler) Update(ctx *gin.Context) {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        id   path      string  true  "Car model UUID"
-// @Success      200  {object}  map[string]any
-// @Failure      400  {object}  map[string]any
-// @Failure      404  {object}  map[string]any
-// @Failure      500  {object}  map[string]any
+// @Success      200
+// @Failure      400  {object}  dto.ErrorResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      404  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
 // @Router       /car-models/{id} [delete]
 func (h *CarModelHandler) Delete(ctx *gin.Context) {
 	id, err := dto.IDParam(ctx)
@@ -189,9 +193,9 @@ func (h *CarModelHandler) Delete(ctx *gin.Context) {
 // @Tags         car-models
 // @Produce      json
 // @Security     BearerAuth
-// @Success      200  {object}  map[string]any  "uploadData"
-// @Failure      401  {object}  map[string]any
-// @Failure      500  {object}  map[string]any
+// @Success      200  {object}  dto.ImageUploadResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
 // @Router       /car-models/image-upload [get]
 func (h *CarModelHandler) GetImageUploadUrl(ctx *gin.Context) {
 	uploadData, err := h.svc.GetImageUploadData(ctx)

@@ -8,43 +8,50 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )
 
+type CarInsuranceResponse struct {
+	Insurance CarInsurance `json:"insurance"`
+}
+
+type CarInsurancesResponse struct {
+	Insurances []CarInsurance `json:"insurances"`
+}
+
 type CarInsurance struct {
-	ID               string    `json:"id"`
-	CarID            string    `json:"carId"`
-	Type             string    `json:"type"`
-	Provider         string    `json:"provider"`
-	PolicyNum        string    `json:"policyNum"`
-	StartsAt         time.Time `json:"startsAt"`
-	ExpiresAt        time.Time `json:"expiresAt"`
-	CostTenge        int32     `json:"costTenge"`
-	Status           string    `json:"status"`
-	ImageStorageUrls []string  `json:"imageStorageUrls,omitempty"`
-	Notes            *string   `json:"notes,omitempty"`
-	CreatedAt        time.Time `json:"createdAt"`
-	UpdatedAt        time.Time `json:"updatedAt"`
+	ID        string    `json:"id"`
+	CarID     string    `json:"carId"`
+	Type      string    `json:"type"`
+	Provider  string    `json:"provider"`
+	PolicyNum string    `json:"policyNum"`
+	StartsAt  time.Time `json:"startsAt"`
+	ExpiresAt time.Time `json:"expiresAt"`
+	CostTenge int32     `json:"costTenge"`
+	Status    string    `json:"status"`
+	ImageURLs []string  `json:"imageURLs,omitempty"`
+	Notes     *string   `json:"notes,omitempty"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type CarInsuranceCreateRequest struct {
-	CarID            string    `json:"carId"`
-	Type             string    `json:"type"`
-	Provider         string    `json:"provider"`
-	PolicyNum        string    `json:"policyNum"`
-	StartsAt         time.Time `json:"startsAt"`
-	ExpiresAt        time.Time `json:"expiresAt"`
-	CostTenge        int32     `json:"costTenge"`
-	ImageStorageKeys []string  `json:"imageStorageKeys"`
-	Notes            *string   `json:"notes"`
+	CarID     string    `json:"carId"`
+	Type      string    `json:"type"`
+	Provider  string    `json:"provider"`
+	PolicyNum string    `json:"policyNum"`
+	StartsAt  time.Time `json:"startsAt"`
+	ExpiresAt time.Time `json:"expiresAt"`
+	CostTenge int32     `json:"costTenge"`
+	Notes     *string   `json:"notes"`
 }
 
 type CarInsuranceUpdateRequest struct {
-	Provider         *string    `json:"provider"`
-	PolicyNum        *string    `json:"policyNum"`
-	StartsAt         *time.Time `json:"startsAt"`
-	ExpiresAt        *time.Time `json:"expiresAt"`
-	CostTenge        *int32     `json:"costTenge"`
-	Status           *string    `json:"status"`
-	ImageStorageKeys []string   `json:"imageStorageKeys"`
-	Notes            *string    `json:"notes"`
+	Provider  *string    `json:"provider"`
+	PolicyNum *string    `json:"policyNum"`
+	StartsAt  *time.Time `json:"startsAt"`
+	ExpiresAt *time.Time `json:"expiresAt"`
+	CostTenge *int32     `json:"costTenge"`
+	Status    *string    `json:"status"`
+	ImageKeys []string   `json:"imageKeys"`
+	Notes     *string    `json:"notes"`
 }
 
 func FromCarInsuranceCreateRequest(ctx *gin.Context) (model.CarInsuranceCreate, error) {
@@ -53,15 +60,14 @@ func FromCarInsuranceCreateRequest(ctx *gin.Context) (model.CarInsuranceCreate, 
 		return model.CarInsuranceCreate{}, err
 	}
 	return model.CarInsuranceCreate{
-		CarID:            req.CarID,
-		Type:             req.Type,
-		Provider:         req.Provider,
-		PolicyNum:        req.PolicyNum,
-		StartsAt:         req.StartsAt,
-		ExpiresAt:        req.ExpiresAt,
-		CostTenge:        req.CostTenge,
-		ImageStorageKeys: req.ImageStorageKeys,
-		Notes:            req.Notes,
+		CarID:     req.CarID,
+		Type:      req.Type,
+		Provider:  req.Provider,
+		PolicyNum: req.PolicyNum,
+		StartsAt:  req.StartsAt,
+		ExpiresAt: req.ExpiresAt,
+		CostTenge: req.CostTenge,
+		Notes:     req.Notes,
 	}, nil
 }
 
@@ -71,14 +77,14 @@ func FromCarInsuranceUpdateRequest(ctx *gin.Context) (model.CarInsuranceUpdate, 
 		return model.CarInsuranceUpdate{}, err
 	}
 	return model.CarInsuranceUpdate{
-		Provider:         req.Provider,
-		PolicyNum:        req.PolicyNum,
-		StartsAt:         req.StartsAt,
-		ExpiresAt:        req.ExpiresAt,
-		CostTenge:        req.CostTenge,
-		Status:           req.Status,
-		ImageStorageKeys: req.ImageStorageKeys,
-		Notes:            req.Notes,
+		Provider:  req.Provider,
+		PolicyNum: req.PolicyNum,
+		StartsAt:  req.StartsAt,
+		ExpiresAt: req.ExpiresAt,
+		CostTenge: req.CostTenge,
+		Status:    req.Status,
+		ImageKeys: req.ImageKeys,
+		Notes:     req.Notes,
 	}, nil
 }
 
@@ -116,18 +122,18 @@ func CarInsuranceFilterFromCtx(ctx *gin.Context) (model.CarInsuranceFilter, erro
 
 func ToCarInsuranceResponse(m model.CarInsurance) CarInsurance {
 	return CarInsurance{
-		ID:               m.ID,
-		CarID:            m.CarID,
-		Type:             m.Type,
-		Provider:         m.Provider,
-		PolicyNum:        m.PolicyNum,
-		StartsAt:         m.StartsAt,
-		ExpiresAt:        m.ExpiresAt,
-		CostTenge:        m.CostTenge,
-		Status:           m.Status,
-		ImageStorageUrls: m.ImageStorageUrls,
-		Notes:            m.Notes,
-		CreatedAt:        m.CreatedAt,
-		UpdatedAt:        m.UpdatedAt,
+		ID:        m.ID,
+		CarID:     m.CarID,
+		Type:      m.Type,
+		Provider:  m.Provider,
+		PolicyNum: m.PolicyNum,
+		StartsAt:  m.StartsAt,
+		ExpiresAt: m.ExpiresAt,
+		CostTenge: m.CostTenge,
+		Status:    m.Status,
+		ImageURLs: m.ImageURLs,
+		Notes:     m.Notes,
+		CreatedAt: m.CreatedAt,
+		UpdatedAt: m.UpdatedAt,
 	}
 }

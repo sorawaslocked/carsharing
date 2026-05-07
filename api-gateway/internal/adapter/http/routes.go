@@ -49,7 +49,7 @@ func (s *Server) setupRoutes(
 		{
 			users.POST("", s.userHandler.Create)
 			users.GET("/:id", s.userHandler.Get)
-			users.GET("", s.userHandler.GetAllWithFilter)
+			users.GET("", s.userHandler.List)
 			users.PATCH("/:id", s.userHandler.Update)
 			users.DELETE("/:id", s.userHandler.Delete)
 
@@ -68,7 +68,7 @@ func (s *Server) setupRoutes(
 		{
 			carModels.POST("", s.carModelHandler.Create)
 			carModels.GET("/:id", s.carModelHandler.Get)
-			carModels.GET("", s.carModelHandler.GetAll)
+			carModels.GET("", s.carModelHandler.List)
 			carModels.PATCH("/:id", s.carModelHandler.Update)
 			carModels.DELETE("/:id", s.carModelHandler.Delete)
 			carModels.GET("/image-upload", s.carModelHandler.GetImageUploadUrl)
@@ -82,11 +82,15 @@ func (s *Server) setupRoutes(
 			{
 				cars.POST("", s.carHandler.Create)
 				cars.GET("/:id", s.carHandler.Get)
-				cars.GET("", s.carHandler.GetAll)
+				cars.GET("", s.carHandler.List)
 				cars.PATCH("/:id", s.carHandler.Update)
 				cars.DELETE("/:id", s.carHandler.Delete)
-				cars.GET("/status-log", s.carHandler.GetCarStatusLog)
-				cars.GET("/fuel-history", s.carHandler.GetCarFuelHistory)
+				cars.PATCH("/:id/admin", s.carHandler.AdminUpdate)
+				cars.GET("/:id/status-history", s.carHandler.GetCarStatusHistory)
+				cars.GET("/:id/fuel-history", s.carHandler.GetCarFuelHistory)
+				cars.GET("/:id/location-history", s.carHandler.GetCarLocationHistory)
+				cars.GET("/:id/battery-history", s.carHandler.GetCarBatteryHistory)
+				cars.GET("/:id/mileage-history", s.carHandler.GetCarMileageHistory)
 				cars.GET("/image-upload", s.carHandler.GetImageUploadUrl)
 			}
 
@@ -94,7 +98,7 @@ func (s *Server) setupRoutes(
 			{
 				carInsurances.POST("", s.carInsuranceHandler.Create)
 				carInsurances.GET("/:id", s.carInsuranceHandler.Get)
-				carInsurances.GET("", s.carInsuranceHandler.GetAll)
+				carInsurances.GET("", s.carInsuranceHandler.List)
 				carInsurances.PATCH("/:id", s.carInsuranceHandler.Update)
 				carInsurances.DELETE("/:id", s.carInsuranceHandler.Delete)
 				carInsurances.GET("/image-upload", s.carInsuranceHandler.GetImageUploadUrl)
@@ -106,7 +110,7 @@ func (s *Server) setupRoutes(
 				{
 					template.POST("", s.carMaintenanceHandler.CreateTemplate)
 					template.GET("/:id", s.carMaintenanceHandler.GetTemplate)
-					template.GET("", s.carMaintenanceHandler.GetAllTemplates)
+					template.GET("", s.carMaintenanceHandler.ListTemplates)
 					template.PATCH("/:id", s.carMaintenanceHandler.UpdateTemplate)
 					template.DELETE("/:id", s.carMaintenanceHandler.DeleteTemplate)
 				}
@@ -123,7 +127,7 @@ func (s *Server) setupRoutes(
 			{
 				zones.POST("", s.zoneHandler.Create)
 				zones.GET("/:id", s.zoneHandler.Get)
-				zones.GET("", s.zoneHandler.GetAll)
+				zones.GET("", s.zoneHandler.List)
 				zones.PATCH("/:id", s.zoneHandler.Update)
 				zones.DELETE("/:id", s.zoneHandler.Delete)
 			}

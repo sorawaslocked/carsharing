@@ -78,7 +78,7 @@ func (h *UserHandler) Get(c *gin.Context) {
 	dto.Ok(c, gin.H{"user": dto.ToUserResponse(user)})
 }
 
-// GetAllWithFilter (UserHandler) godoc
+// List (UserHandler) godoc
 // @Summary      Get users with filter
 // @Description  Returns a list of users, optionally filtered by query params.
 // @Tags         users
@@ -98,7 +98,7 @@ func (h *UserHandler) Get(c *gin.Context) {
 // @Failure      401   {object}  dto.ErrorResponse
 // @Failure      500   {object}  dto.ErrorResponse
 // @Router       /users [get]
-func (h *UserHandler) GetAllWithFilter(c *gin.Context) {
+func (h *UserHandler) List(c *gin.Context) {
 	filter, err := dto.UserFilterFromCtx(c)
 	if err != nil {
 		dto.FromError(c, err)
@@ -106,7 +106,7 @@ func (h *UserHandler) GetAllWithFilter(c *gin.Context) {
 		return
 	}
 
-	users, err := h.svc.GetAllWithFilter(c, filter)
+	users, err := h.svc.List(c, filter)
 	if err != nil {
 		dto.FromError(c, err)
 

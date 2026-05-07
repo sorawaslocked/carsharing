@@ -33,8 +33,8 @@ func (s *UserService) Get(ctx context.Context, id string) (model.User, error) {
 	return s.presenter.Get(ctx, id)
 }
 
-func (s *UserService) GetAllWithFilter(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
-	return s.presenter.GetAllWithFilter(ctx, filter)
+func (s *UserService) List(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
+	return s.presenter.List(ctx, filter)
 }
 
 func (s *UserService) Update(ctx context.Context, id string, data model.UserUpdate) error {
@@ -147,7 +147,7 @@ func (s *UserService) CreateDocument(ctx context.Context, objectKey, imageType s
 }
 
 func (s *UserService) GetUploadDocumentData(ctx context.Context, imageType string) (model.ImageUploadData, error) {
-	return s.presenter.GetUploadDocumentData(ctx, imageType)
+	return s.presenter.GetDocumentImageUploadData(ctx, imageType)
 }
 
 func (s *UserService) GetProcessedDocumentsForUser(ctx context.Context, userID string) ([]model.Document, error) {

@@ -21,11 +21,11 @@ func NewCarInsuranceHandler(svc CarInsuranceService) *CarInsuranceHandler {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        body  body      dto.CarInsuranceCreateRequest  true  "Insurance payload"
-// @Success      200   {object}  map[string]any                 "id"
-// @Failure      400   {object}  map[string]any
-// @Failure      401   {object}  map[string]any
-// @Failure      409   {object}  map[string]any
-// @Failure      500   {object}  map[string]any
+// @Success      200   {object}  dto.IDResponse
+// @Failure      400   {object}  dto.ErrorResponse
+// @Failure      401   {object}  dto.ErrorResponse
+// @Failure      409   {object}  dto.ErrorResponse
+// @Failure      500   {object}  dto.ErrorResponse
 // @Router       /car-insurances [post]
 func (h *CarInsuranceHandler) Create(ctx *gin.Context) {
 	data, err := dto.FromCarInsuranceCreateRequest(ctx)
@@ -51,10 +51,11 @@ func (h *CarInsuranceHandler) Create(ctx *gin.Context) {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        id   path      string  true  "Insurance UUID"
-// @Success      200  {object}  map[string]any  "insurance"
-// @Failure      400  {object}  map[string]any
-// @Failure      404  {object}  map[string]any
-// @Failure      500  {object}  map[string]any
+// @Success      200  {object}  dto.CarInsuranceResponse
+// @Failure      400  {object}  dto.ErrorResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      404  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
 // @Router       /car-insurances/{id} [get]
 func (h *CarInsuranceHandler) Get(ctx *gin.Context) {
 	id, err := dto.IDParam(ctx)
@@ -74,7 +75,7 @@ func (h *CarInsuranceHandler) Get(ctx *gin.Context) {
 	dto.Ok(ctx, gin.H{"insurance": dto.ToCarInsuranceResponse(insurance)})
 }
 
-// GetAll (CarInsurance) godoc
+// List (CarInsurance) godoc
 // @Summary      List insurance records
 // @Description  Returns insurance records filtered by car, type, status, or expiry window.
 // @Tags         car-insurances
@@ -86,11 +87,12 @@ func (h *CarInsuranceHandler) Get(ctx *gin.Context) {
 // @Param        expiringWithinDays  query     integer  false  "Return policies expiring within N days"
 // @Param        limit               query     integer  false  "Pagination limit"
 // @Param        offset              query     integer  false  "Pagination offset"
-// @Success      200                 {object}  map[string]any  "insurances"
-// @Failure      400                 {object}  map[string]any
-// @Failure      500                 {object}  map[string]any
+// @Success      200                 {object}  dto.CarInsurancesResponse
+// @Failure      400                 {object}  dto.ErrorResponse
+// @Failure      401                 {object}  dto.ErrorResponse
+// @Failure      500                 {object}  dto.ErrorResponse
 // @Router       /car-insurances [get]
-func (h *CarInsuranceHandler) GetAll(ctx *gin.Context) {
+func (h *CarInsuranceHandler) List(ctx *gin.Context) {
 	filter, err := dto.CarInsuranceFilterFromCtx(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -98,7 +100,7 @@ func (h *CarInsuranceHandler) GetAll(ctx *gin.Context) {
 		return
 	}
 
-	insurances, err := h.svc.GetAll(ctx, filter)
+	insurances, err := h.svc.List(ctx, filter)
 	if err != nil {
 		dto.FromError(ctx, err)
 
@@ -121,10 +123,11 @@ func (h *CarInsuranceHandler) GetAll(ctx *gin.Context) {
 // @Security     BearerAuth
 // @Param        id    path      string                         true  "Insurance UUID"
 // @Param        body  body      dto.CarInsuranceUpdateRequest  true  "Fields to update"
-// @Success      200   {object}  map[string]any
-// @Failure      400   {object}  map[string]any
-// @Failure      404   {object}  map[string]any
-// @Failure      500   {object}  map[string]any
+// @Success      200
+// @Failure      400  {object}  dto.ErrorResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      404  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
 // @Router       /car-insurances/{id} [patch]
 func (h *CarInsuranceHandler) Update(ctx *gin.Context) {
 	id, err := dto.IDParam(ctx)
@@ -157,10 +160,11 @@ func (h *CarInsuranceHandler) Update(ctx *gin.Context) {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        id   path      string  true  "Insurance UUID"
-// @Success      200  {object}  map[string]any
-// @Failure      400  {object}  map[string]any
-// @Failure      404  {object}  map[string]any
-// @Failure      500  {object}  map[string]any
+// @Success      200
+// @Failure      400  {object}  dto.ErrorResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      404  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
 // @Router       /car-insurances/{id} [delete]
 func (h *CarInsuranceHandler) Delete(ctx *gin.Context) {
 	id, err := dto.IDParam(ctx)
@@ -185,9 +189,9 @@ func (h *CarInsuranceHandler) Delete(ctx *gin.Context) {
 // @Tags         car-insurances
 // @Produce      json
 // @Security     BearerAuth
-// @Success      200  {object}  map[string]any  "uploadData"
-// @Failure      401  {object}  map[string]any
-// @Failure      500  {object}  map[string]any
+// @Success      200  {object}  dto.ImageUploadResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
 // @Router       /car-insurances/image-upload [get]
 func (h *CarInsuranceHandler) GetImageUploadUrl(ctx *gin.Context) {
 	uploadData, err := h.svc.GetImageUploadData(ctx)

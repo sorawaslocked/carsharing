@@ -20,6 +20,7 @@ import (
 	pkgnats "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/nats"
 	pkgredis "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/redis"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/service"
+	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 )
 
@@ -48,66 +49,74 @@ type App struct {
 func New(cfg config.Config, log *slog.Logger) *App {
 	log = log.With(slog.String("appID", "api-gateway"))
 
-	userServiceLog := log.With(
-		slog.String("grpcURL", cfg.GRPCServer.Client.UserServiceURL),
-	)
+	// User service gRPC connection
+	userServiceLog := log.With(slog.String("grpcURL", cfg.GRPCServer.Client.UserServiceURL))
 	userServiceLog.Info("connecting to grpc server")
 
-	userServiceGrpcConn, err := grpcconn.Connect(
-		cfg.GRPCServer.Client.UserServiceURL,
-		cfg.GRPCServer.Client,
-	)
+	userServiceGrpcConn, err := grpcconn.Connect(cfg.GRPCServer.Client.UserServiceURL, cfg.GRPCServer.Client)
 	if err != nil {
 		userServiceLog.Error("connecting to grpc server", pkglog.Err(err))
-
 		return nil
 	}
 
-	//if err = grpcconn.PingServer(userServiceGrpcConn); err != nil {
-	//	userServiceLog.Error("pinging grpc server", pkglog.Err(err))
-	//}
+	// Car service gRPC connection
+	carServiceLog := log.With(slog.String("grpcURL", cfg.GRPCServer.Client.CarServiceURL))
+	carServiceLog.Info("connecting to grpc server")
 
-	userServiceGrpcClient := usersvc.NewUserServiceClient(userServiceGrpcConn)
-	userServiceGrpcHandler := grpchandler.NewUserHandler(userServiceGrpcClient, log)
+	carServiceGrpcConn, err := grpcconn.Connect(cfg.GRPCServer.Client.CarServiceURL, cfg.GRPCServer.Client)
+	if err != nil {
+		carServiceLog.Error("connecting to grpc server", pkglog.Err(err))
+		return nil
+	}
 
+	// gRPC clients
+	userGrpcClient := usersvc.NewUserServiceClient(userServiceGrpcConn)
+	carGrpcClient := carsvc.NewCarServiceClient(carServiceGrpcConn)
+	carModelGrpcClient := carsvc.NewCarModelServiceClient(carServiceGrpcConn)
+	carInsuranceGrpcClient := carsvc.NewCarInsuranceServiceClient(carServiceGrpcConn)
+	carMaintenanceGrpcClient := carsvc.NewCarMaintenanceServiceClient(carServiceGrpcConn)
+	zoneGrpcClient := carsvc.NewZoneServiceClient(carServiceGrpcConn)
+	carPricingGrpcClient := carsvc.NewCarPricingServiceClient(carServiceGrpcConn)
+
+	// gRPC handlers
+	userServiceGrpcHandler := grpchandler.NewUserHandler(userGrpcClient, log)
+	carGrpcHandler := grpchandler.NewCarHandler(carGrpcClient, log)
+	carModelGrpcHandler := grpchandler.NewCarModelHandler(carModelGrpcClient, log)
+	carInsuranceGrpcHandler := grpchandler.NewCarInsuranceHandler(carInsuranceGrpcClient, log)
+	carMaintenanceGrpcHandler := grpchandler.NewCarMaintenanceHandler(carMaintenanceGrpcClient, log)
+	zoneGrpcHandler := grpchandler.NewZoneHandler(zoneGrpcClient, log)
+	carPricingGrpcHandler := grpchandler.NewCarPricingRuleHandler(carPricingGrpcClient, log)
+
+	// JWT
 	jwtManager := pkgjwt.NewManager(cfg.JWT, log)
 
+	// Services
 	lazy := &lazySessionCache{}
 	userService := service.NewUserService(userServiceGrpcHandler, jwtManager, lazy)
+	carService := service.NewCarService(carGrpcHandler)
+	carModelService := service.NewCarModelService(carModelGrpcHandler)
+	carInsuranceService := service.NewCarInsuranceService(carInsuranceGrpcHandler)
+	carMaintenanceService := service.NewCarMaintenanceService(carMaintenanceGrpcHandler)
+	zoneService := service.NewZoneService(zoneGrpcHandler)
+	_ = service.NewCarPricingRuleService(carPricingGrpcHandler)
 
-	carModelServiceGrpcHandler := grpchandler.NewCarModelHandler()
-	carModelService := service.NewCarModelService(carModelServiceGrpcHandler)
-
-	carServiceGrpcHandler := grpchandler.NewCarHandler()
-	carService := service.NewCarService(carServiceGrpcHandler)
-
-	carInsuranceServiceGrpcHandler := grpchandler.NewInsuranceHandler()
-	carInsuranceService := service.NewCarInsuranceService(carInsuranceServiceGrpcHandler)
-
-	carMaintenanceServiceGrpcHandler := grpchandler.NewCarMaintenanceHandler()
-	carMaintenanceService := service.NewCarMaintenanceService(carMaintenanceServiceGrpcHandler)
-
-	zoneServiceGrpcHandler := grpchandler.NewZoneHandler()
-	zoneService := service.NewZoneService(zoneServiceGrpcHandler)
-
+	// Redis
 	rdb, err := pkgredis.NewClient(context.Background(), &cfg.Redis, log)
 	if err != nil {
-		// error already logged inside NewClient
 		return nil
 	}
 
 	userCache := redisadapter.NewUserCache(rdb, userService, cfg.Redis, log)
 	lazy.real = userCache
 
+	// NATS
 	natsConn, err := pkgnats.Connect(cfg.NATS, log)
 	if err != nil {
-		// error already logged inside Connect
 		return nil
 	}
 
 	natsUserSub := natshandler.NewUserSubscriber(natsConn, userCache, log)
 	if err = natsUserSub.Subscribe(); err != nil {
-		// error already logged inside Subscribe
 		return nil
 	}
 

@@ -7,6 +7,18 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )
 
+type CarMaintenanceTemplateItemResponse struct {
+	Template CarMaintenanceTemplate `json:"template"`
+}
+
+type CarMaintenanceTemplatesResponse struct {
+	Templates []CarMaintenanceTemplate `json:"templates"`
+}
+
+type CarMaintenanceRecordsResponse struct {
+	Records []CarMaintenanceRecord `json:"records"`
+}
+
 type CarMaintenanceTemplate struct {
 	ID          string  `json:"id"`
 	Name        string  `json:"name"`
@@ -97,10 +109,10 @@ func FromCarMaintenanceRecordCompleteRequest(ctx *gin.Context) (model.CarMainten
 	}
 
 	return model.CarMaintenanceRecordComplete{
-		CompletedKm:             req.CompletedKm,
-		CostTenge:               req.CostTenge,
-		ReceiptImageStorageKeys: req.ReceiptImageStorageKeys,
-		Notes:                   req.Notes,
+		OdometerAtCompletionKM: req.CompletedKm,
+		CostTenge:              req.CostTenge,
+		ReceiptImageKeys:       req.ReceiptImageStorageKeys,
+		Notes:                  req.Notes,
 	}, nil
 }
 
@@ -120,13 +132,13 @@ func CarMaintenanceTemplateFilterFromCtx(ctx *gin.Context) (model.CarMaintenance
 func CarMaintenanceRecordFilterFromCtx(ctx *gin.Context) (model.CarMaintenanceRecordFilter, error) {
 	f := model.CarMaintenanceRecordFilter{}
 
-	if v := ctx.Param("carID"); v != "" {
+	if v := ctx.Query("carId"); v != "" {
 		f.CarID = &v
 	}
-	if v := ctx.Param("templateID"); v != "" {
+	if v := ctx.Query("templateId"); v != "" {
 		f.TemplateID = &v
 	}
-	if v := ctx.Param("status"); v != "" {
+	if v := ctx.Query("status"); v != "" {
 		f.Status = &v
 	}
 
@@ -154,18 +166,18 @@ func ToCarMaintenanceTemplateResponse(m model.CarMaintenanceTemplate) CarMainten
 
 func ToCarMaintenanceRecordResponse(m model.CarMaintenanceRecord) CarMaintenanceRecord {
 	return CarMaintenanceRecord{
-		ID:                      m.CarID,
+		ID:                      m.ID,
 		CarID:                   m.CarID,
 		TemplateID:              m.TemplateID,
 		Status:                  m.Status,
-		OdometerAt:              m.OdometerAt,
-		CompletedKm:             m.CompletedKm,
+		OdometerAt:              m.OdometerAtWarningKM,
+		CompletedKm:             m.OdometerAtCompletionKM,
 		CostTenge:               m.CostTenge,
 		Notes:                   m.Notes,
 		AssignedTo:              m.AssignedTo,
 		DueBy:                   m.DueBy,
 		CompletedAt:             m.CompletedAt,
-		ReceiptImageStorageUrls: m.ReceiptImageStorageUrls,
+		ReceiptImageStorageUrls: m.ReceiptImageURLs,
 		CreatedAt:               m.CreatedAt,
 	}
 }

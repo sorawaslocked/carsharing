@@ -22,8 +22,8 @@ func (s *ZoneService) Get(ctx context.Context, id string) (model.Zone, error) {
 	return s.presenter.Get(ctx, id)
 }
 
-func (s *ZoneService) GetAll(ctx context.Context, filter model.ZoneFilter) ([]model.Zone, error) {
-	return s.presenter.GetAll(ctx, filter)
+func (s *ZoneService) List(ctx context.Context, filter model.ZoneFilter) ([]model.Zone, error) {
+	return s.presenter.List(ctx, filter)
 }
 
 func (s *ZoneService) Update(ctx context.Context, id string, data model.ZoneUpdate) error {

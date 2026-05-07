@@ -85,9 +85,9 @@ func (s *UserSubscriber) handleUserCreated(msg *nc.Msg) {
 		return
 	}
 
-	if err := s.handler.OnUserCreated(context.Background(), event.GetID()); err != nil {
+	if err := s.handler.OnUserCreated(context.Background(), event.GetId()); err != nil {
 		logger.Error("handling event",
-			slog.String("userID", event.GetID()),
+			slog.String("userID", event.GetId()),
 			pkglog.Err(err),
 		)
 	}
@@ -102,9 +102,9 @@ func (s *UserSubscriber) handleUserUpdated(msg *nc.Msg) {
 		return
 	}
 
-	if err := s.handler.OnUserUpdated(context.Background(), event.GetID(), event.GetIsSecurityUpdate()); err != nil {
+	if err := s.handler.OnUserUpdated(context.Background(), event.GetId(), event.GetIsSecurityUpdate()); err != nil {
 		logger.Error("handling event",
-			slog.String("userID", event.GetID()),
+			slog.String("userID", event.GetId()),
 			pkglog.Err(err),
 		)
 	}
@@ -119,9 +119,9 @@ func (s *UserSubscriber) handleUserDeleted(msg *nc.Msg) {
 		return
 	}
 
-	if err := s.handler.OnUserDeleted(context.Background(), event.GetID()); err != nil {
+	if err := s.handler.OnUserDeleted(context.Background(), event.GetId()); err != nil {
 		logger.Error("handling event",
-			slog.String("userID", event.GetID()),
+			slog.String("userID", event.GetId()),
 			pkglog.Err(err),
 		)
 	}

@@ -8,6 +8,34 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )
 
+type CarResponse struct {
+	Car Car `json:"car"`
+}
+
+type CarsResponse struct {
+	Cars []Car `json:"cars"`
+}
+
+type CarStatusHistoryResponse struct {
+	StatusHistory []CarStatusReading `json:"statusHistory"`
+}
+
+type CarFuelHistoryResponse struct {
+	FuelHistory []CarFuelReading `json:"fuelHistory"`
+}
+
+type CarLocationHistoryResponse struct {
+	LocationHistory []CarLocationReading `json:"locationHistory"`
+}
+
+type CarBatteryHistoryResponse struct {
+	BatteryHistory []CarBatteryReading `json:"batteryHistory"`
+}
+
+type CarMileageHistoryResponse struct {
+	MileageHistory []CarMileageReading `json:"mileageHistory"`
+}
+
 type Car struct {
 	ID               string    `json:"id"`
 	ModelID          string    `json:"modelId"`
@@ -23,6 +51,7 @@ type Car struct {
 	FuelStatus       string    `json:"fuelStatus"`
 	ZoneID           *string   `json:"zoneId,omitempty"`
 	Status           string    `json:"status"`
+	IsRetired        bool      `json:"isRetired"`
 	Notes            *string   `json:"notes,omitempty"`
 	ImageStorageUrls []string  `json:"imageStorageUrls,omitempty"`
 	LastSeenAt       time.Time `json:"lastSeenAt"`
@@ -30,41 +59,9 @@ type Car struct {
 	UpdatedAt        time.Time `json:"updatedAt"`
 }
 
-type CarCreateRequest struct {
-	ModelID          string   `json:"modelID"`
-	VIN              string   `json:"vin"`
-	LicensePlate     string   `json:"licensePlate"`
-	Color            string   `json:"color"`
-	YearManufactured int16    `json:"yearManufactured"`
-	MileageKM        int64    `json:"mileageKm"`
-	FuelLevel        *float32 `json:"fuelLevel"`
-	BatteryLevel     *float32 `json:"batteryLevel"`
-	Latitude         float64  `json:"latitude"`
-	Longitude        float64  `json:"longitude"`
-	TelematicsID     string   `json:"telematicsID"`
-	Notes            *string  `json:"notes"`
-	ImageStorageKeys []string `json:"imageStorageKeys"`
-}
-
-type CarUpdateRequest struct {
-	ModelID          *string  `json:"modelId"`
-	LicensePlate     *string  `json:"licensePlate"`
-	Color            *string  `json:"color"`
-	MileageKM        *int64   `json:"mileageKm"`
-	FuelLevel        *float32 `json:"fuelLevel"`
-	BatteryLevel     *float32 `json:"batteryLevel"`
-	Latitude         *float64 `json:"latitude"`
-	Longitude        *float64 `json:"longitude"`
-	TelematicsID     *string  `json:"telematicsId"`
-	ZoneID           *string  `json:"zoneId"`
-	Status           *string  `json:"status"`
-	Notes            *string  `json:"notes"`
-	ImageStorageKeys []string `json:"imageStorageKeys"`
-}
-
-type CarStatusLogEntry struct {
+type CarStatusReading struct {
 	ID         string         `json:"id"`
-	CarID      string         `json:"carID"`
+	CarID      string         `json:"carId"`
 	FromStatus string         `json:"fromStatus"`
 	ToStatus   string         `json:"toStatus"`
 	ActorType  string         `json:"actorType"`
@@ -75,10 +72,86 @@ type CarStatusLogEntry struct {
 }
 
 type CarFuelReading struct {
-	CarID      string    `json:"carID"`
-	FuelPct    int       `json:"fuelPct"`
-	RawPct     int       `json:"rawPct"`
-	RecordedAt time.Time `json:"recordedAt"`
+	ID         string         `json:"id"`
+	CarID      string         `json:"carId"`
+	FuelPct    float32        `json:"fuelPct"`
+	RawPct     float32        `json:"rawPct"`
+	ActorType  string         `json:"actorType"`
+	ActorID    *string        `json:"actorId,omitempty"`
+	Reason     *string        `json:"reason,omitempty"`
+	Metadata   map[string]any `json:"metadata,omitempty"`
+	RecordedAt time.Time      `json:"recordedAt"`
+}
+
+type CarLocationReading struct {
+	ID         string         `json:"id"`
+	CarID      string         `json:"carId"`
+	Location   location       `json:"location"`
+	ActorType  string         `json:"actorType"`
+	ActorID    *string        `json:"actorId,omitempty"`
+	Reason     *string        `json:"reason,omitempty"`
+	Metadata   map[string]any `json:"metadata,omitempty"`
+	RecordedAt time.Time      `json:"recordedAt"`
+}
+
+type CarBatteryReading struct {
+	ID           string         `json:"id"`
+	CarID        string         `json:"carId"`
+	BatteryLevel float32        `json:"batteryLevel"`
+	ActorType    string         `json:"actorType"`
+	ActorID      *string        `json:"actorId,omitempty"`
+	Reason       *string        `json:"reason,omitempty"`
+	Metadata     map[string]any `json:"metadata,omitempty"`
+	RecordedAt   time.Time      `json:"recordedAt"`
+}
+
+type CarMileageReading struct {
+	ID         string         `json:"id"`
+	CarID      string         `json:"carId"`
+	MileageKM  int64          `json:"mileageKm"`
+	ActorType  string         `json:"actorType"`
+	ActorID    *string        `json:"actorId,omitempty"`
+	Reason     *string        `json:"reason,omitempty"`
+	Metadata   map[string]any `json:"metadata,omitempty"`
+	RecordedAt time.Time      `json:"recordedAt"`
+}
+
+type CarCreateRequest struct {
+	ModelID          string  `json:"modelId"`
+	VIN              string  `json:"vin"`
+	LicensePlate     string  `json:"licensePlate"`
+	Color            string  `json:"color"`
+	YearManufactured int16   `json:"yearManufactured"`
+	TelematicsID     string  `json:"telematicsId"`
+	Notes            *string `json:"notes"`
+}
+
+type CarUpdateRequest struct {
+	ModelID      *string  `json:"modelId"`
+	LicensePlate *string  `json:"licensePlate"`
+	Color        *string  `json:"color"`
+	MileageKM    *int64   `json:"mileageKm"`
+	FuelLevel    *float32 `json:"fuelLevel"`
+	BatteryLevel *float32 `json:"batteryLevel"`
+	Latitude     *float64 `json:"latitude"`
+	Longitude    *float64 `json:"longitude"`
+	TelematicsID *string  `json:"telematicsId"`
+	ZoneID       *string  `json:"zoneId"`
+	Status       *string  `json:"status"`
+	IsRetired    *bool    `json:"isRetired"`
+	Notes        *string  `json:"notes"`
+	ImageKeys    []string `json:"imageKeys"`
+}
+
+type CarElevatedUpdateRequest struct {
+	Status       *string        `json:"status"`
+	MileageKM    *int64         `json:"mileageKm"`
+	FuelLevel    *float32       `json:"fuelLevel"`
+	BatteryLevel *float32       `json:"batteryLevel"`
+	Latitude     *float64       `json:"latitude"`
+	Longitude    *float64       `json:"longitude"`
+	Reason       string         `json:"reason"`
+	Metadata     map[string]any `json:"metadata"`
 }
 
 func FromCarCreateRequest(ctx *gin.Context) (model.CarCreate, error) {
@@ -93,14 +166,8 @@ func FromCarCreateRequest(ctx *gin.Context) (model.CarCreate, error) {
 		LicensePlate:     req.LicensePlate,
 		Color:            req.Color,
 		YearManufactured: req.YearManufactured,
-		MileageKM:        req.MileageKM,
-		FuelLevel:        req.FuelLevel,
-		BatteryLevel:     req.BatteryLevel,
-		Latitude:         req.Latitude,
-		Longitude:        req.Longitude,
 		TelematicsID:     req.TelematicsID,
 		Notes:            req.Notes,
-		ImageStorageKeys: req.ImageStorageKeys,
 	}, nil
 }
 
@@ -110,21 +177,52 @@ func FromCarUpdateRequest(ctx *gin.Context) (model.CarUpdate, error) {
 		return model.CarUpdate{}, err
 	}
 
-	return model.CarUpdate{
-		ModelID:          req.ModelID,
-		LicensePlate:     req.LicensePlate,
-		Color:            req.Color,
-		MileageKM:        req.MileageKM,
-		FuelLevel:        req.FuelLevel,
-		BatteryLevel:     req.BatteryLevel,
-		Latitude:         req.Latitude,
-		Longitude:        req.Longitude,
-		TelematicsID:     req.TelematicsID,
-		ZoneID:           req.ZoneID,
-		Status:           req.Status,
-		Notes:            req.Notes,
-		ImageStorageKeys: req.ImageStorageKeys,
-	}, nil
+	update := model.CarUpdate{
+		ModelID:      req.ModelID,
+		LicensePlate: req.LicensePlate,
+		Color:        req.Color,
+		MileageKM:    req.MileageKM,
+		FuelLevel:    req.FuelLevel,
+		BatteryLevel: req.BatteryLevel,
+		TelematicsID: req.TelematicsID,
+		ZoneID:       req.ZoneID,
+		Status:       req.Status,
+		IsRetired:    req.IsRetired,
+		Notes:        req.Notes,
+		ImageKeys:    req.ImageKeys,
+	}
+	if req.Latitude != nil && req.Longitude != nil {
+		update.Location = &model.Location{
+			Latitude:  *req.Latitude,
+			Longitude: *req.Longitude,
+		}
+	}
+
+	return update, nil
+}
+
+func FromCarElevatedUpdateRequest(ctx *gin.Context) (model.CarElevatedUpdate, error) {
+	var req CarElevatedUpdateRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return model.CarElevatedUpdate{}, err
+	}
+
+	update := model.CarElevatedUpdate{
+		Status:       req.Status,
+		MileageKM:    req.MileageKM,
+		FuelLevel:    req.FuelLevel,
+		BatteryLevel: req.BatteryLevel,
+		Reason:       req.Reason,
+		Metadata:     req.Metadata,
+	}
+	if req.Latitude != nil && req.Longitude != nil {
+		update.Location = &model.Location{
+			Latitude:  *req.Latitude,
+			Longitude: *req.Longitude,
+		}
+	}
+
+	return update, nil
 }
 
 func CarFilterFromCtx(ctx *gin.Context) (model.CarFilter, error) {
@@ -157,21 +255,18 @@ func CarFilterFromCtx(ctx *gin.Context) (model.CarFilter, error) {
 		minSeats := int8(vInt)
 		f.MinSeats = &minSeats
 	}
-	if v := ctx.Query("latitude"); v != "" {
-		vFloat, err := strconv.ParseFloat(v, 64)
-		if err != nil {
-			return model.CarFilter{}, model.ErrInvalidQueryParam
+	if lat := ctx.Query("latitude"); lat != "" {
+		if lng := ctx.Query("longitude"); lng != "" {
+			latF, err := strconv.ParseFloat(lat, 64)
+			if err != nil {
+				return model.CarFilter{}, model.ErrInvalidQueryParam
+			}
+			lngF, err := strconv.ParseFloat(lng, 64)
+			if err != nil {
+				return model.CarFilter{}, model.ErrInvalidQueryParam
+			}
+			f.Location = &model.Location{Latitude: latF, Longitude: lngF}
 		}
-
-		f.Latitude = &vFloat
-	}
-	if v := ctx.Query("longitude"); v != "" {
-		vFloat, err := strconv.ParseFloat(v, 64)
-		if err != nil {
-			return model.CarFilter{}, model.ErrInvalidQueryParam
-		}
-
-		f.Longitude = &vFloat
 	}
 	if v := ctx.Query("radiusM"); v != "" {
 		vInt, err := strconv.ParseInt(v, 10, 32)
@@ -208,54 +303,73 @@ func CarFilterFromCtx(ctx *gin.Context) (model.CarFilter, error) {
 	return f, nil
 }
 
-func CarStatusLogFilterFromCtx(ctx *gin.Context) (model.CarStatusLogFilter, error) {
-	f := model.CarStatusLogFilter{}
-
-	if v := ctx.Query("carID"); v != "" {
-		f.CarID = &v
+func carTimeRangeFilter(ctx *gin.Context) (from, to *time.Time, p *model.Pagination, err error) {
+	if v := ctx.Query("from"); v != "" {
+		t, parseErr := time.Parse("2006-01-02", v)
+		if parseErr != nil {
+			return nil, nil, nil, model.ErrInvalidQueryParam
+		}
+		from = &t
+	}
+	if v := ctx.Query("to"); v != "" {
+		t, parseErr := time.Parse("2006-01-02", v)
+		if parseErr != nil {
+			return nil, nil, nil, model.ErrInvalidQueryParam
+		}
+		to = &t
 	}
 
-	p, err := pagination(ctx)
+	p, err = pagination(ctx)
 	if err != nil {
-		return model.CarStatusLogFilter{}, model.ErrInvalidQueryParam
+		return nil, nil, nil, model.ErrInvalidQueryParam
 	}
 
-	f.Pagination = p
+	return from, to, p, nil
+}
 
-	return f, nil
+func CarStatusReadingFilterFromCtx(ctx *gin.Context) (model.CarStatusReadingFilter, error) {
+	from, to, p, err := carTimeRangeFilter(ctx)
+	if err != nil {
+		return model.CarStatusReadingFilter{}, err
+	}
+
+	return model.CarStatusReadingFilter{From: from, To: to, Pagination: p}, nil
 }
 
 func CarFuelReadingFilterFromCtx(ctx *gin.Context) (model.CarFuelReadingFilter, error) {
-	f := model.CarFuelReadingFilter{}
-
-	if v := ctx.Query("carID"); v != "" {
-		f.CarID = &v
-	}
-	if v := ctx.Query("from"); v != "" {
-		vTime, err := time.Parse("2006-01-02", v)
-		if err != nil {
-			return model.CarFuelReadingFilter{}, model.ErrInvalidQueryParam
-		}
-
-		f.From = &vTime
-	}
-	if v := ctx.Query("to"); v != "" {
-		vTime, err := time.Parse("2006-01-02", v)
-		if err != nil {
-			return model.CarFuelReadingFilter{}, model.ErrInvalidQueryParam
-		}
-
-		f.To = &vTime
-	}
-
-	p, err := pagination(ctx)
+	from, to, p, err := carTimeRangeFilter(ctx)
 	if err != nil {
-		return model.CarFuelReadingFilter{}, model.ErrInvalidQueryParam
+		return model.CarFuelReadingFilter{}, err
 	}
 
-	f.Pagination = p
+	return model.CarFuelReadingFilter{From: from, To: to, Pagination: p}, nil
+}
 
-	return f, nil
+func CarLocationReadingFilterFromCtx(ctx *gin.Context) (model.CarLocationReadingFilter, error) {
+	from, to, p, err := carTimeRangeFilter(ctx)
+	if err != nil {
+		return model.CarLocationReadingFilter{}, err
+	}
+
+	return model.CarLocationReadingFilter{From: from, To: to, Pagination: p}, nil
+}
+
+func CarBatteryReadingFilterFromCtx(ctx *gin.Context) (model.CarBatteryReadingFilter, error) {
+	from, to, p, err := carTimeRangeFilter(ctx)
+	if err != nil {
+		return model.CarBatteryReadingFilter{}, err
+	}
+
+	return model.CarBatteryReadingFilter{From: from, To: to, Pagination: p}, nil
+}
+
+func CarMileageReadingFilterFromCtx(ctx *gin.Context) (model.CarMileageReadingFilter, error) {
+	from, to, p, err := carTimeRangeFilter(ctx)
+	if err != nil {
+		return model.CarMileageReadingFilter{}, err
+	}
+
+	return model.CarMileageReadingFilter{From: from, To: to, Pagination: p}, nil
 }
 
 func ToCarResponse(m model.Car) Car {
@@ -277,16 +391,17 @@ func ToCarResponse(m model.Car) Car {
 		FuelStatus:       m.FuelStatus,
 		ZoneID:           m.ZoneID,
 		Status:           m.Status,
+		IsRetired:        m.IsRetired,
 		Notes:            m.Notes,
-		ImageStorageUrls: m.ImageStorageUrls,
+		ImageStorageUrls: m.ImageURLs,
 		LastSeenAt:       m.LastSeenAt,
 		CreatedAt:        m.CreatedAt,
 		UpdatedAt:        m.UpdatedAt,
 	}
 }
 
-func ToCarStatusLogEntryResponse(m model.CarStatusLogEntry) CarStatusLogEntry {
-	return CarStatusLogEntry{
+func ToCarStatusReadingResponse(m model.CarStatusReading) CarStatusReading {
+	return CarStatusReading{
 		ID:         m.ID,
 		CarID:      m.CarID,
 		FromStatus: m.FromStatus,
@@ -301,9 +416,56 @@ func ToCarStatusLogEntryResponse(m model.CarStatusLogEntry) CarStatusLogEntry {
 
 func ToCarFuelReadingResponse(m model.CarFuelReading) CarFuelReading {
 	return CarFuelReading{
+		ID:         m.ID,
 		CarID:      m.CarID,
 		FuelPct:    m.FuelPct,
 		RawPct:     m.RawPct,
+		ActorType:  m.ActorType,
+		ActorID:    m.ActorID,
+		Reason:     m.Reason,
+		Metadata:   m.Metadata,
+		RecordedAt: m.RecordedAt,
+	}
+}
+
+func ToCarLocationReadingResponse(m model.CarLocationReading) CarLocationReading {
+	return CarLocationReading{
+		ID:    m.ID,
+		CarID: m.CarID,
+		Location: location{
+			Latitude:  m.Location.Latitude,
+			Longitude: m.Location.Longitude,
+		},
+		ActorType:  m.ActorType,
+		ActorID:    m.ActorID,
+		Reason:     m.Reason,
+		Metadata:   m.Metadata,
+		RecordedAt: m.RecordedAt,
+	}
+}
+
+func ToCarBatteryReadingResponse(m model.CarBatteryReading) CarBatteryReading {
+	return CarBatteryReading{
+		ID:           m.ID,
+		CarID:        m.CarID,
+		BatteryLevel: m.BatteryLevel,
+		ActorType:    m.ActorType,
+		ActorID:      m.ActorID,
+		Reason:       m.Reason,
+		Metadata:     m.Metadata,
+		RecordedAt:   m.RecordedAt,
+	}
+}
+
+func ToCarMileageReadingResponse(m model.CarMileageReading) CarMileageReading {
+	return CarMileageReading{
+		ID:         m.ID,
+		CarID:      m.CarID,
+		MileageKM:  m.MileageKM,
+		ActorType:  m.ActorType,
+		ActorID:    m.ActorID,
+		Reason:     m.Reason,
+		Metadata:   m.Metadata,
 		RecordedAt: m.RecordedAt,
 	}
 }

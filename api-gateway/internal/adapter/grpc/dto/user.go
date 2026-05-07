@@ -7,7 +7,7 @@ import (
 
 func UserFromProto(u *baseuser.User) model.User {
 	return model.User{
-		ID:          u.GetID(),
+		ID:          u.GetId(),
 		Email:       u.GetEmail(),
 		PhoneNumber: u.PhoneNumber,
 		FirstName:   u.GetFirstName(),
@@ -16,7 +16,7 @@ func UserFromProto(u *baseuser.User) model.User {
 		Password: model.Password{
 			Hash: u.GetPasswordHash(),
 		},
-		ProfileImageURL:    u.ProfileImageURL,
+		ProfileImageURL:    u.ProfileImageUrl,
 		Roles:              u.GetRoles(),
 		IsDocumentVerified: u.GetIsDocumentVerified(),
 		IsEmailVerified:    u.GetIsEmailVerified(),
@@ -28,12 +28,12 @@ func UserFromProto(u *baseuser.User) model.User {
 
 func DocumentFromProto(d *baseuser.Document) model.Document {
 	return model.Document{
-		ID:        d.GetID(),
-		UserID:    d.GetUserID(),
+		ID:        d.GetId(),
+		UserID:    d.GetUserId(),
 		ImageType: d.GetImageType(),
 		Status:    d.GetStatus(),
 		Reason:    d.Error,
-		ImageURL:  d.GetImageURL(),
+		ImageURL:  d.GetImageUrl(),
 		CreatedAt: d.GetCreatedAt().AsTime(),
 		UpdatedAt: d.GetUpdatedAt().AsTime(),
 	}

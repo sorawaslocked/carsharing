@@ -8,6 +8,14 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )
 
+type CarModelGetResponse struct {
+	CarModel CarModel `json:"carModel"`
+}
+
+type CarModelsResponse struct {
+	CarModels []CarModel `json:"carModels"`
+}
+
 type CarModel struct {
 	ID               string    `json:"id"`
 	Brand            string    `json:"brand"`
@@ -63,18 +71,17 @@ func FromCarModelCreateRequest(ctx *gin.Context) (model.CarModelCreate, error) {
 	}
 
 	return model.CarModelCreate{
-		Brand:            req.Brand,
-		Model:            req.Model,
-		Year:             req.Year,
-		FuelType:         req.FuelType,
-		Transmission:     req.Transmission,
-		BodyType:         req.BodyType,
-		Class:            req.Class,
-		Seats:            req.Seats,
-		EngineVolume:     req.EngineVolume,
-		RangeKM:          req.RangeKM,
-		Features:         req.Features,
-		ImageStorageKeys: req.ImageStorageKeys,
+		Brand:        req.Brand,
+		Model:        req.Model,
+		Year:         req.Year,
+		FuelType:     req.FuelType,
+		Transmission: req.Transmission,
+		BodyType:     req.BodyType,
+		Class:        req.Class,
+		Seats:        req.Seats,
+		EngineVolume: req.EngineVolume,
+		RangeKM:      req.RangeKM,
+		Features:     req.Features,
 	}, nil
 }
 
@@ -85,18 +92,18 @@ func FromCarModelUpdateRequest(ctx *gin.Context) (model.CarModelUpdate, error) {
 	}
 
 	return model.CarModelUpdate{
-		Brand:            req.Brand,
-		Model:            req.Model,
-		Year:             req.Year,
-		FuelType:         req.FuelType,
-		Transmission:     req.Transmission,
-		BodyType:         req.BodyType,
-		Class:            req.Class,
-		Seats:            req.Seats,
-		EngineVolume:     req.EngineVolume,
-		RangeKM:          req.RangeKM,
-		Features:         req.Features,
-		ImageStorageKeys: req.ImageStorageKeys,
+		Brand:        req.Brand,
+		Model:        req.Model,
+		Year:         req.Year,
+		FuelType:     req.FuelType,
+		Transmission: req.Transmission,
+		BodyType:     req.BodyType,
+		Class:        req.Class,
+		Seats:        req.Seats,
+		EngineVolume: req.EngineVolume,
+		RangeKM:      req.RangeKM,
+		Features:     req.Features,
+		ImageKeys:    req.ImageStorageKeys,
 	}, nil
 }
 
@@ -155,7 +162,7 @@ func ToCarModelResponse(m model.CarModel) CarModel {
 		EngineVolume:     m.EngineVolume,
 		RangeKM:          m.RangeKM,
 		Features:         m.Features,
-		ImageStorageUrls: m.ImageStorageUrls,
+		ImageStorageUrls: m.ImageURLs,
 		CreatedAt:        m.CreatedAt,
 		UpdatedAt:        m.UpdatedAt,
 	}

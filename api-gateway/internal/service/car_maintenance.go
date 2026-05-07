@@ -22,8 +22,8 @@ func (s *CarMaintenanceService) GetTemplate(ctx context.Context, id string) (mod
 	return s.presenter.GetTemplate(ctx, id)
 }
 
-func (s *CarMaintenanceService) GetAllTemplates(ctx context.Context, filter model.CarMaintenanceTemplateFilter) ([]model.CarMaintenanceTemplate, error) {
-	return s.presenter.GetAllTemplates(ctx, filter)
+func (s *CarMaintenanceService) ListTemplates(ctx context.Context, filter model.CarMaintenanceTemplateFilter) ([]model.CarMaintenanceTemplate, error) {
+	return s.presenter.ListTemplates(ctx, filter)
 }
 
 func (s *CarMaintenanceService) UpdateTemplate(ctx context.Context, id string, data model.CarMaintenanceTemplateUpdate) error {
@@ -34,8 +34,8 @@ func (s *CarMaintenanceService) DeleteTemplate(ctx context.Context, id string) e
 	return s.presenter.DeleteTemplate(ctx, id)
 }
 
-func (s *CarMaintenanceService) GetRecords(ctx context.Context, filter model.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error) {
-	return s.presenter.GetRecords(ctx, filter)
+func (s *CarMaintenanceService) ListRecords(ctx context.Context, filter model.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error) {
+	return s.presenter.ListRecords(ctx, filter)
 }
 
 func (s *CarMaintenanceService) CompleteRecord(ctx context.Context, recordID string, data model.CarMaintenanceRecordComplete) error {

@@ -21,11 +21,11 @@ func NewZoneHandler(svc ZoneService) *ZoneHandler {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        body  body      dto.ZoneCreateRequest  true  "Zone payload (boundary as GeoJSON polygon string)"
-// @Success      200   {object}  map[string]any         "id"
-// @Failure      400   {object}  map[string]any
-// @Failure      401   {object}  map[string]any
-// @Failure      409   {object}  map[string]any
-// @Failure      500   {object}  map[string]any
+// @Success      200   {object}  dto.IDResponse
+// @Failure      400   {object}  dto.ErrorResponse
+// @Failure      401   {object}  dto.ErrorResponse
+// @Failure      409   {object}  dto.ErrorResponse
+// @Failure      500   {object}  dto.ErrorResponse
 // @Router       /zones [post]
 func (h *ZoneHandler) Create(ctx *gin.Context) {
 	data, err := dto.FromZoneCreateRequest(ctx)
@@ -51,10 +51,11 @@ func (h *ZoneHandler) Create(ctx *gin.Context) {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        id   path      string  true  "Zone UUID"
-// @Success      200  {object}  map[string]any  "zone"
-// @Failure      400  {object}  map[string]any
-// @Failure      404  {object}  map[string]any
-// @Failure      500  {object}  map[string]any
+// @Success      200  {object}  dto.ZoneResponse
+// @Failure      400  {object}  dto.ErrorResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      404  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
 // @Router       /zones/{id} [get]
 func (h *ZoneHandler) Get(ctx *gin.Context) {
 	id, err := dto.IDParam(ctx)
@@ -74,7 +75,7 @@ func (h *ZoneHandler) Get(ctx *gin.Context) {
 	dto.Ok(ctx, gin.H{"zone": dto.ToZoneResponse(zone)})
 }
 
-// GetAll (Zone) godoc
+// List (Zone) godoc
 // @Summary      List zones
 // @Description  Returns zones filtered by type and active status.
 // @Tags         zones
@@ -82,11 +83,12 @@ func (h *ZoneHandler) Get(ctx *gin.Context) {
 // @Security     BearerAuth
 // @Param        type      query     string   false  "Zone type (operating, no_drop, parking_hub, surcharge)"
 // @Param        isActive  query     boolean  false  "Filter by active flag"
-// @Success      200       {object}  map[string]any  "zones"
-// @Failure      400       {object}  map[string]any
-// @Failure      500       {object}  map[string]any
+// @Success      200       {object}  dto.ZonesResponse
+// @Failure      400       {object}  dto.ErrorResponse
+// @Failure      401       {object}  dto.ErrorResponse
+// @Failure      500       {object}  dto.ErrorResponse
 // @Router       /zones [get]
-func (h *ZoneHandler) GetAll(ctx *gin.Context) {
+func (h *ZoneHandler) List(ctx *gin.Context) {
 	filter, err := dto.ZoneFilterFromCtx(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -94,7 +96,7 @@ func (h *ZoneHandler) GetAll(ctx *gin.Context) {
 		return
 	}
 
-	zones, err := h.svc.GetAll(ctx, filter)
+	zones, err := h.svc.List(ctx, filter)
 	if err != nil {
 		dto.FromError(ctx, err)
 
@@ -117,10 +119,11 @@ func (h *ZoneHandler) GetAll(ctx *gin.Context) {
 // @Security     BearerAuth
 // @Param        id    path      string                 true  "Zone UUID"
 // @Param        body  body      dto.ZoneUpdateRequest  true  "Fields to update"
-// @Success      200   {object}  map[string]any
-// @Failure      400   {object}  map[string]any
-// @Failure      404   {object}  map[string]any
-// @Failure      500   {object}  map[string]any
+// @Success      204
+// @Failure      400  {object}  dto.ErrorResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      404  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
 // @Router       /zones/{id} [patch]
 func (h *ZoneHandler) Update(ctx *gin.Context) {
 	id, err := dto.IDParam(ctx)
@@ -144,7 +147,7 @@ func (h *ZoneHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	dto.Ok(ctx, nil)
+	dto.NoContent(ctx)
 }
 
 // Delete (Zone) godoc
@@ -153,10 +156,11 @@ func (h *ZoneHandler) Update(ctx *gin.Context) {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        id   path      string  true  "Zone UUID"
-// @Success      200  {object}  map[string]any
-// @Failure      400  {object}  map[string]any
-// @Failure      404  {object}  map[string]any
-// @Failure      500  {object}  map[string]any
+// @Success      204
+// @Failure      400  {object}  dto.ErrorResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      404  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
 // @Router       /zones/{id} [delete]
 func (h *ZoneHandler) Delete(ctx *gin.Context) {
 	id, err := dto.IDParam(ctx)
@@ -173,5 +177,5 @@ func (h *ZoneHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	dto.Ok(ctx, nil)
+	dto.NoContent(ctx)
 }

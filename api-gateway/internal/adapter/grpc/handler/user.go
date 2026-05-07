@@ -27,7 +27,7 @@ func NewUserHandler(client usersvc.UserServiceClient, logger *slog.Logger) *User
 func (h *UserHandler) Create(ctx context.Context, data model.UserCreate) (string, error) {
 	logger := pkglog.WithMethod(h.log, "Create")
 
-	req := &usersvc.CreateRequest{
+	req := &usersvc.CreateUserRequest{
 		Email:       data.Email,
 		FirstName:   data.FirstName,
 		LastName:    data.LastName,
@@ -41,7 +41,7 @@ func (h *UserHandler) Create(ctx context.Context, data model.UserCreate) (string
 		req.PasswordConfirmation = *data.Password.TextConfirmation
 	}
 
-	res, err := h.client.Create(ctx, req)
+	res, err := h.client.CreateUser(ctx, req)
 	if err != nil {
 		if dto.IsSystemErr(err) {
 			logger.Error("grpc call failed", pkglog.Err(err))
@@ -50,13 +50,13 @@ func (h *UserHandler) Create(ctx context.Context, data model.UserCreate) (string
 		return "", dto.FromGrpcErr(err)
 	}
 
-	return res.GetID(), nil
+	return res.GetId(), nil
 }
 
 func (h *UserHandler) Get(ctx context.Context, id string) (model.User, error) {
 	logger := pkglog.WithMethod(h.log, "Get")
 
-	res, err := h.client.Get(ctx, &usersvc.GetRequest{ID: id})
+	res, err := h.client.GetUser(ctx, &usersvc.GetUserRequest{Id: id})
 	if err != nil {
 		if dto.IsSystemErr(err) {
 			logger.Error("grpc call failed", pkglog.Err(err))
@@ -68,10 +68,10 @@ func (h *UserHandler) Get(ctx context.Context, id string) (model.User, error) {
 	return dto.UserFromProto(res.GetUser()), nil
 }
 
-func (h *UserHandler) GetAllWithFilter(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
-	logger := pkglog.WithMethod(h.log, "GetAllWithFilter")
+func (h *UserHandler) List(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
+	logger := pkglog.WithMethod(h.log, "List")
 
-	req := &usersvc.GetAllWithFilterRequest{
+	req := &usersvc.ListUsersRequest{
 		Email:              filter.Email,
 		PhoneNumber:        filter.PhoneNumber,
 		FirstName:          filter.FirstName,
@@ -87,7 +87,7 @@ func (h *UserHandler) GetAllWithFilter(ctx context.Context, filter model.UserFil
 		}
 	}
 
-	res, err := h.client.GetAllWithFilter(ctx, req)
+	res, err := h.client.ListUsers(ctx, req)
 	if err != nil {
 		if dto.IsSystemErr(err) {
 			logger.Error("grpc call failed", pkglog.Err(err))
@@ -107,8 +107,8 @@ func (h *UserHandler) GetAllWithFilter(ctx context.Context, filter model.UserFil
 func (h *UserHandler) Update(ctx context.Context, id string, data model.UserUpdate) error {
 	logger := pkglog.WithMethod(h.log, "Update")
 
-	req := &usersvc.UpdateRequest{
-		ID:                 id,
+	req := &usersvc.UpdateUserRequest{
+		Id:                 id,
 		Email:              data.Email,
 		PhoneNumber:        data.PhoneNumber,
 		FirstName:          data.FirstName,
@@ -127,7 +127,7 @@ func (h *UserHandler) Update(ctx context.Context, id string, data model.UserUpda
 		req.PasswordConfirmation = data.Password.TextConfirmation
 	}
 
-	_, err := h.client.Update(ctx, req)
+	_, err := h.client.UpdateUser(ctx, req)
 	if err != nil {
 		if dto.IsSystemErr(err) {
 			logger.Error("grpc call failed", pkglog.Err(err))
@@ -142,7 +142,7 @@ func (h *UserHandler) Update(ctx context.Context, id string, data model.UserUpda
 func (h *UserHandler) Delete(ctx context.Context, id string) error {
 	logger := pkglog.WithMethod(h.log, "Delete")
 
-	_, err := h.client.Delete(ctx, &usersvc.DeleteRequest{ID: id})
+	_, err := h.client.DeleteUser(ctx, &usersvc.DeleteUserRequest{Id: id})
 	if err != nil {
 		if dto.IsSystemErr(err) {
 			logger.Error("grpc call failed", pkglog.Err(err))
@@ -180,7 +180,7 @@ func (h *UserHandler) Register(ctx context.Context, data model.UserCreate) (stri
 		return "", dto.FromGrpcErr(err)
 	}
 
-	return res.GetID(), nil
+	return res.GetId(), nil
 }
 
 func (h *UserHandler) SignIn(ctx context.Context, creds model.Credentials) (string, error) {
@@ -203,7 +203,7 @@ func (h *UserHandler) SignIn(ctx context.Context, creds model.Credentials) (stri
 		return "", dto.FromGrpcErr(err)
 	}
 
-	return res.GetID(), nil
+	return res.GetId(), nil
 }
 
 func (h *UserHandler) SendActivationCode(ctx context.Context) error {
@@ -251,11 +251,11 @@ func (h *UserHandler) CreateDocument(ctx context.Context, objectKey, imageType s
 		return "", dto.FromGrpcErr(err)
 	}
 
-	return res.GetID(), nil
+	return res.GetId(), nil
 }
 
-func (h *UserHandler) GetUploadDocumentData(ctx context.Context, imageType string) (model.ImageUploadData, error) {
-	logger := pkglog.WithMethod(h.log, "GetUploadDocumentData")
+func (h *UserHandler) GetDocumentImageUploadData(ctx context.Context, imageType string) (model.ImageUploadData, error) {
+	logger := pkglog.WithMethod(h.log, "GetDocumentImageUploadData")
 
 	res, err := h.client.GetUploadDocumentData(ctx, &usersvc.GetUploadDocumentDataRequest{ImageType: imageType})
 	if err != nil {
@@ -266,21 +266,13 @@ func (h *UserHandler) GetUploadDocumentData(ctx context.Context, imageType strin
 		return model.ImageUploadData{}, dto.FromGrpcErr(err)
 	}
 
-	ud := res.GetUploadData()
-	if ud == nil {
-		return model.ImageUploadData{}, nil
-	}
-
-	return model.ImageUploadData{
-		PresignedPutURL: ud.GetPresignedPutURL(),
-		ObjectKey:       ud.GetObjectKey(),
-	}, nil
+	return dto.ImageUploadDataFromProto(res.GetUploadData()), nil
 }
 
 func (h *UserHandler) GetProcessedDocumentsForUser(ctx context.Context, userID string) ([]model.Document, error) {
 	logger := pkglog.WithMethod(h.log, "GetProcessedDocumentsForUser")
 
-	res, err := h.client.GetProcessedDocumentsForUser(ctx, &usersvc.GetProcessedDocumentsForUserRequest{UserID: userID})
+	res, err := h.client.GetProcessedDocumentsForUser(ctx, &usersvc.GetProcessedDocumentsForUserRequest{UserId: userID})
 	if err != nil {
 		if dto.IsSystemErr(err) {
 			logger.Error("grpc call failed", pkglog.Err(err))
@@ -301,7 +293,7 @@ func (h *UserHandler) CheckDocument(ctx context.Context, docID, status string, r
 	logger := pkglog.WithMethod(h.log, "CheckDocument")
 
 	_, err := h.client.CheckDocument(ctx, &usersvc.CheckDocumentRequest{
-		DocID:  docID,
+		DocId:  docID,
 		Status: status,
 		Error:  reason,
 	})

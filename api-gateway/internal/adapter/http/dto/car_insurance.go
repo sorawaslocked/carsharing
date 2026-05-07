@@ -18,7 +18,7 @@ type CarInsurancesResponse struct {
 
 type CarInsurance struct {
 	ID        string    `json:"id"`
-	CarID     string    `json:"carId"`
+	CarID     string    `json:"carID"`
 	Type      string    `json:"type"`
 	Provider  string    `json:"provider"`
 	PolicyNum string    `json:"policyNum"`
@@ -33,7 +33,7 @@ type CarInsurance struct {
 }
 
 type CarInsuranceCreateRequest struct {
-	CarID     string    `json:"carId"`
+	CarID     string    `json:"carID"`
 	Type      string    `json:"type"`
 	Provider  string    `json:"provider"`
 	PolicyNum string    `json:"policyNum"`

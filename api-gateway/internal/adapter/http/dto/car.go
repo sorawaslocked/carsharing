@@ -61,7 +61,7 @@ type Car struct {
 
 type CarStatusReading struct {
 	ID         string         `json:"id"`
-	CarID      string         `json:"carId"`
+	CarID      string         `json:"carID"`
 	FromStatus string         `json:"fromStatus"`
 	ToStatus   string         `json:"toStatus"`
 	ActorType  string         `json:"actorType"`
@@ -73,7 +73,7 @@ type CarStatusReading struct {
 
 type CarFuelReading struct {
 	ID         string         `json:"id"`
-	CarID      string         `json:"carId"`
+	CarID      string         `json:"carID"`
 	FuelPct    float32        `json:"fuelPct"`
 	RawPct     float32        `json:"rawPct"`
 	ActorType  string         `json:"actorType"`
@@ -85,7 +85,7 @@ type CarFuelReading struct {
 
 type CarLocationReading struct {
 	ID         string         `json:"id"`
-	CarID      string         `json:"carId"`
+	CarID      string         `json:"carID"`
 	Location   location       `json:"location"`
 	ActorType  string         `json:"actorType"`
 	ActorID    *string        `json:"actorId,omitempty"`
@@ -96,7 +96,7 @@ type CarLocationReading struct {
 
 type CarBatteryReading struct {
 	ID           string         `json:"id"`
-	CarID        string         `json:"carId"`
+	CarID        string         `json:"carID"`
 	BatteryLevel float32        `json:"batteryLevel"`
 	ActorType    string         `json:"actorType"`
 	ActorID      *string        `json:"actorId,omitempty"`
@@ -107,7 +107,7 @@ type CarBatteryReading struct {
 
 type CarMileageReading struct {
 	ID         string         `json:"id"`
-	CarID      string         `json:"carId"`
+	CarID      string         `json:"carID"`
 	MileageKM  int64          `json:"mileageKm"`
 	ActorType  string         `json:"actorType"`
 	ActorID    *string        `json:"actorId,omitempty"`
@@ -117,7 +117,7 @@ type CarMileageReading struct {
 }
 
 type CarCreateRequest struct {
-	ModelID          string  `json:"modelId"`
+	ModelID          string  `json:"modelID"`
 	VIN              string  `json:"vin"`
 	LicensePlate     string  `json:"licensePlate"`
 	Color            string  `json:"color"`
@@ -127,7 +127,7 @@ type CarCreateRequest struct {
 }
 
 type CarUpdateRequest struct {
-	ModelID      *string  `json:"modelId"`
+	ModelID      *string  `json:"modelID"`
 	LicensePlate *string  `json:"licensePlate"`
 	Color        *string  `json:"color"`
 	MileageKM    *int64   `json:"mileageKm"`
@@ -136,7 +136,7 @@ type CarUpdateRequest struct {
 	Latitude     *float64 `json:"latitude"`
 	Longitude    *float64 `json:"longitude"`
 	TelematicsID *string  `json:"telematicsId"`
-	ZoneID       *string  `json:"zoneId"`
+	ZoneID       *string  `json:"zoneID"`
 	Status       *string  `json:"status"`
 	IsRetired    *bool    `json:"isRetired"`
 	Notes        *string  `json:"notes"`

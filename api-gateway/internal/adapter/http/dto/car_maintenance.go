@@ -31,8 +31,8 @@ type CarMaintenanceTemplate struct {
 
 type CarMaintenanceRecord struct {
 	ID                      string     `json:"id"`
-	CarID                   string     `json:"carId"`
-	TemplateID              string     `json:"templateId"`
+	CarID                   string     `json:"carID"`
+	TemplateID              string     `json:"templateID"`
 	Status                  string     `json:"status"`
 	OdometerAt              int32      `json:"odometerAt"`
 	CompletedKm             *int32     `json:"completedKm,omitempty"`

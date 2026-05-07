@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package service;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service";
+
+message HealthResponse {
+  string status = 1;
+
+  string serviceName = 2;
+  string version = 3;
+
+  google.protobuf.Timestamp timestamp = 4;
+
+  uint64 uptimeSeconds = 5;
+
+  repeated DependencyHealth dependencies = 6;
+}
+
+message DependencyHealth {
+  string name = 1;
+  string status = 2;
+
+  optional uint32 latencyMS = 3;
+
+  optional string error = 4;
+}

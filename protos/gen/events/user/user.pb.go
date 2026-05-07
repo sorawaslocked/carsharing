@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v4.25.1
-// source: events/user/user.proto
+// source: event/user/user.proto
 
 package user
 
@@ -165,14 +165,14 @@ var File_events_user_user_proto protoreflect.FileDescriptor
 
 const file_events_user_user_proto_rawDesc = "" +
 	"\n" +
-	"\x16events/user/user.proto\x12\vevents.user\"\x1d\n" +
+	"\x16events/user/user.proto\x12\vevent.user\"\x1d\n" +
 	"\vCreateEvent\x12\x0e\n" +
 	"\x02ID\x18\x01 \x01(\tR\x02ID\"I\n" +
 	"\vUpdateEvent\x12\x0e\n" +
 	"\x02ID\x18\x01 \x01(\tR\x02ID\x12*\n" +
 	"\x10isSecurityUpdate\x18\x02 \x01(\bR\x10isSecurityUpdate\"\x1d\n" +
 	"\vDeleteEvent\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02IDB<Z:github.com/sorawaslocked/car-rental-protos/gen/events/userb\x06proto3"
+	"\x02ID\x18\x01 \x01(\tR\x02IDB<Z:github.com/sorawaslocked/car-rental-protos/gen/event/userb\x06proto3"
 
 var (
 	file_events_user_user_proto_rawDescOnce sync.Once
@@ -188,9 +188,9 @@ func file_events_user_user_proto_rawDescGZIP() []byte {
 
 var file_events_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_events_user_user_proto_goTypes = []any{
-	(*CreateEvent)(nil), // 0: events.user.CreateEvent
-	(*UpdateEvent)(nil), // 1: events.user.UpdateEvent
-	(*DeleteEvent)(nil), // 2: events.user.DeleteEvent
+	(*CreateEvent)(nil), // 0: event.user.CreateEvent
+	(*UpdateEvent)(nil), // 1: event.user.UpdateEvent
+	(*DeleteEvent)(nil), // 2: event.user.DeleteEvent
 }
 var file_events_user_user_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type

@@ -5,10 +5,13 @@ package service.user;
 import "base/user/user.proto";
 import "base/helpers.proto";
 import "google/protobuf/empty.proto";
+import "service/helpers.proto";
 
 option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/user";
 
 service UserService {
+  rpc Health(google.protobuf.Empty) returns (HealthResponse);
+
   rpc Create(CreateRequest) returns (CreateResponse);
   rpc Get(GetRequest) returns (GetResponse);
   rpc GetAllWithFilter(GetAllWithFilterRequest) returns (GetAllWithFilterResponse);
@@ -18,7 +21,7 @@ service UserService {
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc SignIn(SignInRequest) returns (SignInResponse);
 
-  rpc SendActivationCode(SendActivationCodeRequest) returns (google.protobuf.Empty);
+  rpc SendActivationCode(google.protobuf.Empty) returns (google.protobuf.Empty);
   rpc CheckActivationCode(CheckActivationCodeRequest) returns (google.protobuf.Empty);
 
   rpc CreateDocument(CreateDocumentRequest) returns (CreateDocumentResponse);
@@ -113,8 +116,6 @@ message SignInResponse {
 }
 
 // Activation Code
-message SendActivationCodeRequest {}
-
 message CheckActivationCodeRequest {
   string code = 1;
 }

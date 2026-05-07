@@ -8,6 +8,7 @@ package user
 
 import (
 	context "context"
+	service "github.com/sorawaslocked/car-rental-protos/gen/service"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -20,6 +21,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	UserService_Health_FullMethodName                       = "/service.user.UserService/Health"
 	UserService_Create_FullMethodName                       = "/service.user.UserService/Create"
 	UserService_Get_FullMethodName                          = "/service.user.UserService/Get"
 	UserService_GetAllWithFilter_FullMethodName             = "/service.user.UserService/GetAllWithFilter"
@@ -39,6 +41,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
+	Health(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*service.HealthResponse, error)
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	GetAllWithFilter(ctx context.Context, in *GetAllWithFilterRequest, opts ...grpc.CallOption) (*GetAllWithFilterResponse, error)
@@ -46,7 +49,7 @@ type UserServiceClient interface {
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*SignInResponse, error)
-	SendActivationCode(ctx context.Context, in *SendActivationCodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	SendActivationCode(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CheckActivationCode(ctx context.Context, in *CheckActivationCodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CreateDocument(ctx context.Context, in *CreateDocumentRequest, opts ...grpc.CallOption) (*CreateDocumentResponse, error)
 	GetUploadDocumentData(ctx context.Context, in *GetUploadDocumentDataRequest, opts ...grpc.CallOption) (*GetUploadDocumentDataResponse, error)
@@ -60,6 +63,16 @@ type userServiceClient struct {
 
 func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
+}
+
+func (c *userServiceClient) Health(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*service.HealthResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(service.HealthResponse)
+	err := c.cc.Invoke(ctx, UserService_Health_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *userServiceClient) Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error) {
@@ -132,7 +145,7 @@ func (c *userServiceClient) SignIn(ctx context.Context, in *SignInRequest, opts 
 	return out, nil
 }
 
-func (c *userServiceClient) SendActivationCode(ctx context.Context, in *SendActivationCodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *userServiceClient) SendActivationCode(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, UserService_SendActivationCode_FullMethodName, in, out, cOpts...)
@@ -196,6 +209,7 @@ func (c *userServiceClient) CheckDocument(ctx context.Context, in *CheckDocument
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
 type UserServiceServer interface {
+	Health(context.Context, *emptypb.Empty) (*service.HealthResponse, error)
 	Create(context.Context, *CreateRequest) (*CreateResponse, error)
 	Get(context.Context, *GetRequest) (*GetResponse, error)
 	GetAllWithFilter(context.Context, *GetAllWithFilterRequest) (*GetAllWithFilterResponse, error)
@@ -203,7 +217,7 @@ type UserServiceServer interface {
 	Delete(context.Context, *DeleteRequest) (*emptypb.Empty, error)
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	SignIn(context.Context, *SignInRequest) (*SignInResponse, error)
-	SendActivationCode(context.Context, *SendActivationCodeRequest) (*emptypb.Empty, error)
+	SendActivationCode(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	CheckActivationCode(context.Context, *CheckActivationCodeRequest) (*emptypb.Empty, error)
 	CreateDocument(context.Context, *CreateDocumentRequest) (*CreateDocumentResponse, error)
 	GetUploadDocumentData(context.Context, *GetUploadDocumentDataRequest) (*GetUploadDocumentDataResponse, error)
@@ -219,6 +233,9 @@ type UserServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedUserServiceServer struct{}
 
+func (UnimplementedUserServiceServer) Health(context.Context, *emptypb.Empty) (*service.HealthResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method Health not implemented")
+}
 func (UnimplementedUserServiceServer) Create(context.Context, *CreateRequest) (*CreateResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Create not implemented")
 }
@@ -240,7 +257,7 @@ func (UnimplementedUserServiceServer) Register(context.Context, *RegisterRequest
 func (UnimplementedUserServiceServer) SignIn(context.Context, *SignInRequest) (*SignInResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SignIn not implemented")
 }
-func (UnimplementedUserServiceServer) SendActivationCode(context.Context, *SendActivationCodeRequest) (*emptypb.Empty, error) {
+func (UnimplementedUserServiceServer) SendActivationCode(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method SendActivationCode not implemented")
 }
 func (UnimplementedUserServiceServer) CheckActivationCode(context.Context, *CheckActivationCodeRequest) (*emptypb.Empty, error) {
@@ -277,6 +294,24 @@ func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&UserService_ServiceDesc, srv)
+}
+
+func _UserService_Health_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).Health(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_Health_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).Health(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _UserService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -406,7 +441,7 @@ func _UserService_SignIn_Handler(srv interface{}, ctx context.Context, dec func(
 }
 
 func _UserService_SendActivationCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SendActivationCodeRequest)
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -418,7 +453,7 @@ func _UserService_SendActivationCode_Handler(srv interface{}, ctx context.Contex
 		FullMethod: UserService_SendActivationCode_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).SendActivationCode(ctx, req.(*SendActivationCodeRequest))
+		return srv.(UserServiceServer).SendActivationCode(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -520,6 +555,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "service.user.UserService",
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Health",
+			Handler:    _UserService_Health_Handler,
+		},
 		{
 			MethodName: "Create",
 			Handler:    _UserService_Create_Handler,

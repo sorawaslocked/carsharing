@@ -7,7 +7,7 @@
 package car
 
 import (
-	base "github.com/sorawaslocked/car-rental-protos/gen/base"
+	car "github.com/sorawaslocked/car-rental-protos/gen/base/car"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -222,7 +222,7 @@ func (x *GetCarRequest) GetID() string {
 
 type GetCarResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Car           *base.Car              `protobuf:"bytes,1,opt,name=car,proto3" json:"car,omitempty"`
+	Car           *car.Car               `protobuf:"bytes,1,opt,name=car,proto3" json:"car,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -257,7 +257,7 @@ func (*GetCarResponse) Descriptor() ([]byte, []int) {
 	return file_service_car_car_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *GetCarResponse) GetCar() *base.Car {
+func (x *GetCarResponse) GetCar() *car.Car {
 	if x != nil {
 		return x.Car
 	}
@@ -407,7 +407,7 @@ func (x *GetCarsRequest) GetOffset() int64 {
 
 type GetCarsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Cars          []*base.Car            `protobuf:"bytes,1,rep,name=cars,proto3" json:"cars,omitempty"`
+	Cars          []*car.Car             `protobuf:"bytes,1,rep,name=cars,proto3" json:"cars,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -442,7 +442,7 @@ func (*GetCarsResponse) Descriptor() ([]byte, []int) {
 	return file_service_car_car_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *GetCarsResponse) GetCars() []*base.Car {
+func (x *GetCarsResponse) GetCars() []*car.Car {
 	if x != nil {
 		return x.Cars
 	}
@@ -584,7 +584,7 @@ func (x *GetAvailableCarsRequest) GetOffset() int64 {
 
 type GetAvailableCarsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Cars          []*base.Car            `protobuf:"bytes,1,rep,name=cars,proto3" json:"cars,omitempty"`
+	Cars          []*car.Car             `protobuf:"bytes,1,rep,name=cars,proto3" json:"cars,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -619,7 +619,7 @@ func (*GetAvailableCarsResponse) Descriptor() ([]byte, []int) {
 	return file_service_car_car_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *GetAvailableCarsResponse) GetCars() []*base.Car {
+func (x *GetAvailableCarsResponse) GetCars() []*car.Car {
 	if x != nil {
 		return x.Cars
 	}
@@ -913,7 +913,7 @@ var File_service_car_car_proto protoreflect.FileDescriptor
 
 const file_service_car_car_proto_rawDesc = "" +
 	"\n" +
-	"\x15service/car/car.proto\x12\vservice.car\x1a\x0ebase/car.proto\"\xc3\x02\n" +
+	"\x15service/car/car.proto\x12\vservice.car\x1a\x12base/car/car.proto\"\xc3\x02\n" +
 	"\x10CreateCarRequest\x12\x18\n" +
 	"\amodelID\x18\x01 \x01(\tR\amodelID\x12\x10\n" +
 	"\x03VIN\x18\x02 \x01(\tR\x03VIN\x12\"\n" +
@@ -930,9 +930,9 @@ const file_service_car_car_proto_rawDesc = "" +
 	"\x11CreateCarResponse\x12\x0e\n" +
 	"\x02ID\x18\x01 \x01(\tR\x02ID\"\x1f\n" +
 	"\rGetCarRequest\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\tR\x02ID\"-\n" +
-	"\x0eGetCarResponse\x12\x1b\n" +
-	"\x03car\x18\x01 \x01(\v2\t.base.CarR\x03car\"\xc5\x04\n" +
+	"\x02ID\x18\x01 \x01(\tR\x02ID\"1\n" +
+	"\x0eGetCarResponse\x12\x1f\n" +
+	"\x03car\x18\x01 \x01(\v2\r.base.car.CarR\x03car\"\xc5\x04\n" +
 	"\x0eGetCarsRequest\x12\x19\n" +
 	"\x05brand\x18\x01 \x01(\tH\x00R\x05brand\x88\x01\x01\x12\x19\n" +
 	"\x05model\x18\x02 \x01(\tH\x01R\x05model\x88\x01\x01\x12\x1f\n" +
@@ -962,9 +962,9 @@ const file_service_car_car_proto_rawDesc = "" +
 	"_longitudeB\v\n" +
 	"\t_radiusKMB\b\n" +
 	"\x06_limitB\t\n" +
-	"\a_offset\"0\n" +
-	"\x0fGetCarsResponse\x12\x1d\n" +
-	"\x04cars\x18\x01 \x03(\v2\t.base.CarR\x04cars\"\xa6\x04\n" +
+	"\a_offset\"4\n" +
+	"\x0fGetCarsResponse\x12!\n" +
+	"\x04cars\x18\x01 \x03(\v2\r.base.car.CarR\x04cars\"\xa6\x04\n" +
 	"\x17GetAvailableCarsRequest\x12\x19\n" +
 	"\x05brand\x18\x01 \x01(\tH\x00R\x05brand\x88\x01\x01\x12\x19\n" +
 	"\x05model\x18\x02 \x01(\tH\x01R\x05model\x88\x01\x01\x12\x1f\n" +
@@ -992,9 +992,9 @@ const file_service_car_car_proto_rawDesc = "" +
 	"_longitudeB\v\n" +
 	"\t_radiusKMB\b\n" +
 	"\x06_limitB\t\n" +
-	"\a_offset\"9\n" +
-	"\x18GetAvailableCarsResponse\x12\x1d\n" +
-	"\x04cars\x18\x01 \x03(\v2\t.base.CarR\x04cars\"\xc2\x01\n" +
+	"\a_offset\"=\n" +
+	"\x18GetAvailableCarsResponse\x12!\n" +
+	"\x04cars\x18\x01 \x03(\v2\r.base.car.CarR\x04cars\"\xc2\x01\n" +
 	"\x10UpdateCarRequest\x12\x0e\n" +
 	"\x02ID\x18\x01 \x01(\tR\x02ID\x12\x1d\n" +
 	"\amodelID\x18\x02 \x01(\tH\x00R\amodelID\x88\x01\x01\x12'\n" +
@@ -1051,12 +1051,12 @@ var file_service_car_car_proto_goTypes = []any{
 	(*UpdateCarStatusResponse)(nil),  // 11: service.car.UpdateCarStatusResponse
 	(*DeleteCarRequest)(nil),         // 12: service.car.DeleteCarRequest
 	(*DeleteCarResponse)(nil),        // 13: service.car.DeleteCarResponse
-	(*base.Car)(nil),                 // 14: base.Car
+	(*car.Car)(nil),                  // 14: base.car.Car
 }
 var file_service_car_car_proto_depIdxs = []int32{
-	14, // 0: service.car.GetCarResponse.car:type_name -> base.Car
-	14, // 1: service.car.GetCarsResponse.cars:type_name -> base.Car
-	14, // 2: service.car.GetAvailableCarsResponse.cars:type_name -> base.Car
+	14, // 0: service.car.GetCarResponse.car:type_name -> base.car.Car
+	14, // 1: service.car.GetCarsResponse.cars:type_name -> base.car.Car
+	14, // 2: service.car.GetAvailableCarsResponse.cars:type_name -> base.car.Car
 	0,  // 3: service.car.CarService.CreateCar:input_type -> service.car.CreateCarRequest
 	2,  // 4: service.car.CarService.GetCar:input_type -> service.car.GetCarRequest
 	4,  // 5: service.car.CarService.GetCars:input_type -> service.car.GetCarsRequest

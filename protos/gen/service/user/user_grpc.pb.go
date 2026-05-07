@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,14 +20,19 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_Create_FullMethodName              = "/service.user.UserService/Create"
-	UserService_Get_FullMethodName                 = "/service.user.UserService/Get"
-	UserService_GetAll_FullMethodName              = "/service.user.UserService/GetAll"
-	UserService_Update_FullMethodName              = "/service.user.UserService/Update"
-	UserService_Delete_FullMethodName              = "/service.user.UserService/Delete"
-	UserService_Me_FullMethodName                  = "/service.user.UserService/Me"
-	UserService_SendActivationCode_FullMethodName  = "/service.user.UserService/SendActivationCode"
-	UserService_CheckActivationCode_FullMethodName = "/service.user.UserService/CheckActivationCode"
+	UserService_Create_FullMethodName                       = "/service.user.UserService/Create"
+	UserService_Get_FullMethodName                          = "/service.user.UserService/Get"
+	UserService_GetAllWithFilter_FullMethodName             = "/service.user.UserService/GetAllWithFilter"
+	UserService_Update_FullMethodName                       = "/service.user.UserService/Update"
+	UserService_Delete_FullMethodName                       = "/service.user.UserService/Delete"
+	UserService_Register_FullMethodName                     = "/service.user.UserService/Register"
+	UserService_SignIn_FullMethodName                       = "/service.user.UserService/SignIn"
+	UserService_SendActivationCode_FullMethodName           = "/service.user.UserService/SendActivationCode"
+	UserService_CheckActivationCode_FullMethodName          = "/service.user.UserService/CheckActivationCode"
+	UserService_CreateDocument_FullMethodName               = "/service.user.UserService/CreateDocument"
+	UserService_GetUploadDocumentData_FullMethodName        = "/service.user.UserService/GetUploadDocumentData"
+	UserService_GetProcessedDocumentsForUser_FullMethodName = "/service.user.UserService/GetProcessedDocumentsForUser"
+	UserService_CheckDocument_FullMethodName                = "/service.user.UserService/CheckDocument"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -35,12 +41,17 @@ const (
 type UserServiceClient interface {
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
-	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
-	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
-	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
-	Me(ctx context.Context, in *MeRequest, opts ...grpc.CallOption) (*MeResponse, error)
-	SendActivationCode(ctx context.Context, in *SendActivationCodeRequest, opts ...grpc.CallOption) (*SendActivationCodeResponse, error)
-	CheckActivationCode(ctx context.Context, in *CheckActivationCodeRequest, opts ...grpc.CallOption) (*CheckActivationCodeResponse, error)
+	GetAllWithFilter(ctx context.Context, in *GetAllWithFilterRequest, opts ...grpc.CallOption) (*GetAllWithFilterResponse, error)
+	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
+	SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*SignInResponse, error)
+	SendActivationCode(ctx context.Context, in *SendActivationCodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CheckActivationCode(ctx context.Context, in *CheckActivationCodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CreateDocument(ctx context.Context, in *CreateDocumentRequest, opts ...grpc.CallOption) (*CreateDocumentResponse, error)
+	GetUploadDocumentData(ctx context.Context, in *GetUploadDocumentDataRequest, opts ...grpc.CallOption) (*GetUploadDocumentDataResponse, error)
+	GetProcessedDocumentsForUser(ctx context.Context, in *GetProcessedDocumentsForUserRequest, opts ...grpc.CallOption) (*GetProcessedDocumentsForUserResponse, error)
+	CheckDocument(ctx context.Context, in *CheckDocumentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type userServiceClient struct {
@@ -71,19 +82,19 @@ func (c *userServiceClient) Get(ctx context.Context, in *GetRequest, opts ...grp
 	return out, nil
 }
 
-func (c *userServiceClient) GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error) {
+func (c *userServiceClient) GetAllWithFilter(ctx context.Context, in *GetAllWithFilterRequest, opts ...grpc.CallOption) (*GetAllWithFilterResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetAllResponse)
-	err := c.cc.Invoke(ctx, UserService_GetAll_FullMethodName, in, out, cOpts...)
+	out := new(GetAllWithFilterResponse)
+	err := c.cc.Invoke(ctx, UserService_GetAllWithFilter_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error) {
+func (c *userServiceClient) Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpdateResponse)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, UserService_Update_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -91,9 +102,9 @@ func (c *userServiceClient) Update(ctx context.Context, in *UpdateRequest, opts 
 	return out, nil
 }
 
-func (c *userServiceClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
+func (c *userServiceClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteResponse)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, UserService_Delete_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -101,19 +112,29 @@ func (c *userServiceClient) Delete(ctx context.Context, in *DeleteRequest, opts 
 	return out, nil
 }
 
-func (c *userServiceClient) Me(ctx context.Context, in *MeRequest, opts ...grpc.CallOption) (*MeResponse, error) {
+func (c *userServiceClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(MeResponse)
-	err := c.cc.Invoke(ctx, UserService_Me_FullMethodName, in, out, cOpts...)
+	out := new(RegisterResponse)
+	err := c.cc.Invoke(ctx, UserService_Register_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) SendActivationCode(ctx context.Context, in *SendActivationCodeRequest, opts ...grpc.CallOption) (*SendActivationCodeResponse, error) {
+func (c *userServiceClient) SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*SignInResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SendActivationCodeResponse)
+	out := new(SignInResponse)
+	err := c.cc.Invoke(ctx, UserService_SignIn_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) SendActivationCode(ctx context.Context, in *SendActivationCodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, UserService_SendActivationCode_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -121,10 +142,50 @@ func (c *userServiceClient) SendActivationCode(ctx context.Context, in *SendActi
 	return out, nil
 }
 
-func (c *userServiceClient) CheckActivationCode(ctx context.Context, in *CheckActivationCodeRequest, opts ...grpc.CallOption) (*CheckActivationCodeResponse, error) {
+func (c *userServiceClient) CheckActivationCode(ctx context.Context, in *CheckActivationCodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CheckActivationCodeResponse)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, UserService_CheckActivationCode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) CreateDocument(ctx context.Context, in *CreateDocumentRequest, opts ...grpc.CallOption) (*CreateDocumentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateDocumentResponse)
+	err := c.cc.Invoke(ctx, UserService_CreateDocument_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetUploadDocumentData(ctx context.Context, in *GetUploadDocumentDataRequest, opts ...grpc.CallOption) (*GetUploadDocumentDataResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUploadDocumentDataResponse)
+	err := c.cc.Invoke(ctx, UserService_GetUploadDocumentData_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetProcessedDocumentsForUser(ctx context.Context, in *GetProcessedDocumentsForUserRequest, opts ...grpc.CallOption) (*GetProcessedDocumentsForUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetProcessedDocumentsForUserResponse)
+	err := c.cc.Invoke(ctx, UserService_GetProcessedDocumentsForUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) CheckDocument(ctx context.Context, in *CheckDocumentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, UserService_CheckDocument_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -137,12 +198,17 @@ func (c *userServiceClient) CheckActivationCode(ctx context.Context, in *CheckAc
 type UserServiceServer interface {
 	Create(context.Context, *CreateRequest) (*CreateResponse, error)
 	Get(context.Context, *GetRequest) (*GetResponse, error)
-	GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error)
-	Update(context.Context, *UpdateRequest) (*UpdateResponse, error)
-	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
-	Me(context.Context, *MeRequest) (*MeResponse, error)
-	SendActivationCode(context.Context, *SendActivationCodeRequest) (*SendActivationCodeResponse, error)
-	CheckActivationCode(context.Context, *CheckActivationCodeRequest) (*CheckActivationCodeResponse, error)
+	GetAllWithFilter(context.Context, *GetAllWithFilterRequest) (*GetAllWithFilterResponse, error)
+	Update(context.Context, *UpdateRequest) (*emptypb.Empty, error)
+	Delete(context.Context, *DeleteRequest) (*emptypb.Empty, error)
+	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
+	SignIn(context.Context, *SignInRequest) (*SignInResponse, error)
+	SendActivationCode(context.Context, *SendActivationCodeRequest) (*emptypb.Empty, error)
+	CheckActivationCode(context.Context, *CheckActivationCodeRequest) (*emptypb.Empty, error)
+	CreateDocument(context.Context, *CreateDocumentRequest) (*CreateDocumentResponse, error)
+	GetUploadDocumentData(context.Context, *GetUploadDocumentDataRequest) (*GetUploadDocumentDataResponse, error)
+	GetProcessedDocumentsForUser(context.Context, *GetProcessedDocumentsForUserRequest) (*GetProcessedDocumentsForUserResponse, error)
+	CheckDocument(context.Context, *CheckDocumentRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -159,23 +225,38 @@ func (UnimplementedUserServiceServer) Create(context.Context, *CreateRequest) (*
 func (UnimplementedUserServiceServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Get not implemented")
 }
-func (UnimplementedUserServiceServer) GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetAll not implemented")
+func (UnimplementedUserServiceServer) GetAllWithFilter(context.Context, *GetAllWithFilterRequest) (*GetAllWithFilterResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAllWithFilter not implemented")
 }
-func (UnimplementedUserServiceServer) Update(context.Context, *UpdateRequest) (*UpdateResponse, error) {
+func (UnimplementedUserServiceServer) Update(context.Context, *UpdateRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method Update not implemented")
 }
-func (UnimplementedUserServiceServer) Delete(context.Context, *DeleteRequest) (*DeleteResponse, error) {
+func (UnimplementedUserServiceServer) Delete(context.Context, *DeleteRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method Delete not implemented")
 }
-func (UnimplementedUserServiceServer) Me(context.Context, *MeRequest) (*MeResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method Me not implemented")
+func (UnimplementedUserServiceServer) Register(context.Context, *RegisterRequest) (*RegisterResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method Register not implemented")
 }
-func (UnimplementedUserServiceServer) SendActivationCode(context.Context, *SendActivationCodeRequest) (*SendActivationCodeResponse, error) {
+func (UnimplementedUserServiceServer) SignIn(context.Context, *SignInRequest) (*SignInResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SignIn not implemented")
+}
+func (UnimplementedUserServiceServer) SendActivationCode(context.Context, *SendActivationCodeRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method SendActivationCode not implemented")
 }
-func (UnimplementedUserServiceServer) CheckActivationCode(context.Context, *CheckActivationCodeRequest) (*CheckActivationCodeResponse, error) {
+func (UnimplementedUserServiceServer) CheckActivationCode(context.Context, *CheckActivationCodeRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method CheckActivationCode not implemented")
+}
+func (UnimplementedUserServiceServer) CreateDocument(context.Context, *CreateDocumentRequest) (*CreateDocumentResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateDocument not implemented")
+}
+func (UnimplementedUserServiceServer) GetUploadDocumentData(context.Context, *GetUploadDocumentDataRequest) (*GetUploadDocumentDataResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetUploadDocumentData not implemented")
+}
+func (UnimplementedUserServiceServer) GetProcessedDocumentsForUser(context.Context, *GetProcessedDocumentsForUserRequest) (*GetProcessedDocumentsForUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetProcessedDocumentsForUser not implemented")
+}
+func (UnimplementedUserServiceServer) CheckDocument(context.Context, *CheckDocumentRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method CheckDocument not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -234,20 +315,20 @@ func _UserService_Get_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAllRequest)
+func _UserService_GetAllWithFilter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllWithFilterRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).GetAll(ctx, in)
+		return srv.(UserServiceServer).GetAllWithFilter(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_GetAll_FullMethodName,
+		FullMethod: UserService_GetAllWithFilter_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetAll(ctx, req.(*GetAllRequest))
+		return srv.(UserServiceServer).GetAllWithFilter(ctx, req.(*GetAllWithFilterRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -288,20 +369,38 @@ func _UserService_Delete_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_Me_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MeRequest)
+func _UserService_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).Me(ctx, in)
+		return srv.(UserServiceServer).Register(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_Me_FullMethodName,
+		FullMethod: UserService_Register_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).Me(ctx, req.(*MeRequest))
+		return srv.(UserServiceServer).Register(ctx, req.(*RegisterRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_SignIn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SignInRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).SignIn(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_SignIn_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).SignIn(ctx, req.(*SignInRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -342,6 +441,78 @@ func _UserService_CheckActivationCode_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_CreateDocument_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDocumentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).CreateDocument(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_CreateDocument_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).CreateDocument(ctx, req.(*CreateDocumentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetUploadDocumentData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUploadDocumentDataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetUploadDocumentData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetUploadDocumentData_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetUploadDocumentData(ctx, req.(*GetUploadDocumentDataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetProcessedDocumentsForUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProcessedDocumentsForUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetProcessedDocumentsForUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetProcessedDocumentsForUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetProcessedDocumentsForUser(ctx, req.(*GetProcessedDocumentsForUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_CheckDocument_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckDocumentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).CheckDocument(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_CheckDocument_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).CheckDocument(ctx, req.(*CheckDocumentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -358,8 +529,8 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_Get_Handler,
 		},
 		{
-			MethodName: "GetAll",
-			Handler:    _UserService_GetAll_Handler,
+			MethodName: "GetAllWithFilter",
+			Handler:    _UserService_GetAllWithFilter_Handler,
 		},
 		{
 			MethodName: "Update",
@@ -370,8 +541,12 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_Delete_Handler,
 		},
 		{
-			MethodName: "Me",
-			Handler:    _UserService_Me_Handler,
+			MethodName: "Register",
+			Handler:    _UserService_Register_Handler,
+		},
+		{
+			MethodName: "SignIn",
+			Handler:    _UserService_SignIn_Handler,
 		},
 		{
 			MethodName: "SendActivationCode",
@@ -380,6 +555,22 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CheckActivationCode",
 			Handler:    _UserService_CheckActivationCode_Handler,
+		},
+		{
+			MethodName: "CreateDocument",
+			Handler:    _UserService_CreateDocument_Handler,
+		},
+		{
+			MethodName: "GetUploadDocumentData",
+			Handler:    _UserService_GetUploadDocumentData_Handler,
+		},
+		{
+			MethodName: "GetProcessedDocumentsForUser",
+			Handler:    _UserService_GetProcessedDocumentsForUser_Handler,
+		},
+		{
+			MethodName: "CheckDocument",
+			Handler:    _UserService_CheckDocument_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

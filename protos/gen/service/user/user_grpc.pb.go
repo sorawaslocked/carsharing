@@ -41,7 +41,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
-	Health(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*service.HealthResponse, error)
+	Health(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*service.ServiceHealthResponse, error)
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	GetAllWithFilter(ctx context.Context, in *GetAllWithFilterRequest, opts ...grpc.CallOption) (*GetAllWithFilterResponse, error)
@@ -65,9 +65,9 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
 }
 
-func (c *userServiceClient) Health(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*service.HealthResponse, error) {
+func (c *userServiceClient) Health(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*service.ServiceHealthResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(service.HealthResponse)
+	out := new(service.ServiceHealthResponse)
 	err := c.cc.Invoke(ctx, UserService_Health_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -209,7 +209,7 @@ func (c *userServiceClient) CheckDocument(ctx context.Context, in *CheckDocument
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
 type UserServiceServer interface {
-	Health(context.Context, *emptypb.Empty) (*service.HealthResponse, error)
+	Health(context.Context, *emptypb.Empty) (*service.ServiceHealthResponse, error)
 	Create(context.Context, *CreateRequest) (*CreateResponse, error)
 	Get(context.Context, *GetRequest) (*GetResponse, error)
 	GetAllWithFilter(context.Context, *GetAllWithFilterRequest) (*GetAllWithFilterResponse, error)
@@ -233,7 +233,7 @@ type UserServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedUserServiceServer struct{}
 
-func (UnimplementedUserServiceServer) Health(context.Context, *emptypb.Empty) (*service.HealthResponse, error) {
+func (UnimplementedUserServiceServer) Health(context.Context, *emptypb.Empty) (*service.ServiceHealthResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Health not implemented")
 }
 func (UnimplementedUserServiceServer) Create(context.Context, *CreateRequest) (*CreateResponse, error) {

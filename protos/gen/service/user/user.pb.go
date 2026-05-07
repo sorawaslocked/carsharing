@@ -1312,9 +1312,9 @@ const file_service_user_user_proto_rawDesc = "" +
 	"\x05docID\x18\x01 \x01(\tR\x05docID\x12\x16\n" +
 	"\x06status\x18\x02 \x01(\tR\x06status\x12\x19\n" +
 	"\x05error\x18\x03 \x01(\tH\x00R\x05error\x88\x01\x01B\b\n" +
-	"\x06_error2\xfd\b\n" +
-	"\vUserService\x129\n" +
-	"\x06Health\x12\x16.google.protobuf.Empty\x1a\x17.service.HealthResponse\x12C\n" +
+	"\x06_error2\x84\t\n" +
+	"\vUserService\x12@\n" +
+	"\x06Health\x12\x16.google.protobuf.Empty\x1a\x1e.service.ServiceHealthResponse\x12C\n" +
 	"\x06Create\x12\x1b.service.user.CreateRequest\x1a\x1c.service.user.CreateResponse\x12:\n" +
 	"\x03Get\x12\x18.service.user.GetRequest\x1a\x19.service.user.GetResponse\x12a\n" +
 	"\x10GetAllWithFilter\x12%.service.user.GetAllWithFilterRequest\x1a&.service.user.GetAllWithFilterResponse\x12=\n" +
@@ -1368,7 +1368,7 @@ var file_service_user_user_proto_goTypes = []any{
 	(*base.ImageUploadData)(nil),                 // 22: base.ImageUploadData
 	(*user.Document)(nil),                        // 23: base.user.Document
 	(*emptypb.Empty)(nil),                        // 24: google.protobuf.Empty
-	(*service.HealthResponse)(nil),               // 25: service.HealthResponse
+	(*service.ServiceHealthResponse)(nil),        // 25: service.ServiceHealthResponse
 }
 var file_service_user_user_proto_depIdxs = []int32{
 	20, // 0: service.user.GetResponse.user:type_name -> base.user.User
@@ -1390,7 +1390,7 @@ var file_service_user_user_proto_depIdxs = []int32{
 	15, // 16: service.user.UserService.GetUploadDocumentData:input_type -> service.user.GetUploadDocumentDataRequest
 	17, // 17: service.user.UserService.GetProcessedDocumentsForUser:input_type -> service.user.GetProcessedDocumentsForUserRequest
 	19, // 18: service.user.UserService.CheckDocument:input_type -> service.user.CheckDocumentRequest
-	25, // 19: service.user.UserService.Health:output_type -> service.HealthResponse
+	25, // 19: service.user.UserService.Health:output_type -> service.ServiceHealthResponse
 	1,  // 20: service.user.UserService.Create:output_type -> service.user.CreateResponse
 	3,  // 21: service.user.UserService.Get:output_type -> service.user.GetResponse
 	5,  // 22: service.user.UserService.GetAllWithFilter:output_type -> service.user.GetAllWithFilterResponse

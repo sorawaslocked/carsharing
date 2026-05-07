@@ -22,10 +22,10 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type HealthResponse struct {
+type ServiceHealthResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
-	ServiceName   string                 `protobuf:"bytes,2,opt,name=serviceName,proto3" json:"serviceName,omitempty"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
 	Version       string                 `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
 	Timestamp     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	UptimeSeconds uint64                 `protobuf:"varint,5,opt,name=uptimeSeconds,proto3" json:"uptimeSeconds,omitempty"`
@@ -34,20 +34,20 @@ type HealthResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *HealthResponse) Reset() {
-	*x = HealthResponse{}
+func (x *ServiceHealthResponse) Reset() {
+	*x = ServiceHealthResponse{}
 	mi := &file_service_helpers_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *HealthResponse) String() string {
+func (x *ServiceHealthResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*HealthResponse) ProtoMessage() {}
+func (*ServiceHealthResponse) ProtoMessage() {}
 
-func (x *HealthResponse) ProtoReflect() protoreflect.Message {
+func (x *ServiceHealthResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_service_helpers_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -59,47 +59,47 @@ func (x *HealthResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use HealthResponse.ProtoReflect.Descriptor instead.
-func (*HealthResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use ServiceHealthResponse.ProtoReflect.Descriptor instead.
+func (*ServiceHealthResponse) Descriptor() ([]byte, []int) {
 	return file_service_helpers_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *HealthResponse) GetStatus() string {
+func (x *ServiceHealthResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ServiceHealthResponse) GetStatus() string {
 	if x != nil {
 		return x.Status
 	}
 	return ""
 }
 
-func (x *HealthResponse) GetServiceName() string {
-	if x != nil {
-		return x.ServiceName
-	}
-	return ""
-}
-
-func (x *HealthResponse) GetVersion() string {
+func (x *ServiceHealthResponse) GetVersion() string {
 	if x != nil {
 		return x.Version
 	}
 	return ""
 }
 
-func (x *HealthResponse) GetTimestamp() *timestamppb.Timestamp {
+func (x *ServiceHealthResponse) GetTimestamp() *timestamppb.Timestamp {
 	if x != nil {
 		return x.Timestamp
 	}
 	return nil
 }
 
-func (x *HealthResponse) GetUptimeSeconds() uint64 {
+func (x *ServiceHealthResponse) GetUptimeSeconds() uint64 {
 	if x != nil {
 		return x.UptimeSeconds
 	}
 	return 0
 }
 
-func (x *HealthResponse) GetDependencies() []*DependencyHealth {
+func (x *ServiceHealthResponse) GetDependencies() []*DependencyHealth {
 	if x != nil {
 		return x.Dependencies
 	}
@@ -178,10 +178,10 @@ var File_service_helpers_proto protoreflect.FileDescriptor
 
 const file_service_helpers_proto_rawDesc = "" +
 	"\n" +
-	"\x15service/helpers.proto\x12\aservice\x1a\x1fgoogle/protobuf/timestamp.proto\"\x83\x02\n" +
-	"\x0eHealthResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\x12 \n" +
-	"\vserviceName\x18\x02 \x01(\tR\vserviceName\x12\x18\n" +
+	"\x15service/helpers.proto\x12\aservice\x1a\x1fgoogle/protobuf/timestamp.proto\"\xfc\x01\n" +
+	"\x15ServiceHealthResponse\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\x12\x18\n" +
 	"\aversion\x18\x03 \x01(\tR\aversion\x128\n" +
 	"\ttimestamp\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12$\n" +
 	"\ruptimeSeconds\x18\x05 \x01(\x04R\ruptimeSeconds\x12=\n" +
@@ -209,13 +209,13 @@ func file_service_helpers_proto_rawDescGZIP() []byte {
 
 var file_service_helpers_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_service_helpers_proto_goTypes = []any{
-	(*HealthResponse)(nil),        // 0: service.HealthResponse
+	(*ServiceHealthResponse)(nil), // 0: service.ServiceHealthResponse
 	(*DependencyHealth)(nil),      // 1: service.DependencyHealth
 	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
 }
 var file_service_helpers_proto_depIdxs = []int32{
-	2, // 0: service.HealthResponse.timestamp:type_name -> google.protobuf.Timestamp
-	1, // 1: service.HealthResponse.dependencies:type_name -> service.DependencyHealth
+	2, // 0: service.ServiceHealthResponse.timestamp:type_name -> google.protobuf.Timestamp
+	1, // 1: service.ServiceHealthResponse.dependencies:type_name -> service.DependencyHealth
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name

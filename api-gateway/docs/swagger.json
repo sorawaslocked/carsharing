@@ -3375,7 +3375,7 @@
                 "batteryLevel": {
                     "type": "number"
                 },
-                "carId": {
+                "carID": {
                     "type": "string"
                 },
                 "id": {
@@ -3402,7 +3402,7 @@
                 "licensePlate": {
                     "type": "string"
                 },
-                "modelId": {
+                "modelID": {
                     "type": "string"
                 },
                 "notes": {
@@ -3469,7 +3469,7 @@
                 "actorType": {
                     "type": "string"
                 },
-                "carId": {
+                "carID": {
                     "type": "string"
                 },
                 "fuelPct": {
@@ -3496,7 +3496,7 @@
         "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsurance": {
             "type": "object",
             "properties": {
-                "carId": {
+                "carID": {
                     "type": "string"
                 },
                 "costTenge": {
@@ -3543,7 +3543,7 @@
         "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceCreateRequest": {
             "type": "object",
             "properties": {
-                "carId": {
+                "carID": {
                     "type": "string"
                 },
                 "costTenge": {
@@ -3640,7 +3640,7 @@
                 "actorType": {
                     "type": "string"
                 },
-                "carId": {
+                "carID": {
                     "type": "string"
                 },
                 "id": {
@@ -3667,7 +3667,7 @@
                 "assignedTo": {
                     "type": "string"
                 },
-                "carId": {
+                "carID": {
                     "type": "string"
                 },
                 "completedAt": {
@@ -3703,7 +3703,7 @@
                 "status": {
                     "type": "string"
                 },
-                "templateId": {
+                "templateID": {
                     "type": "string"
                 }
             }
@@ -3850,7 +3850,7 @@
                 "actorType": {
                     "type": "string"
                 },
-                "carId": {
+                "carID": {
                     "type": "string"
                 },
                 "id": {
@@ -4068,7 +4068,7 @@
                 "actorType": {
                     "type": "string"
                 },
-                "carId": {
+                "carID": {
                     "type": "string"
                 },
                 "changedAt": {
@@ -4125,7 +4125,7 @@
                 "mileageKm": {
                     "type": "integer"
                 },
-                "modelId": {
+                "modelID": {
                     "type": "string"
                 },
                 "notes": {
@@ -4137,7 +4137,7 @@
                 "telematicsId": {
                     "type": "string"
                 },
-                "zoneId": {
+                "zoneID": {
                     "type": "string"
                 }
             }

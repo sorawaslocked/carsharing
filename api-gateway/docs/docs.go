@@ -3381,7 +3381,7 @@ const docTemplate = `{
                 "batteryLevel": {
                     "type": "number"
                 },
-                "carId": {
+                "carID": {
                     "type": "string"
                 },
                 "id": {
@@ -3408,7 +3408,7 @@ const docTemplate = `{
                 "licensePlate": {
                     "type": "string"
                 },
-                "modelId": {
+                "modelID": {
                     "type": "string"
                 },
                 "notes": {
@@ -3475,7 +3475,7 @@ const docTemplate = `{
                 "actorType": {
                     "type": "string"
                 },
-                "carId": {
+                "carID": {
                     "type": "string"
                 },
                 "fuelPct": {
@@ -3502,7 +3502,7 @@ const docTemplate = `{
         "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsurance": {
             "type": "object",
             "properties": {
-                "carId": {
+                "carID": {
                     "type": "string"
                 },
                 "costTenge": {
@@ -3549,7 +3549,7 @@ const docTemplate = `{
         "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceCreateRequest": {
             "type": "object",
             "properties": {
-                "carId": {
+                "carID": {
                     "type": "string"
                 },
                 "costTenge": {
@@ -3646,7 +3646,7 @@ const docTemplate = `{
                 "actorType": {
                     "type": "string"
                 },
-                "carId": {
+                "carID": {
                     "type": "string"
                 },
                 "id": {
@@ -3673,7 +3673,7 @@ const docTemplate = `{
                 "assignedTo": {
                     "type": "string"
                 },
-                "carId": {
+                "carID": {
                     "type": "string"
                 },
                 "completedAt": {
@@ -3709,7 +3709,7 @@ const docTemplate = `{
                 "status": {
                     "type": "string"
                 },
-                "templateId": {
+                "templateID": {
                     "type": "string"
                 }
             }
@@ -3856,7 +3856,7 @@ const docTemplate = `{
                 "actorType": {
                     "type": "string"
                 },
-                "carId": {
+                "carID": {
                     "type": "string"
                 },
                 "id": {
@@ -4074,7 +4074,7 @@ const docTemplate = `{
                 "actorType": {
                     "type": "string"
                 },
-                "carId": {
+                "carID": {
                     "type": "string"
                 },
                 "changedAt": {
@@ -4131,7 +4131,7 @@ const docTemplate = `{
                 "mileageKm": {
                     "type": "integer"
                 },
-                "modelId": {
+                "modelID": {
                     "type": "string"
                 },
                 "notes": {
@@ -4143,7 +4143,7 @@ const docTemplate = `{
                 "telematicsId": {
                     "type": "string"
                 },
-                "zoneId": {
+                "zoneID": {
                     "type": "string"
                 }
             }

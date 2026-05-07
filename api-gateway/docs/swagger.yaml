@@ -72,7 +72,7 @@ definitions:
         type: string
       batteryLevel:
         type: number
-      carId:
+      carID:
         type: string
       id:
         type: string
@@ -90,7 +90,7 @@ definitions:
         type: string
       licensePlate:
         type: string
-      modelId:
+      modelID:
         type: string
       notes:
         type: string
@@ -134,7 +134,7 @@ definitions:
         type: string
       actorType:
         type: string
-      carId:
+      carID:
         type: string
       fuelPct:
         type: number
@@ -152,7 +152,7 @@ definitions:
     type: object
   github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsurance:
     properties:
-      carId:
+      carID:
         type: string
       costTenge:
         type: integer
@@ -183,7 +183,7 @@ definitions:
     type: object
   github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceCreateRequest:
     properties:
-      carId:
+      carID:
         type: string
       costTenge:
         type: integer
@@ -246,7 +246,7 @@ definitions:
         type: string
       actorType:
         type: string
-      carId:
+      carID:
         type: string
       id:
         type: string
@@ -264,7 +264,7 @@ definitions:
     properties:
       assignedTo:
         type: string
-      carId:
+      carID:
         type: string
       completedAt:
         type: string
@@ -288,7 +288,7 @@ definitions:
         type: array
       status:
         type: string
-      templateId:
+      templateID:
         type: string
     type: object
   github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceRecordCompleteRequest:
@@ -383,7 +383,7 @@ definitions:
         type: string
       actorType:
         type: string
-      carId:
+      carID:
         type: string
       id:
         type: string
@@ -526,7 +526,7 @@ definitions:
         type: string
       actorType:
         type: string
-      carId:
+      carID:
         type: string
       changedAt:
         type: string
@@ -564,7 +564,7 @@ definitions:
         type: number
       mileageKm:
         type: integer
-      modelId:
+      modelID:
         type: string
       notes:
         type: string
@@ -572,7 +572,7 @@ definitions:
         type: string
       telematicsId:
         type: string
-      zoneId:
+      zoneID:
         type: string
     type: object
   github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarsResponse:

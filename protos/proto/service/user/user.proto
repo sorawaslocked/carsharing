@@ -10,7 +10,7 @@ import "service/helpers.proto";
 option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/user";
 
 service UserService {
-  rpc Health(google.protobuf.Empty) returns (HealthResponse);
+  rpc Health(google.protobuf.Empty) returns (ServiceHealthResponse);
 
   rpc Create(CreateRequest) returns (CreateResponse);
   rpc Get(GetRequest) returns (GetResponse);

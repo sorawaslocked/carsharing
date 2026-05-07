@@ -6,10 +6,9 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service";
 
-message HealthResponse {
-  string status = 1;
-
-  string serviceName = 2;
+message ServiceHealthResponse {
+  string name = 1;
+  string status = 2;
   string version = 3;
 
   google.protobuf.Timestamp timestamp = 4;

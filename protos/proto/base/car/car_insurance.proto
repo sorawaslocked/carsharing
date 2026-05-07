@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package base.car;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base/car";
+
+message CarInsurance {
+  string id = 1;
+  string car_id = 2;
+  string type = 3;
+  string provider = 4;
+  string policy_num = 5;
+
+  google.protobuf.Timestamp starts_at = 6;
+  google.protobuf.Timestamp expires_at = 7;
+
+  int32 cost_tenge = 8;
+  string status = 9;
+
+  repeated string image_urls = 10;
+  optional string notes = 11;
+
+  google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp updated_at = 13;
+}

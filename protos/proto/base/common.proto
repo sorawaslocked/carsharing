@@ -5,11 +5,16 @@ package base;
 option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base";
 
 message ImageUploadData {
-  string presignedPutURL = 1;
-  string objectKey = 2;
+  string presigned_put_url = 1;
+  string object_key = 2;
 }
 
 message Pagination {
   int64 limit = 1;
   int64 offset = 2;
+}
+
+message Location {
+  double latitude = 1;
+  double longitude = 2;
 }

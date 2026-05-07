@@ -7,19 +7,23 @@ import "google/protobuf/timestamp.proto";
 option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base/car";
 
 message CarModel {
-  string ID = 1;
+  string id = 1;
   string brand = 2;
   string model = 3;
   int32 year = 4;
-  string fuelType = 5;
-  string transmission = 6;
-  string bodyType = 7;
-  string class = 8;
-  int32 seats = 9;
-  optional float engineVolume = 10;
-  int32 rangeKM = 11;
-  repeated string features = 12;
 
-  google.protobuf.Timestamp createdAt = 13;
-  google.protobuf.Timestamp updatedAt = 14;
+  string fuel_type = 5;
+  string transmission = 6;
+  string body_type = 7;
+  string class = 8;
+
+  int32 seats = 9;
+  optional float engine_volume = 10;
+  int32 range_km = 11;
+
+  repeated string features = 12;
+  repeated string image_urls = 13;
+
+  google.protobuf.Timestamp created_at = 14;
+  google.protobuf.Timestamp updated_at = 15;
 }

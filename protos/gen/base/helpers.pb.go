@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v4.25.1
-// source: base/helpers.proto
+// source: base/common.proto
 
 package base
 
@@ -129,7 +129,7 @@ var File_base_helpers_proto protoreflect.FileDescriptor
 
 const file_base_helpers_proto_rawDesc = "" +
 	"\n" +
-	"\x12base/helpers.proto\x12\x04base\"Y\n" +
+	"\x12base/common.proto\x12\x04base\"Y\n" +
 	"\x0fImageUploadData\x12(\n" +
 	"\x0fpresignedPutURL\x18\x01 \x01(\tR\x0fpresignedPutURL\x12\x1c\n" +
 	"\tobjectKey\x18\x02 \x01(\tR\tobjectKey\":\n" +

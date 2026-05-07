@@ -3,85 +3,86 @@ syntax = "proto3";
 package service.car;
 
 import "base/car/car_model.proto";
+import "base/common.proto";
+import "google/protobuf/empty.proto";
 
 option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/car";
 
 service CarModelService {
   rpc CreateCarModel (CreateCarModelRequest) returns (CreateCarModelResponse);
   rpc GetCarModel (GetCarModelRequest) returns (GetCarModelResponse);
-  rpc GetCarModels (GetCarModelsRequest) returns (GetCarModelsResponse);
-  rpc UpdateCarModel (UpdateCarModelRequest) returns (UpdateCarModelResponse);
-  rpc DeleteCarModel (DeleteCarModelRequest) returns (DeleteCarModelResponse);
+  rpc ListCarModels (ListCarModelsRequest) returns (ListCarModelsResponse);
+  rpc UpdateCarModel (UpdateCarModelRequest) returns (google.protobuf.Empty);
+  rpc DeleteCarModel (DeleteCarModelRequest) returns (google.protobuf.Empty);
+
+  rpc GetCarModelImageUploadData(google.protobuf.Empty) returns (GetCarModelImageUploadDataResponse);
 }
 
-// CreateCarModel
 message CreateCarModelRequest {
   string brand = 1;
   string model = 2;
   int32 year = 3;
-  string fuelType = 4;
+
+  string fuel_type = 4;
   string transmission = 5;
-  string bodyType = 6;
+  string body_type = 6;
   string class = 7;
+
   int32 seats = 8;
-  optional float engineVolume = 9;
-  int32 rangeKM = 10;
+  optional float engine_volume = 9;
+  int32 range_km = 10;
+
   repeated string features = 11;
 }
 
 message CreateCarModelResponse {
-  string ID = 1;
+  string id = 1;
 }
 
-// GetCarModel
 message GetCarModelRequest {
-  string ID = 1;
+  string id = 1;
 }
 
 message GetCarModelResponse {
-  base.car.CarModel carModel = 1;
+  base.car.CarModel car_model = 1;
 }
 
-// GetCarModels
-message GetCarModelsRequest {
+message ListCarModelsRequest {
   optional string brand = 1;
   optional string model = 2;
-  optional string fuelType = 3;
+  optional string fuel_type = 3;
   optional string transmission = 4;
-  optional string bodyType = 5;
+  optional string body_type = 5;
   optional string class = 6;
-  optional int32 minSeats = 7;
+  optional int32 min_seats = 7;
 
-  optional int64 limit = 8;
-  optional int64 offset = 9;
+  optional base.Pagination pagination = 8;
 }
 
-message GetCarModelsResponse {
-  repeated base.car.CarModel carModels = 1;
+message ListCarModelsResponse {
+  repeated base.car.CarModel car_models = 1;
 }
 
-// UpdateCarModel
 message UpdateCarModelRequest {
-  string ID = 1;
-
+  string id = 1;
   optional string brand = 2;
   optional string model = 3;
   optional int32 year = 4;
-  optional string fuelType = 5;
+  optional string fuel_type = 5;
   optional string transmission = 6;
-  optional string bodyType = 7;
+  optional string body_type = 7;
   optional string class = 8;
   optional int32 seats = 9;
-  optional float engineVolume = 10;
-  optional int32 rangeKM = 11;
+  optional float engine_volume = 10;
+  optional int32 range_km = 11;
   repeated string features = 12;
+  repeated string image_keys = 13;
 }
 
-message UpdateCarModelResponse {}
-
-// DeleteCarModel
 message DeleteCarModelRequest {
-  string ID = 1;
+  string id = 1;
 }
 
-message DeleteCarModelResponse {}
+message GetCarModelImageUploadDataResponse {
+  base.ImageUploadData upload_data = 1;
+}

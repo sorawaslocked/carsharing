@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package base.car;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base/car";
+
+message CarPricingRule {
+  string id = 1;
+  optional string model_id = 2;
+  optional string zone_id = 3;
+  optional string class = 4;
+
+  int32 rate_per_minute_tenge = 5;
+  int32 rate_per_km_tenge = 6;
+  int32 free_minutes = 7;
+  int32 min_charge_tenge = 8;
+
+  bool is_active = 9;
+  google.protobuf.Timestamp starts_at = 10;
+  google.protobuf.Timestamp expires_at = 11;
+
+  google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp updated_at = 13;
+}

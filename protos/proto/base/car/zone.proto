@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package base.car;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base/car";
+
+message Zone {
+  string id = 1;
+  string name = 2;
+  string type = 3;
+  string boundary_geo_json = 4;
+  int32 fee_adjustment = 5;
+  bool is_active = 6;
+
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}

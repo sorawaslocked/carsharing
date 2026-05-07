@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package service.car;
+
+import "base/car/car_pricing.proto";
+import "base/common.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/car";
+
+service CarPricingService {
+  rpc CreatePricingRule(CreatePricingRuleRequest) returns (CreatePricingRuleResponse);
+  rpc GetPricingRule(GetPricingRuleRequest) returns (GetPricingRuleResponse);
+  rpc ListPricingRules(ListPricingRulesRequest) returns (ListPricingRulesResponse);
+  rpc UpdatePricingRule(UpdatePricingRuleRequest) returns (google.protobuf.Empty);
+  rpc DeletePricingRule(DeletePricingRuleRequest) returns (google.protobuf.Empty);
+}
+
+message CreatePricingRuleRequest {
+  optional string model_id = 1;
+  optional string zone_id = 2;
+  optional string class = 3;
+
+  int32 rate_per_minute_tenge = 4;
+  int32 rate_per_km_tenge = 5;
+  int32 free_minutes = 6;
+  int32 min_charge_tenge = 7;
+
+  google.protobuf.Timestamp starts_at = 8;
+  google.protobuf.Timestamp expires_at = 9;
+}
+
+message CreatePricingRuleResponse {
+  string id = 1;
+}
+
+message GetPricingRuleRequest {
+  string id = 1;
+}
+
+message GetPricingRuleResponse {
+  base.car.CarPricingRule rule = 1;
+}
+
+message ListPricingRulesRequest {
+  optional string model_id = 1;
+  optional string zone_id = 2;
+  optional string class = 3;
+  optional bool is_active = 4;
+  optional base.Pagination pagination = 5;
+}
+
+message ListPricingRulesResponse {
+  repeated base.car.CarPricingRule rules = 1;
+}
+
+message UpdatePricingRuleRequest {
+  string id = 1;
+  optional string model_id = 2;
+  optional string zone_id = 3;
+  optional string class = 4;
+  optional int32 rate_per_minute_tenge = 5;
+  optional int32 rate_per_km_tenge = 6;
+  optional int32 free_minutes = 7;
+  optional int32 min_charge_tenge = 8;
+  optional bool is_active = 9;
+  google.protobuf.Timestamp starts_at = 10;
+  google.protobuf.Timestamp expires_at = 11;
+}
+
+message DeletePricingRuleRequest {
+  string id = 1;
+}

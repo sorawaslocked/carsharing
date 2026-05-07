@@ -1201,7 +1201,7 @@ var File_service_user_user_proto protoreflect.FileDescriptor
 
 const file_service_user_user_proto_rawDesc = "" +
 	"\n" +
-	"\x17service/user/user.proto\x12\fservice.user\x1a\x14base/user/user.proto\x1a\x12base/helpers.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x15service/helpers.proto\"\x84\x02\n" +
+	"\x17service/user/user.proto\x12\fservice.user\x1a\x14base/user/user.proto\x1a\x12base/common.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x15service/common.proto\"\x84\x02\n" +
 	"\rCreateRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12%\n" +
 	"\vphoneNumber\x18\x02 \x01(\tH\x00R\vphoneNumber\x88\x01\x01\x12\x1c\n" +

@@ -3,113 +3,164 @@ syntax = "proto3";
 package service.car;
 
 import "base/car/car.proto";
+import "base/common.proto";
+import "service/common.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/car";
 
 service CarService {
-  rpc CreateCar (CreateCarRequest) returns (CreateCarResponse);
+  rpc Health(google.protobuf.Empty) returns (service.ServiceHealthResponse);
+
+  rpc CreateCar(CreateCarRequest) returns (CreateCarResponse);
   rpc GetCar(GetCarRequest) returns (GetCarResponse);
-  rpc GetCars(GetCarsRequest) returns (GetCarsResponse);
-  rpc GetAvailableCars(GetAvailableCarsRequest) returns (GetAvailableCarsResponse);
-  rpc UpdateCar(UpdateCarRequest) returns (UpdateCarResponse);
-  rpc UpdateCarStatus(UpdateCarStatusRequest) returns (UpdateCarStatusResponse);
-  rpc DeleteCar(DeleteCarRequest) returns (DeleteCarResponse);
+  rpc ListCars(ListCarsRequest) returns (ListCarsResponse);
+  rpc UpdateCar(UpdateCarRequest) returns (google.protobuf.Empty);
+  rpc DeleteCar(DeleteCarRequest) returns (google.protobuf.Empty);
+
+  rpc ElevatedUpdateCar(ElevatedUpdateCarRequest) returns (google.protobuf.Empty);
+
+  rpc GetCarStatusHistory(GetCarStatusHistoryRequest) returns (GetCarStatusHistoryResponse);
+  rpc GetCarFuelHistory(GetCarFuelHistoryRequest) returns (GetCarFuelHistoryResponse);
+  rpc GetCarLocationHistory(GetCarLocationHistoryRequest) returns (GetCarLocationHistoryResponse);
+  rpc GetCarBatteryHistory(GetCarBatteryHistoryRequest) returns (GetCarBatteryHistoryResponse);
+  rpc GetCarMileageHistory(GetCarMileageHistoryRequest) returns (GetCarMileageHistoryResponse);
+
+  rpc GetCarImageUploadData(google.protobuf.Empty) returns (GetCarImageUploadDataResponse);
 }
 
-// CreateCar
 message CreateCarRequest {
-  string modelID = 1;
-  string VIN = 2;
-  string licensePlate = 3;
+  string model_id = 1;
+  string vin = 2;
+  string license_plate = 3;
   string color = 4;
-  int32 yearManufactured = 5;
-  int64 mileageKM = 6;
-  optional float fuelLevel = 7;
-  optional float batteryLevel = 8;
-  repeated string notes = 9;
+  int32 year_manufactured = 5;
+  string telematics_id = 6;
+  optional string notes = 7;
 }
 
 message CreateCarResponse {
-  string ID = 1;
+  string id = 1;
 }
 
-// GetCar
 message GetCarRequest {
-  string ID = 1;
+  string id = 1;
 }
 
 message GetCarResponse {
   base.car.Car car = 1;
 }
 
-// GetCars
-message GetCarsRequest {
+message ListCarsRequest {
   optional string brand = 1;
   optional string model = 2;
-  optional string fuelType = 3;
+  optional string fuel_type = 3;
   optional string transmission = 4;
-  optional string bodyType = 5;
+  optional string body_type = 5;
   optional string class = 6;
-  optional int32 minSeats = 7;
-
-  optional string status = 8;
-  optional double latitude = 9;
-  optional double longitude = 10;
-  optional double radiusKM = 11;
-
-  optional int64 limit = 12;
-  optional int64 offset = 13;
+  optional int32 min_seats = 7;
+  optional base.Location location = 8;
+  optional int32 radius_m = 9;
+  optional float min_fuel_level = 10;
+  optional string zone_id = 11;
+  optional string status = 12;
+  optional bool is_retired = 13;
+  optional base.Pagination pagination = 14;
 }
 
-message GetCarsResponse {
+message ListCarsResponse {
   repeated base.car.Car cars = 1;
 }
 
-// GetAvailableCars
-message GetAvailableCarsRequest {
-  optional string brand = 1;
-  optional string model = 2;
-  optional string fuelType = 3;
-  optional string transmission = 4;
-  optional string bodyType = 5;
-  optional string class = 6;
-  optional int32 minSeats = 7;
-
-  optional double latitude = 8;
-  optional double longitude = 9;
-  optional double radiusKM = 10;
-
-  optional int64 limit = 11;
-  optional int64 offset = 12;
-}
-
-message GetAvailableCarsResponse {
-  repeated base.car.Car cars = 1;
-}
-
-// UpdateCar
 message UpdateCarRequest {
-  string ID = 1;
-
-  optional string modelID = 2;
-  optional string licensePlate = 3;
+  string id = 1;
+  optional string model_id = 2;
+  optional string license_plate = 3;
   optional string color = 4;
-  repeated string notes = 5;
+  optional int64 mileage_km = 5;
+  optional float fuel_level = 6;
+  optional float battery_level = 7;
+  optional base.Location location = 8;
+  optional string telematics_id = 9;
+  optional string zone_id = 10;
+  optional string status = 11;
+  optional bool is_retired = 12;
+  optional string notes = 13;
+  repeated string image_keys = 14;
 }
 
-message UpdateCarResponse {}
-
-// UpdateCarStatus
-message UpdateCarStatusRequest {
-  string ID = 1;
-  string status = 2;
-}
-
-message UpdateCarStatusResponse {}
-
-// DeleteCar
 message DeleteCarRequest {
-  string ID = 1;
+  string id = 1;
 }
 
-message DeleteCarResponse {}
+message ElevatedUpdateCarRequest {
+  string id = 1;
+  optional string status = 2;
+  optional int64 mileage_km = 3;
+  optional float fuel_level = 4;
+  optional float battery_level = 5;
+  optional base.Location location = 6;
+  string reason = 7;
+  google.protobuf.Struct metadata = 8;
+}
+
+message GetCarStatusHistoryRequest {
+  string car_id = 1;
+  optional google.protobuf.Timestamp from = 2;
+  optional google.protobuf.Timestamp to = 3;
+  optional base.Pagination pagination = 4;
+}
+
+message GetCarStatusHistoryResponse {
+  repeated base.car.CarStatusReading readings = 1;
+}
+
+message GetCarFuelHistoryRequest {
+  string car_id = 1;
+  optional google.protobuf.Timestamp from = 2;
+  optional google.protobuf.Timestamp to = 3;
+  optional base.Pagination pagination = 4;
+}
+
+message GetCarFuelHistoryResponse {
+  repeated base.car.CarFuelReading readings = 1;
+}
+
+message GetCarLocationHistoryRequest {
+  string car_id = 1;
+  optional google.protobuf.Timestamp from = 2;
+  optional google.protobuf.Timestamp to = 3;
+  optional base.Pagination pagination = 4;
+}
+
+message GetCarLocationHistoryResponse {
+  repeated base.car.CarLocationReading readings = 1;
+}
+
+message GetCarBatteryHistoryRequest {
+  string car_id = 1;
+  optional google.protobuf.Timestamp from = 2;
+  optional google.protobuf.Timestamp to = 3;
+  optional base.Pagination pagination = 4;
+}
+
+message GetCarBatteryHistoryResponse {
+  repeated base.car.CarBatteryReading readings = 1;
+}
+
+message GetCarMileageHistoryRequest {
+  string car_id = 1;
+  optional google.protobuf.Timestamp from = 2;
+  optional google.protobuf.Timestamp to = 3;
+  optional base.Pagination pagination = 4;
+}
+
+message GetCarMileageHistoryResponse {
+  repeated base.car.CarMileageReading readings = 1;
+}
+
+message GetCarImageUploadDataResponse {
+  base.ImageUploadData upload_data = 1;
+}

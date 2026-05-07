@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package service.car;
+
+import "base/car/car_insurance.proto";
+import "base/common.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/car";
+
+service CarInsuranceService {
+  rpc CreateCarInsurance(CreateCarInsuranceRequest) returns (CreateCarInsuranceResponse);
+  rpc GetCarInsurance(GetCarInsuranceRequest) returns (GetCarInsuranceResponse);
+  rpc ListCarInsurances(ListCarInsurancesRequest) returns (ListCarInsurancesResponse);
+  rpc UpdateCarInsurance(UpdateCarInsuranceRequest) returns (google.protobuf.Empty);
+  rpc DeleteCarInsurance(DeleteCarInsuranceRequest) returns (google.protobuf.Empty);
+
+  rpc GetCarInsuranceImageUploadData(google.protobuf.Empty) returns (GetCarInsuranceImageUploadDataResponse);
+}
+
+message CreateCarInsuranceRequest {
+  string car_id = 1;
+  string type = 2;
+  string provider = 3;
+  string policy_num = 4;
+  google.protobuf.Timestamp starts_at = 5;
+  google.protobuf.Timestamp expires_at = 6;
+  int32 cost_tenge = 7;
+  optional string notes = 8;
+}
+
+message CreateCarInsuranceResponse {
+  string id = 1;
+}
+
+message GetCarInsuranceRequest {
+  string id = 1;
+}
+
+message GetCarInsuranceResponse {
+  base.car.CarInsurance car_insurance = 1;
+}
+
+message ListCarInsurancesRequest {
+  optional string car_id = 1;
+  optional string type = 2;
+  optional string status = 3;
+  optional int32 expiring_within_days = 4;
+  optional base.Pagination pagination = 5;
+}
+
+message ListCarInsurancesResponse {
+  repeated base.car.CarInsurance car_insurances = 1;
+}
+
+message UpdateCarInsuranceRequest {
+  string id = 1;
+  optional string provider = 2;
+  optional string policy_num = 3;
+  google.protobuf.Timestamp starts_at = 4;
+  google.protobuf.Timestamp expires_at = 5;
+  optional int32 cost_tenge = 6;
+  optional string status = 7;
+  optional string notes = 8;
+  repeated string image_keys = 9;
+}
+
+message DeleteCarInsuranceRequest {
+  string id = 1;
+}
+
+message GetCarInsuranceImageUploadDataResponse {
+  base.ImageUploadData upload_data = 1;
+}

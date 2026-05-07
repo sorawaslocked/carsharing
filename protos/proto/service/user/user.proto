@@ -3,20 +3,20 @@ syntax = "proto3";
 package service.user;
 
 import "base/user/user.proto";
-import "base/helpers.proto";
+import "base/common.proto";
 import "google/protobuf/empty.proto";
-import "service/helpers.proto";
+import "service/common.proto";
 
 option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/user";
 
 service UserService {
   rpc Health(google.protobuf.Empty) returns (ServiceHealthResponse);
 
-  rpc Create(CreateRequest) returns (CreateResponse);
-  rpc Get(GetRequest) returns (GetResponse);
-  rpc GetAllWithFilter(GetAllWithFilterRequest) returns (GetAllWithFilterResponse);
-  rpc Update(UpdateRequest) returns (google.protobuf.Empty);
-  rpc Delete(DeleteRequest) returns (google.protobuf.Empty);
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (google.protobuf.Empty);
+  rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty);
 
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc SignIn(SignInRequest) returns (SignInResponse);
@@ -31,88 +31,90 @@ service UserService {
 }
 
 // CRUD
-message CreateRequest {
+message CreateUserRequest {
   string email = 1;
-  optional string phoneNumber = 2;
-  string firstName = 3;
-  string lastName = 4;
-  string birthDate = 5;
+  optional string phone_number = 2;
+  string first_name = 3;
+  string last_name = 4;
+  string birth_date = 5;
   string password = 6;
-  string passwordConfirmation = 7;
+  string password_confirmation = 7;
 }
 
-message CreateResponse {
-  optional string ID = 1;
+message CreateUserResponse {
+  optional string id = 1;
 }
 
-message GetRequest {
-  string ID = 1;
+message GetUserRequest {
+  string id = 1;
 }
 
-message GetResponse {
+message GetUserResponse {
   base.user.User user = 1;
 }
 
-message GetAllWithFilterRequest {
+message ListUsersRequest {
   optional string email = 1;
-  optional string phoneNumber = 2;
-  optional string firstName = 3;
-  optional string lastName = 4;
-  optional bool isDocumentVerified = 5;
-  optional bool isEmailVerified = 6;
-  optional bool isSuspended = 7;
+  optional string phone_number = 2;
+  optional string first_name = 3;
+  optional string last_name = 4;
+
+  optional bool is_document_verified = 5;
+  optional bool is_email_verified = 6;
+  optional bool is_suspended = 7;
+
   optional base.Pagination pagination = 8;
 }
 
-message GetAllWithFilterResponse {
+message ListUsersResponse {
   repeated base.user.User users = 1;
 }
 
-message UpdateRequest {
-  string ID = 1;
+message UpdateUserRequest {
+  string id = 1;
 
   optional string email = 2;
-  optional string phoneNumber = 3;
-  optional string firstName = 4;
-  optional string lastName = 5;
-  optional string birthDate = 6;
+  optional string phone_number = 3;
+  optional string first_name = 4;
+  optional string last_name = 5;
+  optional string birth_date = 6;
   optional string password = 7;
-  optional string passwordConfirmation = 8;
-  optional string profileImageKey = 9;
+  optional string password_confirmation = 8;
+  optional string profile_image_key = 9;
 
   repeated string roles = 10;
-  optional bool isDocumentVerified = 11;
-  optional bool isEmailVerified = 12;
-  optional bool isSuspended = 13;
+  optional bool is_document_verified = 11;
+  optional bool is_email_verified = 12;
+  optional bool is_suspended = 13;
 }
 
-message DeleteRequest {
-  string ID = 1;
+message DeleteUserRequest {
+  string id = 1;
 }
 
 // Auth
 message RegisterRequest {
   string email = 1;
-  optional string phoneNumber = 2;
-  string firstName = 3;
-  string lastName = 4;
-  string birthDate = 5;
+  optional string phone_number = 2;
+  string first_name = 3;
+  string last_name = 4;
+  string birth_date = 5;
   string password = 6;
-  string passwordConfirmation = 7;
+  string password_confirmation = 7;
 }
 
 message RegisterResponse {
-  string ID = 1;
+  string id = 1;
 }
 
 message SignInRequest {
   optional string email = 1;
-  optional string phoneNumber = 2;
+  optional string phone_number = 2;
   string password = 3;
 }
 
 message SignInResponse {
-  string ID = 1;
+  string id = 1;
 }
 
 // Activation Code
@@ -122,24 +124,24 @@ message CheckActivationCodeRequest {
 
 // Document
 message CreateDocumentRequest {
-  string objectKey = 2;
-  string imageType = 3;
+  string object_key = 2;
+  string image_type = 3;
 }
 
 message CreateDocumentResponse {
-  string ID = 1;
+  string id = 1;
 }
 
 message GetUploadDocumentDataRequest {
-  string imageType = 1;
+  string image_type = 1;
 }
 
 message GetUploadDocumentDataResponse {
-  base.ImageUploadData uploadData = 1;
+  base.ImageUploadData upload_data = 1;
 }
 
 message GetProcessedDocumentsForUserRequest {
-  string userID = 1;
+  string user_id = 1;
 }
 
 message GetProcessedDocumentsForUserResponse {
@@ -147,7 +149,7 @@ message GetProcessedDocumentsForUserResponse {
 }
 
 message CheckDocumentRequest {
-  string docID = 1;
+  string doc_id = 1;
   string status = 2;
   optional string error = 3;
 }

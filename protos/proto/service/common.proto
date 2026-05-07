@@ -13,7 +13,7 @@ message ServiceHealthResponse {
 
   google.protobuf.Timestamp timestamp = 4;
 
-  uint64 uptimeSeconds = 5;
+  uint64 uptime_seconds = 5;
 
   repeated DependencyHealth dependencies = 6;
 }
@@ -22,7 +22,7 @@ message DependencyHealth {
   string name = 1;
   string status = 2;
 
-  optional uint32 latencyMS = 3;
+  optional uint32 latency_ms = 3;
 
   optional string error = 4;
 }

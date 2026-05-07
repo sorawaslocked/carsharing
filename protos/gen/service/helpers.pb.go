@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v4.25.1
-// source: service/helpers.proto
+// source: service/common.proto
 
 package service
 
@@ -178,7 +178,7 @@ var File_service_helpers_proto protoreflect.FileDescriptor
 
 const file_service_helpers_proto_rawDesc = "" +
 	"\n" +
-	"\x15service/helpers.proto\x12\aservice\x1a\x1fgoogle/protobuf/timestamp.proto\"\xfc\x01\n" +
+	"\x15service/common.proto\x12\aservice\x1a\x1fgoogle/protobuf/timestamp.proto\"\xfc\x01\n" +
 	"\x15ServiceHealthResponse\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
 	"\x06status\x18\x02 \x01(\tR\x06status\x12\x18\n" +

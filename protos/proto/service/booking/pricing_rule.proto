@@ -1,14 +1,14 @@
 syntax = "proto3";
 
-package service.car;
+package service.booking;
 
-import "base/car/car_pricing.proto";
+import "base/booking/pricing_rule.proto";
 import "base/common.proto";
 import "google/protobuf/empty.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/car";
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/booking";
 
-service CarPricingService {
+service PricingRuleService {
   rpc CreatePricingRule(CreatePricingRuleRequest) returns (CreatePricingRuleResponse);
   rpc GetPricingRule(GetPricingRuleRequest) returns (GetPricingRuleResponse);
   rpc ListPricingRules(ListPricingRulesRequest) returns (ListPricingRulesResponse);
@@ -41,7 +41,7 @@ message GetPricingRuleRequest {
 }
 
 message GetPricingRuleResponse {
-  base.car.CarPricingRule rule = 1;
+  base.booking.PricingRule rule = 1;
 }
 
 message ListPricingRulesRequest {
@@ -54,7 +54,7 @@ message ListPricingRulesRequest {
 }
 
 message ListPricingRulesResponse {
-  repeated base.car.CarPricingRule rules = 1;
+  repeated base.booking.PricingRule rules = 1;
 }
 
 message UpdatePricingRuleRequest {

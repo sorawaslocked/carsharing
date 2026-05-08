@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v4.25.1
-// source: base/car/car_pricing.proto
+// source: base/car/pricing_rule.proto
 
 package car
 
@@ -174,7 +174,7 @@ var File_base_car_car_pricing_proto protoreflect.FileDescriptor
 
 const file_base_car_car_pricing_proto_rawDesc = "" +
 	"\n" +
-	"\x1abase/car/car_pricing.proto\x12\bbase.car\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb4\x05\n" +
+	"\x1abase/car/pricing_rule.proto\x12\bbase.car\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb4\x05\n" +
 	"\x0eCarPricingRule\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\bmodel_id\x18\x02 \x01(\tH\x00R\amodelId\x88\x01\x01\x12\x1c\n" +

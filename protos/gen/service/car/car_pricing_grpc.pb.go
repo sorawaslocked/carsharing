@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v4.25.1
-// source: service/car/car_pricing.proto
+// source: service/car/pricing_rule.proto
 
 package car
 
@@ -270,5 +270,5 @@ var CarPricingService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "service/car/car_pricing.proto",
+	Metadata: "service/car/pricing_rule.proto",
 }

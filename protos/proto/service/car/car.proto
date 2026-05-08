@@ -12,8 +12,6 @@ import "google/protobuf/timestamp.proto";
 option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/car";
 
 service CarService {
-  rpc Health(google.protobuf.Empty) returns (service.ServiceHealthResponse);
-
   rpc CreateCar(CreateCarRequest) returns (CreateCarResponse);
   rpc GetCar(GetCarRequest) returns (GetCarResponse);
   rpc ListCars(ListCarsRequest) returns (ListCarsResponse);

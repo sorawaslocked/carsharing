@@ -1,16 +1,16 @@
 syntax = "proto3";
 
-package base.car;
+package base.booking;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base/car";
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base/booking";
 
-message CarPricingRule {
+message PricingRule {
   string id = 1;
-  optional string model_id = 2;
+  optional string car_model_id = 2;
   optional string zone_id = 3;
-  optional string class = 4;
+  optional string car_class = 4;
 
   string type = 5;
   int32 rate_tenge = 6;

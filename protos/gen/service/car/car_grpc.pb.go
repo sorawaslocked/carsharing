@@ -25,7 +25,8 @@ const (
 	CarService_ListCars_FullMethodName              = "/service.car.CarService/ListCars"
 	CarService_UpdateCar_FullMethodName             = "/service.car.CarService/UpdateCar"
 	CarService_DeleteCar_FullMethodName             = "/service.car.CarService/DeleteCar"
-	CarService_ElevatedUpdateCar_FullMethodName     = "/service.car.CarService/ElevatedUpdateCar"
+	CarService_UpdateCarTelemetry_FullMethodName    = "/service.car.CarService/UpdateCarTelemetry"
+	CarService_UpdateCarStatus_FullMethodName       = "/service.car.CarService/UpdateCarStatus"
 	CarService_GetCarStatusHistory_FullMethodName   = "/service.car.CarService/GetCarStatusHistory"
 	CarService_GetCarFuelHistory_FullMethodName     = "/service.car.CarService/GetCarFuelHistory"
 	CarService_GetCarLocationHistory_FullMethodName = "/service.car.CarService/GetCarLocationHistory"
@@ -43,7 +44,8 @@ type CarServiceClient interface {
 	ListCars(ctx context.Context, in *ListCarsRequest, opts ...grpc.CallOption) (*ListCarsResponse, error)
 	UpdateCar(ctx context.Context, in *UpdateCarRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteCar(ctx context.Context, in *DeleteCarRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	ElevatedUpdateCar(ctx context.Context, in *ElevatedUpdateCarRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateCarTelemetry(ctx context.Context, in *UpdateCarTelemetryRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateCarStatus(ctx context.Context, in *UpdateCarStatusRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetCarStatusHistory(ctx context.Context, in *GetCarStatusHistoryRequest, opts ...grpc.CallOption) (*GetCarStatusHistoryResponse, error)
 	GetCarFuelHistory(ctx context.Context, in *GetCarFuelHistoryRequest, opts ...grpc.CallOption) (*GetCarFuelHistoryResponse, error)
 	GetCarLocationHistory(ctx context.Context, in *GetCarLocationHistoryRequest, opts ...grpc.CallOption) (*GetCarLocationHistoryResponse, error)
@@ -110,10 +112,20 @@ func (c *carServiceClient) DeleteCar(ctx context.Context, in *DeleteCarRequest, 
 	return out, nil
 }
 
-func (c *carServiceClient) ElevatedUpdateCar(ctx context.Context, in *ElevatedUpdateCarRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *carServiceClient) UpdateCarTelemetry(ctx context.Context, in *UpdateCarTelemetryRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, CarService_ElevatedUpdateCar_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, CarService_UpdateCarTelemetry_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *carServiceClient) UpdateCarStatus(ctx context.Context, in *UpdateCarStatusRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, CarService_UpdateCarStatus_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +201,8 @@ type CarServiceServer interface {
 	ListCars(context.Context, *ListCarsRequest) (*ListCarsResponse, error)
 	UpdateCar(context.Context, *UpdateCarRequest) (*emptypb.Empty, error)
 	DeleteCar(context.Context, *DeleteCarRequest) (*emptypb.Empty, error)
-	ElevatedUpdateCar(context.Context, *ElevatedUpdateCarRequest) (*emptypb.Empty, error)
+	UpdateCarTelemetry(context.Context, *UpdateCarTelemetryRequest) (*emptypb.Empty, error)
+	UpdateCarStatus(context.Context, *UpdateCarStatusRequest) (*emptypb.Empty, error)
 	GetCarStatusHistory(context.Context, *GetCarStatusHistoryRequest) (*GetCarStatusHistoryResponse, error)
 	GetCarFuelHistory(context.Context, *GetCarFuelHistoryRequest) (*GetCarFuelHistoryResponse, error)
 	GetCarLocationHistory(context.Context, *GetCarLocationHistoryRequest) (*GetCarLocationHistoryResponse, error)
@@ -221,8 +234,11 @@ func (UnimplementedCarServiceServer) UpdateCar(context.Context, *UpdateCarReques
 func (UnimplementedCarServiceServer) DeleteCar(context.Context, *DeleteCarRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteCar not implemented")
 }
-func (UnimplementedCarServiceServer) ElevatedUpdateCar(context.Context, *ElevatedUpdateCarRequest) (*emptypb.Empty, error) {
-	return nil, status.Error(codes.Unimplemented, "method ElevatedUpdateCar not implemented")
+func (UnimplementedCarServiceServer) UpdateCarTelemetry(context.Context, *UpdateCarTelemetryRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateCarTelemetry not implemented")
+}
+func (UnimplementedCarServiceServer) UpdateCarStatus(context.Context, *UpdateCarStatusRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateCarStatus not implemented")
 }
 func (UnimplementedCarServiceServer) GetCarStatusHistory(context.Context, *GetCarStatusHistoryRequest) (*GetCarStatusHistoryResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetCarStatusHistory not implemented")
@@ -353,20 +369,38 @@ func _CarService_DeleteCar_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CarService_ElevatedUpdateCar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ElevatedUpdateCarRequest)
+func _CarService_UpdateCarTelemetry_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCarTelemetryRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CarServiceServer).ElevatedUpdateCar(ctx, in)
+		return srv.(CarServiceServer).UpdateCarTelemetry(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CarService_ElevatedUpdateCar_FullMethodName,
+		FullMethod: CarService_UpdateCarTelemetry_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CarServiceServer).ElevatedUpdateCar(ctx, req.(*ElevatedUpdateCarRequest))
+		return srv.(CarServiceServer).UpdateCarTelemetry(ctx, req.(*UpdateCarTelemetryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CarService_UpdateCarStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCarStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CarServiceServer).UpdateCarStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CarService_UpdateCarStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CarServiceServer).UpdateCarStatus(ctx, req.(*UpdateCarStatusRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -507,8 +541,12 @@ var CarService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CarService_DeleteCar_Handler,
 		},
 		{
-			MethodName: "ElevatedUpdateCar",
-			Handler:    _CarService_ElevatedUpdateCar_Handler,
+			MethodName: "UpdateCarTelemetry",
+			Handler:    _CarService_UpdateCarTelemetry_Handler,
+		},
+		{
+			MethodName: "UpdateCarStatus",
+			Handler:    _CarService_UpdateCarStatus_Handler,
 		},
 		{
 			MethodName: "GetCarStatusHistory",

@@ -591,6 +591,166 @@ func (x *UpdateCarRequest) GetImageKeys() []string {
 	return nil
 }
 
+type UpdateCarTelemetryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	MileageKm     *int64                 `protobuf:"varint,2,opt,name=mileage_km,json=mileageKm,proto3,oneof" json:"mileage_km,omitempty"`
+	FuelLevel     *float32               `protobuf:"fixed32,3,opt,name=fuel_level,json=fuelLevel,proto3,oneof" json:"fuel_level,omitempty"`
+	BatteryLevel  *float32               `protobuf:"fixed32,4,opt,name=battery_level,json=batteryLevel,proto3,oneof" json:"battery_level,omitempty"`
+	Location      *base.Location         `protobuf:"bytes,5,opt,name=location,proto3,oneof" json:"location,omitempty"`
+	Reason        string                 `protobuf:"bytes,6,opt,name=reason,proto3" json:"reason,omitempty"`
+	Metadata      *structpb.Struct       `protobuf:"bytes,7,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateCarTelemetryRequest) Reset() {
+	*x = UpdateCarTelemetryRequest{}
+	mi := &file_service_car_car_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateCarTelemetryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateCarTelemetryRequest) ProtoMessage() {}
+
+func (x *UpdateCarTelemetryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_service_car_car_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateCarTelemetryRequest.ProtoReflect.Descriptor instead.
+func (*UpdateCarTelemetryRequest) Descriptor() ([]byte, []int) {
+	return file_service_car_car_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *UpdateCarTelemetryRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateCarTelemetryRequest) GetMileageKm() int64 {
+	if x != nil && x.MileageKm != nil {
+		return *x.MileageKm
+	}
+	return 0
+}
+
+func (x *UpdateCarTelemetryRequest) GetFuelLevel() float32 {
+	if x != nil && x.FuelLevel != nil {
+		return *x.FuelLevel
+	}
+	return 0
+}
+
+func (x *UpdateCarTelemetryRequest) GetBatteryLevel() float32 {
+	if x != nil && x.BatteryLevel != nil {
+		return *x.BatteryLevel
+	}
+	return 0
+}
+
+func (x *UpdateCarTelemetryRequest) GetLocation() *base.Location {
+	if x != nil {
+		return x.Location
+	}
+	return nil
+}
+
+func (x *UpdateCarTelemetryRequest) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+func (x *UpdateCarTelemetryRequest) GetMetadata() *structpb.Struct {
+	if x != nil {
+		return x.Metadata
+	}
+	return nil
+}
+
+type UpdateCarStatusRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	Reason        string                 `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"`
+	Metadata      *structpb.Struct       `protobuf:"bytes,4,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateCarStatusRequest) Reset() {
+	*x = UpdateCarStatusRequest{}
+	mi := &file_service_car_car_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateCarStatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateCarStatusRequest) ProtoMessage() {}
+
+func (x *UpdateCarStatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_service_car_car_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateCarStatusRequest.ProtoReflect.Descriptor instead.
+func (*UpdateCarStatusRequest) Descriptor() ([]byte, []int) {
+	return file_service_car_car_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *UpdateCarStatusRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateCarStatusRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *UpdateCarStatusRequest) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+func (x *UpdateCarStatusRequest) GetMetadata() *structpb.Struct {
+	if x != nil {
+		return x.Metadata
+	}
+	return nil
+}
+
 type DeleteCarRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -600,7 +760,7 @@ type DeleteCarRequest struct {
 
 func (x *DeleteCarRequest) Reset() {
 	*x = DeleteCarRequest{}
-	mi := &file_service_car_car_proto_msgTypes[7]
+	mi := &file_service_car_car_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -612,7 +772,7 @@ func (x *DeleteCarRequest) String() string {
 func (*DeleteCarRequest) ProtoMessage() {}
 
 func (x *DeleteCarRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_car_car_proto_msgTypes[7]
+	mi := &file_service_car_car_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -625,7 +785,7 @@ func (x *DeleteCarRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteCarRequest.ProtoReflect.Descriptor instead.
 func (*DeleteCarRequest) Descriptor() ([]byte, []int) {
-	return file_service_car_car_proto_rawDescGZIP(), []int{7}
+	return file_service_car_car_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *DeleteCarRequest) GetId() string {
@@ -651,7 +811,7 @@ type ElevatedUpdateCarRequest struct {
 
 func (x *ElevatedUpdateCarRequest) Reset() {
 	*x = ElevatedUpdateCarRequest{}
-	mi := &file_service_car_car_proto_msgTypes[8]
+	mi := &file_service_car_car_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -663,7 +823,7 @@ func (x *ElevatedUpdateCarRequest) String() string {
 func (*ElevatedUpdateCarRequest) ProtoMessage() {}
 
 func (x *ElevatedUpdateCarRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_car_car_proto_msgTypes[8]
+	mi := &file_service_car_car_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -676,7 +836,7 @@ func (x *ElevatedUpdateCarRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ElevatedUpdateCarRequest.ProtoReflect.Descriptor instead.
 func (*ElevatedUpdateCarRequest) Descriptor() ([]byte, []int) {
-	return file_service_car_car_proto_rawDescGZIP(), []int{8}
+	return file_service_car_car_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ElevatedUpdateCarRequest) GetId() string {
@@ -747,7 +907,7 @@ type GetCarStatusHistoryRequest struct {
 
 func (x *GetCarStatusHistoryRequest) Reset() {
 	*x = GetCarStatusHistoryRequest{}
-	mi := &file_service_car_car_proto_msgTypes[9]
+	mi := &file_service_car_car_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -759,7 +919,7 @@ func (x *GetCarStatusHistoryRequest) String() string {
 func (*GetCarStatusHistoryRequest) ProtoMessage() {}
 
 func (x *GetCarStatusHistoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_car_car_proto_msgTypes[9]
+	mi := &file_service_car_car_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -772,7 +932,7 @@ func (x *GetCarStatusHistoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCarStatusHistoryRequest.ProtoReflect.Descriptor instead.
 func (*GetCarStatusHistoryRequest) Descriptor() ([]byte, []int) {
-	return file_service_car_car_proto_rawDescGZIP(), []int{9}
+	return file_service_car_car_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *GetCarStatusHistoryRequest) GetCarId() string {
@@ -812,7 +972,7 @@ type GetCarStatusHistoryResponse struct {
 
 func (x *GetCarStatusHistoryResponse) Reset() {
 	*x = GetCarStatusHistoryResponse{}
-	mi := &file_service_car_car_proto_msgTypes[10]
+	mi := &file_service_car_car_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -824,7 +984,7 @@ func (x *GetCarStatusHistoryResponse) String() string {
 func (*GetCarStatusHistoryResponse) ProtoMessage() {}
 
 func (x *GetCarStatusHistoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_car_car_proto_msgTypes[10]
+	mi := &file_service_car_car_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -837,7 +997,7 @@ func (x *GetCarStatusHistoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCarStatusHistoryResponse.ProtoReflect.Descriptor instead.
 func (*GetCarStatusHistoryResponse) Descriptor() ([]byte, []int) {
-	return file_service_car_car_proto_rawDescGZIP(), []int{10}
+	return file_service_car_car_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *GetCarStatusHistoryResponse) GetReadings() []*car.CarStatusReading {
@@ -859,7 +1019,7 @@ type GetCarFuelHistoryRequest struct {
 
 func (x *GetCarFuelHistoryRequest) Reset() {
 	*x = GetCarFuelHistoryRequest{}
-	mi := &file_service_car_car_proto_msgTypes[11]
+	mi := &file_service_car_car_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -871,7 +1031,7 @@ func (x *GetCarFuelHistoryRequest) String() string {
 func (*GetCarFuelHistoryRequest) ProtoMessage() {}
 
 func (x *GetCarFuelHistoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_car_car_proto_msgTypes[11]
+	mi := &file_service_car_car_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -884,7 +1044,7 @@ func (x *GetCarFuelHistoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCarFuelHistoryRequest.ProtoReflect.Descriptor instead.
 func (*GetCarFuelHistoryRequest) Descriptor() ([]byte, []int) {
-	return file_service_car_car_proto_rawDescGZIP(), []int{11}
+	return file_service_car_car_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *GetCarFuelHistoryRequest) GetCarId() string {
@@ -924,7 +1084,7 @@ type GetCarFuelHistoryResponse struct {
 
 func (x *GetCarFuelHistoryResponse) Reset() {
 	*x = GetCarFuelHistoryResponse{}
-	mi := &file_service_car_car_proto_msgTypes[12]
+	mi := &file_service_car_car_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -936,7 +1096,7 @@ func (x *GetCarFuelHistoryResponse) String() string {
 func (*GetCarFuelHistoryResponse) ProtoMessage() {}
 
 func (x *GetCarFuelHistoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_car_car_proto_msgTypes[12]
+	mi := &file_service_car_car_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -949,7 +1109,7 @@ func (x *GetCarFuelHistoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCarFuelHistoryResponse.ProtoReflect.Descriptor instead.
 func (*GetCarFuelHistoryResponse) Descriptor() ([]byte, []int) {
-	return file_service_car_car_proto_rawDescGZIP(), []int{12}
+	return file_service_car_car_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *GetCarFuelHistoryResponse) GetReadings() []*car.CarFuelReading {
@@ -971,7 +1131,7 @@ type GetCarLocationHistoryRequest struct {
 
 func (x *GetCarLocationHistoryRequest) Reset() {
 	*x = GetCarLocationHistoryRequest{}
-	mi := &file_service_car_car_proto_msgTypes[13]
+	mi := &file_service_car_car_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -983,7 +1143,7 @@ func (x *GetCarLocationHistoryRequest) String() string {
 func (*GetCarLocationHistoryRequest) ProtoMessage() {}
 
 func (x *GetCarLocationHistoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_car_car_proto_msgTypes[13]
+	mi := &file_service_car_car_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -996,7 +1156,7 @@ func (x *GetCarLocationHistoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCarLocationHistoryRequest.ProtoReflect.Descriptor instead.
 func (*GetCarLocationHistoryRequest) Descriptor() ([]byte, []int) {
-	return file_service_car_car_proto_rawDescGZIP(), []int{13}
+	return file_service_car_car_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *GetCarLocationHistoryRequest) GetCarId() string {
@@ -1036,7 +1196,7 @@ type GetCarLocationHistoryResponse struct {
 
 func (x *GetCarLocationHistoryResponse) Reset() {
 	*x = GetCarLocationHistoryResponse{}
-	mi := &file_service_car_car_proto_msgTypes[14]
+	mi := &file_service_car_car_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1048,7 +1208,7 @@ func (x *GetCarLocationHistoryResponse) String() string {
 func (*GetCarLocationHistoryResponse) ProtoMessage() {}
 
 func (x *GetCarLocationHistoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_car_car_proto_msgTypes[14]
+	mi := &file_service_car_car_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1061,7 +1221,7 @@ func (x *GetCarLocationHistoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCarLocationHistoryResponse.ProtoReflect.Descriptor instead.
 func (*GetCarLocationHistoryResponse) Descriptor() ([]byte, []int) {
-	return file_service_car_car_proto_rawDescGZIP(), []int{14}
+	return file_service_car_car_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *GetCarLocationHistoryResponse) GetReadings() []*car.CarLocationReading {
@@ -1083,7 +1243,7 @@ type GetCarBatteryHistoryRequest struct {
 
 func (x *GetCarBatteryHistoryRequest) Reset() {
 	*x = GetCarBatteryHistoryRequest{}
-	mi := &file_service_car_car_proto_msgTypes[15]
+	mi := &file_service_car_car_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1095,7 +1255,7 @@ func (x *GetCarBatteryHistoryRequest) String() string {
 func (*GetCarBatteryHistoryRequest) ProtoMessage() {}
 
 func (x *GetCarBatteryHistoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_car_car_proto_msgTypes[15]
+	mi := &file_service_car_car_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1108,7 +1268,7 @@ func (x *GetCarBatteryHistoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCarBatteryHistoryRequest.ProtoReflect.Descriptor instead.
 func (*GetCarBatteryHistoryRequest) Descriptor() ([]byte, []int) {
-	return file_service_car_car_proto_rawDescGZIP(), []int{15}
+	return file_service_car_car_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *GetCarBatteryHistoryRequest) GetCarId() string {
@@ -1148,7 +1308,7 @@ type GetCarBatteryHistoryResponse struct {
 
 func (x *GetCarBatteryHistoryResponse) Reset() {
 	*x = GetCarBatteryHistoryResponse{}
-	mi := &file_service_car_car_proto_msgTypes[16]
+	mi := &file_service_car_car_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1160,7 +1320,7 @@ func (x *GetCarBatteryHistoryResponse) String() string {
 func (*GetCarBatteryHistoryResponse) ProtoMessage() {}
 
 func (x *GetCarBatteryHistoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_car_car_proto_msgTypes[16]
+	mi := &file_service_car_car_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1173,7 +1333,7 @@ func (x *GetCarBatteryHistoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCarBatteryHistoryResponse.ProtoReflect.Descriptor instead.
 func (*GetCarBatteryHistoryResponse) Descriptor() ([]byte, []int) {
-	return file_service_car_car_proto_rawDescGZIP(), []int{16}
+	return file_service_car_car_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *GetCarBatteryHistoryResponse) GetReadings() []*car.CarBatteryReading {
@@ -1195,7 +1355,7 @@ type GetCarMileageHistoryRequest struct {
 
 func (x *GetCarMileageHistoryRequest) Reset() {
 	*x = GetCarMileageHistoryRequest{}
-	mi := &file_service_car_car_proto_msgTypes[17]
+	mi := &file_service_car_car_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1207,7 +1367,7 @@ func (x *GetCarMileageHistoryRequest) String() string {
 func (*GetCarMileageHistoryRequest) ProtoMessage() {}
 
 func (x *GetCarMileageHistoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_car_car_proto_msgTypes[17]
+	mi := &file_service_car_car_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1220,7 +1380,7 @@ func (x *GetCarMileageHistoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCarMileageHistoryRequest.ProtoReflect.Descriptor instead.
 func (*GetCarMileageHistoryRequest) Descriptor() ([]byte, []int) {
-	return file_service_car_car_proto_rawDescGZIP(), []int{17}
+	return file_service_car_car_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *GetCarMileageHistoryRequest) GetCarId() string {
@@ -1260,7 +1420,7 @@ type GetCarMileageHistoryResponse struct {
 
 func (x *GetCarMileageHistoryResponse) Reset() {
 	*x = GetCarMileageHistoryResponse{}
-	mi := &file_service_car_car_proto_msgTypes[18]
+	mi := &file_service_car_car_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1272,7 +1432,7 @@ func (x *GetCarMileageHistoryResponse) String() string {
 func (*GetCarMileageHistoryResponse) ProtoMessage() {}
 
 func (x *GetCarMileageHistoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_car_car_proto_msgTypes[18]
+	mi := &file_service_car_car_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1285,7 +1445,7 @@ func (x *GetCarMileageHistoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCarMileageHistoryResponse.ProtoReflect.Descriptor instead.
 func (*GetCarMileageHistoryResponse) Descriptor() ([]byte, []int) {
-	return file_service_car_car_proto_rawDescGZIP(), []int{18}
+	return file_service_car_car_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *GetCarMileageHistoryResponse) GetReadings() []*car.CarMileageReading {
@@ -1304,7 +1464,7 @@ type GetCarImageUploadDataResponse struct {
 
 func (x *GetCarImageUploadDataResponse) Reset() {
 	*x = GetCarImageUploadDataResponse{}
-	mi := &file_service_car_car_proto_msgTypes[19]
+	mi := &file_service_car_car_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1316,7 +1476,7 @@ func (x *GetCarImageUploadDataResponse) String() string {
 func (*GetCarImageUploadDataResponse) ProtoMessage() {}
 
 func (x *GetCarImageUploadDataResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_car_car_proto_msgTypes[19]
+	mi := &file_service_car_car_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1329,7 +1489,7 @@ func (x *GetCarImageUploadDataResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCarImageUploadDataResponse.ProtoReflect.Descriptor instead.
 func (*GetCarImageUploadDataResponse) Descriptor() ([]byte, []int) {
-	return file_service_car_car_proto_rawDescGZIP(), []int{19}
+	return file_service_car_car_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *GetCarImageUploadDataResponse) GetUploadData() *base.ImageUploadData {
@@ -1432,7 +1592,26 @@ const file_service_car_car_proto_rawDesc = "" +
 	"\b_zone_idB\t\n" +
 	"\a_statusB\r\n" +
 	"\v_is_retiredB\b\n" +
-	"\x06_notes\"\"\n" +
+	"\x06_notes\"\xd8\x02\n" +
+	"\x19UpdateCarTelemetryRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\"\n" +
+	"\n" +
+	"mileage_km\x18\x02 \x01(\x03H\x00R\tmileageKm\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"fuel_level\x18\x03 \x01(\x02H\x01R\tfuelLevel\x88\x01\x01\x12(\n" +
+	"\rbattery_level\x18\x04 \x01(\x02H\x02R\fbatteryLevel\x88\x01\x01\x12/\n" +
+	"\blocation\x18\x05 \x01(\v2\x0e.base.LocationH\x03R\blocation\x88\x01\x01\x12\x16\n" +
+	"\x06reason\x18\x06 \x01(\tR\x06reason\x123\n" +
+	"\bmetadata\x18\a \x01(\v2\x17.google.protobuf.StructR\bmetadataB\r\n" +
+	"\v_mileage_kmB\r\n" +
+	"\v_fuel_levelB\x10\n" +
+	"\x0e_battery_levelB\v\n" +
+	"\t_location\"\x8d\x01\n" +
+	"\x16UpdateCarStatusRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\x12\x16\n" +
+	"\x06reason\x18\x03 \x01(\tR\x06reason\x123\n" +
+	"\bmetadata\x18\x04 \x01(\v2\x17.google.protobuf.StructR\bmetadata\"\"\n" +
 	"\x10DeleteCarRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"\xff\x02\n" +
 	"\x18ElevatedUpdateCarRequest\x12\x0e\n" +
@@ -1513,15 +1692,16 @@ const file_service_car_car_proto_rawDesc = "" +
 	"\breadings\x18\x01 \x03(\v2\x1b.base.car.CarMileageReadingR\breadings\"W\n" +
 	"\x1dGetCarImageUploadDataResponse\x126\n" +
 	"\vupload_data\x18\x01 \x01(\v2\x15.base.ImageUploadDataR\n" +
-	"uploadData2\xb5\b\n" +
+	"uploadData2\x87\t\n" +
 	"\n" +
 	"CarService\x12J\n" +
 	"\tCreateCar\x12\x1d.service.car.CreateCarRequest\x1a\x1e.service.car.CreateCarResponse\x12A\n" +
 	"\x06GetCar\x12\x1a.service.car.GetCarRequest\x1a\x1b.service.car.GetCarResponse\x12G\n" +
 	"\bListCars\x12\x1c.service.car.ListCarsRequest\x1a\x1d.service.car.ListCarsResponse\x12B\n" +
 	"\tUpdateCar\x12\x1d.service.car.UpdateCarRequest\x1a\x16.google.protobuf.Empty\x12B\n" +
-	"\tDeleteCar\x12\x1d.service.car.DeleteCarRequest\x1a\x16.google.protobuf.Empty\x12R\n" +
-	"\x11ElevatedUpdateCar\x12%.service.car.ElevatedUpdateCarRequest\x1a\x16.google.protobuf.Empty\x12h\n" +
+	"\tDeleteCar\x12\x1d.service.car.DeleteCarRequest\x1a\x16.google.protobuf.Empty\x12T\n" +
+	"\x12UpdateCarTelemetry\x12&.service.car.UpdateCarTelemetryRequest\x1a\x16.google.protobuf.Empty\x12N\n" +
+	"\x0fUpdateCarStatus\x12#.service.car.UpdateCarStatusRequest\x1a\x16.google.protobuf.Empty\x12h\n" +
 	"\x13GetCarStatusHistory\x12'.service.car.GetCarStatusHistoryRequest\x1a(.service.car.GetCarStatusHistoryResponse\x12b\n" +
 	"\x11GetCarFuelHistory\x12%.service.car.GetCarFuelHistoryRequest\x1a&.service.car.GetCarFuelHistoryResponse\x12n\n" +
 	"\x15GetCarLocationHistory\x12).service.car.GetCarLocationHistoryRequest\x1a*.service.car.GetCarLocationHistoryResponse\x12k\n" +
@@ -1541,7 +1721,7 @@ func file_service_car_car_proto_rawDescGZIP() []byte {
 	return file_service_car_car_proto_rawDescData
 }
 
-var file_service_car_car_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_service_car_car_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
 var file_service_car_car_proto_goTypes = []any{
 	(*CreateCarRequest)(nil),              // 0: service.car.CreateCarRequest
 	(*CreateCarResponse)(nil),             // 1: service.car.CreateCarResponse
@@ -1550,90 +1730,97 @@ var file_service_car_car_proto_goTypes = []any{
 	(*ListCarsRequest)(nil),               // 4: service.car.ListCarsRequest
 	(*ListCarsResponse)(nil),              // 5: service.car.ListCarsResponse
 	(*UpdateCarRequest)(nil),              // 6: service.car.UpdateCarRequest
-	(*DeleteCarRequest)(nil),              // 7: service.car.DeleteCarRequest
-	(*ElevatedUpdateCarRequest)(nil),      // 8: service.car.ElevatedUpdateCarRequest
-	(*GetCarStatusHistoryRequest)(nil),    // 9: service.car.GetCarStatusHistoryRequest
-	(*GetCarStatusHistoryResponse)(nil),   // 10: service.car.GetCarStatusHistoryResponse
-	(*GetCarFuelHistoryRequest)(nil),      // 11: service.car.GetCarFuelHistoryRequest
-	(*GetCarFuelHistoryResponse)(nil),     // 12: service.car.GetCarFuelHistoryResponse
-	(*GetCarLocationHistoryRequest)(nil),  // 13: service.car.GetCarLocationHistoryRequest
-	(*GetCarLocationHistoryResponse)(nil), // 14: service.car.GetCarLocationHistoryResponse
-	(*GetCarBatteryHistoryRequest)(nil),   // 15: service.car.GetCarBatteryHistoryRequest
-	(*GetCarBatteryHistoryResponse)(nil),  // 16: service.car.GetCarBatteryHistoryResponse
-	(*GetCarMileageHistoryRequest)(nil),   // 17: service.car.GetCarMileageHistoryRequest
-	(*GetCarMileageHistoryResponse)(nil),  // 18: service.car.GetCarMileageHistoryResponse
-	(*GetCarImageUploadDataResponse)(nil), // 19: service.car.GetCarImageUploadDataResponse
-	(*car.Car)(nil),                       // 20: base.car.Car
-	(*base.Location)(nil),                 // 21: base.Location
-	(*base.Pagination)(nil),               // 22: base.Pagination
-	(*structpb.Struct)(nil),               // 23: google.protobuf.Struct
-	(*timestamppb.Timestamp)(nil),         // 24: google.protobuf.Timestamp
-	(*car.CarStatusReading)(nil),          // 25: base.car.CarStatusReading
-	(*car.CarFuelReading)(nil),            // 26: base.car.CarFuelReading
-	(*car.CarLocationReading)(nil),        // 27: base.car.CarLocationReading
-	(*car.CarBatteryReading)(nil),         // 28: base.car.CarBatteryReading
-	(*car.CarMileageReading)(nil),         // 29: base.car.CarMileageReading
-	(*base.ImageUploadData)(nil),          // 30: base.ImageUploadData
-	(*emptypb.Empty)(nil),                 // 31: google.protobuf.Empty
+	(*UpdateCarTelemetryRequest)(nil),     // 7: service.car.UpdateCarTelemetryRequest
+	(*UpdateCarStatusRequest)(nil),        // 8: service.car.UpdateCarStatusRequest
+	(*DeleteCarRequest)(nil),              // 9: service.car.DeleteCarRequest
+	(*ElevatedUpdateCarRequest)(nil),      // 10: service.car.ElevatedUpdateCarRequest
+	(*GetCarStatusHistoryRequest)(nil),    // 11: service.car.GetCarStatusHistoryRequest
+	(*GetCarStatusHistoryResponse)(nil),   // 12: service.car.GetCarStatusHistoryResponse
+	(*GetCarFuelHistoryRequest)(nil),      // 13: service.car.GetCarFuelHistoryRequest
+	(*GetCarFuelHistoryResponse)(nil),     // 14: service.car.GetCarFuelHistoryResponse
+	(*GetCarLocationHistoryRequest)(nil),  // 15: service.car.GetCarLocationHistoryRequest
+	(*GetCarLocationHistoryResponse)(nil), // 16: service.car.GetCarLocationHistoryResponse
+	(*GetCarBatteryHistoryRequest)(nil),   // 17: service.car.GetCarBatteryHistoryRequest
+	(*GetCarBatteryHistoryResponse)(nil),  // 18: service.car.GetCarBatteryHistoryResponse
+	(*GetCarMileageHistoryRequest)(nil),   // 19: service.car.GetCarMileageHistoryRequest
+	(*GetCarMileageHistoryResponse)(nil),  // 20: service.car.GetCarMileageHistoryResponse
+	(*GetCarImageUploadDataResponse)(nil), // 21: service.car.GetCarImageUploadDataResponse
+	(*car.Car)(nil),                       // 22: base.car.Car
+	(*base.Location)(nil),                 // 23: base.Location
+	(*base.Pagination)(nil),               // 24: base.Pagination
+	(*structpb.Struct)(nil),               // 25: google.protobuf.Struct
+	(*timestamppb.Timestamp)(nil),         // 26: google.protobuf.Timestamp
+	(*car.CarStatusReading)(nil),          // 27: base.car.CarStatusReading
+	(*car.CarFuelReading)(nil),            // 28: base.car.CarFuelReading
+	(*car.CarLocationReading)(nil),        // 29: base.car.CarLocationReading
+	(*car.CarBatteryReading)(nil),         // 30: base.car.CarBatteryReading
+	(*car.CarMileageReading)(nil),         // 31: base.car.CarMileageReading
+	(*base.ImageUploadData)(nil),          // 32: base.ImageUploadData
+	(*emptypb.Empty)(nil),                 // 33: google.protobuf.Empty
 }
 var file_service_car_car_proto_depIdxs = []int32{
-	20, // 0: service.car.GetCarResponse.car:type_name -> base.car.Car
-	21, // 1: service.car.ListCarsRequest.location:type_name -> base.Location
-	22, // 2: service.car.ListCarsRequest.pagination:type_name -> base.Pagination
-	20, // 3: service.car.ListCarsResponse.cars:type_name -> base.car.Car
-	21, // 4: service.car.UpdateCarRequest.location:type_name -> base.Location
-	21, // 5: service.car.ElevatedUpdateCarRequest.location:type_name -> base.Location
-	23, // 6: service.car.ElevatedUpdateCarRequest.metadata:type_name -> google.protobuf.Struct
-	24, // 7: service.car.GetCarStatusHistoryRequest.from:type_name -> google.protobuf.Timestamp
-	24, // 8: service.car.GetCarStatusHistoryRequest.to:type_name -> google.protobuf.Timestamp
-	22, // 9: service.car.GetCarStatusHistoryRequest.pagination:type_name -> base.Pagination
-	25, // 10: service.car.GetCarStatusHistoryResponse.readings:type_name -> base.car.CarStatusReading
-	24, // 11: service.car.GetCarFuelHistoryRequest.from:type_name -> google.protobuf.Timestamp
-	24, // 12: service.car.GetCarFuelHistoryRequest.to:type_name -> google.protobuf.Timestamp
-	22, // 13: service.car.GetCarFuelHistoryRequest.pagination:type_name -> base.Pagination
-	26, // 14: service.car.GetCarFuelHistoryResponse.readings:type_name -> base.car.CarFuelReading
-	24, // 15: service.car.GetCarLocationHistoryRequest.from:type_name -> google.protobuf.Timestamp
-	24, // 16: service.car.GetCarLocationHistoryRequest.to:type_name -> google.protobuf.Timestamp
-	22, // 17: service.car.GetCarLocationHistoryRequest.pagination:type_name -> base.Pagination
-	27, // 18: service.car.GetCarLocationHistoryResponse.readings:type_name -> base.car.CarLocationReading
-	24, // 19: service.car.GetCarBatteryHistoryRequest.from:type_name -> google.protobuf.Timestamp
-	24, // 20: service.car.GetCarBatteryHistoryRequest.to:type_name -> google.protobuf.Timestamp
-	22, // 21: service.car.GetCarBatteryHistoryRequest.pagination:type_name -> base.Pagination
-	28, // 22: service.car.GetCarBatteryHistoryResponse.readings:type_name -> base.car.CarBatteryReading
-	24, // 23: service.car.GetCarMileageHistoryRequest.from:type_name -> google.protobuf.Timestamp
-	24, // 24: service.car.GetCarMileageHistoryRequest.to:type_name -> google.protobuf.Timestamp
-	22, // 25: service.car.GetCarMileageHistoryRequest.pagination:type_name -> base.Pagination
-	29, // 26: service.car.GetCarMileageHistoryResponse.readings:type_name -> base.car.CarMileageReading
-	30, // 27: service.car.GetCarImageUploadDataResponse.upload_data:type_name -> base.ImageUploadData
-	0,  // 28: service.car.CarService.CreateCar:input_type -> service.car.CreateCarRequest
-	2,  // 29: service.car.CarService.GetCar:input_type -> service.car.GetCarRequest
-	4,  // 30: service.car.CarService.ListCars:input_type -> service.car.ListCarsRequest
-	6,  // 31: service.car.CarService.UpdateCar:input_type -> service.car.UpdateCarRequest
-	7,  // 32: service.car.CarService.DeleteCar:input_type -> service.car.DeleteCarRequest
-	8,  // 33: service.car.CarService.ElevatedUpdateCar:input_type -> service.car.ElevatedUpdateCarRequest
-	9,  // 34: service.car.CarService.GetCarStatusHistory:input_type -> service.car.GetCarStatusHistoryRequest
-	11, // 35: service.car.CarService.GetCarFuelHistory:input_type -> service.car.GetCarFuelHistoryRequest
-	13, // 36: service.car.CarService.GetCarLocationHistory:input_type -> service.car.GetCarLocationHistoryRequest
-	15, // 37: service.car.CarService.GetCarBatteryHistory:input_type -> service.car.GetCarBatteryHistoryRequest
-	17, // 38: service.car.CarService.GetCarMileageHistory:input_type -> service.car.GetCarMileageHistoryRequest
-	31, // 39: service.car.CarService.GetCarImageUploadData:input_type -> google.protobuf.Empty
-	1,  // 40: service.car.CarService.CreateCar:output_type -> service.car.CreateCarResponse
-	3,  // 41: service.car.CarService.GetCar:output_type -> service.car.GetCarResponse
-	5,  // 42: service.car.CarService.ListCars:output_type -> service.car.ListCarsResponse
-	31, // 43: service.car.CarService.UpdateCar:output_type -> google.protobuf.Empty
-	31, // 44: service.car.CarService.DeleteCar:output_type -> google.protobuf.Empty
-	31, // 45: service.car.CarService.ElevatedUpdateCar:output_type -> google.protobuf.Empty
-	10, // 46: service.car.CarService.GetCarStatusHistory:output_type -> service.car.GetCarStatusHistoryResponse
-	12, // 47: service.car.CarService.GetCarFuelHistory:output_type -> service.car.GetCarFuelHistoryResponse
-	14, // 48: service.car.CarService.GetCarLocationHistory:output_type -> service.car.GetCarLocationHistoryResponse
-	16, // 49: service.car.CarService.GetCarBatteryHistory:output_type -> service.car.GetCarBatteryHistoryResponse
-	18, // 50: service.car.CarService.GetCarMileageHistory:output_type -> service.car.GetCarMileageHistoryResponse
-	19, // 51: service.car.CarService.GetCarImageUploadData:output_type -> service.car.GetCarImageUploadDataResponse
-	40, // [40:52] is the sub-list for method output_type
-	28, // [28:40] is the sub-list for method input_type
-	28, // [28:28] is the sub-list for extension type_name
-	28, // [28:28] is the sub-list for extension extendee
-	0,  // [0:28] is the sub-list for field type_name
+	22, // 0: service.car.GetCarResponse.car:type_name -> base.car.Car
+	23, // 1: service.car.ListCarsRequest.location:type_name -> base.Location
+	24, // 2: service.car.ListCarsRequest.pagination:type_name -> base.Pagination
+	22, // 3: service.car.ListCarsResponse.cars:type_name -> base.car.Car
+	23, // 4: service.car.UpdateCarRequest.location:type_name -> base.Location
+	23, // 5: service.car.UpdateCarTelemetryRequest.location:type_name -> base.Location
+	25, // 6: service.car.UpdateCarTelemetryRequest.metadata:type_name -> google.protobuf.Struct
+	25, // 7: service.car.UpdateCarStatusRequest.metadata:type_name -> google.protobuf.Struct
+	23, // 8: service.car.ElevatedUpdateCarRequest.location:type_name -> base.Location
+	25, // 9: service.car.ElevatedUpdateCarRequest.metadata:type_name -> google.protobuf.Struct
+	26, // 10: service.car.GetCarStatusHistoryRequest.from:type_name -> google.protobuf.Timestamp
+	26, // 11: service.car.GetCarStatusHistoryRequest.to:type_name -> google.protobuf.Timestamp
+	24, // 12: service.car.GetCarStatusHistoryRequest.pagination:type_name -> base.Pagination
+	27, // 13: service.car.GetCarStatusHistoryResponse.readings:type_name -> base.car.CarStatusReading
+	26, // 14: service.car.GetCarFuelHistoryRequest.from:type_name -> google.protobuf.Timestamp
+	26, // 15: service.car.GetCarFuelHistoryRequest.to:type_name -> google.protobuf.Timestamp
+	24, // 16: service.car.GetCarFuelHistoryRequest.pagination:type_name -> base.Pagination
+	28, // 17: service.car.GetCarFuelHistoryResponse.readings:type_name -> base.car.CarFuelReading
+	26, // 18: service.car.GetCarLocationHistoryRequest.from:type_name -> google.protobuf.Timestamp
+	26, // 19: service.car.GetCarLocationHistoryRequest.to:type_name -> google.protobuf.Timestamp
+	24, // 20: service.car.GetCarLocationHistoryRequest.pagination:type_name -> base.Pagination
+	29, // 21: service.car.GetCarLocationHistoryResponse.readings:type_name -> base.car.CarLocationReading
+	26, // 22: service.car.GetCarBatteryHistoryRequest.from:type_name -> google.protobuf.Timestamp
+	26, // 23: service.car.GetCarBatteryHistoryRequest.to:type_name -> google.protobuf.Timestamp
+	24, // 24: service.car.GetCarBatteryHistoryRequest.pagination:type_name -> base.Pagination
+	30, // 25: service.car.GetCarBatteryHistoryResponse.readings:type_name -> base.car.CarBatteryReading
+	26, // 26: service.car.GetCarMileageHistoryRequest.from:type_name -> google.protobuf.Timestamp
+	26, // 27: service.car.GetCarMileageHistoryRequest.to:type_name -> google.protobuf.Timestamp
+	24, // 28: service.car.GetCarMileageHistoryRequest.pagination:type_name -> base.Pagination
+	31, // 29: service.car.GetCarMileageHistoryResponse.readings:type_name -> base.car.CarMileageReading
+	32, // 30: service.car.GetCarImageUploadDataResponse.upload_data:type_name -> base.ImageUploadData
+	0,  // 31: service.car.CarService.CreateCar:input_type -> service.car.CreateCarRequest
+	2,  // 32: service.car.CarService.GetCar:input_type -> service.car.GetCarRequest
+	4,  // 33: service.car.CarService.ListCars:input_type -> service.car.ListCarsRequest
+	6,  // 34: service.car.CarService.UpdateCar:input_type -> service.car.UpdateCarRequest
+	9,  // 35: service.car.CarService.DeleteCar:input_type -> service.car.DeleteCarRequest
+	7,  // 36: service.car.CarService.UpdateCarTelemetry:input_type -> service.car.UpdateCarTelemetryRequest
+	8,  // 37: service.car.CarService.UpdateCarStatus:input_type -> service.car.UpdateCarStatusRequest
+	11, // 38: service.car.CarService.GetCarStatusHistory:input_type -> service.car.GetCarStatusHistoryRequest
+	13, // 39: service.car.CarService.GetCarFuelHistory:input_type -> service.car.GetCarFuelHistoryRequest
+	15, // 40: service.car.CarService.GetCarLocationHistory:input_type -> service.car.GetCarLocationHistoryRequest
+	17, // 41: service.car.CarService.GetCarBatteryHistory:input_type -> service.car.GetCarBatteryHistoryRequest
+	19, // 42: service.car.CarService.GetCarMileageHistory:input_type -> service.car.GetCarMileageHistoryRequest
+	33, // 43: service.car.CarService.GetCarImageUploadData:input_type -> google.protobuf.Empty
+	1,  // 44: service.car.CarService.CreateCar:output_type -> service.car.CreateCarResponse
+	3,  // 45: service.car.CarService.GetCar:output_type -> service.car.GetCarResponse
+	5,  // 46: service.car.CarService.ListCars:output_type -> service.car.ListCarsResponse
+	33, // 47: service.car.CarService.UpdateCar:output_type -> google.protobuf.Empty
+	33, // 48: service.car.CarService.DeleteCar:output_type -> google.protobuf.Empty
+	33, // 49: service.car.CarService.UpdateCarTelemetry:output_type -> google.protobuf.Empty
+	33, // 50: service.car.CarService.UpdateCarStatus:output_type -> google.protobuf.Empty
+	12, // 51: service.car.CarService.GetCarStatusHistory:output_type -> service.car.GetCarStatusHistoryResponse
+	14, // 52: service.car.CarService.GetCarFuelHistory:output_type -> service.car.GetCarFuelHistoryResponse
+	16, // 53: service.car.CarService.GetCarLocationHistory:output_type -> service.car.GetCarLocationHistoryResponse
+	18, // 54: service.car.CarService.GetCarBatteryHistory:output_type -> service.car.GetCarBatteryHistoryResponse
+	20, // 55: service.car.CarService.GetCarMileageHistory:output_type -> service.car.GetCarMileageHistoryResponse
+	21, // 56: service.car.CarService.GetCarImageUploadData:output_type -> service.car.GetCarImageUploadDataResponse
+	44, // [44:57] is the sub-list for method output_type
+	31, // [31:44] is the sub-list for method input_type
+	31, // [31:31] is the sub-list for extension type_name
+	31, // [31:31] is the sub-list for extension extendee
+	0,  // [0:31] is the sub-list for field type_name
 }
 
 func init() { file_service_car_car_proto_init() }
@@ -1644,19 +1831,20 @@ func file_service_car_car_proto_init() {
 	file_service_car_car_proto_msgTypes[0].OneofWrappers = []any{}
 	file_service_car_car_proto_msgTypes[4].OneofWrappers = []any{}
 	file_service_car_car_proto_msgTypes[6].OneofWrappers = []any{}
-	file_service_car_car_proto_msgTypes[8].OneofWrappers = []any{}
-	file_service_car_car_proto_msgTypes[9].OneofWrappers = []any{}
+	file_service_car_car_proto_msgTypes[7].OneofWrappers = []any{}
+	file_service_car_car_proto_msgTypes[10].OneofWrappers = []any{}
 	file_service_car_car_proto_msgTypes[11].OneofWrappers = []any{}
 	file_service_car_car_proto_msgTypes[13].OneofWrappers = []any{}
 	file_service_car_car_proto_msgTypes[15].OneofWrappers = []any{}
 	file_service_car_car_proto_msgTypes[17].OneofWrappers = []any{}
+	file_service_car_car_proto_msgTypes[19].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_service_car_car_proto_rawDesc), len(file_service_car_car_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   20,
+			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -191,22 +191,22 @@ func (h *CarHandler) Delete(ctx *gin.Context) {
 	dto.NoContent(ctx)
 }
 
-// ElevatedUpdate (Car) godoc
-// @Summary      Elevated car update (admin)
-// @Description  Allows privileged actors to override car status, sensor readings, and location with an audit reason and metadata.
+// UpdateTelemetry (Car) godoc
+// @Summary      Update car telemetry (admin)
+// @Description  Records audited sensor readings (mileage, fuel, battery, location) for a car.
 // @Tags         cars
 // @Accept       json
 // @Produce      json
 // @Security     BearerAuth
-// @Param        id    path      string                        true  "Car UUID"
-// @Param        body  body      dto.CarElevatedUpdateRequest  true  "Elevated update payload"
+// @Param        id    path      string                          true  "Car UUID"
+// @Param        body  body      dto.CarTelemetryUpdateRequest  true  "Telemetry update payload"
 // @Success      204
 // @Failure      400  {object}  dto.ErrorResponse
 // @Failure      401  {object}  dto.ErrorResponse
 // @Failure      404  {object}  dto.ErrorResponse
 // @Failure      500  {object}  dto.ErrorResponse
-// @Router       /cars/{id}/elevated [patch]
-func (h *CarHandler) ElevatedUpdate(ctx *gin.Context) {
+// @Router       /cars/{id}/telemetry [patch]
+func (h *CarHandler) UpdateTelemetry(ctx *gin.Context) {
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -214,16 +214,53 @@ func (h *CarHandler) ElevatedUpdate(ctx *gin.Context) {
 		return
 	}
 
-	data, err := dto.FromCarElevatedUpdateRequest(ctx)
+	data, err := dto.FromCarTelemetryUpdateRequest(ctx)
 	if err != nil {
 		dto.MalformedJson(ctx)
 
 		return
 	}
 
-	data.ActorID = ctx.GetString("x-user-id")
+	if err = h.svc.UpdateTelemetry(ctx, id, data); err != nil {
+		dto.FromError(ctx, err)
 
-	if err = h.svc.ElevatedUpdate(ctx, id, data); err != nil {
+		return
+	}
+
+	dto.NoContent(ctx)
+}
+
+// UpdateStatus (Car) godoc
+// @Summary      Update car status (admin)
+// @Description  Records an audited operational status transition for a car.
+// @Tags         cars
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id    path      string                       true  "Car UUID"
+// @Param        body  body      dto.CarStatusUpdateRequest  true  "Status update payload"
+// @Success      204
+// @Failure      400  {object}  dto.ErrorResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      404  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
+// @Router       /cars/{id}/status [patch]
+func (h *CarHandler) UpdateStatus(ctx *gin.Context) {
+	id, err := dto.IDParam(ctx)
+	if err != nil {
+		dto.FromError(ctx, err)
+
+		return
+	}
+
+	data, err := dto.FromCarStatusUpdateRequest(ctx)
+	if err != nil {
+		dto.MalformedJson(ctx)
+
+		return
+	}
+
+	if err = h.svc.UpdateStatus(ctx, id, data); err != nil {
 		dto.FromError(ctx, err)
 
 		return

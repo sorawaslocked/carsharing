@@ -318,8 +318,8 @@ func (h *UserHandler) SignOut(c *gin.Context) {
 	dto.NoContent(c)
 }
 
-// Me godoc
-// @Summary      Get current user
+// GetProfile godoc
+// @Summary      Get current user profile
 // @Description  Returns the profile of the authenticated user.
 // @Tags         users
 // @Produce      json
@@ -327,9 +327,9 @@ func (h *UserHandler) SignOut(c *gin.Context) {
 // @Success      200  {object}  dto.UserResponse
 // @Failure      401  {object}  dto.ErrorResponse
 // @Failure      500  {object}  dto.ErrorResponse
-// @Router       /users/me [get]
-func (h *UserHandler) Me(c *gin.Context) {
-	user, err := h.svc.Me(c)
+// @Router       /users/profile [get]
+func (h *UserHandler) GetProfile(c *gin.Context) {
+	user, err := h.svc.GetProfile(c)
 	if err != nil {
 		dto.FromError(c, err)
 
@@ -337,6 +337,38 @@ func (h *UserHandler) Me(c *gin.Context) {
 	}
 
 	dto.Ok(c, gin.H{"user": dto.ToUserResponse(user)})
+}
+
+// UpdateProfile godoc
+// @Summary      Update current user profile
+// @Description  Partially updates the authenticated user's own profile. Critical fields (roles, verification flags) are not accepted.
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        body  body      dto.UserProfileUpdateRequest  true  "Profile fields to update"
+// @Success      204
+// @Failure      400  {object}  dto.ErrorResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      404  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
+// @Router       /users/profile [patch]
+func (h *UserHandler) UpdateProfile(c *gin.Context) {
+	data, err := dto.FromProfileUpdateRequest(c)
+	if err != nil {
+		dto.MalformedJson(c)
+
+		return
+	}
+
+	err = h.svc.UpdateProfile(c, data)
+	if err != nil {
+		dto.FromError(c, err)
+
+		return
+	}
+
+	dto.NoContent(c)
 }
 
 // SendActivationCode godoc

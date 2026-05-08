@@ -175,22 +175,22 @@ func (h *BookingHandler) Cancel(ctx *gin.Context) {
 	dto.NoContent(ctx)
 }
 
-// ElevatedUpdate (Booking) godoc
-// @Summary      Elevated update of a booking
-// @Description  Allows privileged users to override booking status or add a reason.
+// UpdateStatus (Booking) godoc
+// @Summary      Update booking status (admin)
+// @Description  Allows privileged users to override booking status with an optional reason.
 // @Tags         bookings
 // @Accept       json
 // @Produce      json
 // @Security     BearerAuth
-// @Param        id    path      string                        true  "Booking UUID"
-// @Param        body  body      dto.BookingElevatedUpdateRequest  true  "Update payload"
+// @Param        id    path      string                          true  "Booking UUID"
+// @Param        body  body      dto.BookingStatusUpdateRequest  true  "Status update payload"
 // @Success      204
 // @Failure      400  {object}  dto.ErrorResponse
 // @Failure      401  {object}  dto.ErrorResponse
 // @Failure      404  {object}  dto.ErrorResponse
 // @Failure      500  {object}  dto.ErrorResponse
-// @Router       /bookings/{id}/elevated [patch]
-func (h *BookingHandler) ElevatedUpdate(ctx *gin.Context) {
+// @Router       /bookings/{id}/status [patch]
+func (h *BookingHandler) UpdateStatus(ctx *gin.Context) {
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -198,14 +198,14 @@ func (h *BookingHandler) ElevatedUpdate(ctx *gin.Context) {
 		return
 	}
 
-	data, err := dto.FromBookingElevatedUpdateRequest(ctx)
+	data, err := dto.FromBookingStatusUpdateRequest(ctx)
 	if err != nil {
 		dto.MalformedJson(ctx)
 
 		return
 	}
 
-	if err = h.svc.ElevatedUpdate(ctx, id, data); err != nil {
+	if err = h.svc.UpdateStatus(ctx, id, data); err != nil {
 		dto.FromError(ctx, err)
 
 		return

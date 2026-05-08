@@ -53,7 +53,8 @@ func (s *Server) setupRoutes(
 			users.PATCH("/:id", s.userHandler.Update)
 			users.DELETE("/:id", s.userHandler.Delete)
 
-			users.GET("/me", s.userHandler.Me)
+			users.GET("/profile", s.userHandler.GetProfile)
+			users.PATCH("/profile", s.userHandler.UpdateProfile)
 
 			users.POST("/activation-code/send", s.userHandler.SendActivationCode)
 			users.POST("/activation-code/check", s.userHandler.CheckActivationCode)
@@ -85,7 +86,8 @@ func (s *Server) setupRoutes(
 				cars.GET("", s.carHandler.List)
 				cars.PATCH("/:id", s.carHandler.Update)
 				cars.DELETE("/:id", s.carHandler.Delete)
-				cars.PATCH("/:id/elevated", s.carHandler.ElevatedUpdate)
+				cars.PATCH("/:id/telemetry", s.carHandler.UpdateTelemetry)
+				cars.PATCH("/:id/status", s.carHandler.UpdateStatus)
 				cars.GET("/:id/status-history", s.carHandler.GetCarStatusHistory)
 				cars.GET("/:id/fuel-history", s.carHandler.GetCarFuelHistory)
 				cars.GET("/:id/location-history", s.carHandler.GetCarLocationHistory)
@@ -148,7 +150,7 @@ func (s *Server) setupRoutes(
 				bookings.GET("", s.bookingHandler.List)
 				bookings.POST("/:id/start", s.bookingHandler.Start)
 				bookings.POST("/:id/cancel", s.bookingHandler.Cancel)
-				bookings.PATCH("/:id/elevated", s.bookingHandler.ElevatedUpdate)
+				bookings.PATCH("/:id/status", s.bookingHandler.UpdateStatus)
 				bookings.GET("/:id/status-history", s.bookingHandler.GetStatusHistory)
 			}
 		}

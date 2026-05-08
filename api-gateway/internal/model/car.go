@@ -66,15 +66,9 @@ type CarUpdate struct {
 	LicensePlate *string
 	Color        *string
 
-	MileageKM    *int64
-	FuelLevel    *float32
-	BatteryLevel *float32
-	Location     *Location
-
 	TelematicsID *string
 	ZoneID       *string
 
-	Status    *string
 	IsRetired *bool
 	Notes     *string
 	ImageKeys []string
@@ -170,14 +164,19 @@ type CarMileageReadingFilter struct {
 	Pagination *Pagination
 }
 
-type CarElevatedUpdate struct {
-	Status       *string
+type CarTelemetryUpdate struct {
 	MileageKM    *int64
 	FuelLevel    *float32
 	BatteryLevel *float32
 	Location     *Location
 
-	ActorID  string
+	Reason   string
+	Metadata map[string]any
+}
+
+type CarStatusUpdate struct {
+	Status string
+
 	Reason   string
 	Metadata map[string]any
 }

@@ -43,8 +43,8 @@ type BookingCreate struct {
 	PricingRuleID    string
 }
 
-type BookingElevatedUpdate struct {
-	Status *string
+type BookingStatusUpdate struct {
+	Status string
 	Reason *string
 }
 

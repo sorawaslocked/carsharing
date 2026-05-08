@@ -54,7 +54,8 @@ type CarPresenter interface {
 	Update(ctx context.Context, id string, data model.CarUpdate) error
 	Delete(ctx context.Context, id string) error
 
-	ElevatedUpdate(ctx context.Context, carID string, data model.CarElevatedUpdate) error
+	UpdateTelemetry(ctx context.Context, carID string, data model.CarTelemetryUpdate) error
+	UpdateStatus(ctx context.Context, carID string, data model.CarStatusUpdate) error
 
 	GetCarStatusHistory(ctx context.Context, carID string, filter model.CarStatusReadingFilter) ([]model.CarStatusReading, error)
 	GetCarFuelHistory(ctx context.Context, carID string, filter model.CarFuelReadingFilter) ([]model.CarFuelReading, error)
@@ -97,7 +98,7 @@ type BookingPresenter interface {
 	List(ctx context.Context, filter model.BookingFilter) ([]model.Booking, error)
 	Start(ctx context.Context, id string) error
 	Cancel(ctx context.Context, id string) error
-	ElevatedUpdate(ctx context.Context, id string, data model.BookingElevatedUpdate) error
+	UpdateStatus(ctx context.Context, id string, data model.BookingStatusUpdate) error
 	GetStatusHistory(ctx context.Context, id string, filter model.BookingStatusReadingFilter) ([]model.BookingStatusReading, error)
 }
 

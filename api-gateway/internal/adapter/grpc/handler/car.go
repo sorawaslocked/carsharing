@@ -119,18 +119,11 @@ func (h *CarHandler) Update(ctx context.Context, id string, data model.CarUpdate
 		ModelId:      data.ModelID,
 		LicensePlate: data.LicensePlate,
 		Color:        data.Color,
-		MileageKm:    data.MileageKM,
-		FuelLevel:    data.FuelLevel,
-		BatteryLevel: data.BatteryLevel,
 		TelematicsId: data.TelematicsID,
 		ZoneId:       data.ZoneID,
-		Status:       data.Status,
 		IsRetired:    data.IsRetired,
 		Notes:        data.Notes,
 		ImageKeys:    data.ImageKeys,
-	}
-	if data.Location != nil {
-		req.Location = dto.LocationToProto(*data.Location)
 	}
 
 	_, err := h.client.UpdateCar(ctx, req)
@@ -160,12 +153,11 @@ func (h *CarHandler) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (h *CarHandler) ElevatedUpdate(ctx context.Context, carID string, data model.CarElevatedUpdate) error {
-	logger := pkglog.WithMethod(h.log, "ElevatedUpdate")
+func (h *CarHandler) UpdateTelemetry(ctx context.Context, carID string, data model.CarTelemetryUpdate) error {
+	logger := pkglog.WithMethod(h.log, "UpdateTelemetry")
 
-	req := &carsvc.ElevatedUpdateCarRequest{
+	req := &carsvc.UpdateCarTelemetryRequest{
 		Id:           carID,
-		Status:       data.Status,
 		MileageKm:    data.MileageKM,
 		FuelLevel:    data.FuelLevel,
 		BatteryLevel: data.BatteryLevel,
@@ -181,7 +173,34 @@ func (h *CarHandler) ElevatedUpdate(ctx context.Context, carID string, data mode
 		}
 	}
 
-	_, err := h.client.ElevatedUpdateCar(ctx, req)
+	_, err := h.client.UpdateCarTelemetry(ctx, req)
+	if err != nil {
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return dto.FromGrpcErr(err)
+	}
+
+	return nil
+}
+
+func (h *CarHandler) UpdateStatus(ctx context.Context, carID string, data model.CarStatusUpdate) error {
+	logger := pkglog.WithMethod(h.log, "UpdateStatus")
+
+	req := &carsvc.UpdateCarStatusRequest{
+		Id:     carID,
+		Status: data.Status,
+		Reason: data.Reason,
+	}
+	if data.Metadata != nil {
+		s, err := structpb.NewStruct(data.Metadata)
+		if err == nil {
+			req.Metadata = s
+		}
+	}
+
+	_, err := h.client.UpdateCarStatus(ctx, req)
 	if err != nil {
 		if dto.IsSystemErr(err) {
 			logger.Error("grpc call failed", pkglog.Err(err))

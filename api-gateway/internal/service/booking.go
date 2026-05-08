@@ -34,8 +34,8 @@ func (s *BookingService) Cancel(ctx context.Context, id string) error {
 	return s.presenter.Cancel(ctx, id)
 }
 
-func (s *BookingService) ElevatedUpdate(ctx context.Context, id string, data model.BookingElevatedUpdate) error {
-	return s.presenter.ElevatedUpdate(ctx, id, data)
+func (s *BookingService) UpdateStatus(ctx context.Context, id string, data model.BookingStatusUpdate) error {
+	return s.presenter.UpdateStatus(ctx, id, data)
 }
 
 func (s *BookingService) GetStatusHistory(ctx context.Context, id string, filter model.BookingStatusReadingFilter) ([]model.BookingStatusReading, error) {

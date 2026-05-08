@@ -81,6 +81,16 @@ type UserUpdateRequest struct {
 	ProfileImageKey *string `json:"profileImageKey"`
 }
 
+type UserProfileUpdateRequest struct {
+	PhoneNumber          *string `json:"phoneNumber"`
+	FirstName            *string `json:"firstName"`
+	LastName             *string `json:"lastName"`
+	BirthDate            *string `json:"birthDate"`
+	Password             *string `json:"password"`
+	PasswordConfirmation *string `json:"passwordConfirmation"`
+	ProfileImageKey      *string `json:"profileImageKey"`
+}
+
 type RegisterRequest struct {
 	Email                string  `json:"email"`
 	PhoneNumber          *string `json:"phoneNumber"`
@@ -284,6 +294,26 @@ func FromLoginRequest(ctx *gin.Context) (model.Credentials, error) {
 	}
 
 	return cred, nil
+}
+
+func FromProfileUpdateRequest(c *gin.Context) (model.UserProfileUpdate, error) {
+	var req UserProfileUpdateRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		return model.UserProfileUpdate{}, err
+	}
+
+	return model.UserProfileUpdate{
+		PhoneNumber: req.PhoneNumber,
+		FirstName:   req.FirstName,
+		LastName:    req.LastName,
+		BirthDate:   req.BirthDate,
+		Password: model.Password{
+			Text:             req.Password,
+			TextConfirmation: req.PasswordConfirmation,
+		},
+		ProfileImageKey: req.ProfileImageKey,
+	}, nil
 }
 
 func FromCheckActivationCodeRequest(c *gin.Context) (code string, err error) {

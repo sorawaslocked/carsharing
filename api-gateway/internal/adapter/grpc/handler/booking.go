@@ -126,16 +126,16 @@ func (h *BookingHandler) Cancel(ctx context.Context, id string) error {
 	return nil
 }
 
-func (h *BookingHandler) ElevatedUpdate(ctx context.Context, id string, data model.BookingElevatedUpdate) error {
-	logger := pkglog.WithMethod(h.log, "ElevatedUpdate")
+func (h *BookingHandler) UpdateStatus(ctx context.Context, id string, data model.BookingStatusUpdate) error {
+	logger := pkglog.WithMethod(h.log, "UpdateStatus")
 
-	req := &bookingsvc.ElevatedUpdateBookingRequest{
+	req := &bookingsvc.UpdateBookingStatusRequest{
 		Id:     id,
 		Status: data.Status,
 		Reason: data.Reason,
 	}
 
-	_, err := h.client.ElevatedUpdateBooking(ctx, req)
+	_, err := h.client.UpdateBookingStatus(ctx, req)
 	if err != nil {
 		if dto.IsSystemErr(err) {
 			logger.Error("grpc call failed", pkglog.Err(err))

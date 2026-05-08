@@ -15,13 +15,14 @@ type UserService interface {
 	Get(ctx context.Context, id string) (model.User, error)
 	List(ctx context.Context, filter model.UserFilter) ([]model.User, error)
 	Update(ctx context.Context, id string, data model.UserUpdate) error
+	UpdateProfile(ctx context.Context, data model.UserProfileUpdate) error
 	Delete(ctx context.Context, id string) error
 
 	Register(ctx context.Context, data model.UserCreate) (string, error)
 	SignIn(ctx context.Context, cred model.Credentials) (model.AccessToken, model.RefreshToken, error)
 	RefreshToken(ctx context.Context, refreshToken string) (model.AccessToken, model.RefreshToken, error)
 	SignOut(ctx context.Context) error
-	Me(ctx context.Context) (model.User, error)
+	GetProfile(ctx context.Context) (model.User, error)
 
 	SendActivationCode(ctx context.Context) error
 	CheckActivationCode(ctx context.Context, code string) error
@@ -49,7 +50,8 @@ type CarService interface {
 	Update(ctx context.Context, id string, data model.CarUpdate) error
 	Delete(ctx context.Context, id string) error
 
-	ElevatedUpdate(ctx context.Context, carID string, data model.CarElevatedUpdate) error
+	UpdateTelemetry(ctx context.Context, carID string, data model.CarTelemetryUpdate) error
+	UpdateStatus(ctx context.Context, carID string, data model.CarStatusUpdate) error
 
 	GetCarStatusHistory(ctx context.Context, carID string, filter model.CarStatusReadingFilter) ([]model.CarStatusReading, error)
 	GetCarFuelHistory(ctx context.Context, carID string, filter model.CarFuelReadingFilter) ([]model.CarFuelReading, error)
@@ -92,7 +94,7 @@ type BookingService interface {
 	List(ctx context.Context, filter model.BookingFilter) ([]model.Booking, error)
 	Start(ctx context.Context, id string) error
 	Cancel(ctx context.Context, id string) error
-	ElevatedUpdate(ctx context.Context, id string, data model.BookingElevatedUpdate) error
+	UpdateStatus(ctx context.Context, id string, data model.BookingStatusUpdate) error
 	GetStatusHistory(ctx context.Context, id string, filter model.BookingStatusReadingFilter) ([]model.BookingStatusReading, error)
 }
 

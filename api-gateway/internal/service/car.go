@@ -34,8 +34,12 @@ func (s *CarService) Delete(ctx context.Context, id string) error {
 	return s.presenter.Delete(ctx, id)
 }
 
-func (s *CarService) ElevatedUpdate(ctx context.Context, carID string, data model.CarElevatedUpdate) error {
-	return s.presenter.ElevatedUpdate(ctx, carID, data)
+func (s *CarService) UpdateTelemetry(ctx context.Context, carID string, data model.CarTelemetryUpdate) error {
+	return s.presenter.UpdateTelemetry(ctx, carID, data)
+}
+
+func (s *CarService) UpdateStatus(ctx context.Context, carID string, data model.CarStatusUpdate) error {
+	return s.presenter.UpdateStatus(ctx, carID, data)
 }
 
 func (s *CarService) GetCarStatusHistory(ctx context.Context, carID string, filter model.CarStatusReadingFilter) ([]model.CarStatusReading, error) {

@@ -130,21 +130,14 @@ type CarUpdateRequest struct {
 	ModelID      *string  `json:"modelID"`
 	LicensePlate *string  `json:"licensePlate"`
 	Color        *string  `json:"color"`
-	MileageKM    *int64   `json:"mileageKm"`
-	FuelLevel    *float32 `json:"fuelLevel"`
-	BatteryLevel *float32 `json:"batteryLevel"`
-	Latitude     *float64 `json:"latitude"`
-	Longitude    *float64 `json:"longitude"`
 	TelematicsID *string  `json:"telematicsId"`
 	ZoneID       *string  `json:"zoneID"`
-	Status       *string  `json:"status"`
 	IsRetired    *bool    `json:"isRetired"`
 	Notes        *string  `json:"notes"`
 	ImageKeys    []string `json:"imageKeys"`
 }
 
-type CarElevatedUpdateRequest struct {
-	Status       *string        `json:"status"`
+type CarTelemetryUpdateRequest struct {
 	MileageKM    *int64         `json:"mileageKm"`
 	FuelLevel    *float32       `json:"fuelLevel"`
 	BatteryLevel *float32       `json:"batteryLevel"`
@@ -152,6 +145,12 @@ type CarElevatedUpdateRequest struct {
 	Longitude    *float64       `json:"longitude"`
 	Reason       string         `json:"reason"`
 	Metadata     map[string]any `json:"metadata"`
+}
+
+type CarStatusUpdateRequest struct {
+	Status   string         `json:"status"`
+	Reason   string         `json:"reason"`
+	Metadata map[string]any `json:"metadata"`
 }
 
 func FromCarCreateRequest(ctx *gin.Context) (model.CarCreate, error) {
@@ -177,38 +176,25 @@ func FromCarUpdateRequest(ctx *gin.Context) (model.CarUpdate, error) {
 		return model.CarUpdate{}, err
 	}
 
-	update := model.CarUpdate{
+	return model.CarUpdate{
 		ModelID:      req.ModelID,
 		LicensePlate: req.LicensePlate,
 		Color:        req.Color,
-		MileageKM:    req.MileageKM,
-		FuelLevel:    req.FuelLevel,
-		BatteryLevel: req.BatteryLevel,
 		TelematicsID: req.TelematicsID,
 		ZoneID:       req.ZoneID,
-		Status:       req.Status,
 		IsRetired:    req.IsRetired,
 		Notes:        req.Notes,
 		ImageKeys:    req.ImageKeys,
-	}
-	if req.Latitude != nil && req.Longitude != nil {
-		update.Location = &model.Location{
-			Latitude:  *req.Latitude,
-			Longitude: *req.Longitude,
-		}
-	}
-
-	return update, nil
+	}, nil
 }
 
-func FromCarElevatedUpdateRequest(ctx *gin.Context) (model.CarElevatedUpdate, error) {
-	var req CarElevatedUpdateRequest
+func FromCarTelemetryUpdateRequest(ctx *gin.Context) (model.CarTelemetryUpdate, error) {
+	var req CarTelemetryUpdateRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		return model.CarElevatedUpdate{}, err
+		return model.CarTelemetryUpdate{}, err
 	}
 
-	update := model.CarElevatedUpdate{
-		Status:       req.Status,
+	update := model.CarTelemetryUpdate{
 		MileageKM:    req.MileageKM,
 		FuelLevel:    req.FuelLevel,
 		BatteryLevel: req.BatteryLevel,
@@ -223,6 +209,19 @@ func FromCarElevatedUpdateRequest(ctx *gin.Context) (model.CarElevatedUpdate, er
 	}
 
 	return update, nil
+}
+
+func FromCarStatusUpdateRequest(ctx *gin.Context) (model.CarStatusUpdate, error) {
+	var req CarStatusUpdateRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return model.CarStatusUpdate{}, err
+	}
+
+	return model.CarStatusUpdate{
+		Status:   req.Status,
+		Reason:   req.Reason,
+		Metadata: req.Metadata,
+	}, nil
 }
 
 func CarFilterFromCtx(ctx *gin.Context) (model.CarFilter, error) {

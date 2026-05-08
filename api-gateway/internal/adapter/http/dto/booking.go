@@ -45,8 +45,8 @@ type BookingCreateRequest struct {
 	CommittedPeriods *int32 `json:"committedPeriods"`
 }
 
-type BookingElevatedUpdateRequest struct {
-	Status *string `json:"status"`
+type BookingStatusUpdateRequest struct {
+	Status string  `json:"status"`
 	Reason *string `json:"reason"`
 }
 
@@ -66,13 +66,13 @@ func FromBookingCreateRequest(ctx *gin.Context) (model.BookingCreate, error) {
 	}, nil
 }
 
-func FromBookingElevatedUpdateRequest(ctx *gin.Context) (model.BookingElevatedUpdate, error) {
-	var req BookingElevatedUpdateRequest
+func FromBookingStatusUpdateRequest(ctx *gin.Context) (model.BookingStatusUpdate, error) {
+	var req BookingStatusUpdateRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		return model.BookingElevatedUpdate{}, err
+		return model.BookingStatusUpdate{}, err
 	}
 
-	return model.BookingElevatedUpdate{
+	return model.BookingStatusUpdate{
 		Status: req.Status,
 		Reason: req.Reason,
 	}, nil

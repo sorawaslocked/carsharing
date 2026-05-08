@@ -128,10 +128,23 @@ func (s *UserService) SignOut(ctx context.Context) error {
 	return err
 }
 
-func (s *UserService) Me(ctx context.Context) (model.User, error) {
+func (s *UserService) GetProfile(ctx context.Context) (model.User, error) {
 	userID := ctx.Value(ctxUserIDKey).(string)
 
 	return s.Get(ctx, userID)
+}
+
+func (s *UserService) UpdateProfile(ctx context.Context, data model.UserProfileUpdate) error {
+	userID := ctx.Value(ctxUserIDKey).(string)
+
+	return s.Update(ctx, userID, model.UserUpdate{
+		PhoneNumber:     data.PhoneNumber,
+		FirstName:       data.FirstName,
+		LastName:        data.LastName,
+		BirthDate:       data.BirthDate,
+		Password:        data.Password,
+		ProfileImageKey: data.ProfileImageKey,
+	})
 }
 
 func (s *UserService) SendActivationCode(ctx context.Context) error {

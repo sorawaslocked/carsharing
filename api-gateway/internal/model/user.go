@@ -58,6 +58,15 @@ type UserUpdate struct {
 	IsSuspended        *bool
 }
 
+type UserProfileUpdate struct {
+	PhoneNumber     *string
+	FirstName       *string
+	LastName        *string
+	BirthDate       *string
+	Password        Password
+	ProfileImageKey *string
+}
+
 type Password struct {
 	Hash             []byte
 	Text             *string

@@ -8,7 +8,6 @@ package car
 
 import (
 	context "context"
-	service "github.com/sorawaslocked/car-rental-protos/gen/service"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -21,7 +20,6 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CarService_Health_FullMethodName                = "/service.car.CarService/Health"
 	CarService_CreateCar_FullMethodName             = "/service.car.CarService/CreateCar"
 	CarService_GetCar_FullMethodName                = "/service.car.CarService/GetCar"
 	CarService_ListCars_FullMethodName              = "/service.car.CarService/ListCars"
@@ -40,7 +38,6 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CarServiceClient interface {
-	Health(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*service.ServiceHealthResponse, error)
 	CreateCar(ctx context.Context, in *CreateCarRequest, opts ...grpc.CallOption) (*CreateCarResponse, error)
 	GetCar(ctx context.Context, in *GetCarRequest, opts ...grpc.CallOption) (*GetCarResponse, error)
 	ListCars(ctx context.Context, in *ListCarsRequest, opts ...grpc.CallOption) (*ListCarsResponse, error)
@@ -61,16 +58,6 @@ type carServiceClient struct {
 
 func NewCarServiceClient(cc grpc.ClientConnInterface) CarServiceClient {
 	return &carServiceClient{cc}
-}
-
-func (c *carServiceClient) Health(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*service.ServiceHealthResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(service.ServiceHealthResponse)
-	err := c.cc.Invoke(ctx, CarService_Health_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *carServiceClient) CreateCar(ctx context.Context, in *CreateCarRequest, opts ...grpc.CallOption) (*CreateCarResponse, error) {
@@ -197,7 +184,6 @@ func (c *carServiceClient) GetCarImageUploadData(ctx context.Context, in *emptyp
 // All implementations must embed UnimplementedCarServiceServer
 // for forward compatibility.
 type CarServiceServer interface {
-	Health(context.Context, *emptypb.Empty) (*service.ServiceHealthResponse, error)
 	CreateCar(context.Context, *CreateCarRequest) (*CreateCarResponse, error)
 	GetCar(context.Context, *GetCarRequest) (*GetCarResponse, error)
 	ListCars(context.Context, *ListCarsRequest) (*ListCarsResponse, error)
@@ -220,9 +206,6 @@ type CarServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedCarServiceServer struct{}
 
-func (UnimplementedCarServiceServer) Health(context.Context, *emptypb.Empty) (*service.ServiceHealthResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method Health not implemented")
-}
 func (UnimplementedCarServiceServer) CreateCar(context.Context, *CreateCarRequest) (*CreateCarResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateCar not implemented")
 }
@@ -278,24 +261,6 @@ func RegisterCarServiceServer(s grpc.ServiceRegistrar, srv CarServiceServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&CarService_ServiceDesc, srv)
-}
-
-func _CarService_Health_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CarServiceServer).Health(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: CarService_Health_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CarServiceServer).Health(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _CarService_CreateCar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -521,10 +486,6 @@ var CarService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "service.car.CarService",
 	HandlerType: (*CarServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "Health",
-			Handler:    _CarService_Health_Handler,
-		},
 		{
 			MethodName: "CreateCar",
 			Handler:    _CarService_CreateCar_Handler,

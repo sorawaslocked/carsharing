@@ -9,7 +9,7 @@ package car
 import (
 	base "github.com/sorawaslocked/car-rental-protos/gen/base"
 	car "github.com/sorawaslocked/car-rental-protos/gen/base/car"
-	service "github.com/sorawaslocked/car-rental-protos/gen/service"
+	_ "github.com/sorawaslocked/car-rental-protos/gen/service"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -1513,10 +1513,9 @@ const file_service_car_car_proto_rawDesc = "" +
 	"\breadings\x18\x01 \x03(\v2\x1b.base.car.CarMileageReadingR\breadings\"W\n" +
 	"\x1dGetCarImageUploadDataResponse\x126\n" +
 	"\vupload_data\x18\x01 \x01(\v2\x15.base.ImageUploadDataR\n" +
-	"uploadData2\xf7\b\n" +
+	"uploadData2\xb5\b\n" +
 	"\n" +
-	"CarService\x12@\n" +
-	"\x06Health\x12\x16.google.protobuf.Empty\x1a\x1e.service.ServiceHealthResponse\x12J\n" +
+	"CarService\x12J\n" +
 	"\tCreateCar\x12\x1d.service.car.CreateCarRequest\x1a\x1e.service.car.CreateCarResponse\x12A\n" +
 	"\x06GetCar\x12\x1a.service.car.GetCarRequest\x1a\x1b.service.car.GetCarResponse\x12G\n" +
 	"\bListCars\x12\x1c.service.car.ListCarsRequest\x1a\x1d.service.car.ListCarsResponse\x12B\n" +
@@ -1576,7 +1575,6 @@ var file_service_car_car_proto_goTypes = []any{
 	(*car.CarMileageReading)(nil),         // 29: base.car.CarMileageReading
 	(*base.ImageUploadData)(nil),          // 30: base.ImageUploadData
 	(*emptypb.Empty)(nil),                 // 31: google.protobuf.Empty
-	(*service.ServiceHealthResponse)(nil), // 32: service.ServiceHealthResponse
 }
 var file_service_car_car_proto_depIdxs = []int32{
 	20, // 0: service.car.GetCarResponse.car:type_name -> base.car.Car
@@ -1607,34 +1605,32 @@ var file_service_car_car_proto_depIdxs = []int32{
 	22, // 25: service.car.GetCarMileageHistoryRequest.pagination:type_name -> base.Pagination
 	29, // 26: service.car.GetCarMileageHistoryResponse.readings:type_name -> base.car.CarMileageReading
 	30, // 27: service.car.GetCarImageUploadDataResponse.upload_data:type_name -> base.ImageUploadData
-	31, // 28: service.car.CarService.Health:input_type -> google.protobuf.Empty
-	0,  // 29: service.car.CarService.CreateCar:input_type -> service.car.CreateCarRequest
-	2,  // 30: service.car.CarService.GetCar:input_type -> service.car.GetCarRequest
-	4,  // 31: service.car.CarService.ListCars:input_type -> service.car.ListCarsRequest
-	6,  // 32: service.car.CarService.UpdateCar:input_type -> service.car.UpdateCarRequest
-	7,  // 33: service.car.CarService.DeleteCar:input_type -> service.car.DeleteCarRequest
-	8,  // 34: service.car.CarService.ElevatedUpdateCar:input_type -> service.car.ElevatedUpdateCarRequest
-	9,  // 35: service.car.CarService.GetCarStatusHistory:input_type -> service.car.GetCarStatusHistoryRequest
-	11, // 36: service.car.CarService.GetCarFuelHistory:input_type -> service.car.GetCarFuelHistoryRequest
-	13, // 37: service.car.CarService.GetCarLocationHistory:input_type -> service.car.GetCarLocationHistoryRequest
-	15, // 38: service.car.CarService.GetCarBatteryHistory:input_type -> service.car.GetCarBatteryHistoryRequest
-	17, // 39: service.car.CarService.GetCarMileageHistory:input_type -> service.car.GetCarMileageHistoryRequest
-	31, // 40: service.car.CarService.GetCarImageUploadData:input_type -> google.protobuf.Empty
-	32, // 41: service.car.CarService.Health:output_type -> service.ServiceHealthResponse
-	1,  // 42: service.car.CarService.CreateCar:output_type -> service.car.CreateCarResponse
-	3,  // 43: service.car.CarService.GetCar:output_type -> service.car.GetCarResponse
-	5,  // 44: service.car.CarService.ListCars:output_type -> service.car.ListCarsResponse
-	31, // 45: service.car.CarService.UpdateCar:output_type -> google.protobuf.Empty
-	31, // 46: service.car.CarService.DeleteCar:output_type -> google.protobuf.Empty
-	31, // 47: service.car.CarService.ElevatedUpdateCar:output_type -> google.protobuf.Empty
-	10, // 48: service.car.CarService.GetCarStatusHistory:output_type -> service.car.GetCarStatusHistoryResponse
-	12, // 49: service.car.CarService.GetCarFuelHistory:output_type -> service.car.GetCarFuelHistoryResponse
-	14, // 50: service.car.CarService.GetCarLocationHistory:output_type -> service.car.GetCarLocationHistoryResponse
-	16, // 51: service.car.CarService.GetCarBatteryHistory:output_type -> service.car.GetCarBatteryHistoryResponse
-	18, // 52: service.car.CarService.GetCarMileageHistory:output_type -> service.car.GetCarMileageHistoryResponse
-	19, // 53: service.car.CarService.GetCarImageUploadData:output_type -> service.car.GetCarImageUploadDataResponse
-	41, // [41:54] is the sub-list for method output_type
-	28, // [28:41] is the sub-list for method input_type
+	0,  // 28: service.car.CarService.CreateCar:input_type -> service.car.CreateCarRequest
+	2,  // 29: service.car.CarService.GetCar:input_type -> service.car.GetCarRequest
+	4,  // 30: service.car.CarService.ListCars:input_type -> service.car.ListCarsRequest
+	6,  // 31: service.car.CarService.UpdateCar:input_type -> service.car.UpdateCarRequest
+	7,  // 32: service.car.CarService.DeleteCar:input_type -> service.car.DeleteCarRequest
+	8,  // 33: service.car.CarService.ElevatedUpdateCar:input_type -> service.car.ElevatedUpdateCarRequest
+	9,  // 34: service.car.CarService.GetCarStatusHistory:input_type -> service.car.GetCarStatusHistoryRequest
+	11, // 35: service.car.CarService.GetCarFuelHistory:input_type -> service.car.GetCarFuelHistoryRequest
+	13, // 36: service.car.CarService.GetCarLocationHistory:input_type -> service.car.GetCarLocationHistoryRequest
+	15, // 37: service.car.CarService.GetCarBatteryHistory:input_type -> service.car.GetCarBatteryHistoryRequest
+	17, // 38: service.car.CarService.GetCarMileageHistory:input_type -> service.car.GetCarMileageHistoryRequest
+	31, // 39: service.car.CarService.GetCarImageUploadData:input_type -> google.protobuf.Empty
+	1,  // 40: service.car.CarService.CreateCar:output_type -> service.car.CreateCarResponse
+	3,  // 41: service.car.CarService.GetCar:output_type -> service.car.GetCarResponse
+	5,  // 42: service.car.CarService.ListCars:output_type -> service.car.ListCarsResponse
+	31, // 43: service.car.CarService.UpdateCar:output_type -> google.protobuf.Empty
+	31, // 44: service.car.CarService.DeleteCar:output_type -> google.protobuf.Empty
+	31, // 45: service.car.CarService.ElevatedUpdateCar:output_type -> google.protobuf.Empty
+	10, // 46: service.car.CarService.GetCarStatusHistory:output_type -> service.car.GetCarStatusHistoryResponse
+	12, // 47: service.car.CarService.GetCarFuelHistory:output_type -> service.car.GetCarFuelHistoryResponse
+	14, // 48: service.car.CarService.GetCarLocationHistory:output_type -> service.car.GetCarLocationHistoryResponse
+	16, // 49: service.car.CarService.GetCarBatteryHistory:output_type -> service.car.GetCarBatteryHistoryResponse
+	18, // 50: service.car.CarService.GetCarMileageHistory:output_type -> service.car.GetCarMileageHistoryResponse
+	19, // 51: service.car.CarService.GetCarImageUploadData:output_type -> service.car.GetCarImageUploadDataResponse
+	40, // [40:52] is the sub-list for method output_type
+	28, // [28:40] is the sub-list for method input_type
 	28, // [28:28] is the sub-list for extension type_name
 	28, // [28:28] is the sub-list for extension extendee
 	0,  // [0:28] is the sub-list for field type_name

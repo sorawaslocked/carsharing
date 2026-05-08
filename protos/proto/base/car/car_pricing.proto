@@ -12,15 +12,18 @@ message CarPricingRule {
   optional string zone_id = 3;
   optional string class = 4;
 
-  int32 rate_per_minute_tenge = 5;
-  int32 rate_per_km_tenge = 6;
-  int32 free_minutes = 7;
-  int32 min_charge_tenge = 8;
+  string type = 5;
+  int32 rate_tenge = 6;
 
-  bool is_active = 9;
-  google.protobuf.Timestamp starts_at = 10;
-  google.protobuf.Timestamp expires_at = 11;
+  optional int32 rate_per_km_tenge = 7;
+  optional int32 free_minutes = 8;
+  optional int32 min_charge_tenge = 9;
 
-  google.protobuf.Timestamp created_at = 12;
-  google.protobuf.Timestamp updated_at = 13;
+  optional string overtime_policy = 10;
+  optional int32 overtime_rate_tenge = 11;
+
+  bool is_active = 12;
+
+  google.protobuf.Timestamp created_at = 13;
+  google.protobuf.Timestamp updated_at = 14;
 }

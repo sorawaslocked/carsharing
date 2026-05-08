@@ -2,18 +2,10 @@ syntax = "proto3";
 
 package base.booking;
 
+import "base/common.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base/booking";
-
-message BookingPricingSnapshot {
-  int32 rate_tenge = 1;
-  optional int32 rate_per_km_tenge = 2;
-  optional int32 free_minutes = 3;
-  optional int32 min_charge_tenge = 4;
-  optional string overtime_policy = 5;
-  optional int32 overtime_rate_tenge = 6;
-}
 
 message Booking {
   string id = 1;
@@ -23,7 +15,7 @@ message Booking {
   optional int32 committed_periods = 4;
   string status = 5;
   string pricing_rule_id = 6;
-  BookingPricingSnapshot pricing_snapshot = 7;
+  base.PricingSnapshot pricing_snapshot = 7;
 
   google.protobuf.Timestamp created_at = 8;
   google.protobuf.Timestamp updated_at = 9;

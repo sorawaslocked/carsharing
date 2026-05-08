@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package service.trip;
+
+import "base/common.proto";
+import "base/trip/trip.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/trip";
+
+service TripService {
+  rpc StartTrip(StartTripRequest) returns (StartTripResponse);
+  rpc GetTrip(GetTripRequest) returns (GetTripResponse);
+  rpc ListTrips(ListTripsRequest) returns (ListTripsResponse);
+  rpc EndTrip(EndTripRequest) returns (google.protobuf.Empty);
+  rpc CancelTrip(CancelTripRequest) returns (google.protobuf.Empty);
+  rpc GetTripSummary(GetTripSummaryRequest) returns (GetTripSummaryResponse);
+  rpc GetTripStatusHistory(GetTripStatusHistoryRequest) returns (GetTripStatusHistoryResponse);
+}
+
+message StartTripRequest {
+  string booking_id = 1;
+}
+
+message StartTripResponse {
+  string id = 1;
+}
+
+message GetTripRequest {
+  string id = 1;
+}
+
+message GetTripResponse {
+  base.trip.Trip trip = 1;
+}
+
+message ListTripsRequest {
+  optional string user_id = 1;
+  optional string car_id = 2;
+  optional string status = 3;
+  optional google.protobuf.Timestamp started_after = 4;
+  optional google.protobuf.Timestamp started_before = 5;
+  optional base.Pagination pagination = 6;
+}
+
+message ListTripsResponse {
+  repeated base.trip.Trip trips = 1;
+}
+
+message EndTripRequest {
+  string id = 1;
+}
+
+message CancelTripRequest {
+  string id = 1;
+  optional string reason = 2;
+}
+
+message GetTripSummaryRequest {
+  string id = 1;
+}
+
+message GetTripSummaryResponse {
+  base.trip.TripSummary summary = 1;
+}
+
+message GetTripStatusHistoryRequest {
+  string id = 1;
+  optional google.protobuf.Timestamp from = 2;
+  optional google.protobuf.Timestamp to = 3;
+  optional base.Pagination pagination = 4;
+}
+
+message GetTripStatusHistoryResponse {
+  repeated base.trip.TripStatusReading status_history = 1;
+}

@@ -18,3 +18,12 @@ message Location {
   double latitude = 1;
   double longitude = 2;
 }
+
+message PricingSnapshot {
+  int32 rate_tenge = 1;
+  optional int32 rate_per_km_tenge = 2;
+  optional int32 free_minutes = 3;
+  optional int32 min_charge_tenge = 4;
+  optional string overtime_policy = 5;
+  optional int32 overtime_rate_tenge = 6;
+}

@@ -23,22 +23,23 @@ const (
 )
 
 type CarPricingRule struct {
-	state              protoimpl.MessageState `protogen:"open.v1"`
-	Id                 string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	ModelId            *string                `protobuf:"bytes,2,opt,name=model_id,json=modelId,proto3,oneof" json:"model_id,omitempty"`
-	ZoneId             *string                `protobuf:"bytes,3,opt,name=zone_id,json=zoneId,proto3,oneof" json:"zone_id,omitempty"`
-	Class              *string                `protobuf:"bytes,4,opt,name=class,proto3,oneof" json:"class,omitempty"`
-	RatePerMinuteTenge int32                  `protobuf:"varint,5,opt,name=rate_per_minute_tenge,json=ratePerMinuteTenge,proto3" json:"rate_per_minute_tenge,omitempty"`
-	RatePerKmTenge     int32                  `protobuf:"varint,6,opt,name=rate_per_km_tenge,json=ratePerKmTenge,proto3" json:"rate_per_km_tenge,omitempty"`
-	FreeMinutes        int32                  `protobuf:"varint,7,opt,name=free_minutes,json=freeMinutes,proto3" json:"free_minutes,omitempty"`
-	MinChargeTenge     int32                  `protobuf:"varint,8,opt,name=min_charge_tenge,json=minChargeTenge,proto3" json:"min_charge_tenge,omitempty"`
-	IsActive           bool                   `protobuf:"varint,9,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
-	StartsAt           *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=starts_at,json=startsAt,proto3" json:"starts_at,omitempty"`
-	ExpiresAt          *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
-	CreatedAt          *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt          *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ModelId           *string                `protobuf:"bytes,2,opt,name=model_id,json=modelId,proto3,oneof" json:"model_id,omitempty"`
+	ZoneId            *string                `protobuf:"bytes,3,opt,name=zone_id,json=zoneId,proto3,oneof" json:"zone_id,omitempty"`
+	Class             *string                `protobuf:"bytes,4,opt,name=class,proto3,oneof" json:"class,omitempty"`
+	Type              string                 `protobuf:"bytes,5,opt,name=type,proto3" json:"type,omitempty"`
+	RateTenge         int32                  `protobuf:"varint,6,opt,name=rate_tenge,json=rateTenge,proto3" json:"rate_tenge,omitempty"`
+	RatePerKmTenge    *int32                 `protobuf:"varint,7,opt,name=rate_per_km_tenge,json=ratePerKmTenge,proto3,oneof" json:"rate_per_km_tenge,omitempty"`
+	FreeMinutes       *int32                 `protobuf:"varint,8,opt,name=free_minutes,json=freeMinutes,proto3,oneof" json:"free_minutes,omitempty"`
+	MinChargeTenge    *int32                 `protobuf:"varint,9,opt,name=min_charge_tenge,json=minChargeTenge,proto3,oneof" json:"min_charge_tenge,omitempty"`
+	OvertimePolicy    *string                `protobuf:"bytes,10,opt,name=overtime_policy,json=overtimePolicy,proto3,oneof" json:"overtime_policy,omitempty"`
+	OvertimeRateTenge *int32                 `protobuf:"varint,11,opt,name=overtime_rate_tenge,json=overtimeRateTenge,proto3,oneof" json:"overtime_rate_tenge,omitempty"`
+	IsActive          bool                   `protobuf:"varint,12,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
+	CreatedAt         *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt         *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *CarPricingRule) Reset() {
@@ -99,30 +100,51 @@ func (x *CarPricingRule) GetClass() string {
 	return ""
 }
 
-func (x *CarPricingRule) GetRatePerMinuteTenge() int32 {
+func (x *CarPricingRule) GetType() string {
 	if x != nil {
-		return x.RatePerMinuteTenge
+		return x.Type
+	}
+	return ""
+}
+
+func (x *CarPricingRule) GetRateTenge() int32 {
+	if x != nil {
+		return x.RateTenge
 	}
 	return 0
 }
 
 func (x *CarPricingRule) GetRatePerKmTenge() int32 {
-	if x != nil {
-		return x.RatePerKmTenge
+	if x != nil && x.RatePerKmTenge != nil {
+		return *x.RatePerKmTenge
 	}
 	return 0
 }
 
 func (x *CarPricingRule) GetFreeMinutes() int32 {
-	if x != nil {
-		return x.FreeMinutes
+	if x != nil && x.FreeMinutes != nil {
+		return *x.FreeMinutes
 	}
 	return 0
 }
 
 func (x *CarPricingRule) GetMinChargeTenge() int32 {
-	if x != nil {
-		return x.MinChargeTenge
+	if x != nil && x.MinChargeTenge != nil {
+		return *x.MinChargeTenge
+	}
+	return 0
+}
+
+func (x *CarPricingRule) GetOvertimePolicy() string {
+	if x != nil && x.OvertimePolicy != nil {
+		return *x.OvertimePolicy
+	}
+	return ""
+}
+
+func (x *CarPricingRule) GetOvertimeRateTenge() int32 {
+	if x != nil && x.OvertimeRateTenge != nil {
+		return *x.OvertimeRateTenge
 	}
 	return 0
 }
@@ -132,20 +154,6 @@ func (x *CarPricingRule) GetIsActive() bool {
 		return x.IsActive
 	}
 	return false
-}
-
-func (x *CarPricingRule) GetStartsAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.StartsAt
-	}
-	return nil
-}
-
-func (x *CarPricingRule) GetExpiresAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.ExpiresAt
-	}
-	return nil
 }
 
 func (x *CarPricingRule) GetCreatedAt() *timestamppb.Timestamp {
@@ -166,29 +174,35 @@ var File_base_car_car_pricing_proto protoreflect.FileDescriptor
 
 const file_base_car_car_pricing_proto_rawDesc = "" +
 	"\n" +
-	"\x1abase/car/car_pricing.proto\x12\bbase.car\x1a\x1fgoogle/protobuf/timestamp.proto\"\xce\x04\n" +
+	"\x1abase/car/car_pricing.proto\x12\bbase.car\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb4\x05\n" +
 	"\x0eCarPricingRule\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\bmodel_id\x18\x02 \x01(\tH\x00R\amodelId\x88\x01\x01\x12\x1c\n" +
 	"\azone_id\x18\x03 \x01(\tH\x01R\x06zoneId\x88\x01\x01\x12\x19\n" +
-	"\x05class\x18\x04 \x01(\tH\x02R\x05class\x88\x01\x01\x121\n" +
-	"\x15rate_per_minute_tenge\x18\x05 \x01(\x05R\x12ratePerMinuteTenge\x12)\n" +
-	"\x11rate_per_km_tenge\x18\x06 \x01(\x05R\x0eratePerKmTenge\x12!\n" +
-	"\ffree_minutes\x18\a \x01(\x05R\vfreeMinutes\x12(\n" +
-	"\x10min_charge_tenge\x18\b \x01(\x05R\x0eminChargeTenge\x12\x1b\n" +
-	"\tis_active\x18\t \x01(\bR\bisActive\x127\n" +
-	"\tstarts_at\x18\n" +
-	" \x01(\v2\x1a.google.protobuf.TimestampR\bstartsAt\x129\n" +
+	"\x05class\x18\x04 \x01(\tH\x02R\x05class\x88\x01\x01\x12\x12\n" +
+	"\x04type\x18\x05 \x01(\tR\x04type\x12\x1d\n" +
 	"\n" +
-	"expires_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x129\n" +
+	"rate_tenge\x18\x06 \x01(\x05R\trateTenge\x12.\n" +
+	"\x11rate_per_km_tenge\x18\a \x01(\x05H\x03R\x0eratePerKmTenge\x88\x01\x01\x12&\n" +
+	"\ffree_minutes\x18\b \x01(\x05H\x04R\vfreeMinutes\x88\x01\x01\x12-\n" +
+	"\x10min_charge_tenge\x18\t \x01(\x05H\x05R\x0eminChargeTenge\x88\x01\x01\x12,\n" +
+	"\x0fovertime_policy\x18\n" +
+	" \x01(\tH\x06R\x0eovertimePolicy\x88\x01\x01\x123\n" +
+	"\x13overtime_rate_tenge\x18\v \x01(\x05H\aR\x11overtimeRateTenge\x88\x01\x01\x12\x1b\n" +
+	"\tis_active\x18\f \x01(\bR\bisActive\x129\n" +
 	"\n" +
-	"created_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"created_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\v\n" +
+	"updated_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\v\n" +
 	"\t_model_idB\n" +
 	"\n" +
 	"\b_zone_idB\b\n" +
-	"\x06_classB9Z7github.com/sorawaslocked/car-rental-protos/gen/base/carb\x06proto3"
+	"\x06_classB\x14\n" +
+	"\x12_rate_per_km_tengeB\x0f\n" +
+	"\r_free_minutesB\x13\n" +
+	"\x11_min_charge_tengeB\x12\n" +
+	"\x10_overtime_policyB\x16\n" +
+	"\x14_overtime_rate_tengeB9Z7github.com/sorawaslocked/car-rental-protos/gen/base/carb\x06proto3"
 
 var (
 	file_base_car_car_pricing_proto_rawDescOnce sync.Once
@@ -208,15 +222,13 @@ var file_base_car_car_pricing_proto_goTypes = []any{
 	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
 }
 var file_base_car_car_pricing_proto_depIdxs = []int32{
-	1, // 0: base.car.CarPricingRule.starts_at:type_name -> google.protobuf.Timestamp
-	1, // 1: base.car.CarPricingRule.expires_at:type_name -> google.protobuf.Timestamp
-	1, // 2: base.car.CarPricingRule.created_at:type_name -> google.protobuf.Timestamp
-	1, // 3: base.car.CarPricingRule.updated_at:type_name -> google.protobuf.Timestamp
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	1, // 0: base.car.CarPricingRule.created_at:type_name -> google.protobuf.Timestamp
+	1, // 1: base.car.CarPricingRule.updated_at:type_name -> google.protobuf.Timestamp
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_base_car_car_pricing_proto_init() }

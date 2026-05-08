@@ -20,6 +20,7 @@ import (
 	pkgnats "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/nats"
 	pkgredis "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/redis"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/service"
+	bookingsvc "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 )
@@ -69,23 +70,41 @@ func New(cfg config.Config, log *slog.Logger) *App {
 		return nil
 	}
 
+	// Booking service gRPC connection
+	bookingServiceLog := log.With(slog.String("grpcURL", cfg.GRPCServer.Client.BookingServiceURL))
+	bookingServiceLog.Info("connecting to grpc server")
+
+	bookingServiceGrpcConn, err := grpcconn.Connect(cfg.GRPCServer.Client.BookingServiceURL, cfg.GRPCServer.Client)
+	if err != nil {
+		bookingServiceLog.Error("connecting to grpc server", pkglog.Err(err))
+		return nil
+	}
+
 	// gRPC clients
 	userGrpcClient := usersvc.NewUserServiceClient(userServiceGrpcConn)
+	userHealthGrpcClient := usersvc.NewHealthServiceClient(userServiceGrpcConn)
 	carGrpcClient := carsvc.NewCarServiceClient(carServiceGrpcConn)
+	carHealthGrpcClient := carsvc.NewHealthServiceClient(carServiceGrpcConn)
 	carModelGrpcClient := carsvc.NewCarModelServiceClient(carServiceGrpcConn)
 	carInsuranceGrpcClient := carsvc.NewCarInsuranceServiceClient(carServiceGrpcConn)
 	carMaintenanceGrpcClient := carsvc.NewCarMaintenanceServiceClient(carServiceGrpcConn)
 	zoneGrpcClient := carsvc.NewZoneServiceClient(carServiceGrpcConn)
-	carPricingGrpcClient := carsvc.NewCarPricingServiceClient(carServiceGrpcConn)
+	pricingRuleGrpcClient := bookingsvc.NewPricingRuleServiceClient(bookingServiceGrpcConn)
+	bookingGrpcClient := bookingsvc.NewBookingServiceClient(bookingServiceGrpcConn)
+	bookingHealthGrpcClient := bookingsvc.NewHealthServiceClient(bookingServiceGrpcConn)
 
 	// gRPC handlers
 	userServiceGrpcHandler := grpchandler.NewUserHandler(userGrpcClient, log)
+	userHealthGrpcHandler := grpchandler.NewHealthHandler(userHealthGrpcClient, log)
 	carGrpcHandler := grpchandler.NewCarHandler(carGrpcClient, log)
+	carHealthGrpcHandler := grpchandler.NewHealthHandler(carHealthGrpcClient, log)
 	carModelGrpcHandler := grpchandler.NewCarModelHandler(carModelGrpcClient, log)
 	carInsuranceGrpcHandler := grpchandler.NewCarInsuranceHandler(carInsuranceGrpcClient, log)
 	carMaintenanceGrpcHandler := grpchandler.NewCarMaintenanceHandler(carMaintenanceGrpcClient, log)
 	zoneGrpcHandler := grpchandler.NewZoneHandler(zoneGrpcClient, log)
-	carPricingGrpcHandler := grpchandler.NewCarPricingRuleHandler(carPricingGrpcClient, log)
+	pricingRuleGrpcHandler := grpchandler.NewPricingRuleHandler(pricingRuleGrpcClient, log)
+	bookingGrpcHandler := grpchandler.NewBookingHandler(bookingGrpcClient, log)
+	bookingHealthGrpcHandler := grpchandler.NewHealthHandler(bookingHealthGrpcClient, log)
 
 	// JWT
 	jwtManager := pkgjwt.NewManager(cfg.JWT, log)
@@ -98,7 +117,8 @@ func New(cfg config.Config, log *slog.Logger) *App {
 	carInsuranceService := service.NewCarInsuranceService(carInsuranceGrpcHandler)
 	carMaintenanceService := service.NewCarMaintenanceService(carMaintenanceGrpcHandler)
 	zoneService := service.NewZoneService(zoneGrpcHandler)
-	_ = service.NewCarPricingRuleService(carPricingGrpcHandler)
+	pricingRuleService := service.NewPricingRuleService(pricingRuleGrpcHandler)
+	bookingService := service.NewBookingService(bookingGrpcHandler)
 
 	// Redis
 	rdb, err := pkgredis.NewClient(context.Background(), &cfg.Redis, log)
@@ -120,7 +140,11 @@ func New(cfg config.Config, log *slog.Logger) *App {
 		return nil
 	}
 
-	healthCheckers := []httphandler.HealthChecker{userServiceGrpcHandler}
+	healthCheckers := []httphandler.HealthChecker{
+		userHealthGrpcHandler,
+		carHealthGrpcHandler,
+		bookingHealthGrpcHandler,
+	}
 
 	httpServer := httpserver.New(
 		cfg.HTTPServer,
@@ -132,7 +156,9 @@ func New(cfg config.Config, log *slog.Logger) *App {
 		carService,
 		carInsuranceService,
 		carMaintenanceService,
+		pricingRuleService,
 		zoneService,
+		bookingService,
 		jwtManager,
 		userCache,
 		userCache,

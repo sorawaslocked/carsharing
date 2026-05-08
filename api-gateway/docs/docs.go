@@ -192,6 +192,470 @@ const docTemplate = `{
                 }
             }
         },
+        "/bookings": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns bookings filtered by optional query parameters.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookings"
+                ],
+                "summary": "List bookings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by user UUID",
+                        "name": "userID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by car UUID",
+                        "name": "carID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by pricing rule UUID",
+                        "name": "pricingRuleID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Booking"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Reserves a car for the authenticated user with a chosen pricing rule.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookings"
+                ],
+                "summary": "Create a booking",
+                "parameters": [
+                    {
+                        "description": "Booking create payload",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.BookingCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.IDResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/bookings/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookings"
+                ],
+                "summary": "Get booking by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Booking UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Booking"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/bookings/{id}/cancel": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Cancels a reserved or active booking.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookings"
+                ],
+                "summary": "Cancel a booking",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Booking UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/bookings/{id}/elevated": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Allows privileged users to override booking status or add a reason.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookings"
+                ],
+                "summary": "Elevated update of a booking",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Booking UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update payload",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.BookingElevatedUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/bookings/{id}/start": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Transitions a reserved booking to active, beginning the trip.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookings"
+                ],
+                "summary": "Start a booking",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Booking UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/bookings/{id}/status-history": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the chronological status change log for a booking.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookings"
+                ],
+                "summary": "Get booking status history",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Booking UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Start time (RFC3339)",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End time (RFC3339)",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.BookingStatusReading"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/car-insurances": {
             "get": {
                 "security": [
@@ -449,8 +913,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK"
+                    "204": {
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -513,8 +977,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK"
+                    "204": {
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -655,8 +1119,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK"
+                    "204": {
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -911,8 +1375,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK"
+                    "204": {
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -975,8 +1439,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK"
+                    "204": {
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1281,8 +1745,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK"
+                    "204": {
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1345,8 +1809,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK"
+                    "204": {
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1687,8 +2151,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK"
+                    "204": {
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1751,75 +2215,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/cars/{id}/admin": {
-            "patch": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Allows privileged actors to override car status, sensor readings, and location with an audit reason and metadata.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "cars"
-                ],
-                "summary": "Elevated car update (admin)",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Car UUID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Elevated update payload",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarElevatedUpdateRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
+                    "204": {
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -1902,6 +2299,73 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarBatteryHistoryResponse"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/cars/{id}/elevated": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Allows privileged actors to override car status, sensor readings, and location with an audit reason and metadata.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cars"
+                ],
+                "summary": "Elevated car update (admin)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Car UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Elevated update payload",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarElevatedUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -2273,6 +2737,328 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.HealthResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/pricing-rules": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns pricing rules filtered by optional scope dimensions.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pricing-rules"
+                ],
+                "summary": "List pricing rules",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by car model UUID",
+                        "name": "modelID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by zone UUID",
+                        "name": "zoneID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by car class",
+                        "name": "class",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by pricing type",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by active status",
+                        "name": "isActive",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRulesResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Defines a new pricing rule. Nil scope fields (modelID, zoneID, class) act as wildcards and apply to all values of that dimension.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pricing-rules"
+                ],
+                "summary": "Create a pricing rule",
+                "parameters": [
+                    {
+                        "description": "Pricing rule create payload",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRuleCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.IDResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/pricing-rules/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pricing-rules"
+                ],
+                "summary": "Get pricing rule by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Pricing rule UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRuleResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pricing-rules"
+                ],
+                "summary": "Delete pricing rule",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Pricing rule UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Partially updates a pricing rule. Only provided fields are changed.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pricing-rules"
+                ],
+                "summary": "Update pricing rule",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Pricing rule UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fields to update",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRuleUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
                         }
                     }
                 }
@@ -3287,6 +4073,115 @@ const docTemplate = `{
             "properties": {
                 "accessToken": {
                     "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.AccessTokenData"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Booking": {
+            "type": "object",
+            "properties": {
+                "carID": {
+                    "type": "string"
+                },
+                "committedPeriods": {
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "pricingRuleID": {
+                    "type": "string"
+                },
+                "pricingSnapshot": {
+                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.BookingPricingSnapshot"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "userID": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.BookingCreateRequest": {
+            "type": "object",
+            "properties": {
+                "carID": {
+                    "type": "string"
+                },
+                "committedPeriods": {
+                    "type": "integer"
+                },
+                "pricingRuleID": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.BookingElevatedUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "reason": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.BookingPricingSnapshot": {
+            "type": "object",
+            "properties": {
+                "freeMinutes": {
+                    "type": "integer"
+                },
+                "minChargeTenge": {
+                    "type": "integer"
+                },
+                "overtimePolicy": {
+                    "type": "string"
+                },
+                "overtimeRateTenge": {
+                    "type": "integer"
+                },
+                "ratePerKMTenge": {
+                    "type": "integer"
+                },
+                "rateTenge": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.BookingStatusReading": {
+            "type": "object",
+            "properties": {
+                "actorID": {
+                    "type": "string"
+                },
+                "actorType": {
+                    "type": "string"
+                },
+                "bookingID": {
+                    "type": "string"
+                },
+                "changedAt": {
+                    "type": "string"
+                },
+                "fromStatus": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "reason": {
+                    "type": "string"
+                },
+                "toStatus": {
+                    "type": "string"
                 }
             }
         },
@@ -4322,6 +5217,145 @@ const docTemplate = `{
                 },
                 "phoneNumber": {
                     "type": "string"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRule": {
+            "type": "object",
+            "properties": {
+                "class": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "freeMinutes": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "isActive": {
+                    "type": "boolean"
+                },
+                "minChargeTenge": {
+                    "type": "integer"
+                },
+                "modelID": {
+                    "type": "string"
+                },
+                "overtimePolicy": {
+                    "type": "string"
+                },
+                "overtimeRateTenge": {
+                    "type": "integer"
+                },
+                "ratePerKMTenge": {
+                    "type": "integer"
+                },
+                "rateTenge": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "zoneID": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRuleCreateRequest": {
+            "type": "object",
+            "properties": {
+                "class": {
+                    "type": "string"
+                },
+                "freeMinutes": {
+                    "type": "integer"
+                },
+                "minChargeTenge": {
+                    "type": "integer"
+                },
+                "modelID": {
+                    "type": "string"
+                },
+                "overtimePolicy": {
+                    "type": "string"
+                },
+                "overtimeRateTenge": {
+                    "type": "integer"
+                },
+                "ratePerKMTenge": {
+                    "type": "integer"
+                },
+                "rateTenge": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "zoneID": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRuleResponse": {
+            "type": "object",
+            "properties": {
+                "rule": {
+                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRule"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRuleUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "class": {
+                    "type": "string"
+                },
+                "freeMinutes": {
+                    "type": "integer"
+                },
+                "isActive": {
+                    "type": "boolean"
+                },
+                "minChargeTenge": {
+                    "type": "integer"
+                },
+                "modelID": {
+                    "type": "string"
+                },
+                "overtimePolicy": {
+                    "type": "string"
+                },
+                "overtimeRateTenge": {
+                    "type": "integer"
+                },
+                "ratePerKMTenge": {
+                    "type": "integer"
+                },
+                "rateTenge": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "zoneID": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRulesResponse": {
+            "type": "object",
+            "properties": {
+                "rules": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRule"
+                    }
                 }
             }
         },

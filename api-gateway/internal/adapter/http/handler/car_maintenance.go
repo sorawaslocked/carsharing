@@ -117,7 +117,7 @@ func (h *CarMaintenanceHandler) ListTemplates(ctx *gin.Context) {
 // @Security     BearerAuth
 // @Param        id    path      string                                   true  "Template UUID"
 // @Param        body  body      dto.CarMaintenanceTemplateUpdateRequest  true  "Fields to update"
-// @Success      200
+// @Success      204
 // @Failure      400  {object}  dto.ErrorResponse
 // @Failure      401  {object}  dto.ErrorResponse
 // @Failure      404  {object}  dto.ErrorResponse
@@ -145,7 +145,7 @@ func (h *CarMaintenanceHandler) UpdateTemplate(ctx *gin.Context) {
 		return
 	}
 
-	dto.Ok(ctx, nil)
+	dto.NoContent(ctx)
 }
 
 // DeleteTemplate godoc
@@ -154,7 +154,7 @@ func (h *CarMaintenanceHandler) UpdateTemplate(ctx *gin.Context) {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        id   path      string  true  "Template UUID"
-// @Success      200
+// @Success      204
 // @Failure      400  {object}  dto.ErrorResponse
 // @Failure      401  {object}  dto.ErrorResponse
 // @Failure      404  {object}  dto.ErrorResponse
@@ -175,7 +175,7 @@ func (h *CarMaintenanceHandler) DeleteTemplate(ctx *gin.Context) {
 		return
 	}
 
-	dto.Ok(ctx, nil)
+	dto.NoContent(ctx)
 }
 
 // GetRecords godoc
@@ -226,7 +226,7 @@ func (h *CarMaintenanceHandler) GetRecords(ctx *gin.Context) {
 // @Security     BearerAuth
 // @Param        id    path      string                                   true  "Maintenance record UUID"
 // @Param        body  body      dto.CarMaintenanceRecordCompleteRequest  true  "Completion details"
-// @Success      200
+// @Success      204
 // @Failure      400  {object}  dto.ErrorResponse
 // @Failure      401  {object}  dto.ErrorResponse
 // @Failure      404  {object}  dto.ErrorResponse
@@ -254,7 +254,7 @@ func (h *CarMaintenanceHandler) CompleteRecord(ctx *gin.Context) {
 		return
 	}
 
-	dto.Ok(ctx, nil)
+	dto.NoContent(ctx)
 }
 
 // GetReceiptImageUploadUrl godoc

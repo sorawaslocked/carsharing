@@ -14,10 +14,6 @@ func NewCarService(presenter CarPresenter) *CarService {
 	return &CarService{presenter: presenter}
 }
 
-func (s *CarService) Health(ctx context.Context) (model.ServiceHealth, error) {
-	return s.presenter.Health(ctx)
-}
-
 func (s *CarService) Create(ctx context.Context, data model.CarCreate) (string, error) {
 	return s.presenter.Create(ctx, data)
 }

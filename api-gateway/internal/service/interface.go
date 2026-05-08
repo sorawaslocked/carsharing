@@ -48,8 +48,6 @@ type CarModelPresenter interface {
 }
 
 type CarPresenter interface {
-	Health(ctx context.Context) (model.ServiceHealth, error)
-
 	Create(ctx context.Context, data model.CarCreate) (string, error)
 	Get(ctx context.Context, id string) (model.Car, error)
 	List(ctx context.Context, filter model.CarFilter) ([]model.Car, error)
@@ -67,11 +65,11 @@ type CarPresenter interface {
 	GetImageUploadData(ctx context.Context) (model.ImageUploadData, error)
 }
 
-type CarPricingRulePresenter interface {
-	Create(ctx context.Context, data model.CarPricingRuleCreate) (string, error)
-	Get(ctx context.Context, id string) (model.CarPricingRule, error)
-	List(ctx context.Context, filter model.CarPricingRuleFilter) ([]model.CarPricingRule, error)
-	Update(ctx context.Context, id string, data model.CarPricingRuleUpdate) error
+type PricingRulePresenter interface {
+	Create(ctx context.Context, data model.PricingRuleCreate) (string, error)
+	Get(ctx context.Context, id string) (model.PricingRule, error)
+	List(ctx context.Context, filter model.PricingRuleFilter) ([]model.PricingRule, error)
+	Update(ctx context.Context, id string, data model.PricingRuleUpdate) error
 	Delete(ctx context.Context, id string) error
 }
 
@@ -91,6 +89,16 @@ type ZonePresenter interface {
 	List(ctx context.Context, filter model.ZoneFilter) ([]model.Zone, error)
 	Update(ctx context.Context, id string, data model.ZoneUpdate) error
 	Delete(ctx context.Context, id string) error
+}
+
+type BookingPresenter interface {
+	Create(ctx context.Context, data model.BookingCreate) (string, error)
+	Get(ctx context.Context, id string) (model.Booking, error)
+	List(ctx context.Context, filter model.BookingFilter) ([]model.Booking, error)
+	Start(ctx context.Context, id string) error
+	Cancel(ctx context.Context, id string) error
+	ElevatedUpdate(ctx context.Context, id string, data model.BookingElevatedUpdate) error
+	GetStatusHistory(ctx context.Context, id string, filter model.BookingStatusReadingFilter) ([]model.BookingStatusReading, error)
 }
 
 type CarMaintenancePresenter interface {

@@ -132,7 +132,7 @@ func (h *CarHandler) List(ctx *gin.Context) {
 // @Security     BearerAuth
 // @Param        id    path      string                true  "Car UUID"
 // @Param        body  body      dto.CarUpdateRequest  true  "Fields to update"
-// @Success      200
+// @Success      204
 // @Failure      400  {object}  dto.ErrorResponse
 // @Failure      401  {object}  dto.ErrorResponse
 // @Failure      404  {object}  dto.ErrorResponse
@@ -159,7 +159,7 @@ func (h *CarHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	dto.Ok(ctx, nil)
+	dto.NoContent(ctx)
 }
 
 // Delete (Car) godoc
@@ -168,7 +168,7 @@ func (h *CarHandler) Update(ctx *gin.Context) {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        id   path      string  true  "Car UUID"
-// @Success      200
+// @Success      204
 // @Failure      400  {object}  dto.ErrorResponse
 // @Failure      401  {object}  dto.ErrorResponse
 // @Failure      404  {object}  dto.ErrorResponse
@@ -188,10 +188,10 @@ func (h *CarHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	dto.Ok(ctx, nil)
+	dto.NoContent(ctx)
 }
 
-// AdminUpdate (Car) godoc
+// ElevatedUpdate (Car) godoc
 // @Summary      Elevated car update (admin)
 // @Description  Allows privileged actors to override car status, sensor readings, and location with an audit reason and metadata.
 // @Tags         cars
@@ -200,13 +200,13 @@ func (h *CarHandler) Delete(ctx *gin.Context) {
 // @Security     BearerAuth
 // @Param        id    path      string                        true  "Car UUID"
 // @Param        body  body      dto.CarElevatedUpdateRequest  true  "Elevated update payload"
-// @Success      200
+// @Success      204
 // @Failure      400  {object}  dto.ErrorResponse
 // @Failure      401  {object}  dto.ErrorResponse
 // @Failure      404  {object}  dto.ErrorResponse
 // @Failure      500  {object}  dto.ErrorResponse
-// @Router       /cars/{id}/admin [patch]
-func (h *CarHandler) AdminUpdate(ctx *gin.Context) {
+// @Router       /cars/{id}/elevated [patch]
+func (h *CarHandler) ElevatedUpdate(ctx *gin.Context) {
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -229,7 +229,7 @@ func (h *CarHandler) AdminUpdate(ctx *gin.Context) {
 		return
 	}
 
-	dto.Ok(ctx, nil)
+	dto.NoContent(ctx)
 }
 
 // GetCarStatusHistory godoc

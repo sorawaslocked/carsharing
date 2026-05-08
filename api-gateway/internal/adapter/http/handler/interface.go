@@ -78,6 +78,24 @@ type ZoneService interface {
 	Delete(ctx context.Context, id string) error
 }
 
+type PricingRuleService interface {
+	Create(ctx context.Context, data model.PricingRuleCreate) (string, error)
+	Get(ctx context.Context, id string) (model.PricingRule, error)
+	List(ctx context.Context, filter model.PricingRuleFilter) ([]model.PricingRule, error)
+	Update(ctx context.Context, id string, data model.PricingRuleUpdate) error
+	Delete(ctx context.Context, id string) error
+}
+
+type BookingService interface {
+	Create(ctx context.Context, data model.BookingCreate) (string, error)
+	Get(ctx context.Context, id string) (model.Booking, error)
+	List(ctx context.Context, filter model.BookingFilter) ([]model.Booking, error)
+	Start(ctx context.Context, id string) error
+	Cancel(ctx context.Context, id string) error
+	ElevatedUpdate(ctx context.Context, id string, data model.BookingElevatedUpdate) error
+	GetStatusHistory(ctx context.Context, id string, filter model.BookingStatusReadingFilter) ([]model.BookingStatusReading, error)
+}
+
 type CarMaintenanceService interface {
 	CreateTemplate(ctx context.Context, data model.CarMaintenanceTemplateCreate) (string, error)
 	GetTemplate(ctx context.Context, id string) (model.CarMaintenanceTemplate, error)

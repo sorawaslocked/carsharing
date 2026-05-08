@@ -22,7 +22,9 @@ type Server struct {
 	carHandler            *handler.CarHandler
 	carInsuranceHandler   *handler.CarInsuranceHandler
 	carMaintenanceHandler *handler.CarMaintenanceHandler
+	pricingRuleHandler    *handler.PricingRuleHandler
 	zoneHandler           *handler.ZoneHandler
+	bookingHandler        *handler.BookingHandler
 }
 
 func New(
@@ -35,7 +37,9 @@ func New(
 	carService handler.CarService,
 	carInsuranceService handler.CarInsuranceService,
 	carMaintenanceService handler.CarMaintenanceService,
+	pricingRuleService handler.PricingRuleService,
 	zoneService handler.ZoneService,
+	bookingService handler.BookingService,
 	tokenManager TokenParser,
 	userPermissionsCache UserPermissionsCache,
 	userSessionCache UserSessionCache,
@@ -55,7 +59,9 @@ func New(
 	carHandler := handler.NewCarHandler(carService)
 	carInsuranceHandler := handler.NewCarInsuranceHandler(carInsuranceService)
 	carMaintenanceHandler := handler.NewCarMaintenanceHandler(carMaintenanceService)
+	pricingRuleHandler := handler.NewPricingRuleHandler(pricingRuleService)
 	zoneHandler := handler.NewZoneHandler(zoneService)
+	bookingHandler := handler.NewBookingHandler(bookingService)
 
 	server := &Server{
 		router:                router,
@@ -67,7 +73,9 @@ func New(
 		carHandler:            carHandler,
 		carInsuranceHandler:   carInsuranceHandler,
 		carMaintenanceHandler: carMaintenanceHandler,
+		pricingRuleHandler:    pricingRuleHandler,
 		zoneHandler:           zoneHandler,
+		bookingHandler:        bookingHandler,
 	}
 
 	server.setupMiddleware()

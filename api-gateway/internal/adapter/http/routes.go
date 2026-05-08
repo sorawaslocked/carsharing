@@ -85,7 +85,7 @@ func (s *Server) setupRoutes(
 				cars.GET("", s.carHandler.List)
 				cars.PATCH("/:id", s.carHandler.Update)
 				cars.DELETE("/:id", s.carHandler.Delete)
-				cars.PATCH("/:id/admin", s.carHandler.AdminUpdate)
+				cars.PATCH("/:id/elevated", s.carHandler.ElevatedUpdate)
 				cars.GET("/:id/status-history", s.carHandler.GetCarStatusHistory)
 				cars.GET("/:id/fuel-history", s.carHandler.GetCarFuelHistory)
 				cars.GET("/:id/location-history", s.carHandler.GetCarLocationHistory)
@@ -123,6 +123,15 @@ func (s *Server) setupRoutes(
 				}
 			}
 
+			pricingRules := verified.Group("/pricing-rules")
+			{
+				pricingRules.POST("", s.pricingRuleHandler.Create)
+				pricingRules.GET("/:id", s.pricingRuleHandler.Get)
+				pricingRules.GET("", s.pricingRuleHandler.List)
+				pricingRules.PATCH("/:id", s.pricingRuleHandler.Update)
+				pricingRules.DELETE("/:id", s.pricingRuleHandler.Delete)
+			}
+
 			zones := verified.Group("/zones")
 			{
 				zones.POST("", s.zoneHandler.Create)
@@ -130,6 +139,17 @@ func (s *Server) setupRoutes(
 				zones.GET("", s.zoneHandler.List)
 				zones.PATCH("/:id", s.zoneHandler.Update)
 				zones.DELETE("/:id", s.zoneHandler.Delete)
+			}
+
+			bookings := verified.Group("/bookings")
+			{
+				bookings.POST("", s.bookingHandler.Create)
+				bookings.GET("/:id", s.bookingHandler.Get)
+				bookings.GET("", s.bookingHandler.List)
+				bookings.POST("/:id/start", s.bookingHandler.Start)
+				bookings.POST("/:id/cancel", s.bookingHandler.Cancel)
+				bookings.PATCH("/:id/elevated", s.bookingHandler.ElevatedUpdate)
+				bookings.GET("/:id/status-history", s.bookingHandler.GetStatusHistory)
 			}
 		}
 	}

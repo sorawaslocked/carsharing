@@ -123,7 +123,7 @@ func (h *CarInsuranceHandler) List(ctx *gin.Context) {
 // @Security     BearerAuth
 // @Param        id    path      string                         true  "Insurance UUID"
 // @Param        body  body      dto.CarInsuranceUpdateRequest  true  "Fields to update"
-// @Success      200
+// @Success      204
 // @Failure      400  {object}  dto.ErrorResponse
 // @Failure      401  {object}  dto.ErrorResponse
 // @Failure      404  {object}  dto.ErrorResponse
@@ -151,7 +151,7 @@ func (h *CarInsuranceHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	dto.Ok(ctx, nil)
+	dto.NoContent(ctx)
 }
 
 // Delete (CarInsurance) godoc
@@ -160,7 +160,7 @@ func (h *CarInsuranceHandler) Update(ctx *gin.Context) {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        id   path      string  true  "Insurance UUID"
-// @Success      200
+// @Success      204
 // @Failure      400  {object}  dto.ErrorResponse
 // @Failure      401  {object}  dto.ErrorResponse
 // @Failure      404  {object}  dto.ErrorResponse
@@ -181,7 +181,7 @@ func (h *CarInsuranceHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	dto.Ok(ctx, nil)
+	dto.NoContent(ctx)
 }
 
 // GetImageUploadUrl (CarInsurance) godoc

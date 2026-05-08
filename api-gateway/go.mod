@@ -11,7 +11,7 @@ require (
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/nats-io/nats.go v1.52.0
 	github.com/redis/go-redis/v9 v9.18.0
-	github.com/sorawaslocked/car-rental-protos v0.0.17
+	github.com/sorawaslocked/car-rental-protos v0.0.20
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.1
 	github.com/swaggo/swag v1.16.6

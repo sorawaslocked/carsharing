@@ -307,18 +307,3 @@ func (h *UserHandler) CheckDocument(ctx context.Context, docID, status string, r
 
 	return nil
 }
-
-func (h *UserHandler) Health(ctx context.Context) (model.ServiceHealth, error) {
-	logger := pkglog.WithMethod(h.log, "Health")
-
-	res, err := h.client.Health(ctx, &emptypb.Empty{})
-	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
-
-		return model.ServiceHealth{}, dto.FromGrpcErr(err)
-	}
-
-	return dto.ServiceHealthFromProto(res), nil
-}

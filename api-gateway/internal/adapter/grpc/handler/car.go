@@ -26,21 +26,6 @@ func NewCarHandler(client carsvc.CarServiceClient, logger *slog.Logger) *CarHand
 	}
 }
 
-func (h *CarHandler) Health(ctx context.Context) (model.ServiceHealth, error) {
-	logger := pkglog.WithMethod(h.log, "Health")
-
-	res, err := h.client.Health(ctx, &emptypb.Empty{})
-	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
-
-		return model.ServiceHealth{}, dto.FromGrpcErr(err)
-	}
-
-	return dto.ServiceHealthFromProto(res), nil
-}
-
 func (h *CarHandler) Create(ctx context.Context, data model.CarCreate) (string, error) {
 	logger := pkglog.WithMethod(h.log, "Create")
 

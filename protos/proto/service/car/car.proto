@@ -18,7 +18,8 @@ service CarService {
   rpc UpdateCar(UpdateCarRequest) returns (google.protobuf.Empty);
   rpc DeleteCar(DeleteCarRequest) returns (google.protobuf.Empty);
 
-  rpc ElevatedUpdateCar(ElevatedUpdateCarRequest) returns (google.protobuf.Empty);
+  rpc UpdateCarTelemetry(UpdateCarTelemetryRequest) returns (google.protobuf.Empty);
+  rpc UpdateCarStatus(UpdateCarStatusRequest) returns (google.protobuf.Empty);
 
   rpc GetCarStatusHistory(GetCarStatusHistoryRequest) returns (GetCarStatusHistoryResponse);
   rpc GetCarFuelHistory(GetCarFuelHistoryRequest) returns (GetCarFuelHistoryResponse);
@@ -87,6 +88,23 @@ message UpdateCarRequest {
   optional bool is_retired = 12;
   optional string notes = 13;
   repeated string image_keys = 14;
+}
+
+message UpdateCarTelemetryRequest {
+  string id = 1;
+  optional int64 mileage_km = 2;
+  optional float fuel_level = 3;
+  optional float battery_level = 4;
+  optional base.Location location = 5;
+  string reason = 6;
+  google.protobuf.Struct metadata = 7;
+}
+
+message UpdateCarStatusRequest {
+  string id = 1;
+  string status = 2;
+  string reason = 3;
+  google.protobuf.Struct metadata = 4;
 }
 
 message DeleteCarRequest {

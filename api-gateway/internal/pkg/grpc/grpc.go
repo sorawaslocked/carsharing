@@ -19,6 +19,7 @@ type (
 		UserServiceURL    string `yaml:"user_service_url" env:"GRPC_USER_SERVICE_URL" env-required:"true"`
 		CarServiceURL     string `yaml:"car_service_url" env:"GRPC_CAR_SERVICE_URL" env-required:"true"`
 		BookingServiceURL string `yaml:"booking_service_url" env:"GRPC_BOOKING_SERVICE_URL" env-required:"true"`
+		TripServiceURL    string `yaml:"trip_service_url" env:"GRPC_TRIP_SERVICE_URL" env-required:"true"`
 
 		MaxReceiveSizeMb int           `yaml:"max_receive_size_mb" env:"GRPC_MAX_RECEIVE_SIZE_MB" env-default:"4"`
 		TimeKeepAlive    time.Duration `yaml:"time_keep_alive" env:"GRPC_TIME_KEEP_ALIVE" env-default:"1m"`

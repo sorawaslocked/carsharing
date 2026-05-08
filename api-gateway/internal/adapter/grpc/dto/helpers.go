@@ -6,6 +6,17 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
+func PricingSnapshotFromProto(s *basepb.PricingSnapshot) model.PricingSnapshot {
+	return model.PricingSnapshot{
+		RateTenge:         s.GetRateTenge(),
+		RatePerKMTenge:    s.RatePerKmTenge,
+		FreeMinutes:       s.FreeMinutes,
+		MinChargeTenge:    s.MinChargeTenge,
+		OvertimePolicy:    s.OvertimePolicy,
+		OvertimeRateTenge: s.OvertimeRateTenge,
+	}
+}
+
 func LocationFromProto(l *basepb.Location) model.Location {
 	if l == nil {
 		return model.Location{}

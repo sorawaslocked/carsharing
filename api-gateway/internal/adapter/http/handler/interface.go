@@ -98,6 +98,16 @@ type BookingService interface {
 	GetStatusHistory(ctx context.Context, id string, filter model.BookingStatusReadingFilter) ([]model.BookingStatusReading, error)
 }
 
+type TripService interface {
+	Start(ctx context.Context, bookingID string) (string, error)
+	Get(ctx context.Context, id string) (model.Trip, error)
+	List(ctx context.Context, filter model.TripFilter) ([]model.Trip, error)
+	End(ctx context.Context, id string) error
+	Cancel(ctx context.Context, id string, reason *string) error
+	GetSummary(ctx context.Context, id string) (model.TripSummary, error)
+	GetStatusHistory(ctx context.Context, id string, filter model.TripStatusReadingFilter) ([]model.TripStatusReading, error)
+}
+
 type CarMaintenanceService interface {
 	CreateTemplate(ctx context.Context, data model.CarMaintenanceTemplateCreate) (string, error)
 	GetTemplate(ctx context.Context, id string) (model.CarMaintenanceTemplate, error)

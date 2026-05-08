@@ -25,6 +25,7 @@ type Server struct {
 	pricingRuleHandler    *handler.PricingRuleHandler
 	zoneHandler           *handler.ZoneHandler
 	bookingHandler        *handler.BookingHandler
+	tripHandler           *handler.TripHandler
 }
 
 func New(
@@ -40,6 +41,7 @@ func New(
 	pricingRuleService handler.PricingRuleService,
 	zoneService handler.ZoneService,
 	bookingService handler.BookingService,
+	tripService handler.TripService,
 	tokenManager TokenParser,
 	userPermissionsCache UserPermissionsCache,
 	userSessionCache UserSessionCache,
@@ -62,6 +64,7 @@ func New(
 	pricingRuleHandler := handler.NewPricingRuleHandler(pricingRuleService)
 	zoneHandler := handler.NewZoneHandler(zoneService)
 	bookingHandler := handler.NewBookingHandler(bookingService)
+	tripHandler := handler.NewTripHandler(tripService)
 
 	server := &Server{
 		router:                router,
@@ -76,6 +79,7 @@ func New(
 		pricingRuleHandler:    pricingRuleHandler,
 		zoneHandler:           zoneHandler,
 		bookingHandler:        bookingHandler,
+		tripHandler:           tripHandler,
 	}
 
 	server.setupMiddleware()

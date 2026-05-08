@@ -10,19 +10,10 @@ type Booking struct {
 	CommittedPeriods *int32 // number of hours or days booked upfront; nil for per_minute
 	Status           string // "reserved" | "active" | "completed" | "cancelled"
 	PricingRuleID    string
-	PricingSnapshot  BookingPricingSnapshot
+	PricingSnapshot  PricingSnapshot
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
-}
-
-type BookingPricingSnapshot struct {
-	RateTenge         int32
-	RatePerKMTenge    *int32
-	FreeMinutes       *int32
-	MinChargeTenge    *int32
-	OvertimePolicy    *string
-	OvertimeRateTenge *int32
 }
 
 type BookingFilter struct {

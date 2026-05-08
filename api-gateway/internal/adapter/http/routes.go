@@ -153,6 +153,17 @@ func (s *Server) setupRoutes(
 				bookings.PATCH("/:id/status", s.bookingHandler.UpdateStatus)
 				bookings.GET("/:id/status-history", s.bookingHandler.GetStatusHistory)
 			}
+
+			trips := verified.Group("/trips")
+			{
+				trips.POST("", s.tripHandler.Start)
+				trips.GET("/:id", s.tripHandler.Get)
+				trips.GET("", s.tripHandler.List)
+				trips.POST("/:id/end", s.tripHandler.End)
+				trips.POST("/:id/cancel", s.tripHandler.Cancel)
+				trips.GET("/:id/summary", s.tripHandler.GetSummary)
+				trips.GET("/:id/status-history", s.tripHandler.GetStatusHistory)
+			}
 		}
 	}
 

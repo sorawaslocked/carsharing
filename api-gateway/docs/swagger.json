@@ -3125,6 +3125,484 @@
                 }
             }
         },
+        "/trips": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns trips filtered by optional query parameters.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "trips"
+                ],
+                "summary": "List trips",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by user UUID",
+                        "name": "userID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by car UUID",
+                        "name": "carID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by start time lower bound (RFC3339)",
+                        "name": "startedAfter",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by start time upper bound (RFC3339)",
+                        "name": "startedBefore",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Trip"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Begins a trip for the given booking. The gateway captures car telemetry at this moment.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "trips"
+                ],
+                "summary": "Start a trip",
+                "parameters": [
+                    {
+                        "description": "Trip start payload",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.TripStartRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.IDResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/trips/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "trips"
+                ],
+                "summary": "Get trip by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Trip UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Trip"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/trips/{id}/cancel": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Cancels an in-progress trip with an optional reason.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "trips"
+                ],
+                "summary": "Cancel a trip",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Trip UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Cancellation reason",
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.TripCancelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/trips/{id}/end": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Completes an in-progress trip. The gateway captures final car telemetry at this moment.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "trips"
+                ],
+                "summary": "End a trip",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Trip UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/trips/{id}/status-history": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the chronological status change log for a trip.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "trips"
+                ],
+                "summary": "Get trip status history",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Trip UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Start time (RFC3339)",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End time (RFC3339)",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.TripStatusReading"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/trips/{id}/summary": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the billing breakdown for a completed trip.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "trips"
+                ],
+                "summary": "Get trip summary",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Trip UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.TripSummary"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "security": [
@@ -4214,7 +4692,7 @@
                     "type": "string"
                 },
                 "pricingSnapshot": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.BookingPricingSnapshot"
+                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingSnapshot"
                 },
                 "status": {
                     "type": "string"
@@ -4238,29 +4716,6 @@
                 },
                 "pricingRuleID": {
                     "type": "string"
-                }
-            }
-        },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.BookingPricingSnapshot": {
-            "type": "object",
-            "properties": {
-                "freeMinutes": {
-                    "type": "integer"
-                },
-                "minChargeTenge": {
-                    "type": "integer"
-                },
-                "overtimePolicy": {
-                    "type": "string"
-                },
-                "overtimeRateTenge": {
-                    "type": "integer"
-                },
-                "ratePerKMTenge": {
-                    "type": "integer"
-                },
-                "rateTenge": {
-                    "type": "integer"
                 }
             }
         },
@@ -5472,6 +5927,29 @@
                 }
             }
         },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingSnapshot": {
+            "type": "object",
+            "properties": {
+                "freeMinutes": {
+                    "type": "integer"
+                },
+                "minChargeTenge": {
+                    "type": "integer"
+                },
+                "overtimePolicy": {
+                    "type": "string"
+                },
+                "overtimeRateTenge": {
+                    "type": "integer"
+                },
+                "ratePerKMTenge": {
+                    "type": "integer"
+                },
+                "rateTenge": {
+                    "type": "integer"
+                }
+            }
+        },
         "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RegisterRequest": {
             "type": "object",
             "properties": {
@@ -5517,6 +5995,151 @@
                     "type": "integer"
                 },
                 "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Trip": {
+            "type": "object",
+            "properties": {
+                "bookingID": {
+                    "type": "string"
+                },
+                "cancelReason": {
+                    "type": "string"
+                },
+                "carID": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "distanceTraveledKM": {
+                    "type": "number"
+                },
+                "durationSeconds": {
+                    "type": "integer"
+                },
+                "endFuelLevel": {
+                    "type": "number"
+                },
+                "endLocation": {
+                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.location"
+                },
+                "endMileageKM": {
+                    "type": "integer"
+                },
+                "endedAt": {
+                    "type": "string"
+                },
+                "finalCostTenge": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "startFuelLevel": {
+                    "type": "number"
+                },
+                "startLocation": {
+                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.location"
+                },
+                "startMileageKM": {
+                    "type": "integer"
+                },
+                "startedAt": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "userID": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.TripCancelRequest": {
+            "type": "object",
+            "properties": {
+                "reason": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.TripStartRequest": {
+            "type": "object",
+            "properties": {
+                "bookingID": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.TripStatusReading": {
+            "type": "object",
+            "properties": {
+                "actorID": {
+                    "type": "string"
+                },
+                "actorType": {
+                    "type": "string"
+                },
+                "changedAt": {
+                    "type": "string"
+                },
+                "fromStatus": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "reason": {
+                    "type": "string"
+                },
+                "toStatus": {
+                    "type": "string"
+                },
+                "tripID": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.TripSummary": {
+            "type": "object",
+            "properties": {
+                "baseCostTenge": {
+                    "type": "integer"
+                },
+                "bookingID": {
+                    "type": "string"
+                },
+                "distanceCostTenge": {
+                    "type": "integer"
+                },
+                "distanceTraveledKM": {
+                    "type": "number"
+                },
+                "durationSeconds": {
+                    "type": "integer"
+                },
+                "endedAt": {
+                    "type": "string"
+                },
+                "overtimeCostTenge": {
+                    "type": "integer"
+                },
+                "pricingSnapshot": {
+                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingSnapshot"
+                },
+                "startedAt": {
+                    "type": "string"
+                },
+                "totalCostTenge": {
+                    "type": "integer"
+                },
+                "tripID": {
                     "type": "string"
                 }
             }

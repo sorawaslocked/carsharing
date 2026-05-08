@@ -22,6 +22,7 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/service"
 	bookingsvc "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
+	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 )
 
@@ -80,6 +81,16 @@ func New(cfg config.Config, log *slog.Logger) *App {
 		return nil
 	}
 
+	// Trip service gRPC connection
+	tripServiceLog := log.With(slog.String("grpcURL", cfg.GRPCServer.Client.TripServiceURL))
+	tripServiceLog.Info("connecting to grpc server")
+
+	tripServiceGrpcConn, err := grpcconn.Connect(cfg.GRPCServer.Client.TripServiceURL, cfg.GRPCServer.Client)
+	if err != nil {
+		tripServiceLog.Error("connecting to grpc server", pkglog.Err(err))
+		return nil
+	}
+
 	// gRPC clients
 	userGrpcClient := usersvc.NewUserServiceClient(userServiceGrpcConn)
 	userHealthGrpcClient := usersvc.NewHealthServiceClient(userServiceGrpcConn)
@@ -92,6 +103,8 @@ func New(cfg config.Config, log *slog.Logger) *App {
 	pricingRuleGrpcClient := bookingsvc.NewPricingRuleServiceClient(bookingServiceGrpcConn)
 	bookingGrpcClient := bookingsvc.NewBookingServiceClient(bookingServiceGrpcConn)
 	bookingHealthGrpcClient := bookingsvc.NewHealthServiceClient(bookingServiceGrpcConn)
+	tripGrpcClient := tripsvc.NewTripServiceClient(tripServiceGrpcConn)
+	tripHealthGrpcClient := tripsvc.NewHealthServiceClient(tripServiceGrpcConn)
 
 	// gRPC handlers
 	userServiceGrpcHandler := grpchandler.NewUserHandler(userGrpcClient, log)
@@ -105,6 +118,8 @@ func New(cfg config.Config, log *slog.Logger) *App {
 	pricingRuleGrpcHandler := grpchandler.NewPricingRuleHandler(pricingRuleGrpcClient, log)
 	bookingGrpcHandler := grpchandler.NewBookingHandler(bookingGrpcClient, log)
 	bookingHealthGrpcHandler := grpchandler.NewHealthHandler(bookingHealthGrpcClient, log)
+	tripGrpcHandler := grpchandler.NewTripHandler(tripGrpcClient, log)
+	tripHealthGrpcHandler := grpchandler.NewHealthHandler(tripHealthGrpcClient, log)
 
 	// JWT
 	jwtManager := pkgjwt.NewManager(cfg.JWT, log)
@@ -119,6 +134,7 @@ func New(cfg config.Config, log *slog.Logger) *App {
 	zoneService := service.NewZoneService(zoneGrpcHandler)
 	pricingRuleService := service.NewPricingRuleService(pricingRuleGrpcHandler)
 	bookingService := service.NewBookingService(bookingGrpcHandler)
+	tripService := service.NewTripService(tripGrpcHandler)
 
 	// Redis
 	rdb, err := pkgredis.NewClient(context.Background(), &cfg.Redis, log)
@@ -144,6 +160,7 @@ func New(cfg config.Config, log *slog.Logger) *App {
 		userHealthGrpcHandler,
 		carHealthGrpcHandler,
 		bookingHealthGrpcHandler,
+		tripHealthGrpcHandler,
 	}
 
 	httpServer := httpserver.New(
@@ -159,6 +176,7 @@ func New(cfg config.Config, log *slog.Logger) *App {
 		pricingRuleService,
 		zoneService,
 		bookingService,
+		tripService,
 		jwtManager,
 		userCache,
 		userCache,

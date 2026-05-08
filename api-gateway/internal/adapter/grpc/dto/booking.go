@@ -20,7 +20,7 @@ func BookingFromProto(b *basebookingpb.Booking) model.Booking {
 	}
 
 	if s := b.GetPricingSnapshot(); s != nil {
-		booking.PricingSnapshot = BookingPricingSnapshotFromProto(s)
+		booking.PricingSnapshot = PricingSnapshotFromProto(s)
 	}
 
 	if b.GetCreatedAt() != nil {
@@ -31,17 +31,6 @@ func BookingFromProto(b *basebookingpb.Booking) model.Booking {
 	}
 
 	return booking
-}
-
-func BookingPricingSnapshotFromProto(s *basebookingpb.BookingPricingSnapshot) model.BookingPricingSnapshot {
-	return model.BookingPricingSnapshot{
-		RateTenge:         s.GetRateTenge(),
-		RatePerKMTenge:    s.RatePerKmTenge,
-		FreeMinutes:       s.FreeMinutes,
-		MinChargeTenge:    s.MinChargeTenge,
-		OvertimePolicy:    s.OvertimePolicy,
-		OvertimeRateTenge: s.OvertimeRateTenge,
-	}
 }
 
 func BookingStatusReadingFromProto(r *basebookingpb.BookingStatusReading) model.BookingStatusReading {

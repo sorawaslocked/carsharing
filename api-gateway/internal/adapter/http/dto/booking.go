@@ -7,7 +7,7 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )
 
-type BookingPricingSnapshot struct {
+type PricingSnapshot struct {
 	RateTenge         int32   `json:"rateTenge"`
 	RatePerKMTenge    *int32  `json:"ratePerKMTenge,omitempty"`
 	FreeMinutes       *int32  `json:"freeMinutes,omitempty"`
@@ -17,15 +17,15 @@ type BookingPricingSnapshot struct {
 }
 
 type Booking struct {
-	ID               string                 `json:"id"`
-	UserID           string                 `json:"userID"`
-	CarID            string                 `json:"carID"`
-	CommittedPeriods *int32                 `json:"committedPeriods,omitempty"`
-	Status           string                 `json:"status"`
-	PricingRuleID    string                 `json:"pricingRuleID"`
-	PricingSnapshot  BookingPricingSnapshot `json:"pricingSnapshot"`
-	CreatedAt        time.Time              `json:"createdAt"`
-	UpdatedAt        time.Time              `json:"updatedAt"`
+	ID               string          `json:"id"`
+	UserID           string          `json:"userID"`
+	CarID            string          `json:"carID"`
+	CommittedPeriods *int32          `json:"committedPeriods,omitempty"`
+	Status           string          `json:"status"`
+	PricingRuleID    string          `json:"pricingRuleID"`
+	PricingSnapshot  PricingSnapshot `json:"pricingSnapshot"`
+	CreatedAt        time.Time       `json:"createdAt"`
+	UpdatedAt        time.Time       `json:"updatedAt"`
 }
 
 type BookingStatusReading struct {
@@ -140,7 +140,7 @@ func ToBookingResponse(m model.Booking) Booking {
 		CommittedPeriods: m.CommittedPeriods,
 		Status:           m.Status,
 		PricingRuleID:    m.PricingRuleID,
-		PricingSnapshot: BookingPricingSnapshot{
+		PricingSnapshot: PricingSnapshot{
 			RateTenge:         m.PricingSnapshot.RateTenge,
 			RatePerKMTenge:    m.PricingSnapshot.RatePerKMTenge,
 			FreeMinutes:       m.PricingSnapshot.FreeMinutes,

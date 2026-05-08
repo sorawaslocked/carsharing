@@ -15,7 +15,7 @@ service BookingService {
   rpc ListBookings(ListBookingsRequest) returns (ListBookingsResponse);
   rpc StartBooking(StartBookingRequest) returns (google.protobuf.Empty);
   rpc CancelBooking(CancelBookingRequest) returns (google.protobuf.Empty);
-  rpc ElevatedUpdateBooking(ElevatedUpdateBookingRequest) returns (google.protobuf.Empty);
+  rpc UpdateBookingStatus(UpdateBookingStatusRequest) returns (google.protobuf.Empty);
   rpc GetBookingStatusHistory(GetBookingStatusHistoryRequest) returns (GetBookingStatusHistoryResponse);
 }
 
@@ -61,9 +61,9 @@ message CancelBookingRequest {
   string id = 1;
 }
 
-message ElevatedUpdateBookingRequest {
+message UpdateBookingStatusRequest {
   string id = 1;
-  optional string status = 2;
+  string status = 2;
   optional string reason = 3;
 }
 

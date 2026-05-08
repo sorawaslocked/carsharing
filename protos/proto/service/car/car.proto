@@ -78,16 +78,11 @@ message UpdateCarRequest {
   optional string model_id = 2;
   optional string license_plate = 3;
   optional string color = 4;
-  optional int64 mileage_km = 5;
-  optional float fuel_level = 6;
-  optional float battery_level = 7;
-  optional base.Location location = 8;
-  optional string telematics_id = 9;
-  optional string zone_id = 10;
-  optional string status = 11;
-  optional bool is_retired = 12;
-  optional string notes = 13;
-  repeated string image_keys = 14;
+  optional string telematics_id = 5;
+  optional string zone_id = 6;
+  optional bool is_retired = 7;
+  optional string notes = 8;
+  repeated string image_keys = 9;
 }
 
 message UpdateCarTelemetryRequest {
@@ -109,17 +104,6 @@ message UpdateCarStatusRequest {
 
 message DeleteCarRequest {
   string id = 1;
-}
-
-message ElevatedUpdateCarRequest {
-  string id = 1;
-  optional string status = 2;
-  optional int64 mileage_km = 3;
-  optional float fuel_level = 4;
-  optional float battery_level = 5;
-  optional base.Location location = 6;
-  string reason = 7;
-  google.protobuf.Struct metadata = 8;
 }
 
 message GetCarStatusHistoryRequest {

@@ -27,11 +27,14 @@ func WithMethod(log *slog.Logger, method string) *slog.Logger {
 }
 
 func WithMetadata(log *slog.Logger, md utils.Metadata) *slog.Logger {
-	args := make([]any, 0, 3)
+	args := make([]any, 0, 4)
 	args = append(args, slog.String("clientIP", md.ClientIP))
 	args = append(args, slog.String("requestID", md.RequestID))
 	if md.UserID != nil {
 		args = append(args, slog.String("userID", *md.UserID))
+	}
+	if len(md.UserRoles) > 0 {
+		args = append(args, slog.Any("userRoles", md.UserRoles))
 	}
 	return log.With(slog.Group("metadata", args...))
 }

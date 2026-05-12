@@ -27,9 +27,12 @@ func NewUserHandler(log *slog.Logger, userService UserService) *UserHandler {
 	}
 }
 
+func (h *UserHandler) logger(ctx context.Context, method string) *slog.Logger {
+	return pkglog.WithMetadata(pkglog.WithMethod(h.log, method), utils.MetadataFromCtx(ctx))
+}
+
 func (h *UserHandler) CreateUser(ctx context.Context, req *usersvc.CreateUserRequest) (*usersvc.CreateUserResponse, error) {
-	logger := pkglog.WithMethod(h.log, "CreateUser")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	logger := h.logger(ctx, "CreateUser")
 
 	data, err := dto.FromCreateUserRequest(req)
 	if err != nil {
@@ -38,16 +41,19 @@ func (h *UserHandler) CreateUser(ctx context.Context, req *usersvc.CreateUserReq
 
 	id, err := h.userService.Create(ctx, data)
 	if err != nil {
+		logger.Error("creating user", pkglog.Err(err))
 		return nil, dto.ToStatusError(err)
 	}
 
-	_ = logger
 	return &usersvc.CreateUserResponse{Id: &id}, nil
 }
 
 func (h *UserHandler) GetUser(ctx context.Context, req *usersvc.GetUserRequest) (*usersvc.GetUserResponse, error) {
+	logger := h.logger(ctx, "GetUser")
+
 	user, err := h.userService.Get(ctx, req.GetId())
 	if err != nil {
+		logger.Error("getting user", pkglog.Err(err))
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -55,10 +61,13 @@ func (h *UserHandler) GetUser(ctx context.Context, req *usersvc.GetUserRequest) 
 }
 
 func (h *UserHandler) ListUsers(ctx context.Context, req *usersvc.ListUsersRequest) (*usersvc.ListUsersResponse, error) {
+	logger := h.logger(ctx, "ListUsers")
+
 	filter := dto.FromListUsersRequest(req)
 
 	users, err := h.userService.List(ctx, filter)
 	if err != nil {
+		logger.Error("listing users", pkglog.Err(err))
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -71,12 +80,15 @@ func (h *UserHandler) ListUsers(ctx context.Context, req *usersvc.ListUsersReque
 }
 
 func (h *UserHandler) UpdateUser(ctx context.Context, req *usersvc.UpdateUserRequest) (*emptypb.Empty, error) {
+	logger := h.logger(ctx, "UpdateUser")
+
 	data, err := dto.FromUpdateUserRequest(req)
 	if err != nil {
 		return nil, dto.ToStatusError(err)
 	}
 
 	if err := h.userService.Update(ctx, req.GetId(), data); err != nil {
+		logger.Error("updating user", pkglog.Err(err))
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -84,7 +96,10 @@ func (h *UserHandler) UpdateUser(ctx context.Context, req *usersvc.UpdateUserReq
 }
 
 func (h *UserHandler) DeleteUser(ctx context.Context, req *usersvc.DeleteUserRequest) (*emptypb.Empty, error) {
+	logger := h.logger(ctx, "DeleteUser")
+
 	if err := h.userService.Delete(ctx, req.GetId()); err != nil {
+		logger.Error("deleting user", pkglog.Err(err))
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -92,6 +107,8 @@ func (h *UserHandler) DeleteUser(ctx context.Context, req *usersvc.DeleteUserReq
 }
 
 func (h *UserHandler) Register(ctx context.Context, req *usersvc.RegisterRequest) (*usersvc.RegisterResponse, error) {
+	logger := h.logger(ctx, "Register")
+
 	data, err := dto.FromRegisterRequest(req)
 	if err != nil {
 		return nil, dto.ToStatusError(err)
@@ -99,6 +116,7 @@ func (h *UserHandler) Register(ctx context.Context, req *usersvc.RegisterRequest
 
 	id, err := h.userService.Register(ctx, data)
 	if err != nil {
+		logger.Error("registering user", pkglog.Err(err))
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -106,10 +124,13 @@ func (h *UserHandler) Register(ctx context.Context, req *usersvc.RegisterRequest
 }
 
 func (h *UserHandler) SignIn(ctx context.Context, req *usersvc.SignInRequest) (*usersvc.SignInResponse, error) {
+	logger := h.logger(ctx, "SignIn")
+
 	creds := dto.FromSignInRequest(req)
 
 	id, err := h.userService.SignIn(ctx, creds)
 	if err != nil {
+		logger.Error("signing in", pkglog.Err(err))
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -117,12 +138,15 @@ func (h *UserHandler) SignIn(ctx context.Context, req *usersvc.SignInRequest) (*
 }
 
 func (h *UserHandler) SendActivationCode(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
+	logger := h.logger(ctx, "SendActivationCode")
+
 	md := utils.MetadataFromCtx(ctx)
 	if md.UserID == nil {
 		return nil, dto.ToStatusError(model.ErrMissingMetadata)
 	}
 
 	if err := h.userService.SendActivationCode(ctx, *md.UserID); err != nil {
+		logger.Error("sending activation code", pkglog.Err(err))
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -130,12 +154,15 @@ func (h *UserHandler) SendActivationCode(ctx context.Context, _ *emptypb.Empty) 
 }
 
 func (h *UserHandler) CheckActivationCode(ctx context.Context, req *usersvc.CheckActivationCodeRequest) (*emptypb.Empty, error) {
+	logger := h.logger(ctx, "CheckActivationCode")
+
 	md := utils.MetadataFromCtx(ctx)
 	if md.UserID == nil {
 		return nil, dto.ToStatusError(model.ErrMissingMetadata)
 	}
 
 	if err := h.userService.CheckActivationCode(ctx, *md.UserID, req.GetCode()); err != nil {
+		logger.Error("checking activation code", pkglog.Err(err))
 		return nil, dto.ToStatusError(err)
 	}
 

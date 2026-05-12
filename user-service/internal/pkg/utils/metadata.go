@@ -2,6 +2,8 @@ package utils
 
 import (
 	"context"
+
+	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 )
 
 const (
@@ -15,23 +17,27 @@ type Metadata struct {
 	ClientIP  string
 	RequestID string
 	UserID    *string
-	UserRoles []string
+	UserRoles []model.Role
 }
 
 func MetadataFromCtx(ctx context.Context) Metadata {
 	md := Metadata{}
 
-	clientIP, ok := ctx.Value(ctxRequestClientIPKey).(string)
-	if ok {
+	if clientIP, ok := ctx.Value(ctxRequestClientIPKey).(string); ok {
 		md.ClientIP = clientIP
 	}
-	requestID, ok := ctx.Value(ctxRequestIDKey).(string)
-	if ok {
+	if requestID, ok := ctx.Value(ctxRequestIDKey).(string); ok {
 		md.RequestID = requestID
 	}
-	userID, ok := ctx.Value(ctxRequestUserIDKey).(string)
-	if ok {
+	if userID, ok := ctx.Value(ctxRequestUserIDKey).(string); ok {
 		md.UserID = &userID
+	}
+	if rawRoles, ok := ctx.Value(ctxRequestUserRolesKey).([]string); ok {
+		for _, s := range rawRoles {
+			if role, err := model.RoleFromString(s); err == nil {
+				md.UserRoles = append(md.UserRoles, role)
+			}
+		}
 	}
 
 	return md

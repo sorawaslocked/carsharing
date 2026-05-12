@@ -10,8 +10,13 @@ import (
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/security"
 )
 
-func (s *UserService) SendActivationCode(ctx context.Context, userID string) error {
+func (s *UserService) SendActivationCode(ctx context.Context) error {
 	logger := pkglog.WithMethod(s.log, "SendActivationCode")
+
+	userID, err := userIDFromCtx(ctx)
+	if err != nil {
+		return err
+	}
 
 	user, err := s.userRepo.FindByID(ctx, userID)
 	if err != nil {
@@ -35,8 +40,13 @@ func (s *UserService) SendActivationCode(ctx context.Context, userID string) err
 	return nil
 }
 
-func (s *UserService) CheckActivationCode(ctx context.Context, userID, code string) error {
+func (s *UserService) CheckActivationCode(ctx context.Context, code string) error {
 	logger := pkglog.WithMethod(s.log, "CheckActivationCode")
+
+	userID, err := userIDFromCtx(ctx)
+	if err != nil {
+		return err
+	}
 
 	user, err := s.userRepo.FindByID(ctx, userID)
 	if err != nil {

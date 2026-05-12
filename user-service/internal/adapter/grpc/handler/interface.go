@@ -16,6 +16,6 @@ type UserService interface {
 	Register(ctx context.Context, data model.UserCreate) (string, error)
 	SignIn(ctx context.Context, creds model.Credentials) (string, error)
 
-	SendActivationCode(ctx context.Context, userID string) error
-	CheckActivationCode(ctx context.Context, userID, code string) error
+	SendActivationCode(ctx context.Context) error
+	CheckActivationCode(ctx context.Context, code string) error
 }

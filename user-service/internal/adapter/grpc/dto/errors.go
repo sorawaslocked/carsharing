@@ -32,8 +32,6 @@ func ToStatusError(err error) error {
 	var ve model.ValidationErrors
 
 	switch {
-	case errors.Is(err, model.ErrMissingMetadata):
-		return status.Error(codes.InvalidArgument, err.Error())
 	case errors.Is(err, model.ErrUnauthenticated):
 		return status.Error(codes.Unauthenticated, err.Error())
 	case errors.Is(err, model.ErrInsufficientPermissions):

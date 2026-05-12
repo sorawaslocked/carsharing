@@ -1,6 +1,7 @@
 package mailer
 
 type Config struct {
-	APIKey string `env:"MAILER_SEND_API_KEY" env-required:"true"`
-	From   string `env:"MAILER_SEND_FROM" env-required:"true"`
+	Token    string `yaml:"token" env:"MAILTRAP_TOKEN" env-required:"true"`
+	From     string `yaml:"from" env:"MAILTRAP_FROM" env-required:"true"`
+	FromName string `yaml:"from_name" env:"MAILTRAP_FROM_NAME" env-default:"Car Rental"`
 }

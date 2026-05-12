@@ -59,7 +59,7 @@ func New(
 	redisConn := rediscfg.Client(cfg.Redis)
 	activationCodeCache := redis.NewActivationCodeRedisCache(redisConn)
 
-	msMailer := mailer.New(cfg.Mailer)
+	msMailer := mailer.New(log, cfg.Mailer)
 	userRepo := postgres.NewUserRepository(log, db)
 	publisher := natsadapter.NewPublisher(log, natsConn)
 

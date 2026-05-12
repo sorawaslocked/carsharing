@@ -18,7 +18,7 @@ func uncapitalize(s string) string {
 func userIDFromCtx(ctx context.Context) (string, error) {
 	md := utils.MetadataFromCtx(ctx)
 	if md.UserID == nil {
-		return "", model.ErrMissingMetadata
+		return "", model.ErrUnauthenticated
 	}
 	return *md.UserID, nil
 }

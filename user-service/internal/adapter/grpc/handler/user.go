@@ -9,7 +9,6 @@ import (
 	baseuserpb "github.com/sorawaslocked/car-rental-protos/gen/base/user"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/dto"
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/utils"
 )
@@ -140,12 +139,7 @@ func (h *UserHandler) SignIn(ctx context.Context, req *usersvc.SignInRequest) (*
 func (h *UserHandler) SendActivationCode(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
 	logger := h.logger(ctx, "SendActivationCode")
 
-	md := utils.MetadataFromCtx(ctx)
-	if md.UserID == nil {
-		return nil, dto.ToStatusError(model.ErrMissingMetadata)
-	}
-
-	if err := h.userService.SendActivationCode(ctx, *md.UserID); err != nil {
+	if err := h.userService.SendActivationCode(ctx); err != nil {
 		logger.Error("sending activation code", pkglog.Err(err))
 		return nil, dto.ToStatusError(err)
 	}
@@ -156,12 +150,7 @@ func (h *UserHandler) SendActivationCode(ctx context.Context, _ *emptypb.Empty) 
 func (h *UserHandler) CheckActivationCode(ctx context.Context, req *usersvc.CheckActivationCodeRequest) (*emptypb.Empty, error) {
 	logger := h.logger(ctx, "CheckActivationCode")
 
-	md := utils.MetadataFromCtx(ctx)
-	if md.UserID == nil {
-		return nil, dto.ToStatusError(model.ErrMissingMetadata)
-	}
-
-	if err := h.userService.CheckActivationCode(ctx, *md.UserID, req.GetCode()); err != nil {
+	if err := h.userService.CheckActivationCode(ctx, req.GetCode()); err != nil {
 		logger.Error("checking activation code", pkglog.Err(err))
 		return nil, dto.ToStatusError(err)
 	}

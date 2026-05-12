@@ -1,112 +1,150 @@
 package dto
 
 import (
-	"github.com/sorawaslocked/car-rental-protos/gen/base"
+	"time"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	baseuserpb "github.com/sorawaslocked/car-rental-protos/gen/base/user"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
-	"google.golang.org/protobuf/types/known/timestamppb"
-	"time"
 )
 
-func FromCreateUserRequest(req *usersvc.CreateRequest) (model.UserCreateData, error) {
-	birthDate, err := time.Parse("2006-01-02", req.BirthDate)
+func FromCreateUserRequest(req *usersvc.CreateUserRequest) (model.UserCreate, error) {
+	birthDate, err := time.Parse("2006-01-02", req.GetBirthDate())
 	if err != nil {
-		return model.UserCreateData{}, model.ValidationErrors{
-			"birthDate": model.ErrInvalidDateFormat,
+		return model.UserCreate{}, model.ValidationErrors{
+			"birth_date": model.ErrInvalidDateFormat,
 		}
 	}
 
-	data := model.UserCreateData{
-		Email:                req.Email,
-		PhoneNumber:          *req.PhoneNumber,
-		Password:             req.Password,
-		PasswordConfirmation: req.PasswordConfirmation,
-		FirstName:            req.FirstName,
-		LastName:             req.LastName,
+	return model.UserCreate{
+		Email:                req.GetEmail(),
+		PhoneNumber:          req.PhoneNumber,
+		FirstName:            req.GetFirstName(),
+		LastName:             req.GetLastName(),
 		BirthDate:            birthDate,
-		IsActive:             &req.IsActive,
-		IsConfirmed:          &req.IsConfirmed,
-	}
+		Password:             req.GetPassword(),
+		PasswordConfirmation: req.GetPasswordConfirmation(),
+	}, nil
+}
 
-	if len(req.Roles) > 0 {
-		roles := make([]model.Role, len(req.Roles))
-
-		for i, roleStr := range req.Roles {
-			role, err := model.FromStringToRole(roleStr)
-			if err != nil {
-				return model.UserCreateData{}, model.ValidationErrors{
-					"role": model.ErrInvalidRole,
-				}
-			}
-			roles[i] = role
+func FromRegisterRequest(req *usersvc.RegisterRequest) (model.UserCreate, error) {
+	birthDate, err := time.Parse("2006-01-02", req.GetBirthDate())
+	if err != nil {
+		return model.UserCreate{}, model.ValidationErrors{
+			"birth_date": model.ErrInvalidDateFormat,
 		}
-
-		data.Roles = &roles
 	}
 
-	return data, nil
+	return model.UserCreate{
+		Email:                req.GetEmail(),
+		PhoneNumber:          req.PhoneNumber,
+		FirstName:            req.GetFirstName(),
+		LastName:             req.GetLastName(),
+		BirthDate:            birthDate,
+		Password:             req.GetPassword(),
+		PasswordConfirmation: req.GetPasswordConfirmation(),
+	}, nil
 }
 
-func ToUserProto(user model.User) *base.User {
-	roles := make([]string, len(user.Roles))
-	for i, role := range user.Roles {
-		roles[i] = role.String()
+func FromListUsersRequest(req *usersvc.ListUsersRequest) model.UserFilter {
+	filter := model.UserFilter{
+		Email:              req.Email,
+		PhoneNumber:        req.PhoneNumber,
+		FirstName:          req.FirstName,
+		LastName:           req.LastName,
+		IsDocumentVerified: req.IsDocumentVerified,
+		IsEmailVerified:    req.IsEmailVerified,
+		IsSuspended:        req.IsSuspended,
 	}
 
-	return &base.User{
-		ID:           user.ID,
-		Email:        user.Email,
-		PhoneNumber:  user.PhoneNumber,
-		FirstName:    user.FirstName,
-		LastName:     user.LastName,
-		BirthDate:    user.BirthDate.Format("2006-01-02"),
-		PasswordHash: user.PasswordHash,
-		Roles:        roles,
-		CreatedAt:    timestamppb.New(user.CreatedAt),
-		UpdatedAt:    timestamppb.New(user.UpdatedAt),
-		IsActive:     user.IsActive,
-		IsConfirmed:  user.IsConfirmed,
+	if req.Pagination != nil {
+		filter.Pagination = &model.Pagination{
+			Limit:  req.Pagination.Limit,
+			Offset: req.Pagination.Offset,
+		}
 	}
+
+	return filter
 }
 
-func FromUpdateUserRequest(req *usersvc.UpdateRequest) (model.UserUpdateData, error) {
-	data := model.UserUpdateData{
-		Email:                req.NewEmail,
+func FromUpdateUserRequest(req *usersvc.UpdateUserRequest) (model.UserUpdate, error) {
+	update := model.UserUpdate{
+		Email:                req.Email,
 		PhoneNumber:          req.PhoneNumber,
 		FirstName:            req.FirstName,
 		LastName:             req.LastName,
 		Password:             req.Password,
 		PasswordConfirmation: req.PasswordConfirmation,
-		IsActive:             req.IsActive,
-		IsConfirmed:          req.IsConfirmed,
-	}
-
-	if len(req.Roles) > 0 {
-		roles := make([]model.Role, len(req.Roles))
-
-		for i, roleStr := range req.Roles {
-			role, err := model.FromStringToRole(roleStr)
-			if err != nil {
-				return model.UserUpdateData{}, model.ValidationErrors{
-					"role": model.ErrInvalidRole,
-				}
-			}
-			roles[i] = role
-		}
-
-		data.Roles = &roles
+		ProfileImageKey:      req.ProfileImageKey,
+		IsDocumentVerified:   req.IsDocumentVerified,
+		IsEmailVerified:      req.IsEmailVerified,
+		IsSuspended:          req.IsSuspended,
 	}
 
 	if req.BirthDate != nil {
 		birthDate, err := time.Parse("2006-01-02", *req.BirthDate)
 		if err != nil {
-			return model.UserUpdateData{}, model.ValidationErrors{
-				"birthDate": model.ErrInvalidDateFormat,
+			return model.UserUpdate{}, model.ValidationErrors{
+				"birth_date": model.ErrInvalidDateFormat,
 			}
 		}
-
-		data.BirthDate = &birthDate
+		update.BirthDate = &birthDate
 	}
 
-	return data, nil
+	if len(req.Roles) > 0 {
+		roles := make([]model.Role, len(req.Roles))
+		for i, r := range req.Roles {
+			role, err := model.RoleFromString(r)
+			if err != nil {
+				return model.UserUpdate{}, model.ValidationErrors{
+					"roles": model.ErrInvalidRole,
+				}
+			}
+			roles[i] = role
+		}
+		update.Roles = roles
+	}
+
+	return update, nil
+}
+
+func FromSignInRequest(req *usersvc.SignInRequest) model.Credentials {
+	return model.Credentials{
+		Email:       req.Email,
+		PhoneNumber: req.PhoneNumber,
+		Password:    req.GetPassword(),
+	}
+}
+
+func UserToProto(user model.User) *baseuserpb.User {
+	roles := make([]string, len(user.Roles))
+	for i, r := range user.Roles {
+		roles[i] = r.String()
+	}
+
+	u := &baseuserpb.User{
+		Id:                 user.ID,
+		Email:              user.Email,
+		FirstName:          user.FirstName,
+		LastName:           user.LastName,
+		BirthDate:          user.BirthDate.Format("2006-01-02"),
+		PasswordHash:       user.PasswordHash,
+		Roles:              roles,
+		IsDocumentVerified: user.IsDocumentVerified,
+		IsEmailVerified:    user.IsEmailVerified,
+		IsSuspended:        user.IsSuspended,
+		CreatedAt:          timestamppb.New(user.CreatedAt),
+		UpdatedAt:          timestamppb.New(user.UpdatedAt),
+	}
+
+	if user.PhoneNumber != nil {
+		u.PhoneNumber = user.PhoneNumber
+	}
+	if user.ProfileImage != nil && user.ProfileImage.URL != "" {
+		u.ProfileImageUrl = &user.ProfileImage.URL
+	}
+
+	return u
 }

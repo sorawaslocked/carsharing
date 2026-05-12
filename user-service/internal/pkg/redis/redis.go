@@ -1,31 +1,31 @@
 package redis
 
 import (
-	"github.com/redis/go-redis/v9"
 	"time"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type Config struct {
-	Host         string        `yaml:"host" env:"REDIS_HOST" env-required:"true"`
-	Password     string        `yaml:"password" env:"REDIS_PASSWORD"`
-	User         string        `yaml:"user" env:"REDIS_USER" env-default:"car_rental"`
-	MaxRetries   int           `yaml:"max_retries" env:"REDIS_MAX_RETRIES" env-default:"5"`
-	DialTimeout  time.Duration `yaml:"dial_timeout" env:"REDIS_DIAL_TIMEOUT" env-default:"10s"`
-	WriteTimeout time.Duration `yaml:"write_timeout" env:"REDIS_WRITE_TIMEOUT" env-default:"10s"`
-	ReadTimeout  time.Duration `yaml:"read_timeout" env:"REDIS_READ_TIMEOUT" env-default:"10s"`
+	Address      string        `yaml:"address" env:"REDIS_ADDRESS" env-required:"true"`
+	Password     string        `yaml:"password"  env:"REDIS_PASSWORD" env-required:"true"`
+	DB           int           `yaml:"db" env:"REDIS_DB" env-default:"0"`
+	PoolSize     int           `yaml:"pool_size" env:"REDIS_POOL_SIZE" env-default:"10"`
+	DialTimeout  time.Duration `yaml:"dial_timeout" env:"REDIS_DIAL_TIMEOUT" env-default:"5s"`
+	ReadTimeout  time.Duration `yaml:"read_timeout" env:"REDIS_READ_TIMEOUT" env-default:"3s"`
+	WriteTimeout time.Duration `yaml:"write_timeout" env:"REDIS_WRITE_TIMEOUT" env-default:"3s"`
+	MetadataTTL  time.Duration `yaml:"metadata_ttl" env:"REDIS_METADATA_TTL" env-default:"1h"`
+	SessionTTL   time.Duration `yaml:"session_ttl" env:"REDIS_SESSION_TTL" env-default:"24h"`
 }
 
 func Client(cfg Config) *redis.Client {
-	rdb := redis.NewClient(&redis.Options{
-		Addr:         cfg.Host,
+	return redis.NewClient(&redis.Options{
+		Addr:         cfg.Address,
 		Password:     cfg.Password,
-		Username:     cfg.User,
-		DB:           0,
-		MaxRetries:   cfg.MaxRetries,
+		DB:           cfg.DB,
+		PoolSize:     cfg.PoolSize,
 		DialTimeout:  cfg.DialTimeout,
 		WriteTimeout: cfg.WriteTimeout,
 		ReadTimeout:  cfg.ReadTimeout,
 	})
-
-	return rdb
 }

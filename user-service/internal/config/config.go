@@ -2,25 +2,24 @@ package config
 
 import (
 	"flag"
+	"os"
+
 	"github.com/ilyakaznacheev/cleanenv"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/grpc"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/jwt"
+	grpccfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/grpc"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/mailer"
+	natscfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/nats"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/postgres"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/redis"
-	"os"
 )
 
-type (
-	Config struct {
-		Env      string          `yaml:"env" env:"ENV" env-required:"true"`
-		Postgres postgres.Config `yaml:"postgres" env-required:"true"`
-		Redis    redis.Config    `yaml:"redis" env-required:"true"`
-		GRPC     grpc.Config     `yaml:"grpc" env-required:"true"`
-		JWT      jwt.Config      `yaml:"jwt" env-required:"true"`
-		Mailer   mailer.Config
-	}
-)
+type Config struct {
+	Env      string          `yaml:"env" env:"ENV" env-required:"true"`
+	Postgres postgres.Config `yaml:"postgres" env-required:"true"`
+	Redis    redis.Config    `yaml:"redis" env-required:"true"`
+	NATS     natscfg.Config  `yaml:"nats" env-required:"true"`
+	GRPC     grpccfg.Config  `yaml:"grpc" env-required:"true"`
+	Mailer   mailer.Config
+}
 
 func MustLoad() Config {
 	cfgPath := fetchConfigPath()

@@ -3,19 +3,20 @@ package service
 import (
 	"context"
 	"errors"
-	"github.com/go-playground/validator/v10"
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/logger"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/security"
 	"log/slog"
 	"time"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/sorawaslocked/car-rental-user-service/internal/model"
+	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/security"
 )
 
 type UserService struct {
 	log                   *slog.Logger
 	validate              *validator.Validate
-	jwtProvider           JwtProvider
 	userRepo              UserRepository
+	publisher             Publisher
 	activationCodeStorage ActivationCodeStorage
 	mailer                Mailer
 }
@@ -23,37 +24,56 @@ type UserService struct {
 func NewUserService(
 	log *slog.Logger,
 	validate *validator.Validate,
-	jwtProvider JwtProvider,
 	userRepo UserRepository,
+	publisher Publisher,
 	activationCodeStorage ActivationCodeStorage,
 	mailer Mailer,
 ) *UserService {
 	return &UserService{
-		log:                   log,
+		log:                   pkglog.WithComponent(log, "service.UserService"),
 		validate:              validate,
-		jwtProvider:           jwtProvider,
 		userRepo:              userRepo,
+		publisher:             publisher,
 		activationCodeStorage: activationCodeStorage,
 		mailer:                mailer,
 	}
 }
 
-func (s *UserService) Insert(ctx context.Context, data model.UserCreateData) (uint64, error) {
-	err := validateInput(s.validate, data)
-	if err != nil {
-		return 0, err
+func (s *UserService) Create(ctx context.Context, data model.UserCreate) (string, error) {
+	logger := pkglog.WithMethod(s.log, "Create")
+	return s.insertUser(ctx, logger, data)
+}
+
+func (s *UserService) Register(ctx context.Context, data model.UserCreate) (string, error) {
+	logger := pkglog.WithMethod(s.log, "Register")
+	return s.insertUser(ctx, logger, data)
+}
+
+func (s *UserService) insertUser(ctx context.Context, logger *slog.Logger, data model.UserCreate) (string, error) {
+	if err := validateInput(s.validate, data); err != nil {
+		return "", err
 	}
 
-	_, err = s.userRepo.FindOne(ctx, model.UserFilter{Email: &data.Email})
-	if err == nil {
-		return 0, model.ErrDuplicateEmail
+	if _, err := s.userRepo.FindOne(ctx, model.UserFilter{Email: &data.Email}); err == nil {
+		return "", model.ErrDuplicateEmail
+	} else if !errors.Is(err, model.ErrNotFound) {
+		logger.Error("repo: finding user by email", pkglog.Err(err))
+		return "", err
 	}
 
-	passwordHash, err := security.HashString(data.Password)
-	if err != nil {
-		s.log.Error("bcrypt: hashing password", logger.Err(err))
+	if data.PhoneNumber != nil {
+		if _, err := s.userRepo.FindOne(ctx, model.UserFilter{PhoneNumber: data.PhoneNumber}); err == nil {
+			return "", model.ErrDuplicatePhone
+		} else if !errors.Is(err, model.ErrNotFound) {
+			logger.Error("repo: finding user by phone", pkglog.Err(err))
+			return "", err
+		}
+	}
 
-		return 0, model.ErrBcrypt
+	hash, err := security.HashString(data.Password)
+	if err != nil {
+		logger.Error("bcrypt: hashing password", pkglog.Err(err))
+		return "", model.ErrBcrypt
 	}
 
 	user := model.User{
@@ -62,129 +82,157 @@ func (s *UserService) Insert(ctx context.Context, data model.UserCreateData) (ui
 		FirstName:    data.FirstName,
 		LastName:     data.LastName,
 		BirthDate:    data.BirthDate,
-		PasswordHash: passwordHash,
+		PasswordHash: hash,
+		Roles:        []model.Role{model.RoleUser},
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}
 
-	// TODO: add permission checks
-	if data.Roles == nil {
-		user.Roles = []model.Role{model.RoleUser}
-	}
-	if data.IsActive != nil {
-		user.IsActive = *data.IsActive
-	}
-	if data.IsConfirmed != nil {
-		user.IsConfirmed = *data.IsConfirmed
+	id, err := s.userRepo.Insert(ctx, user)
+	if err != nil {
+		logger.Error("repo: inserting user", pkglog.Err(err))
+		return "", err
 	}
 
-	return s.userRepo.Insert(ctx, user)
+	if err := s.publisher.PublishUserCreated(ctx, id); err != nil {
+		logger.Error("nats: publishing user.created", pkglog.Err(err))
+	}
+
+	return id, nil
 }
 
-func (s *UserService) FindOne(ctx context.Context, filter model.UserFilter) (model.User, error) {
-	err := checkQueryParams(s.validate, filter)
-	if err != nil {
-		return model.User{}, err
-	}
-	formatFilter(&filter)
+func (s *UserService) Get(ctx context.Context, id string) (model.User, error) {
+	logger := pkglog.WithMethod(s.log, "Get")
 
-	user, err := s.userRepo.FindOne(ctx, filter)
+	user, err := s.userRepo.FindByID(ctx, id)
 	if err != nil {
-		if errors.Is(err, model.ErrNotFound) {
-			return model.User{}, model.ErrNotFound
+		if !errors.Is(err, model.ErrNotFound) {
+			logger.Error("repo: finding user by id", pkglog.Err(err))
 		}
-		s.log.Error("sql: finding user", logger.Err(err))
-
-		return model.User{}, model.ErrSql
+		return model.User{}, err
 	}
 
 	return user, nil
 }
 
-func (s *UserService) Find(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
+func (s *UserService) List(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
+	logger := pkglog.WithMethod(s.log, "List")
+
 	users, err := s.userRepo.Find(ctx, filter)
 	if err != nil {
-		s.log.Error("sql: finding users", logger.Err(err))
-
-		return []model.User{}, model.ErrSql
+		logger.Error("repo: listing users", pkglog.Err(err))
+		return nil, err
 	}
 
 	return users, nil
 }
 
-func (s *UserService) Update(ctx context.Context, filter model.UserFilter, data model.UserUpdateData) error {
-	err := checkQueryParams(s.validate, filter)
-	if err != nil {
-		return err
-	}
-	formatFilter(&filter)
+func (s *UserService) Update(ctx context.Context, id string, data model.UserUpdate) error {
+	logger := pkglog.WithMethod(s.log, "Update")
 
-	_, err = s.FindOne(ctx, filter)
-	if err != nil {
-		return err
-	}
-
-	err = validateInput(s.validate, data)
-	if err != nil {
+	if _, err := s.userRepo.FindByID(ctx, id); err != nil {
+		if !errors.Is(err, model.ErrNotFound) {
+			logger.Error("repo: finding user for update", pkglog.Err(err))
+		}
 		return err
 	}
 
-	update := model.UserUpdate{
-		Email:       data.Email,
-		PhoneNumber: data.PhoneNumber,
-		FirstName:   data.FirstName,
-		LastName:    data.LastName,
-		BirthDate:   data.BirthDate,
-		Roles:       data.Roles,
-		UpdatedAt:   time.Now(),
-		IsActive:    data.IsActive,
-		IsConfirmed: data.IsConfirmed,
+	if err := validateInput(s.validate, data); err != nil {
+		return err
 	}
 
 	if data.Password != nil {
-		passwordHash, err := security.HashString(*data.Password)
-		if err != nil {
-			s.log.Error("bcrypt: hashing password", logger.Err(err))
-
-			return model.ErrBcrypt
+		if data.PasswordConfirmation == nil || *data.Password != *data.PasswordConfirmation {
+			return model.ValidationErrors{"password_confirmation": model.ErrPasswordsDoNotMatch}
 		}
-		update.PasswordHash = &passwordHash
 	}
 
-	err = s.userRepo.Update(ctx, filter, update)
+	repoUpdate := model.UserRepoUpdate{
+		Email:              data.Email,
+		PhoneNumber:        data.PhoneNumber,
+		FirstName:          data.FirstName,
+		LastName:           data.LastName,
+		BirthDate:          data.BirthDate,
+		Roles:              data.Roles,
+		IsDocumentVerified: data.IsDocumentVerified,
+		IsEmailVerified:    data.IsEmailVerified,
+		IsSuspended:        data.IsSuspended,
+		UpdatedAt:          time.Now(),
+	}
 
-	if err != nil {
-		if errors.Is(err, model.ErrDuplicateEmail) {
-			return model.ValidationErrors{
-				"email": model.ErrDuplicateEmail,
-			}
+	if data.ProfileImageKey != nil {
+		repoUpdate.ProfileImageKey = data.ProfileImageKey
+	}
+
+	if data.Password != nil {
+		hash, err := security.HashString(*data.Password)
+		if err != nil {
+			logger.Error("bcrypt: hashing password", pkglog.Err(err))
+			return model.ErrBcrypt
 		}
+		repoUpdate.PasswordHash = &hash
+	}
 
+	if err := s.userRepo.Update(ctx, id, repoUpdate); err != nil {
+		if !errors.Is(err, model.ErrNotFound) &&
+			!errors.Is(err, model.ErrDuplicateEmail) &&
+			!errors.Is(err, model.ErrDuplicatePhone) {
+			logger.Error("repo: updating user", pkglog.Err(err))
+		}
 		return err
+	}
+
+	isSecurityUpdate := data.Password != nil || len(data.Roles) > 0 || data.IsSuspended != nil
+	if err := s.publisher.PublishUserUpdated(ctx, id, isSecurityUpdate); err != nil {
+		logger.Error("nats: publishing user.updated", pkglog.Err(err))
 	}
 
 	return nil
 }
 
-func (s *UserService) Delete(ctx context.Context, filter model.UserFilter) error {
-	err := checkQueryParams(s.validate, filter)
-	if err != nil {
+func (s *UserService) Delete(ctx context.Context, id string) error {
+	logger := pkglog.WithMethod(s.log, "Delete")
+
+	if err := s.userRepo.Delete(ctx, id); err != nil {
+		if !errors.Is(err, model.ErrNotFound) {
+			logger.Error("repo: deleting user", pkglog.Err(err))
+		}
 		return err
 	}
-	formatFilter(&filter)
 
-	return s.userRepo.Delete(ctx, filter)
+	if err := s.publisher.PublishUserDeleted(ctx, id); err != nil {
+		logger.Error("nats: publishing user.deleted", pkglog.Err(err))
+	}
+
+	return nil
 }
 
-func (s *UserService) Me(ctx context.Context) (model.User, error) {
-	id, err := userIDFromCtx(ctx)
+func (s *UserService) SignIn(ctx context.Context, creds model.Credentials) (string, error) {
+	logger := pkglog.WithMethod(s.log, "SignIn")
+
+	if err := validateInput(s.validate, creds); err != nil {
+		return "", err
+	}
+
+	filter := model.UserFilter{}
+	if creds.Email != nil {
+		filter.Email = creds.Email
+	} else {
+		filter.PhoneNumber = creds.PhoneNumber
+	}
+
+	user, err := s.userRepo.FindOne(ctx, filter)
 	if err != nil {
-		return model.User{}, err
+		if errors.Is(err, model.ErrNotFound) {
+			return "", model.ErrUnauthenticated
+		}
+		logger.Error("repo: finding user for sign in", pkglog.Err(err))
+		return "", err
 	}
 
-	filter := model.UserFilter{
-		ID: &id,
+	if err := security.CheckStringHash(creds.Password, user.PasswordHash); err != nil {
+		return "", model.ErrUnauthenticated
 	}
 
-	return s.userRepo.FindOne(ctx, filter)
+	return user.ID, nil
 }

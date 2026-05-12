@@ -2,102 +2,118 @@ package dto
 
 import (
 	"fmt"
+
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 )
 
-func WhereClausesFromFilter(filter model.UserFilter, args []any, argNumber int) ([]string, []any) {
-	var whereClauses []string
+// WhereClausesFromFilter builds parameterised WHERE clauses from a UserFilter.
+// Returns the clauses, accumulated args, and the next available argument index.
+func WhereClausesFromFilter(filter model.UserFilter, args []any, argNumber int) ([]string, []any, int) {
+	var clauses []string
 	if args == nil {
 		args = []any{}
 	}
 
-	if filter.ID != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("id = $%d", argNumber))
-		args = append(args, *filter.ID)
-		argNumber++
-	}
 	if filter.Email != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("email = $%d", argNumber))
+		clauses = append(clauses, fmt.Sprintf("email = $%d", argNumber))
 		args = append(args, *filter.Email)
 		argNumber++
 	}
 	if filter.PhoneNumber != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("phone_number = $%d", argNumber))
+		clauses = append(clauses, fmt.Sprintf("phone_number = $%d", argNumber))
 		args = append(args, *filter.PhoneNumber)
 		argNumber++
 	}
 	if filter.FirstName != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("first_name = $%d", argNumber))
+		clauses = append(clauses, fmt.Sprintf("first_name = $%d", argNumber))
 		args = append(args, *filter.FirstName)
 		argNumber++
 	}
 	if filter.LastName != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("last_name = $%d", argNumber))
+		clauses = append(clauses, fmt.Sprintf("last_name = $%d", argNumber))
 		args = append(args, *filter.LastName)
 		argNumber++
 	}
-	if filter.IsActive != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("is_active = $%d", argNumber))
-		args = append(args, *filter.IsActive)
+	if filter.IsDocumentVerified != nil {
+		clauses = append(clauses, fmt.Sprintf("is_document_verified = $%d", argNumber))
+		args = append(args, *filter.IsDocumentVerified)
 		argNumber++
 	}
-	if filter.IsConfirmed != nil {
-		whereClauses = append(whereClauses, fmt.Sprintf("is_confirmed = $%d", argNumber))
-		args = append(args, *filter.IsConfirmed)
+	if filter.IsEmailVerified != nil {
+		clauses = append(clauses, fmt.Sprintf("is_email_verified = $%d", argNumber))
+		args = append(args, *filter.IsEmailVerified)
+		argNumber++
+	}
+	if filter.IsSuspended != nil {
+		clauses = append(clauses, fmt.Sprintf("is_suspended = $%d", argNumber))
+		args = append(args, *filter.IsSuspended)
 		argNumber++
 	}
 
-	return whereClauses, args
+	return clauses, args, argNumber
 }
 
-func SetClausesFromUpdateData(update model.UserUpdate) ([]string, []any, int) {
-	var setClauses []string
+// SetClausesFromRepoUpdate builds parameterised SET clauses from a UserRepoUpdate.
+// Returns the clauses, accumulated args, and the next available argument index.
+func SetClausesFromRepoUpdate(update model.UserRepoUpdate) ([]string, []any, int) {
+	var clauses []string
 	var args []any
 	argNumber := 1
 
 	if update.Email != nil {
-		setClauses = append(setClauses, fmt.Sprintf("email = $%d", argNumber))
+		clauses = append(clauses, fmt.Sprintf("email = $%d", argNumber))
 		args = append(args, *update.Email)
 		argNumber++
 	}
 	if update.PhoneNumber != nil {
-		setClauses = append(setClauses, fmt.Sprintf("phone_number = $%d", argNumber))
+		clauses = append(clauses, fmt.Sprintf("phone_number = $%d", argNumber))
 		args = append(args, *update.PhoneNumber)
 		argNumber++
 	}
 	if update.FirstName != nil {
-		setClauses = append(setClauses, fmt.Sprintf("first_name = $%d", argNumber))
+		clauses = append(clauses, fmt.Sprintf("first_name = $%d", argNumber))
 		args = append(args, *update.FirstName)
 		argNumber++
 	}
 	if update.LastName != nil {
-		setClauses = append(setClauses, fmt.Sprintf("last_name = $%d", argNumber))
+		clauses = append(clauses, fmt.Sprintf("last_name = $%d", argNumber))
 		args = append(args, *update.LastName)
 		argNumber++
 	}
 	if update.BirthDate != nil {
-		setClauses = append(setClauses, fmt.Sprintf("birth_date = $%d", argNumber))
+		clauses = append(clauses, fmt.Sprintf("birth_date = $%d", argNumber))
 		args = append(args, *update.BirthDate)
 		argNumber++
 	}
 	if update.PasswordHash != nil {
-		setClauses = append(setClauses, fmt.Sprintf("password_hash = $%d", argNumber))
+		clauses = append(clauses, fmt.Sprintf("password_hash = $%d", argNumber))
 		args = append(args, *update.PasswordHash)
 		argNumber++
 	}
-	if update.IsActive != nil {
-		setClauses = append(setClauses, fmt.Sprintf("is_active = $%d", argNumber))
-		args = append(args, *update.IsActive)
+	if update.ProfileImageKey != nil {
+		clauses = append(clauses, fmt.Sprintf("profile_image_key = $%d", argNumber))
+		args = append(args, *update.ProfileImageKey)
 		argNumber++
 	}
-	if update.IsConfirmed != nil {
-		setClauses = append(setClauses, fmt.Sprintf("is_confirmed = $%d", argNumber))
-		args = append(args, *update.IsConfirmed)
+	if update.IsDocumentVerified != nil {
+		clauses = append(clauses, fmt.Sprintf("is_document_verified = $%d", argNumber))
+		args = append(args, *update.IsDocumentVerified)
 		argNumber++
 	}
-	setClauses = append(setClauses, fmt.Sprintf("updated_at = $%d", argNumber))
+	if update.IsEmailVerified != nil {
+		clauses = append(clauses, fmt.Sprintf("is_email_verified = $%d", argNumber))
+		args = append(args, *update.IsEmailVerified)
+		argNumber++
+	}
+	if update.IsSuspended != nil {
+		clauses = append(clauses, fmt.Sprintf("is_suspended = $%d", argNumber))
+		args = append(args, *update.IsSuspended)
+		argNumber++
+	}
+
+	clauses = append(clauses, fmt.Sprintf("updated_at = $%d", argNumber))
 	args = append(args, update.UpdatedAt)
 	argNumber++
 
-	return setClauses, args, argNumber
+	return clauses, args, argNumber
 }

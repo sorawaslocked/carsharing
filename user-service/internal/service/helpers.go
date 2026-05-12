@@ -1,38 +1,24 @@
 package service
 
 import (
+	"strings"
+
 	"context"
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
-	"strings"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/utils"
 )
 
 func uncapitalize(s string) string {
+	if len(s) == 0 {
+		return s
+	}
 	return strings.ToLower(s[:1]) + s[1:]
 }
 
-func toRoleStrings(roles []model.Role) []string {
-	var result []string
-	for _, role := range roles {
-		result = append(result, role.String())
+func userIDFromCtx(ctx context.Context) (string, error) {
+	md := utils.MetadataFromCtx(ctx)
+	if md.UserID == nil {
+		return "", model.ErrMissingMetadata
 	}
-
-	return result
-}
-
-func formatFilter(filter *model.UserFilter) {
-	if filter.ID != nil && *filter.ID > 0 {
-		filter.Email = nil
-	}
-	if filter.Email != nil && *filter.Email != "" {
-		filter.ID = nil
-	}
-}
-
-func userIDFromCtx(ctx context.Context) (uint64, error) {
-	id, ok := ctx.Value("userID").(uint64)
-	if !ok {
-		return id, model.ErrInvalidToken
-	}
-
-	return id, nil
+	return *md.UserID, nil
 }

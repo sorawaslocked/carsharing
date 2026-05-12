@@ -1,40 +1,31 @@
 package model
 
-type Role int32
+type Role string
 
 const (
-	RoleUser                  Role = 1
-	RoleAdmin                 Role = 2
-	RoleTechSupport           Role = 3
-	RoleFinanceManager        Role = 4
-	RoleMaintenanceSpecialist Role = 5
+	RoleUser           Role = "user"
+	RoleAdmin          Role = "admin"
+	RoleFleetManager   Role = "fleet_manager"
+	RoleUserManager    Role = "user_manager"
+	RoleBookingManager Role = "booking_manager"
 )
 
-var roleName = map[Role]string{
-	RoleUser:                  "user",
-	RoleAdmin:                 "admin",
-	RoleTechSupport:           "tech_support",
-	RoleFinanceManager:        "finance_manager",
-	RoleMaintenanceSpecialist: "maintenance_specialist",
+var validRoles = map[Role]struct{}{
+	RoleUser:           {},
+	RoleAdmin:          {},
+	RoleFleetManager:   {},
+	RoleUserManager:    {},
+	RoleBookingManager: {},
 }
 
-var nameRole = map[string]Role{
-	"user":                   RoleUser,
-	"admin":                  RoleAdmin,
-	"tech_support":           RoleTechSupport,
-	"finance_manager":        RoleFinanceManager,
-	"maintenance_specialist": RoleMaintenanceSpecialist,
-}
-
-func (role Role) String() string {
-	return roleName[role]
-}
-
-func FromStringToRole(s string) (Role, error) {
-	role, ok := nameRole[s]
-	if !ok {
-		return 0, ErrInvalidRole
+func RoleFromString(s string) (Role, error) {
+	r := Role(s)
+	if _, ok := validRoles[r]; !ok {
+		return "", ErrInvalidRole
 	}
+	return r, nil
+}
 
-	return role, nil
+func (r Role) String() string {
+	return string(r)
 }

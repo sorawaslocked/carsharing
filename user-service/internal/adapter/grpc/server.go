@@ -2,15 +2,15 @@ package grpc
 
 import (
 	"fmt"
-	authsvc "github.com/sorawaslocked/car-rental-protos/gen/service/auth"
+	"log/slog"
+	"net"
+
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/handler"
 	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/interceptor"
 	grpccfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"log/slog"
-	"net"
 )
 
 type Server struct {
@@ -22,16 +22,14 @@ type Server struct {
 func NewServer(
 	cfg grpccfg.Config,
 	log *slog.Logger,
-	authService handler.AuthService,
 	userService handler.UserService,
-	jwtProvider interceptor.JwtProvider,
 ) *Server {
 	server := &Server{
 		cfg: cfg,
 		log: log,
 	}
 
-	server.register(authService, userService, jwtProvider, log)
+	server.register(userService)
 
 	return server
 }
@@ -49,27 +47,18 @@ func (s *Server) Stop() {
 		"stopping grpc server",
 		slog.String("addr", fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)),
 	)
-
 	s.s.GracefulStop()
 }
 
-func (s *Server) register(
-	authService handler.AuthService,
-	userService handler.UserService,
-	jwtProvider interceptor.JwtProvider,
-	log *slog.Logger,
-) {
+func (s *Server) register(userService handler.UserService) {
 	baseInterceptor := interceptor.NewBaseInterceptor()
-	loggerInterceptor := interceptor.NewLoggerInterceptor(log)
-	authInterceptor := interceptor.NewAuthInterceptor(jwtProvider)
+	loggerInterceptor := interceptor.NewLoggerInterceptor(s.log)
 
 	s.s = grpc.NewServer(grpc.ChainUnaryInterceptor(
 		baseInterceptor.Unary,
 		loggerInterceptor.Unary,
-		authInterceptor.Unary,
 	))
 
-	authsvc.RegisterAuthServiceServer(s.s, handler.NewAuthHandler(s.log, authService))
 	usersvc.RegisterUserServiceServer(s.s, handler.NewUserHandler(s.log, userService))
 
 	reflection.Register(s.s)

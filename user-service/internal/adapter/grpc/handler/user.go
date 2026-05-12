@@ -2,11 +2,16 @@ package handler
 
 import (
 	"context"
-	"github.com/sorawaslocked/car-rental-protos/gen/base"
+	"log/slog"
+
+	"google.golang.org/protobuf/types/known/emptypb"
+
+	baseuserpb "github.com/sorawaslocked/car-rental-protos/gen/base/user"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/dto"
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
-	"log/slog"
+	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/utils"
 )
 
 type UserHandler struct {
@@ -17,117 +22,122 @@ type UserHandler struct {
 
 func NewUserHandler(log *slog.Logger, userService UserService) *UserHandler {
 	return &UserHandler{
-		log:         log,
+		log:         pkglog.WithComponent(log, "grpc.UserHandler"),
 		userService: userService,
 	}
 }
 
-func (h *UserHandler) Create(ctx context.Context, req *usersvc.CreateRequest) (*usersvc.CreateResponse, error) {
-	data, validationErrs := dto.FromCreateUserRequest(req)
-	if validationErrs != nil {
-		return nil, dto.ToStatusCodeError(validationErrs)
-	}
+func (h *UserHandler) CreateUser(ctx context.Context, req *usersvc.CreateUserRequest) (*usersvc.CreateUserResponse, error) {
+	logger := pkglog.WithMethod(h.log, "CreateUser")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
-	id, err := h.userService.Insert(ctx, data)
+	data, err := dto.FromCreateUserRequest(req)
 	if err != nil {
-		return nil, dto.ToStatusCodeError(err)
+		return nil, dto.ToStatusError(err)
 	}
 
-	return &usersvc.CreateResponse{
-		ID: &id,
-	}, nil
+	id, err := h.userService.Create(ctx, data)
+	if err != nil {
+		return nil, dto.ToStatusError(err)
+	}
+
+	_ = logger
+	return &usersvc.CreateUserResponse{Id: &id}, nil
 }
 
-func (h *UserHandler) Get(ctx context.Context, req *usersvc.GetRequest) (*usersvc.GetResponse, error) {
-	filter := model.UserFilter{
-		ID:    req.ID,
-		Email: req.Email,
-	}
-
-	user, err := h.userService.FindOne(ctx, filter)
+func (h *UserHandler) GetUser(ctx context.Context, req *usersvc.GetUserRequest) (*usersvc.GetUserResponse, error) {
+	user, err := h.userService.Get(ctx, req.GetId())
 	if err != nil {
-		return nil, dto.ToStatusCodeError(err)
+		return nil, dto.ToStatusError(err)
 	}
 
-	return &usersvc.GetResponse{
-		User: dto.ToUserProto(user),
-	}, nil
+	return &usersvc.GetUserResponse{User: dto.UserToProto(user)}, nil
 }
 
-func (h *UserHandler) GetAll(ctx context.Context, _ *usersvc.GetAllRequest) (*usersvc.GetAllResponse, error) {
-	users, err := h.userService.Find(ctx, model.UserFilter{})
+func (h *UserHandler) ListUsers(ctx context.Context, req *usersvc.ListUsersRequest) (*usersvc.ListUsersResponse, error) {
+	filter := dto.FromListUsersRequest(req)
+
+	users, err := h.userService.List(ctx, filter)
 	if err != nil {
-		return nil, dto.ToStatusCodeError(err)
+		return nil, dto.ToStatusError(err)
 	}
 
-	usersProto := make([]*base.User, len(users))
-	for i, user := range users {
-		usersProto[i] = dto.ToUserProto(user)
+	protoUsers := make([]*baseuserpb.User, len(users))
+	for i, u := range users {
+		protoUsers[i] = dto.UserToProto(u)
 	}
 
-	return &usersvc.GetAllResponse{
-		Users: usersProto,
-	}, nil
+	return &usersvc.ListUsersResponse{Users: protoUsers}, nil
 }
 
-func (h *UserHandler) Update(ctx context.Context, req *usersvc.UpdateRequest) (*usersvc.UpdateResponse, error) {
-	filter := model.UserFilter{
-		ID:    req.ID,
-		Email: req.Email,
-	}
-
+func (h *UserHandler) UpdateUser(ctx context.Context, req *usersvc.UpdateUserRequest) (*emptypb.Empty, error) {
 	data, err := dto.FromUpdateUserRequest(req)
 	if err != nil {
-		return nil, dto.ToStatusCodeError(err)
+		return nil, dto.ToStatusError(err)
 	}
 
-	err = h.userService.Update(ctx, filter, data)
-	if err != nil {
-		return nil, dto.ToStatusCodeError(err)
+	if err := h.userService.Update(ctx, req.GetId(), data); err != nil {
+		return nil, dto.ToStatusError(err)
 	}
 
-	return &usersvc.UpdateResponse{}, nil
+	return &emptypb.Empty{}, nil
 }
 
-func (h *UserHandler) Delete(ctx context.Context, req *usersvc.DeleteRequest) (*usersvc.DeleteResponse, error) {
-	filter := model.UserFilter{
-		ID:    req.ID,
-		Email: req.Email,
+func (h *UserHandler) DeleteUser(ctx context.Context, req *usersvc.DeleteUserRequest) (*emptypb.Empty, error) {
+	if err := h.userService.Delete(ctx, req.GetId()); err != nil {
+		return nil, dto.ToStatusError(err)
 	}
 
-	err := h.userService.Delete(ctx, filter)
-	if err != nil {
-		return nil, dto.ToStatusCodeError(err)
-	}
-
-	return &usersvc.DeleteResponse{}, nil
+	return &emptypb.Empty{}, nil
 }
 
-func (h *UserHandler) Me(ctx context.Context, _ *usersvc.MeRequest) (*usersvc.MeResponse, error) {
-	user, err := h.userService.Me(ctx)
+func (h *UserHandler) Register(ctx context.Context, req *usersvc.RegisterRequest) (*usersvc.RegisterResponse, error) {
+	data, err := dto.FromRegisterRequest(req)
 	if err != nil {
-		return nil, dto.ToStatusCodeError(err)
+		return nil, dto.ToStatusError(err)
 	}
 
-	return &usersvc.MeResponse{
-		User: dto.ToUserProto(user),
-	}, nil
+	id, err := h.userService.Register(ctx, data)
+	if err != nil {
+		return nil, dto.ToStatusError(err)
+	}
+
+	return &usersvc.RegisterResponse{Id: id}, nil
 }
 
-func (h *UserHandler) SendActivationCode(ctx context.Context, _ *usersvc.SendActivationCodeRequest) (*usersvc.SendActivationCodeResponse, error) {
-	err := h.userService.SendActivationCode(ctx)
+func (h *UserHandler) SignIn(ctx context.Context, req *usersvc.SignInRequest) (*usersvc.SignInResponse, error) {
+	creds := dto.FromSignInRequest(req)
+
+	id, err := h.userService.SignIn(ctx, creds)
 	if err != nil {
-		return nil, dto.ToStatusCodeError(err)
+		return nil, dto.ToStatusError(err)
 	}
 
-	return &usersvc.SendActivationCodeResponse{}, nil
+	return &usersvc.SignInResponse{Id: id}, nil
 }
 
-func (h *UserHandler) CheckActivationCode(ctx context.Context, req *usersvc.CheckActivationCodeRequest) (*usersvc.CheckActivationCodeResponse, error) {
-	err := h.userService.CheckActivationCode(ctx, req.Code)
-	if err != nil {
-		return nil, dto.ToStatusCodeError(err)
+func (h *UserHandler) SendActivationCode(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
+	md := utils.MetadataFromCtx(ctx)
+	if md.UserID == nil {
+		return nil, dto.ToStatusError(model.ErrMissingMetadata)
 	}
 
-	return &usersvc.CheckActivationCodeResponse{}, nil
+	if err := h.userService.SendActivationCode(ctx, *md.UserID); err != nil {
+		return nil, dto.ToStatusError(err)
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
+func (h *UserHandler) CheckActivationCode(ctx context.Context, req *usersvc.CheckActivationCodeRequest) (*emptypb.Empty, error) {
+	md := utils.MetadataFromCtx(ctx)
+	if md.UserID == nil {
+		return nil, dto.ToStatusError(model.ErrMissingMetadata)
+	}
+
+	if err := h.userService.CheckActivationCode(ctx, *md.UserID, req.GetCode()); err != nil {
+		return nil, dto.ToStatusError(err)
+	}
+
+	return &emptypb.Empty{}, nil
 }

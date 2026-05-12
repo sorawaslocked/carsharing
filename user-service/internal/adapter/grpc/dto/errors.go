@@ -2,14 +2,16 @@ package dto
 
 import (
 	"errors"
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
+
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 )
 
 func validationError(ve model.ValidationErrors) error {
-	st := status.New(codes.InvalidArgument, "invalid request")
+	st := status.New(codes.InvalidArgument, "validation failed")
 
 	var fieldViolations []*errdetails.BadRequest_FieldViolation
 	for field, err := range ve {
@@ -26,25 +28,25 @@ func validationError(ve model.ValidationErrors) error {
 	return st.Err()
 }
 
-func ToStatusCodeError(err error) error {
+func ToStatusError(err error) error {
 	var ve model.ValidationErrors
 
 	switch {
 	case errors.Is(err, model.ErrMissingMetadata):
 		return status.Error(codes.InvalidArgument, err.Error())
-	case errors.Is(err, model.ErrInvalidToken):
+	case errors.Is(err, model.ErrUnauthenticated):
 		return status.Error(codes.Unauthenticated, err.Error())
 	case errors.Is(err, model.ErrInsufficientPermissions):
 		return status.Error(codes.PermissionDenied, err.Error())
 	case errors.Is(err, model.ErrNotFound):
 		return status.Error(codes.NotFound, err.Error())
-	case errors.Is(err, model.ErrDuplicateEmail):
+	case errors.Is(err, model.ErrDuplicateEmail),
+		errors.Is(err, model.ErrDuplicatePhone),
+		errors.Is(err, model.ErrAlreadyExists):
 		return status.Error(codes.AlreadyExists, err.Error())
 	case errors.Is(err, model.ErrNoUpdateFields):
 		return status.Error(codes.InvalidArgument, err.Error())
 	case errors.Is(err, model.ErrInvalidActivationCode):
-		return status.Error(codes.InvalidArgument, err.Error())
-	case errors.Is(err, model.ErrActivatedUser):
 		return status.Error(codes.InvalidArgument, err.Error())
 	case errors.As(err, &ve):
 		return validationError(ve)

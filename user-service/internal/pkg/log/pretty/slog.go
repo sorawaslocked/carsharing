@@ -3,10 +3,11 @@ package pretty
 import (
 	"context"
 	"encoding/json"
-	"github.com/fatih/color"
 	"io"
 	"log"
 	"log/slog"
+
+	"github.com/fatih/color"
 )
 
 type HandlerOptions struct {
@@ -46,13 +47,13 @@ func (h *Handler) Handle(_ context.Context, r slog.Record) error {
 	fields := make(map[string]interface{}, r.NumAttrs())
 
 	r.Attrs(func(a slog.Attr) bool {
-		fields[a.Key] = a.Value.Any()
+		fields[a.Key] = resolveAttr(a)
 
 		return true
 	})
 
 	for _, a := range h.attrs {
-		fields[a.Key] = a.Value.Any()
+		fields[a.Key] = resolveAttr(a)
 	}
 
 	var bytes []byte
@@ -65,7 +66,7 @@ func (h *Handler) Handle(_ context.Context, r slog.Record) error {
 		}
 	}
 
-	timeStr := r.Time.Format("[2006-01-02 15:04:05.000]")
+	timeStr := r.Time.Format("[2006-01-02 15:04:05.000000000]")
 	msg := color.CyanString(r.Message)
 
 	h.l.Println(
@@ -78,11 +79,27 @@ func (h *Handler) Handle(_ context.Context, r slog.Record) error {
 	return nil
 }
 
+// resolveAttr converts a slog.Attr to a JSON-friendly value.
+// Group values become map[string]interface{} instead of []slog.Attr.
+func resolveAttr(a slog.Attr) interface{} {
+	a.Value = a.Value.Resolve()
+
+	if a.Value.Kind() == slog.KindGroup {
+		m := make(map[string]interface{}, len(a.Value.Group()))
+		for _, ga := range a.Value.Group() {
+			m[ga.Key] = resolveAttr(ga)
+		}
+		return m
+	}
+
+	return a.Value.Any()
+}
+
 func (h *Handler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	return &Handler{
 		Handler: h.Handler,
 		l:       h.l,
-		attrs:   attrs,
+		attrs:   append(h.attrs, attrs...),
 	}
 }
 

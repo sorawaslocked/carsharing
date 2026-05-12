@@ -2,22 +2,24 @@ package app
 
 import (
 	"context"
-	"github.com/go-playground/validator/v10"
-	grpcserver "github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc"
-	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/mailer"
-	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/postgres"
-	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/redis"
-	"github.com/sorawaslocked/car-rental-user-service/internal/config"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/jwt"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/logger"
-	postgrescfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/postgres"
-	rediscfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/redis"
-	validatecfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/validate"
-	"github.com/sorawaslocked/car-rental-user-service/internal/service"
 	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/go-playground/validator/v10"
+	grpcserver "github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc"
+	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/mailer"
+	natsadapter "github.com/sorawaslocked/car-rental-user-service/internal/adapter/nats"
+	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/postgres"
+	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/redis"
+	"github.com/sorawaslocked/car-rental-user-service/internal/config"
+	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
+	natscfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/nats"
+	postgrescfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/postgres"
+	rediscfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/redis"
+	validatecfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/validate"
+	"github.com/sorawaslocked/car-rental-user-service/internal/service"
 )
 
 type App struct {
@@ -35,39 +37,35 @@ func New(
 	log.Info("connecting to postgres database")
 	db, err := postgrescfg.OpenDB(cfg.Postgres)
 	if err != nil {
-		log.Error("connecting to postgres database", logger.Err(err))
-
+		log.Error("connecting to postgres database", pkglog.Err(err))
 		return nil, err
 	}
-
-	jwtProvider := jwt.NewProvider(
-		cfg.JWT.SecretKey,
-		cfg.JWT.AccessTokenTTL,
-		cfg.JWT.RefreshTokenTTL,
-	)
 
 	validate := validator.New()
-	err = validate.RegisterValidation("min_age", validatecfg.MinAge)
-	if err != nil {
+	if err := validate.RegisterValidation("min_age", validatecfg.MinAge); err != nil {
 		return nil, err
 	}
-	err = validate.RegisterValidation("complex_password", validatecfg.ComplexPassword)
-	if err != nil {
+	if err := validate.RegisterValidation("complex_password", validatecfg.ComplexPassword); err != nil {
 		return nil, err
 	}
 
-	userRepo := postgres.NewUserRepository(log, db)
+	log.Info("connecting to nats")
+	natsConn, err := natscfg.Connect(cfg.NATS)
+	if err != nil {
+		log.Error("connecting to nats", pkglog.Err(err))
+		return nil, err
+	}
 
 	redisConn := rediscfg.Client(cfg.Redis)
-	sessionRedisCache := redis.NewSessionRedisCache(redisConn, cfg.JWT.RefreshTokenTTL)
-	activationCodeRedisCache := redis.NewActivationCodeRedisCache(redisConn)
+	activationCodeCache := redis.NewActivationCodeRedisCache(redisConn)
 
 	msMailer := mailer.New(cfg.Mailer)
+	userRepo := postgres.NewUserRepository(log, db)
+	publisher := natsadapter.NewPublisher(log, natsConn)
 
-	userService := service.NewUserService(log, validate, jwtProvider, userRepo, activationCodeRedisCache, msMailer)
-	authService := service.NewAuthService(log, validate, jwtProvider, userService, sessionRedisCache)
+	userService := service.NewUserService(log, validate, userRepo, publisher, activationCodeCache, msMailer)
 
-	grpcServer := grpcserver.NewServer(cfg.GRPC, log, authService, userService, jwtProvider)
+	grpcServer := grpcserver.NewServer(cfg.GRPC, log, userService)
 
 	return &App{
 		log:        log,

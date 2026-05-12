@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+
 	"github.com/redis/go-redis/v9"
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/security"
@@ -29,11 +30,11 @@ func NewActivationCodeRedisCache(client *redis.Client) *ActivationCodeRedisCache
 	}
 }
 
-func (rc *ActivationCodeRedisCache) key(userID uint64) string {
-	return fmt.Sprintf("%s:%d", activationCodeKeyPrefix, userID)
+func (rc *ActivationCodeRedisCache) key(userID string) string {
+	return fmt.Sprintf("%s:%s", activationCodeKeyPrefix, userID)
 }
 
-func (rc *ActivationCodeRedisCache) Save(ctx context.Context, userID uint64) (string, error) {
+func (rc *ActivationCodeRedisCache) Save(ctx context.Context, userID string) (string, error) {
 	code := createCode()
 
 	codeHash, err := security.HashString(code)
@@ -41,18 +42,19 @@ func (rc *ActivationCodeRedisCache) Save(ctx context.Context, userID uint64) (st
 		return "", err
 	}
 
-	err = rc.rdb.Set(ctx, rc.key(userID), codeHash, codeExpiration).Err()
+	if err := rc.rdb.Set(ctx, rc.key(userID), codeHash, codeExpiration).Err(); err != nil {
+		return "", model.ErrRedis
+	}
 
-	return code, model.ErrRedis
+	return code, nil
 }
 
-func (rc *ActivationCodeRedisCache) Get(ctx context.Context, userID uint64) ([]byte, error) {
+func (rc *ActivationCodeRedisCache) Get(ctx context.Context, userID string) ([]byte, error) {
 	codeHash, err := rc.rdb.Get(ctx, rc.key(userID)).Bytes()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
 			return nil, model.ErrNotFound
 		}
-
 		return nil, model.ErrRedis
 	}
 

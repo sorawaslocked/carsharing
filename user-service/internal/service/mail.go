@@ -2,91 +2,84 @@ package service
 
 import (
 	"context"
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/logger"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/security"
+	"errors"
 	"time"
+
+	"github.com/sorawaslocked/car-rental-user-service/internal/model"
+	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/security"
 )
 
-func (s *UserService) CheckActivationCode(ctx context.Context, code string) error {
-	id, err := userIDFromCtx(ctx)
+func (s *UserService) SendActivationCode(ctx context.Context, userID string) error {
+	logger := pkglog.WithMethod(s.log, "SendActivationCode")
+
+	user, err := s.userRepo.FindByID(ctx, userID)
 	if err != nil {
-		return err
-	}
-
-	filter := model.UserFilter{
-		ID: &id,
-	}
-
-	user, err := s.userRepo.FindOne(ctx, filter)
-	if err != nil {
-		return err
-	}
-
-	if user.IsActive {
-		return model.ErrActivatedUser
-	}
-
-	codeValidation := &activationCodeValidation{
-		Code: code,
-	}
-
-	err = validateInput(s.validate, codeValidation)
-	if err != nil {
-		return err
-	}
-
-	codeHash, err := s.activationCodeStorage.Get(ctx, id)
-	if err != nil {
-		return err
-	}
-
-	err = security.CheckStringHash(code, codeHash)
-	if err != nil {
-		return model.ValidationErrors{
-			"activationCode": model.ErrInvalidActivationCode,
+		if !errors.Is(err, model.ErrNotFound) {
+			logger.Error("repo: finding user", pkglog.Err(err))
 		}
+		return err
 	}
 
-	isActive := true
-	update := model.UserUpdate{
-		UpdatedAt: time.Now(),
-		IsActive:  &isActive,
-	}
-
-	err = s.userRepo.Update(ctx, filter, update)
+	code, err := s.activationCodeStorage.Save(ctx, userID)
 	if err != nil {
+		logger.Error("redis: saving activation code", pkglog.Err(err))
+		return err
+	}
+
+	if err := s.mailer.SendActivationCode(ctx, user.Email, code); err != nil {
+		logger.Error("mailer: sending activation code", pkglog.Err(err))
 		return err
 	}
 
 	return nil
 }
 
-func (s *UserService) SendActivationCode(ctx context.Context) error {
-	id, err := userIDFromCtx(ctx)
+func (s *UserService) CheckActivationCode(ctx context.Context, userID, code string) error {
+	logger := pkglog.WithMethod(s.log, "CheckActivationCode")
+
+	user, err := s.userRepo.FindByID(ctx, userID)
 	if err != nil {
+		if !errors.Is(err, model.ErrNotFound) {
+			logger.Error("repo: finding user", pkglog.Err(err))
+		}
 		return err
 	}
 
-	filter := model.UserFilter{
-		ID: &id,
+	if user.IsEmailVerified {
+		return model.ErrAlreadyExists
 	}
 
-	user, err := s.userRepo.FindOne(ctx, filter)
-	if err != nil {
+	if err := validateInput(s.validate, &activationCodeValidation{Code: code}); err != nil {
 		return err
 	}
 
-	code, err := s.activationCodeStorage.Save(ctx, user.ID)
+	codeHash, err := s.activationCodeStorage.Get(ctx, userID)
 	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return model.ValidationErrors{"code": model.ErrInvalidActivationCode}
+		}
+		logger.Error("redis: getting activation code", pkglog.Err(err))
 		return err
 	}
 
-	err = s.mailer.SendActivationCode(ctx, user.Email, code)
-	if err != nil {
-		s.log.Error("Mailer", logger.Err(err))
+	if err := security.CheckStringHash(code, codeHash); err != nil {
+		return model.ValidationErrors{"code": model.ErrInvalidActivationCode}
+	}
 
+	isEmailVerified := true
+	if err := s.userRepo.Update(ctx, userID, model.UserRepoUpdate{
+		IsEmailVerified: &isEmailVerified,
+		UpdatedAt:       time.Now(),
+	}); err != nil {
+		if !errors.Is(err, model.ErrNotFound) {
+			logger.Error("repo: marking email as verified", pkglog.Err(err))
+		}
 		return err
+	}
+
+	if err := s.publisher.PublishUserUpdated(ctx, userID, false); err != nil {
+		logger.Error("nats: publishing user.updated", pkglog.Err(err))
 	}
 
 	return nil

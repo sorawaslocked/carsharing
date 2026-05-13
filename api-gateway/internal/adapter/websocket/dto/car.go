@@ -7,7 +7,7 @@ type SlimCarLocation struct {
 
 type SlimCar struct {
 	ID           string          `json:"id"`
-	ModelID      string          `json:"modelId"`
+	ModelID      string          `json:"modelID"`
 	LicensePlate string          `json:"licensePlate"`
 	Color        string          `json:"color"`
 	Location     SlimCarLocation `json:"location"`
@@ -28,7 +28,7 @@ type CarTelemetryMessage struct {
 }
 
 type CarStatusMessage struct {
-	CarID      string `json:"carId"`
+	CarID      string `json:"carID"`
 	FromStatus string `json:"fromStatus"`
 	ToStatus   string `json:"toStatus"`
 }

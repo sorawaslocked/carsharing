@@ -3872,7 +3872,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "documents"
                 ],
                 "summary": "Create document record",
                 "parameters": [
@@ -3929,7 +3929,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "documents"
                 ],
                 "summary": "Review a document",
                 "parameters": [
@@ -3996,7 +3996,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "documents"
                 ],
                 "summary": "Get document upload URL",
                 "parameters": [
@@ -4145,7 +4145,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "documents"
                 ],
                 "summary": "Get profile image upload URL",
                 "responses": {
@@ -4358,7 +4358,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "documents"
                 ],
                 "summary": "Get processed documents for a user",
                 "parameters": [
@@ -4400,6 +4400,283 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
                         }
+                    }
+                }
+            }
+        },
+        "/ws/cars": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "WebSocket stream of slim car objects matching the filter. Accepts the same query params as GET /cars. Streams updates until token expiry or disconnect.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cars"
+                ],
+                "summary": "Live car fleet feed",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by brand",
+                        "name": "brand",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by model",
+                        "name": "model",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by fuel type",
+                        "name": "fuelType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by transmission",
+                        "name": "transmission",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by body type",
+                        "name": "bodyType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by class",
+                        "name": "class",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Minimum seats",
+                        "name": "minSeats",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Center latitude for radius search",
+                        "name": "latitude",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Center longitude for radius search",
+                        "name": "longitude",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Radius in meters",
+                        "name": "radiusM",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by zone ID",
+                        "name": "zoneId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Minimum fuel level",
+                        "name": "minFuelLevel",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "101": {
+                        "description": "Streamed WebSocket message format",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.CarFleetMessage"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request"
+                    },
+                    "401": {
+                        "description": "unauthorized"
+                    },
+                    "500": {
+                        "description": "internal server error"
+                    }
+                }
+            }
+        },
+        "/ws/cars/{id}/status": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "WebSocket stream of status transition events for a single car, delivered via NATS. Streams until token expiry or disconnect.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cars"
+                ],
+                "summary": "Live car status feed",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Car ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "101": {
+                        "description": "Streamed WebSocket message format",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.CarStatusMessage"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized"
+                    },
+                    "500": {
+                        "description": "internal server error"
+                    }
+                }
+            }
+        },
+        "/ws/cars/{id}/telemetry": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "WebSocket stream of telemetry updates (fuel, battery, mileage, location) for a single car. Streams until token expiry or disconnect.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cars"
+                ],
+                "summary": "Live car telemetry feed",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Car ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "101": {
+                        "description": "Streamed WebSocket message format",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.CarTelemetryMessage"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized"
+                    },
+                    "500": {
+                        "description": "internal server error"
+                    }
+                }
+            }
+        },
+        "/ws/trips/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "WebSocket stream of in-progress trip data (elapsed time, current cost, distance). Streams until the trip ends or the client disconnects.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "trips"
+                ],
+                "summary": "Live trip feed",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Trip ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "101": {
+                        "description": "Streamed WebSocket message format",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.TripLiveFeedMessage"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized"
+                    },
+                    "500": {
+                        "description": "internal server error"
+                    }
+                }
+            }
+        },
+        "/ws/users/documents": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "WebSocket feed that pushes a single message when the specified document has been analyzed, then closes.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Document verification updates",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Document ID to watch",
+                        "name": "docID",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "101": {
+                        "description": "WebSocket message (one-shot, then closes)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.DocumentAnalyzedMessage"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request"
+                    },
+                    "401": {
+                        "description": "unauthorized"
+                    },
+                    "500": {
+                        "description": "internal server error"
                     }
                 }
             }
@@ -6448,6 +6725,130 @@ const docTemplate = `{
                 },
                 "longitude": {
                     "type": "number"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.CarFleetMessage": {
+            "type": "object",
+            "properties": {
+                "cars": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.SlimCar"
+                    }
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.CarStatusMessage": {
+            "type": "object",
+            "properties": {
+                "carID": {
+                    "type": "string"
+                },
+                "fromStatus": {
+                    "type": "string"
+                },
+                "toStatus": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.CarTelemetryMessage": {
+            "type": "object",
+            "properties": {
+                "batteryLevel": {
+                    "type": "number"
+                },
+                "fuelLevel": {
+                    "type": "number"
+                },
+                "location": {
+                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.SlimCarLocation"
+                },
+                "mileageKm": {
+                    "type": "integer"
+                },
+                "recordedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.DocumentAnalyzedMessage": {
+            "type": "object",
+            "properties": {
+                "defects": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.DocumentDefect"
+                    }
+                },
+                "documentId": {
+                    "type": "string"
+                },
+                "passed": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.DocumentDefect": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.SlimCar": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "fuelLevel": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "licensePlate": {
+                    "type": "string"
+                },
+                "location": {
+                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.SlimCarLocation"
+                },
+                "modelID": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.SlimCarLocation": {
+            "type": "object",
+            "properties": {
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                }
+            }
+        },
+        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.TripLiveFeedMessage": {
+            "type": "object",
+            "properties": {
+                "currentCostTenge": {
+                    "type": "integer"
+                },
+                "distanceTraveledKm": {
+                    "type": "number"
+                },
+                "elapsedSeconds": {
+                    "type": "integer"
                 }
             }
         }

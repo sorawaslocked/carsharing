@@ -30,6 +30,10 @@ func NewTripWsHandler(svc TripStreamService, logger *slog.Logger) *TripWsHandler
 // @Tags         trips
 // @Security     BearerAuth
 // @Param        id  path  string  true  "Trip ID"
+// @Produce      json
+// @Success      101  {object}  wsdto.TripLiveFeedMessage  "Streamed WebSocket message format"
+// @Failure      401  "unauthorized"
+// @Failure      500  "internal server error"
 // @Router       /ws/trips/{id} [get]
 func (h *TripWsHandler) LiveFeed(c *gin.Context) {
 	logger := pkglog.WithMethod(h.log, "LiveFeed")

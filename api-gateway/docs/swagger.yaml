@@ -1145,6 +1145,86 @@ definitions:
       longitude:
         type: number
     type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.CarFleetMessage:
+    properties:
+      cars:
+        items:
+          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.SlimCar'
+        type: array
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.CarStatusMessage:
+    properties:
+      carID:
+        type: string
+      fromStatus:
+        type: string
+      toStatus:
+        type: string
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.CarTelemetryMessage:
+    properties:
+      batteryLevel:
+        type: number
+      fuelLevel:
+        type: number
+      location:
+        $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.SlimCarLocation'
+      mileageKm:
+        type: integer
+      recordedAt:
+        type: string
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.DocumentAnalyzedMessage:
+    properties:
+      defects:
+        items:
+          $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.DocumentDefect'
+        type: array
+      documentId:
+        type: string
+      passed:
+        type: boolean
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.DocumentDefect:
+    properties:
+      description:
+        type: string
+      type:
+        type: string
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.SlimCar:
+    properties:
+      color:
+        type: string
+      fuelLevel:
+        type: number
+      id:
+        type: string
+      licensePlate:
+        type: string
+      location:
+        $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.SlimCarLocation'
+      modelID:
+        type: string
+      status:
+        type: string
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.SlimCarLocation:
+    properties:
+      latitude:
+        type: number
+      longitude:
+        type: number
+    type: object
+  github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.TripLiveFeedMessage:
+    properties:
+      currentCostTenge:
+        type: integer
+      distanceTraveledKm:
+        type: number
+      elapsedSeconds:
+        type: integer
+    type: object
 host: localhost:4000
 info:
   contact:
@@ -3724,7 +3804,7 @@ paths:
       - BearerAuth: []
       summary: Get processed documents for a user
       tags:
-      - users
+      - documents
   /users/activation-code/check:
     post:
       consumes:
@@ -3816,7 +3896,7 @@ paths:
       - BearerAuth: []
       summary: Create document record
       tags:
-      - users
+      - documents
   /users/documents/check/{id}:
     post:
       consumes:
@@ -3860,7 +3940,7 @@ paths:
       - BearerAuth: []
       summary: Review a document
       tags:
-      - users
+      - documents
   /users/documents/upload:
     post:
       consumes:
@@ -3897,7 +3977,7 @@ paths:
       - BearerAuth: []
       summary: Get document upload URL
       tags:
-      - users
+      - documents
   /users/profile:
     get:
       description: Returns the profile of the authenticated user.
@@ -3981,6 +4061,188 @@ paths:
       security:
       - BearerAuth: []
       summary: Get profile image upload URL
+      tags:
+      - documents
+  /ws/cars:
+    get:
+      description: WebSocket stream of slim car objects matching the filter. Accepts
+        the same query params as GET /cars. Streams updates until token expiry or
+        disconnect.
+      parameters:
+      - description: Filter by brand
+        in: query
+        name: brand
+        type: string
+      - description: Filter by model
+        in: query
+        name: model
+        type: string
+      - description: Filter by fuel type
+        in: query
+        name: fuelType
+        type: string
+      - description: Filter by transmission
+        in: query
+        name: transmission
+        type: string
+      - description: Filter by body type
+        in: query
+        name: bodyType
+        type: string
+      - description: Filter by class
+        in: query
+        name: class
+        type: string
+      - description: Minimum seats
+        in: query
+        name: minSeats
+        type: integer
+      - description: Center latitude for radius search
+        in: query
+        name: latitude
+        type: number
+      - description: Center longitude for radius search
+        in: query
+        name: longitude
+        type: number
+      - description: Radius in meters
+        in: query
+        name: radiusM
+        type: integer
+      - description: Filter by zone ID
+        in: query
+        name: zoneId
+        type: string
+      - description: Minimum fuel level
+        in: query
+        name: minFuelLevel
+        type: number
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "101":
+          description: Streamed WebSocket message format
+          schema:
+            $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.CarFleetMessage'
+        "400":
+          description: bad request
+        "401":
+          description: unauthorized
+        "500":
+          description: internal server error
+      security:
+      - BearerAuth: []
+      summary: Live car fleet feed
+      tags:
+      - cars
+  /ws/cars/{id}/status:
+    get:
+      description: WebSocket stream of status transition events for a single car,
+        delivered via NATS. Streams until token expiry or disconnect.
+      parameters:
+      - description: Car ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "101":
+          description: Streamed WebSocket message format
+          schema:
+            $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.CarStatusMessage'
+        "401":
+          description: unauthorized
+        "500":
+          description: internal server error
+      security:
+      - BearerAuth: []
+      summary: Live car status feed
+      tags:
+      - cars
+  /ws/cars/{id}/telemetry:
+    get:
+      description: WebSocket stream of telemetry updates (fuel, battery, mileage,
+        location) for a single car. Streams until token expiry or disconnect.
+      parameters:
+      - description: Car ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "101":
+          description: Streamed WebSocket message format
+          schema:
+            $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.CarTelemetryMessage'
+        "401":
+          description: unauthorized
+        "500":
+          description: internal server error
+      security:
+      - BearerAuth: []
+      summary: Live car telemetry feed
+      tags:
+      - cars
+  /ws/trips/{id}:
+    get:
+      description: WebSocket stream of in-progress trip data (elapsed time, current
+        cost, distance). Streams until the trip ends or the client disconnects.
+      parameters:
+      - description: Trip ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "101":
+          description: Streamed WebSocket message format
+          schema:
+            $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.TripLiveFeedMessage'
+        "401":
+          description: unauthorized
+        "500":
+          description: internal server error
+      security:
+      - BearerAuth: []
+      summary: Live trip feed
+      tags:
+      - trips
+  /ws/users/documents:
+    get:
+      description: WebSocket feed that pushes a single message when the specified
+        document has been analyzed, then closes.
+      parameters:
+      - description: Document ID to watch
+        in: query
+        name: docID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "101":
+          description: WebSocket message (one-shot, then closes)
+          schema:
+            $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.DocumentAnalyzedMessage'
+        "400":
+          description: bad request
+        "401":
+          description: unauthorized
+        "500":
+          description: internal server error
+      security:
+      - BearerAuth: []
+      summary: Document verification updates
       tags:
       - users
   /zones:

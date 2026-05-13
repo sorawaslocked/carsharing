@@ -45,6 +45,11 @@ func NewCarWsHandler(svc CarStreamService, carStatusHub *CarStatusHub, logger *s
 // @Param        zoneId        query  string   false  "Filter by zone ID"
 // @Param        minFuelLevel  query  number   false  "Minimum fuel level"
 // @Param        status        query  string   false  "Filter by status"
+// @Produce      json
+// @Success      101  {object}  wsdto.CarFleetMessage  "Streamed WebSocket message format"
+// @Failure      400  "bad request"
+// @Failure      401  "unauthorized"
+// @Failure      500  "internal server error"
 // @Router       /ws/cars [get]
 func (h *CarWsHandler) Fleet(c *gin.Context) {
 	logger := pkglog.WithMethod(h.log, "Fleet")
@@ -94,6 +99,10 @@ func (h *CarWsHandler) Fleet(c *gin.Context) {
 // @Tags         cars
 // @Security     BearerAuth
 // @Param        id  path  string  true  "Car ID"
+// @Produce      json
+// @Success      101  {object}  wsdto.CarTelemetryMessage  "Streamed WebSocket message format"
+// @Failure      401  "unauthorized"
+// @Failure      500  "internal server error"
 // @Router       /ws/cars/{id}/telemetry [get]
 func (h *CarWsHandler) Telemetry(c *gin.Context) {
 	logger := pkglog.WithMethod(h.log, "Telemetry")
@@ -133,6 +142,10 @@ func (h *CarWsHandler) Telemetry(c *gin.Context) {
 // @Tags         cars
 // @Security     BearerAuth
 // @Param        id  path  string  true  "Car ID"
+// @Produce      json
+// @Success      101  {object}  wsdto.CarStatusMessage  "Streamed WebSocket message format"
+// @Failure      401  "unauthorized"
+// @Failure      500  "internal server error"
 // @Router       /ws/cars/{id}/status [get]
 func (h *CarWsHandler) Status(c *gin.Context) {
 	logger := pkglog.WithMethod(h.log, "Status")

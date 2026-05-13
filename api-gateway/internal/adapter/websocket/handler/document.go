@@ -29,6 +29,11 @@ func NewUserWsHandler(hub *DocumentHub, logger *slog.Logger) *UserWsHandler {
 // @Tags         users
 // @Security     BearerAuth
 // @Param        docID  query  string  true  "Document ID to watch"
+// @Produce      json
+// @Success      101  {object}  wsdto.DocumentAnalyzedMessage  "WebSocket message (one-shot, then closes)"
+// @Failure      400  "bad request"
+// @Failure      401  "unauthorized"
+// @Failure      500  "internal server error"
 // @Router       /ws/users/documents [get]
 func (h *UserWsHandler) DocumentUpdates(c *gin.Context) {
 	logger := pkglog.WithMethod(h.log, "DocumentUpdates")

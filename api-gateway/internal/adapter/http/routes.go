@@ -55,6 +55,7 @@ func (s *Server) setupRoutes(
 
 			users.GET("/profile", s.userHandler.GetProfile)
 			users.PATCH("/profile", s.userHandler.UpdateProfile)
+			users.GET("/profile/image-upload", s.userHandler.GetProfileImageUploadData)
 
 			users.POST("/activation-code/send", s.userHandler.SendActivationCode)
 			users.POST("/activation-code/check", s.userHandler.CheckActivationCode)

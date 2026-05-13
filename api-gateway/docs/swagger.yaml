@@ -3959,6 +3959,30 @@ paths:
       summary: Update current user profile
       tags:
       - users
+  /users/profile/image-upload:
+    get:
+      description: Returns a presigned PUT URL and object key for uploading the current
+        user's profile image to object storage.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ImageUploadResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get profile image upload URL
+      tags:
+      - users
   /zones:
     get:
       description: Returns zones filtered by type and active status.

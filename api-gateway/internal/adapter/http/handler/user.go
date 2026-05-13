@@ -454,6 +454,27 @@ func (h *UserHandler) CreateDocument(c *gin.Context) {
 	dto.Created(c, gin.H{"id": id})
 }
 
+// GetProfileImageUploadData godoc
+// @Summary      Get profile image upload URL
+// @Description  Returns a presigned PUT URL and object key for uploading the current user's profile image to object storage.
+// @Tags         users
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  dto.ImageUploadResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
+// @Router       /users/profile/image-upload [get]
+func (h *UserHandler) GetProfileImageUploadData(c *gin.Context) {
+	data, err := h.svc.GetProfileImageUploadData(c)
+	if err != nil {
+		dto.FromError(c, err)
+
+		return
+	}
+
+	dto.Ok(c, gin.H{"uploadData": dto.ToImageUploadDataResponse(data)})
+}
+
 // GetUploadDocumentData godoc
 // @Summary      Get document upload URL
 // @Description  Returns a presigned PUT URL for uploading a document image to object storage.

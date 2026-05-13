@@ -33,6 +33,7 @@ type UserPresenter interface {
 
 	CreateDocument(ctx context.Context, objectKey, imageType string) (string, error)
 	GetDocumentImageUploadData(ctx context.Context, imageType string) (model.ImageUploadData, error)
+	GetProfileImageUploadData(ctx context.Context) (model.ImageUploadData, error)
 	GetProcessedDocumentsForUser(ctx context.Context, userID string) ([]model.Document, error)
 	CheckDocument(ctx context.Context, docID string, status string, documentError *string) error
 }

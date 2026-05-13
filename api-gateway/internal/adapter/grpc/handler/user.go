@@ -269,6 +269,21 @@ func (h *UserHandler) GetDocumentImageUploadData(ctx context.Context, imageType 
 	return dto.ImageUploadDataFromProto(res.GetUploadData()), nil
 }
 
+func (h *UserHandler) GetProfileImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+	logger := pkglog.WithMethod(h.log, "GetProfileImageUploadData")
+
+	res, err := h.client.GetProfileImageUploadData(ctx, &emptypb.Empty{})
+	if err != nil {
+		if dto.IsSystemErr(err) {
+			logger.Error("grpc call failed", pkglog.Err(err))
+		}
+
+		return model.ImageUploadData{}, dto.FromGrpcErr(err)
+	}
+
+	return dto.ImageUploadDataFromProto(res.GetUploadData()), nil
+}
+
 func (h *UserHandler) GetProcessedDocumentsForUser(ctx context.Context, userID string) ([]model.Document, error) {
 	logger := pkglog.WithMethod(h.log, "GetProcessedDocumentsForUser")
 

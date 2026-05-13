@@ -1,4 +1,4 @@
-package documentanalyzer
+package client
 
 import (
 	"context"

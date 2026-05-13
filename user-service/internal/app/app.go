@@ -9,7 +9,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	grpcserver "github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc"
-	grpcdocanalyzer "github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/documentanalyzer"
+	grpcdocanalyzer "github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/client"
 	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/handler"
 	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/mailer"
 	minioadapter "github.com/sorawaslocked/car-rental-user-service/internal/adapter/minio"
@@ -84,7 +84,7 @@ func New(
 	docRepo := postgres.NewDocumentRepository(log, db)
 	publisher := natsadapter.NewPublisher(log, natsConn)
 	minioStorage := minioadapter.NewMinioObjectStorage(log, minioClient, cfg.Minio)
-	analyzerClient := grpcdocanalyzer.NewClient(log, analyzerConn)
+	analyzerClient := grpcdocanalyzer.NewDocumentAnalyzer(log, analyzerConn)
 
 	userService := service.NewUserService(log, validate, userRepo, docRepo, minioStorage, analyzerClient, publisher, activationCodeCache, msMailer)
 

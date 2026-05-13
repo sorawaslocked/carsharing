@@ -54,10 +54,12 @@ func (s *Server) Stop() {
 func (s *Server) register(userService handler.UserService, healthHandler *handler.HealthHandler) {
 	baseInterceptor := interceptor.NewBaseInterceptor()
 	loggerInterceptor := interceptor.NewLoggerInterceptor(s.log)
+	authInterceptor := interceptor.NewAuthInterceptor(s.log)
 
 	s.s = grpc.NewServer(grpc.ChainUnaryInterceptor(
 		baseInterceptor.Unary,
 		loggerInterceptor.Unary,
+		authInterceptor.Unary,
 	))
 
 	usersvc.RegisterUserServiceServer(s.s, handler.NewUserHandler(s.log, userService))

@@ -10,12 +10,16 @@ import (
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/security"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/utils"
 )
 
 type UserService struct {
 	log                   *slog.Logger
 	validate              *validator.Validate
 	userRepo              UserRepository
+	docRepo               DocumentRepository
+	objectStorage         ObjectStorage
+	documentAnalyzer      DocumentAnalyzer
 	publisher             Publisher
 	activationCodeStorage ActivationCodeStorage
 	mailer                Mailer
@@ -25,6 +29,9 @@ func NewUserService(
 	log *slog.Logger,
 	validate *validator.Validate,
 	userRepo UserRepository,
+	docRepo DocumentRepository,
+	objectStorage ObjectStorage,
+	documentAnalyzer DocumentAnalyzer,
 	publisher Publisher,
 	activationCodeStorage ActivationCodeStorage,
 	mailer Mailer,
@@ -33,6 +40,9 @@ func NewUserService(
 		log:                   pkglog.WithComponent(log, "service.UserService"),
 		validate:              validate,
 		userRepo:              userRepo,
+		docRepo:               docRepo,
+		objectStorage:         objectStorage,
+		documentAnalyzer:      documentAnalyzer,
 		publisher:             publisher,
 		activationCodeStorage: activationCodeStorage,
 		mailer:                mailer,
@@ -40,12 +50,12 @@ func NewUserService(
 }
 
 func (s *UserService) Create(ctx context.Context, data model.UserCreate) (string, error) {
-	logger := pkglog.WithMethod(s.log, "Create")
+	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Create"), utils.MetadataFromCtx(ctx))
 	return s.insertUser(ctx, logger, data)
 }
 
 func (s *UserService) Register(ctx context.Context, data model.UserCreate) (string, error) {
-	logger := pkglog.WithMethod(s.log, "Register")
+	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Register"), utils.MetadataFromCtx(ctx))
 	return s.insertUser(ctx, logger, data)
 }
 
@@ -102,7 +112,7 @@ func (s *UserService) insertUser(ctx context.Context, logger *slog.Logger, data 
 }
 
 func (s *UserService) Get(ctx context.Context, id string) (model.User, error) {
-	logger := pkglog.WithMethod(s.log, "Get")
+	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Get"), utils.MetadataFromCtx(ctx))
 
 	user, err := s.userRepo.FindByID(ctx, id)
 	if err != nil {
@@ -116,7 +126,7 @@ func (s *UserService) Get(ctx context.Context, id string) (model.User, error) {
 }
 
 func (s *UserService) List(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
-	logger := pkglog.WithMethod(s.log, "List")
+	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "List"), utils.MetadataFromCtx(ctx))
 
 	users, err := s.userRepo.Find(ctx, filter)
 	if err != nil {
@@ -128,7 +138,7 @@ func (s *UserService) List(ctx context.Context, filter model.UserFilter) ([]mode
 }
 
 func (s *UserService) Update(ctx context.Context, id string, data model.UserUpdate) error {
-	logger := pkglog.WithMethod(s.log, "Update")
+	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Update"), utils.MetadataFromCtx(ctx))
 
 	if _, err := s.userRepo.FindByID(ctx, id); err != nil {
 		if !errors.Is(err, model.ErrNotFound) {
@@ -191,7 +201,7 @@ func (s *UserService) Update(ctx context.Context, id string, data model.UserUpda
 }
 
 func (s *UserService) Delete(ctx context.Context, id string) error {
-	logger := pkglog.WithMethod(s.log, "Delete")
+	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Delete"), utils.MetadataFromCtx(ctx))
 
 	if err := s.userRepo.Delete(ctx, id); err != nil {
 		if !errors.Is(err, model.ErrNotFound) {
@@ -207,8 +217,20 @@ func (s *UserService) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
+func (s *UserService) GetUserProfileImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetUserProfileImageUploadData"), utils.MetadataFromCtx(ctx))
+
+	data, err := s.objectStorage.GetUserProfileImageUploadData(ctx)
+	if err != nil {
+		logger.Error("object storage: getting upload data", pkglog.Err(err))
+		return model.ImageUploadData{}, err
+	}
+
+	return data, nil
+}
+
 func (s *UserService) SignIn(ctx context.Context, creds model.Credentials) (string, error) {
-	logger := pkglog.WithMethod(s.log, "SignIn")
+	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "SignIn"), utils.MetadataFromCtx(ctx))
 
 	if err := validateInput(s.validate, creds); err != nil {
 		return "", err

@@ -8,10 +8,11 @@ import (
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/security"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/utils"
 )
 
 func (s *UserService) SendActivationCode(ctx context.Context) error {
-	logger := pkglog.WithMethod(s.log, "SendActivationCode")
+	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "SendActivationCode"), utils.MetadataFromCtx(ctx))
 
 	userID, err := userIDFromCtx(ctx)
 	if err != nil {
@@ -41,7 +42,7 @@ func (s *UserService) SendActivationCode(ctx context.Context) error {
 }
 
 func (s *UserService) CheckActivationCode(ctx context.Context, code string) error {
-	logger := pkglog.WithMethod(s.log, "CheckActivationCode")
+	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "CheckActivationCode"), utils.MetadataFromCtx(ctx))
 
 	userID, err := userIDFromCtx(ctx)
 	if err != nil {

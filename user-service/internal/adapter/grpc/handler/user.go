@@ -157,3 +157,81 @@ func (h *UserHandler) CheckActivationCode(ctx context.Context, req *usersvc.Chec
 
 	return &emptypb.Empty{}, nil
 }
+
+func (h *UserHandler) GetProfileImageUploadData(ctx context.Context, _ *emptypb.Empty) (*usersvc.GetProfileImageUploadDataResponse, error) {
+	logger := h.logger(ctx, "GetProfileImageUploadData")
+
+	data, err := h.userService.GetUserProfileImageUploadData(ctx)
+	if err != nil {
+		logger.Error("getting profile image upload data", pkglog.Err(err))
+		return nil, dto.ToStatusError(err)
+	}
+
+	return &usersvc.GetProfileImageUploadDataResponse{
+		UploadData: dto.ImageUploadDataToProto(data),
+	}, nil
+}
+
+func (h *UserHandler) CreateDocument(ctx context.Context, req *usersvc.CreateDocumentRequest) (*usersvc.CreateDocumentResponse, error) {
+	logger := h.logger(ctx, "CreateDocument")
+
+	objectKey, imageType, err := dto.FromCreateDocumentRequest(req)
+	if err != nil {
+		return nil, dto.ToStatusError(err)
+	}
+
+	id, err := h.userService.CreateDocument(ctx, objectKey, imageType)
+	if err != nil {
+		logger.Error("creating document", pkglog.Err(err))
+		return nil, dto.ToStatusError(err)
+	}
+
+	return &usersvc.CreateDocumentResponse{Id: id}, nil
+}
+
+func (h *UserHandler) GetUploadDocumentData(ctx context.Context, req *usersvc.GetUploadDocumentDataRequest) (*usersvc.GetUploadDocumentDataResponse, error) {
+	logger := h.logger(ctx, "GetUploadDocumentData")
+
+	data, err := h.userService.GetDocumentImageUploadData(ctx, req.GetImageType())
+	if err != nil {
+		logger.Error("getting document upload data", pkglog.Err(err))
+		return nil, dto.ToStatusError(err)
+	}
+
+	return &usersvc.GetUploadDocumentDataResponse{
+		UploadData: dto.ImageUploadDataToProto(data),
+	}, nil
+}
+
+func (h *UserHandler) GetProcessedDocumentsForUser(ctx context.Context, req *usersvc.GetProcessedDocumentsForUserRequest) (*usersvc.GetProcessedDocumentsForUserResponse, error) {
+	logger := h.logger(ctx, "GetProcessedDocumentsForUser")
+
+	docs, err := h.userService.GetProcessedDocumentsForUser(ctx, req.GetUserId())
+	if err != nil {
+		logger.Error("getting processed documents for user", pkglog.Err(err))
+		return nil, dto.ToStatusError(err)
+	}
+
+	protoDocs := make([]*baseuserpb.Document, len(docs))
+	for i, d := range docs {
+		protoDocs[i] = dto.DocumentToProto(d)
+	}
+
+	return &usersvc.GetProcessedDocumentsForUserResponse{Documents: protoDocs}, nil
+}
+
+func (h *UserHandler) CheckDocument(ctx context.Context, req *usersvc.CheckDocumentRequest) (*emptypb.Empty, error) {
+	logger := h.logger(ctx, "CheckDocument")
+
+	docID, status, docError, err := dto.FromCheckDocumentRequest(req)
+	if err != nil {
+		return nil, dto.ToStatusError(err)
+	}
+
+	if err := h.userService.CheckDocument(ctx, docID, status, docError); err != nil {
+		logger.Error("checking document", pkglog.Err(err))
+		return nil, dto.ToStatusError(err)
+	}
+
+	return &emptypb.Empty{}, nil
+}

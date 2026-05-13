@@ -15,6 +15,23 @@ type UserRepository interface {
 	Delete(ctx context.Context, id string) error
 }
 
+type DocumentRepository interface {
+	Insert(ctx context.Context, doc model.Document) (string, error)
+	FindByID(ctx context.Context, id string) (model.Document, error)
+	Find(ctx context.Context, filter model.DocumentFilter) ([]model.Document, error)
+	Update(ctx context.Context, id string, update model.DocumentUpdate) error
+}
+
+type ObjectStorage interface {
+	GetDocumentImageUploadData(ctx context.Context, imageType string) (model.ImageUploadData, error)
+	GetUserProfileImageUploadData(ctx context.Context) (model.ImageUploadData, error)
+	GetImageURL(ctx context.Context, objectKey string) (string, error)
+}
+
+type DocumentAnalyzer interface {
+	Analyze(ctx context.Context, documentID string, storageURL string)
+}
+
 type Publisher interface {
 	PublishUserCreated(ctx context.Context, id string) error
 	PublishUserUpdated(ctx context.Context, id string, isSecurityUpdate bool) error

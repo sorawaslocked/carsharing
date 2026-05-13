@@ -11,6 +11,7 @@ import (
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
 	mailercfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/mailer"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/utils"
 )
 
 const sendURL = "https://send.api.mailtrap.io/api/send"
@@ -52,6 +53,8 @@ func (m *Mailer) SendActivationCode(ctx context.Context, receiver, code string) 
 }
 
 func (m *Mailer) send(ctx context.Context, to, subject, text, html string) error {
+	logger := pkglog.WithMetadata(pkglog.WithMethod(m.log, "send"), utils.MetadataFromCtx(ctx))
+
 	payload := sendRequest{
 		From:    m.from,
 		To:      []emailAddr{{Email: to}},
@@ -62,13 +65,13 @@ func (m *Mailer) send(ctx context.Context, to, subject, text, html string) error
 
 	body, err := json.Marshal(payload)
 	if err != nil {
-		m.log.Error("marshalling request", pkglog.Err(err))
+		logger.Error("marshalling request", pkglog.Err(err))
 		return model.ErrMailer
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, sendURL, bytes.NewReader(body))
 	if err != nil {
-		m.log.Error("building request", pkglog.Err(err))
+		logger.Error("building request", pkglog.Err(err))
 		return model.ErrMailer
 	}
 	req.Header.Set("Authorization", "Bearer "+m.token)
@@ -76,13 +79,13 @@ func (m *Mailer) send(ctx context.Context, to, subject, text, html string) error
 
 	resp, err := m.client.Do(req)
 	if err != nil {
-		m.log.Error("sending request", pkglog.Err(err))
+		logger.Error("sending request", pkglog.Err(err))
 		return model.ErrMailer
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= 300 {
-		m.log.Error("unexpected response", slog.String("to", to), slog.Int("status", resp.StatusCode))
+		logger.Error("unexpected response", slog.String("to", to), slog.Int("status", resp.StatusCode))
 		return model.ErrMailer
 	}
 

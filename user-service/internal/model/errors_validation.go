@@ -34,4 +34,6 @@ var (
 	ErrDuplicatePhone        = errors.New("user with this phone number already exists")
 	ErrInvalidRole           = errors.New("must be a valid role")
 	ErrInvalidActivationCode = errors.New("invalid or expired activation code")
+	ErrInvalidDocumentStatus = errors.New("must be \"approved\" or \"rejected\"")
+	ErrInvalidImageType      = errors.New("must be a valid image type")
 )

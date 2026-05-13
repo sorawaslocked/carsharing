@@ -18,4 +18,11 @@ type UserService interface {
 
 	SendActivationCode(ctx context.Context) error
 	CheckActivationCode(ctx context.Context, code string) error
+
+	GetUserProfileImageUploadData(ctx context.Context) (model.ImageUploadData, error)
+
+	CreateDocument(ctx context.Context, objectKey string, imageType model.ImageType) (string, error)
+	GetDocumentImageUploadData(ctx context.Context, imageType string) (model.ImageUploadData, error)
+	GetProcessedDocumentsForUser(ctx context.Context, userID string) ([]model.Document, error)
+	CheckDocument(ctx context.Context, docID string, status model.DocumentStatus, docError *string) error
 }

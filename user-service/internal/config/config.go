@@ -7,18 +7,21 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 	grpccfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/grpc"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/mailer"
+	miniocfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/minio"
 	natscfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/nats"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/postgres"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/redis"
 )
 
 type Config struct {
-	Env      string          `yaml:"env" env:"ENV" env-required:"true"`
-	Postgres postgres.Config `yaml:"postgres" env-required:"true"`
-	Redis    redis.Config    `yaml:"redis" env-required:"true"`
-	NATS     natscfg.Config  `yaml:"nats" env-required:"true"`
-	GRPC     grpccfg.Config  `yaml:"grpc" env-required:"true"`
-	Mailer   mailer.Config
+	Env        string               `yaml:"env" env:"ENV" env-required:"true"`
+	Postgres   postgres.Config      `yaml:"postgres" env-required:"true"`
+	Redis      redis.Config         `yaml:"redis" env-required:"true"`
+	NATS       natscfg.Config       `yaml:"nats" env-required:"true"`
+	GRPC       grpccfg.ServerConfig `yaml:"grpc" env-required:"true"`
+	GRPCClient grpccfg.Config       `yaml:"grpc_client"`
+	Minio      miniocfg.Config      `yaml:"minio" env-required:"true"`
+	Mailer     mailer.Config
 }
 
 func MustLoad() Config {

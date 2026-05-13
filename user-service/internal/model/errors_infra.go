@@ -9,4 +9,5 @@ var (
 	ErrSqlTransaction = errors.New("sql transaction error")
 	ErrSql            = errors.New("sql error")
 	ErrBcrypt         = errors.New("bcrypt error")
+	ErrObjectStorage  = errors.New("object storage error")
 )

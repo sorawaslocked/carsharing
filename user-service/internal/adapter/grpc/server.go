@@ -15,21 +15,22 @@ import (
 
 type Server struct {
 	s   *grpc.Server
-	cfg grpccfg.Config
+	cfg grpccfg.ServerConfig
 	log *slog.Logger
 }
 
 func NewServer(
-	cfg grpccfg.Config,
+	cfg grpccfg.ServerConfig,
 	log *slog.Logger,
 	userService handler.UserService,
+	healthHandler *handler.HealthHandler,
 ) *Server {
 	server := &Server{
 		cfg: cfg,
 		log: log,
 	}
 
-	server.register(userService)
+	server.register(userService, healthHandler)
 
 	return server
 }
@@ -50,7 +51,7 @@ func (s *Server) Stop() {
 	s.s.GracefulStop()
 }
 
-func (s *Server) register(userService handler.UserService) {
+func (s *Server) register(userService handler.UserService, healthHandler *handler.HealthHandler) {
 	baseInterceptor := interceptor.NewBaseInterceptor()
 	loggerInterceptor := interceptor.NewLoggerInterceptor(s.log)
 
@@ -60,6 +61,7 @@ func (s *Server) register(userService handler.UserService) {
 	))
 
 	usersvc.RegisterUserServiceServer(s.s, handler.NewUserHandler(s.log, userService))
+	usersvc.RegisterHealthServiceServer(s.s, healthHandler)
 
 	reflection.Register(s.s)
 }

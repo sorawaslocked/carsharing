@@ -12,6 +12,7 @@ import (
 	pgdto "github.com/sorawaslocked/car-rental-user-service/internal/adapter/postgres/dto"
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/utils"
 )
 
 type UserRepository struct {
@@ -87,7 +88,7 @@ func (r *UserRepository) handlePQErr(logger *slog.Logger, err error) error {
 }
 
 func (r *UserRepository) Insert(ctx context.Context, user model.User) (string, error) {
-	logger := pkglog.WithMethod(r.log, "Insert")
+	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Insert"), utils.MetadataFromCtx(ctx))
 
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -145,7 +146,7 @@ func (r *UserRepository) Insert(ctx context.Context, user model.User) (string, e
 }
 
 func (r *UserRepository) FindByID(ctx context.Context, id string) (model.User, error) {
-	logger := pkglog.WithMethod(r.log, "FindByID")
+	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindByID"), utils.MetadataFromCtx(ctx))
 
 	user, err := scanUser(r.db.QueryRowContext(ctx, userSelect+" WHERE u.id = $1", id))
 	if err != nil {
@@ -159,7 +160,7 @@ func (r *UserRepository) FindByID(ctx context.Context, id string) (model.User, e
 }
 
 func (r *UserRepository) FindOne(ctx context.Context, filter model.UserFilter) (model.User, error) {
-	logger := pkglog.WithMethod(r.log, "FindOne")
+	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindOne"), utils.MetadataFromCtx(ctx))
 
 	query := userSelect
 	clauses, args, _ := pgdto.WhereClausesFromFilter(filter, nil, 1)
@@ -179,7 +180,7 @@ func (r *UserRepository) FindOne(ctx context.Context, filter model.UserFilter) (
 }
 
 func (r *UserRepository) Find(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
-	logger := pkglog.WithMethod(r.log, "Find")
+	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Find"), utils.MetadataFromCtx(ctx))
 
 	query := userSelect
 	clauses, args, nextArg := pgdto.WhereClausesFromFilter(filter, nil, 1)
@@ -218,7 +219,7 @@ func (r *UserRepository) Find(ctx context.Context, filter model.UserFilter) ([]m
 }
 
 func (r *UserRepository) Update(ctx context.Context, id string, update model.UserRepoUpdate) error {
-	logger := pkglog.WithMethod(r.log, "Update")
+	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Update"), utils.MetadataFromCtx(ctx))
 
 	setClauses, args, nextArg := pgdto.SetClausesFromRepoUpdate(update)
 	hasRoles := len(update.Roles) > 0
@@ -275,7 +276,7 @@ func (r *UserRepository) Update(ctx context.Context, id string, update model.Use
 }
 
 func (r *UserRepository) Delete(ctx context.Context, id string) error {
-	logger := pkglog.WithMethod(r.log, "Delete")
+	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Delete"), utils.MetadataFromCtx(ctx))
 
 	res, err := r.db.ExecContext(ctx, `DELETE FROM users WHERE id = $1`, id)
 	if err != nil {

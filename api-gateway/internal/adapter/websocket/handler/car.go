@@ -136,7 +136,6 @@ func (h *CarWsHandler) Telemetry(c *gin.Context) {
 // @Router       /ws/cars/{id}/status [get]
 func (h *CarWsHandler) Status(c *gin.Context) {
 	logger := pkglog.WithMethod(h.log, "Status")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(c.Request.Context()))
 
 	carID := c.Param("id")
 

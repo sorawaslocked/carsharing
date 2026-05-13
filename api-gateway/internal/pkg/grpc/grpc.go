@@ -43,6 +43,7 @@ func Connect(target string, clientCfg Client) (*grpc.ClientConn, error) {
 		grpc.WithKeepaliveParams(keepAliveParams),
 		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(maxReceiveSizeBytes)),
 		grpc.WithUnaryInterceptor(baseClientInterceptor.Unary),
+		grpc.WithStreamInterceptor(baseClientInterceptor.Stream),
 	}
 
 	return grpc.NewClient(target, opts...)

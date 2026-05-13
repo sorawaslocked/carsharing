@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	wsdto "github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/websocket/dto"
 	pkglog "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/utils"
 )
 
 type UserWsHandler struct {
@@ -33,7 +32,6 @@ func NewUserWsHandler(hub *DocumentHub, logger *slog.Logger) *UserWsHandler {
 // @Router       /ws/users/documents [get]
 func (h *UserWsHandler) DocumentUpdates(c *gin.Context) {
 	logger := pkglog.WithMethod(h.log, "DocumentUpdates")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(c.Request.Context()))
 
 	docID := c.Query("docID")
 	if docID == "" {

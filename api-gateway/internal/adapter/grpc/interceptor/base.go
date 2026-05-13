@@ -23,6 +23,16 @@ func NewBaseInterceptor() *BaseClientInterceptor {
 }
 
 func (i *BaseClientInterceptor) Unary(ctx context.Context, method string, req, reply any, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+	ctx = i.appendMetadata(ctx)
+	return invoker(ctx, method, req, reply, cc, opts...)
+}
+
+func (i *BaseClientInterceptor) Stream(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
+	ctx = i.appendMetadata(ctx)
+	return streamer(ctx, desc, cc, method, opts...)
+}
+
+func (i *BaseClientInterceptor) appendMetadata(ctx context.Context) context.Context {
 	if v := ctx.Value(ctxRequestID); v != nil {
 		ctx = metadata.AppendToOutgoingContext(ctx, ctxRequestID, v.(string))
 	}
@@ -38,6 +48,5 @@ func (i *BaseClientInterceptor) Unary(ctx context.Context, method string, req, r
 	if v := ctx.Value(ctxUserRoles); v != nil {
 		ctx = metadata.AppendToOutgoingContext(ctx, ctxUserRoles, strings.Join(v.([]string), ","))
 	}
-
-	return invoker(ctx, method, req, reply, cc, opts...)
+	return ctx
 }

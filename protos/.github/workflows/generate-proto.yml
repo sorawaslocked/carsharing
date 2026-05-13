@@ -60,29 +60,6 @@ jobs:
               "$proto_file"
           done
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Install Python protobuf plugins
-        run: |
-          pip install grpcio-tools
-
-      - name: Generate Python protobuf files
-        run: |
-          python -m grpc_tools.protoc \
-            --proto_path=proto \
-            --python_out=gen \
-            --grpc_python_out=gen \
-            service/user/document.proto
-
-          python -m grpc_tools.protoc \
-            --proto_path=proto \
-            --python_out=gen \
-            --grpc_python_out=gen \
-            event/user/document.proto
-
       - name: Tidy Go modules
         run: |
           go mod tidy

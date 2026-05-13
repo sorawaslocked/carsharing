@@ -35,6 +35,17 @@ message Car {
   google.protobuf.Timestamp updated_at = 20;
 }
 
+message SlimCar {
+  string   id            = 1;
+  string   model_id      = 2;
+  string   license_plate = 3;
+  string   color         = 4;
+  Location location      = 5;
+  string   status        = 6;
+
+  optional float fuel_level = 7;
+}
+
 message CarStatusReading {
   string id = 1;
   string car_id = 2;

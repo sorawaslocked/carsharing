@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package service.trip;
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/trip";
+
+service TripStreamService {
+  rpc StreamTripLiveFeed(StreamTripLiveFeedRequest) returns (stream StreamTripLiveFeedResponse);
+}
+
+message StreamTripLiveFeedRequest {
+  string trip_id = 1;
+}
+
+message StreamTripLiveFeedResponse {
+  int64  elapsed_seconds      = 1;
+  int32  current_cost_tenge   = 2;
+  double distance_traveled_km = 3;
+}

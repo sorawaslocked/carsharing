@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package service.car;
+
+import "base/common.proto";
+import "base/car/car.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/car";
+
+service CarStreamService {
+  rpc StreamCarsWithFilter(StreamCarsWithFilterRequest) returns (stream StreamCarsWithFilterResponse);
+  rpc StreamCarTelemetry(StreamCarTelemetryRequest) returns (stream StreamCarTelemetryResponse);
+}
+
+message StreamCarsWithFilterRequest {
+  optional string brand        = 1;
+  optional string model        = 2;
+  optional string fuel_type    = 3;
+  optional string transmission = 4;
+  optional string body_type    = 5;
+  optional string class        = 6;
+  optional int32  min_seats    = 7;
+
+  optional base.Location location = 8;
+  optional int32         radius_m = 9;
+
+  optional float  min_fuel_level = 10;
+  optional string zone_id        = 11;
+  optional string status         = 12;
+}
+
+message StreamCarsWithFilterResponse {
+  repeated base.car.SlimCar car = 1;
+}
+
+message StreamCarTelemetryRequest {
+  string car_id = 1;
+}
+
+message StreamCarTelemetryResponse {
+  optional float fuel_level    = 1;
+  optional float battery_level = 2;
+  int64          mileage_km    = 3;
+  base.Location  location      = 4;
+
+  google.protobuf.Timestamp recorded_at = 5;
+}

@@ -4,15 +4,15 @@ package event.user;
 
 option go_package = "github.com/sorawaslocked/car-rental-protos/gen/event/user";
 
-message CreateEvent {
+message UserCreatedEvent {
   string id = 1;
 }
 
-message UpdateEvent {
+message UserUpdatedEvent {
   string id = 1;
   bool is_security_update = 2;
 }
 
-message DeleteEvent {
+message UserDeletedEvent {
   string id = 1;
 }

@@ -17,6 +17,7 @@ service UserService {
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
   rpc UpdateUser(UpdateUserRequest) returns (google.protobuf.Empty);
   rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty);
+  rpc GetProfileImageUploadData(google.protobuf.Empty) returns (GetProfileImageUploadDataResponse);
 
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc SignIn(SignInRequest) returns (SignInResponse);
@@ -90,6 +91,10 @@ message UpdateUserRequest {
 
 message DeleteUserRequest {
   string id = 1;
+}
+
+message GetProfileImageUploadDataResponse {
+  base.ImageUploadData upload_data = 1;
 }
 
 // Auth

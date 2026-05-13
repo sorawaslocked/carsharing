@@ -10,7 +10,7 @@ import (
 type TokenManager interface {
 	GenerateAccessToken(userID string) (token string, exp time.Time, err error)
 	GenerateRefreshToken(userID string) (token string, exp time.Time, err error)
-	ParseToken(token string) (userID string, err error)
+	ParseToken(token string) (userID string, exp time.Time, err error)
 }
 
 type UserSessionCache interface {
@@ -65,6 +65,9 @@ type CarPresenter interface {
 	GetCarMileageHistory(ctx context.Context, carID string, filter model.CarMileageReadingFilter) ([]model.CarMileageReading, error)
 
 	GetImageUploadData(ctx context.Context) (model.ImageUploadData, error)
+
+	StreamCarsWithFilter(ctx context.Context, filter model.CarFilter, send func([]model.SlimCar) error) error
+	StreamCarTelemetry(ctx context.Context, carID string, send func(model.CarTelemetryEvent) error) error
 }
 
 type PricingRulePresenter interface {
@@ -111,6 +114,8 @@ type TripPresenter interface {
 	Cancel(ctx context.Context, id string, reason *string) error
 	GetSummary(ctx context.Context, id string) (model.TripSummary, error)
 	GetStatusHistory(ctx context.Context, id string, filter model.TripStatusReadingFilter) ([]model.TripStatusReading, error)
+
+	StreamTripLiveFeed(ctx context.Context, tripID string, send func(model.TripLiveFeed) error) error
 }
 
 type CarMaintenancePresenter interface {

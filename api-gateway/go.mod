@@ -3,6 +3,7 @@ module github.com/sorawaslocked/car-rental-api-gateway
 go 1.25.0
 
 require (
+	github.com/coder/websocket v1.8.14
 	github.com/fatih/color v1.18.0
 	github.com/gin-contrib/cors v1.7.6
 	github.com/gin-contrib/requestid v1.0.5
@@ -11,7 +12,7 @@ require (
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/nats-io/nats.go v1.52.0
 	github.com/redis/go-redis/v9 v9.18.0
-	github.com/sorawaslocked/car-rental-protos v0.0.25
+	github.com/sorawaslocked/car-rental-protos v0.0.26
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.1
 	github.com/swaggo/swag v1.16.6

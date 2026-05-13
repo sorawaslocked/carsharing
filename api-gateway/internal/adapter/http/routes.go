@@ -168,6 +168,24 @@ func (s *Server) setupRoutes(
 		}
 	}
 
+	// WebSocket routes — middleware groups mirror the REST structure exactly.
+	ws := s.router.Group("/ws")
+	ws.Use(authentication.Middleware())
+	ws.Use(middleware.SuspensionChecker())
+	{
+		ws.GET("/users/documents", s.userWsHandler.DocumentUpdates)
+
+		wsVerified := ws.Group("")
+		wsVerified.Use(middleware.EmailVerificationChecker())
+		wsVerified.Use(middleware.DocumentVerificationChecker())
+		{
+			wsVerified.GET("/cars", s.carWsHandler.Fleet)
+			wsVerified.GET("/cars/:id/telemetry", s.carWsHandler.Telemetry)
+			wsVerified.GET("/cars/:id/status", s.carWsHandler.Status)
+			wsVerified.GET("/trips/:id", s.tripWsHandler.LiveFeed)
+		}
+	}
+
 	// Swagger
 	s.router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }

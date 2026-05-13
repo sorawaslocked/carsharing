@@ -7,6 +7,7 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/grpc/dto"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 	pkglog "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/utils"
 	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -15,19 +16,22 @@ import (
 )
 
 type CarHandler struct {
-	client carsvc.CarServiceClient
-	log    *slog.Logger
+	client       carsvc.CarServiceClient
+	streamClient carsvc.CarStreamServiceClient
+	log          *slog.Logger
 }
 
-func NewCarHandler(client carsvc.CarServiceClient, logger *slog.Logger) *CarHandler {
+func NewCarHandler(client carsvc.CarServiceClient, streamClient carsvc.CarStreamServiceClient, logger *slog.Logger) *CarHandler {
 	return &CarHandler{
-		client: client,
-		log:    pkglog.WithComponent(logger, "grpc.CarHandler"),
+		client:       client,
+		streamClient: streamClient,
+		log:          pkglog.WithComponent(logger, "grpc.CarHandler"),
 	}
 }
 
 func (h *CarHandler) Create(ctx context.Context, data model.CarCreate) (string, error) {
 	logger := pkglog.WithMethod(h.log, "Create")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.CreateCar(ctx, &carsvc.CreateCarRequest{
 		ModelId:          data.ModelID,
@@ -51,6 +55,7 @@ func (h *CarHandler) Create(ctx context.Context, data model.CarCreate) (string, 
 
 func (h *CarHandler) Get(ctx context.Context, id string) (model.Car, error) {
 	logger := pkglog.WithMethod(h.log, "Get")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetCar(ctx, &carsvc.GetCarRequest{Id: id})
 	if err != nil {
@@ -66,6 +71,7 @@ func (h *CarHandler) Get(ctx context.Context, id string) (model.Car, error) {
 
 func (h *CarHandler) List(ctx context.Context, filter model.CarFilter) ([]model.Car, error) {
 	logger := pkglog.WithMethod(h.log, "List")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.ListCarsRequest{
 		Brand:        filter.Brand,
@@ -113,6 +119,7 @@ func (h *CarHandler) List(ctx context.Context, filter model.CarFilter) ([]model.
 
 func (h *CarHandler) Update(ctx context.Context, id string, data model.CarUpdate) error {
 	logger := pkglog.WithMethod(h.log, "Update")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.UpdateCarRequest{
 		Id:           id,
@@ -140,6 +147,7 @@ func (h *CarHandler) Update(ctx context.Context, id string, data model.CarUpdate
 
 func (h *CarHandler) Delete(ctx context.Context, id string) error {
 	logger := pkglog.WithMethod(h.log, "Delete")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.DeleteCar(ctx, &carsvc.DeleteCarRequest{Id: id})
 	if err != nil {
@@ -155,6 +163,7 @@ func (h *CarHandler) Delete(ctx context.Context, id string) error {
 
 func (h *CarHandler) UpdateTelemetry(ctx context.Context, carID string, data model.CarTelemetryUpdate) error {
 	logger := pkglog.WithMethod(h.log, "UpdateTelemetry")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.UpdateCarTelemetryRequest{
 		Id:           carID,
@@ -187,6 +196,7 @@ func (h *CarHandler) UpdateTelemetry(ctx context.Context, carID string, data mod
 
 func (h *CarHandler) UpdateStatus(ctx context.Context, carID string, data model.CarStatusUpdate) error {
 	logger := pkglog.WithMethod(h.log, "UpdateStatus")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.UpdateCarStatusRequest{
 		Id:     carID,
@@ -214,6 +224,7 @@ func (h *CarHandler) UpdateStatus(ctx context.Context, carID string, data model.
 
 func (h *CarHandler) GetCarStatusHistory(ctx context.Context, carID string, filter model.CarStatusReadingFilter) ([]model.CarStatusReading, error) {
 	logger := pkglog.WithMethod(h.log, "GetCarStatusHistory")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.GetCarStatusHistoryRequest{CarId: carID}
 	if filter.From != nil {
@@ -248,6 +259,7 @@ func (h *CarHandler) GetCarStatusHistory(ctx context.Context, carID string, filt
 
 func (h *CarHandler) GetCarFuelHistory(ctx context.Context, carID string, filter model.CarFuelReadingFilter) ([]model.CarFuelReading, error) {
 	logger := pkglog.WithMethod(h.log, "GetCarFuelHistory")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.GetCarFuelHistoryRequest{CarId: carID}
 	if filter.From != nil {
@@ -282,6 +294,7 @@ func (h *CarHandler) GetCarFuelHistory(ctx context.Context, carID string, filter
 
 func (h *CarHandler) GetCarLocationHistory(ctx context.Context, carID string, filter model.CarLocationReadingFilter) ([]model.CarLocationReading, error) {
 	logger := pkglog.WithMethod(h.log, "GetCarLocationHistory")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.GetCarLocationHistoryRequest{CarId: carID}
 	if filter.From != nil {
@@ -314,6 +327,7 @@ func (h *CarHandler) GetCarLocationHistory(ctx context.Context, carID string, fi
 
 func (h *CarHandler) GetCarBatteryHistory(ctx context.Context, carID string, filter model.CarBatteryReadingFilter) ([]model.CarBatteryReading, error) {
 	logger := pkglog.WithMethod(h.log, "GetCarBatteryHistory")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.GetCarBatteryHistoryRequest{CarId: carID}
 	if filter.From != nil {
@@ -346,6 +360,7 @@ func (h *CarHandler) GetCarBatteryHistory(ctx context.Context, carID string, fil
 
 func (h *CarHandler) GetCarMileageHistory(ctx context.Context, carID string, filter model.CarMileageReadingFilter) ([]model.CarMileageReading, error) {
 	logger := pkglog.WithMethod(h.log, "GetCarMileageHistory")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.GetCarMileageHistoryRequest{CarId: carID}
 	if filter.From != nil {
@@ -378,6 +393,7 @@ func (h *CarHandler) GetCarMileageHistory(ctx context.Context, carID string, fil
 
 func (h *CarHandler) GetImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
 	logger := pkglog.WithMethod(h.log, "GetImageUploadData")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetCarImageUploadData(ctx, &emptypb.Empty{})
 	if err != nil {

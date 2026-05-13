@@ -180,3 +180,27 @@ type CarStatusUpdate struct {
 	Reason   string
 	Metadata map[string]any
 }
+
+type SlimCar struct {
+	ID           string
+	ModelID      string
+	LicensePlate string
+	Color        string
+	Location     Location
+	FuelLevel    float32
+	Status       string
+}
+
+type CarTelemetryEvent struct {
+	FuelLevel    float32
+	BatteryLevel float32
+	MileageKM    int64
+	Location     Location
+	RecordedAt   time.Time
+}
+
+type CarStatusUpdated struct {
+	CarID      string
+	FromStatus string
+	ToStatus   string
+}

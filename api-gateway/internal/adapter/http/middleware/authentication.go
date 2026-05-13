@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/dto"
@@ -14,6 +15,7 @@ const (
 	ctxUserDocumentVerifiedKey = "x-user-document-verified"
 	ctxUserEmailVerifiedKey    = "x-user-email-verified"
 	ctxUserSuspendedKey        = "x-user-suspended"
+	ctxTokenExpKey             = "x-token-exp"
 )
 
 type Authentication struct {
@@ -44,7 +46,7 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 			return
 		}
 
-		userID, err := a.parseClaims(header)
+		userID, exp, err := a.parseClaims(header)
 		if err != nil {
 			dto.FromError(c, err)
 			c.Abort()
@@ -105,6 +107,7 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 		c.Set(ctxUserDocumentVerifiedKey, isDocumentVerified)
 		c.Set(ctxUserEmailVerifiedKey, isEmailVerified)
 		c.Set(ctxUserSuspendedKey, isSuspended)
+		c.Set(ctxTokenExpKey, exp)
 
 		c.Next()
 	}
@@ -119,13 +122,13 @@ func authHeader(c *gin.Context) (string, error) {
 	return header, nil
 }
 
-func (a *Authentication) parseClaims(authHeader string) (userID string, err error) {
+func (a *Authentication) parseClaims(authHeader string) (userID string, exp time.Time, err error) {
 	token := strings.TrimPrefix(authHeader, "Bearer ")
 
-	userID, err = a.tokenParser.ParseToken(token)
+	userID, exp, err = a.tokenParser.ParseToken(token)
 	if err != nil {
-		return "", model.ErrUnauthorized
+		return "", time.Time{}, model.ErrUnauthorized
 	}
 
-	return userID, nil
+	return userID, exp, nil
 }

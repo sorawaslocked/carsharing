@@ -88,15 +88,3 @@ type RefreshToken struct {
 	Token     string
 	ExpiresIn int64
 }
-
-type Document struct {
-	ID        string
-	UserID    string
-	ImageType string
-	Status    string
-	Reason    *string
-	ImageURL  string
-
-	CreatedAt time.Time
-	UpdatedAt time.Time
-}

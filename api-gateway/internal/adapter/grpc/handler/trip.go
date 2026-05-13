@@ -7,25 +7,29 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/grpc/dto"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 	pkglog "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/utils"
 	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
 	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type TripHandler struct {
-	client tripsvc.TripServiceClient
-	log    *slog.Logger
+	client       tripsvc.TripServiceClient
+	streamClient tripsvc.TripStreamServiceClient
+	log          *slog.Logger
 }
 
-func NewTripHandler(client tripsvc.TripServiceClient, logger *slog.Logger) *TripHandler {
+func NewTripHandler(client tripsvc.TripServiceClient, streamClient tripsvc.TripStreamServiceClient, logger *slog.Logger) *TripHandler {
 	return &TripHandler{
-		client: client,
-		log:    pkglog.WithComponent(logger, "grpc.TripHandler"),
+		client:       client,
+		streamClient: streamClient,
+		log:          pkglog.WithComponent(logger, "grpc.TripHandler"),
 	}
 }
 
 func (h *TripHandler) Start(ctx context.Context, bookingID string) (string, error) {
 	logger := pkglog.WithMethod(h.log, "Start")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.StartTrip(ctx, &tripsvc.StartTripRequest{BookingId: bookingID})
 	if err != nil {
@@ -41,6 +45,7 @@ func (h *TripHandler) Start(ctx context.Context, bookingID string) (string, erro
 
 func (h *TripHandler) Get(ctx context.Context, id string) (model.Trip, error) {
 	logger := pkglog.WithMethod(h.log, "Get")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetTrip(ctx, &tripsvc.GetTripRequest{Id: id})
 	if err != nil {
@@ -56,6 +61,7 @@ func (h *TripHandler) Get(ctx context.Context, id string) (model.Trip, error) {
 
 func (h *TripHandler) List(ctx context.Context, filter model.TripFilter) ([]model.Trip, error) {
 	logger := pkglog.WithMethod(h.log, "List")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &tripsvc.ListTripsRequest{
 		UserId: filter.UserID,
@@ -94,6 +100,7 @@ func (h *TripHandler) List(ctx context.Context, filter model.TripFilter) ([]mode
 
 func (h *TripHandler) End(ctx context.Context, id string) error {
 	logger := pkglog.WithMethod(h.log, "End")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.EndTrip(ctx, &tripsvc.EndTripRequest{Id: id})
 	if err != nil {
@@ -109,6 +116,7 @@ func (h *TripHandler) End(ctx context.Context, id string) error {
 
 func (h *TripHandler) Cancel(ctx context.Context, id string, reason *string) error {
 	logger := pkglog.WithMethod(h.log, "Cancel")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.CancelTrip(ctx, &tripsvc.CancelTripRequest{Id: id, Reason: reason})
 	if err != nil {
@@ -124,6 +132,7 @@ func (h *TripHandler) Cancel(ctx context.Context, id string, reason *string) err
 
 func (h *TripHandler) GetSummary(ctx context.Context, id string) (model.TripSummary, error) {
 	logger := pkglog.WithMethod(h.log, "GetSummary")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetTripSummary(ctx, &tripsvc.GetTripSummaryRequest{Id: id})
 	if err != nil {
@@ -139,6 +148,7 @@ func (h *TripHandler) GetSummary(ctx context.Context, id string) (model.TripSumm
 
 func (h *TripHandler) GetStatusHistory(ctx context.Context, id string, filter model.TripStatusReadingFilter) ([]model.TripStatusReading, error) {
 	logger := pkglog.WithMethod(h.log, "GetStatusHistory")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &tripsvc.GetTripStatusHistoryRequest{Id: id}
 	if filter.From != nil {

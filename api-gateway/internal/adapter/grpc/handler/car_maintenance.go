@@ -7,6 +7,7 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/grpc/dto"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 	pkglog "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/utils"
 	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -26,6 +27,7 @@ func NewCarMaintenanceHandler(client carsvc.CarMaintenanceServiceClient, logger 
 
 func (h *CarMaintenanceHandler) CreateTemplate(ctx context.Context, data model.CarMaintenanceTemplateCreate) (string, error) {
 	logger := pkglog.WithMethod(h.log, "CreateTemplate")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.CreateMaintenanceTemplate(ctx, &carsvc.CreateMaintenanceTemplateRequest{
 		Name:        data.Name,
@@ -48,6 +50,7 @@ func (h *CarMaintenanceHandler) CreateTemplate(ctx context.Context, data model.C
 
 func (h *CarMaintenanceHandler) GetTemplate(ctx context.Context, id string) (model.CarMaintenanceTemplate, error) {
 	logger := pkglog.WithMethod(h.log, "GetTemplate")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetMaintenanceTemplate(ctx, &carsvc.GetMaintenanceTemplateRequest{Id: id})
 	if err != nil {
@@ -63,6 +66,7 @@ func (h *CarMaintenanceHandler) GetTemplate(ctx context.Context, id string) (mod
 
 func (h *CarMaintenanceHandler) ListTemplates(ctx context.Context, filter model.CarMaintenanceTemplateFilter) ([]model.CarMaintenanceTemplate, error) {
 	logger := pkglog.WithMethod(h.log, "ListTemplates")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.ListMaintenanceTemplatesRequest{}
 	if filter.Pagination != nil {
@@ -91,6 +95,7 @@ func (h *CarMaintenanceHandler) ListTemplates(ctx context.Context, filter model.
 
 func (h *CarMaintenanceHandler) UpdateTemplate(ctx context.Context, id string, data model.CarMaintenanceTemplateUpdate) error {
 	logger := pkglog.WithMethod(h.log, "UpdateTemplate")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.UpdateMaintenanceTemplate(ctx, &carsvc.UpdateMaintenanceTemplateRequest{
 		Id:          id,
@@ -114,6 +119,7 @@ func (h *CarMaintenanceHandler) UpdateTemplate(ctx context.Context, id string, d
 
 func (h *CarMaintenanceHandler) DeleteTemplate(ctx context.Context, id string) error {
 	logger := pkglog.WithMethod(h.log, "DeleteTemplate")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.DeleteMaintenanceTemplate(ctx, &carsvc.DeleteMaintenanceTemplateRequest{Id: id})
 	if err != nil {
@@ -129,6 +135,7 @@ func (h *CarMaintenanceHandler) DeleteTemplate(ctx context.Context, id string) e
 
 func (h *CarMaintenanceHandler) ListRecords(ctx context.Context, filter model.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error) {
 	logger := pkglog.WithMethod(h.log, "ListRecords")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.ListMaintenanceRecordsRequest{
 		CarId:      filter.CarID,
@@ -161,6 +168,7 @@ func (h *CarMaintenanceHandler) ListRecords(ctx context.Context, filter model.Ca
 
 func (h *CarMaintenanceHandler) CompleteRecord(ctx context.Context, recordID string, data model.CarMaintenanceRecordComplete) error {
 	logger := pkglog.WithMethod(h.log, "CompleteRecord")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.CompleteMaintenanceRecord(ctx, &carsvc.CompleteMaintenanceRecordRequest{
 		RecordId:               recordID,
@@ -182,6 +190,7 @@ func (h *CarMaintenanceHandler) CompleteRecord(ctx context.Context, recordID str
 
 func (h *CarMaintenanceHandler) GetReceiptImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
 	logger := pkglog.WithMethod(h.log, "GetReceiptImageUploadData")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetMaintenanceReceiptImageUploadData(ctx, &emptypb.Empty{})
 	if err != nil {

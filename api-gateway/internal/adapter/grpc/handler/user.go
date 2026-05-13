@@ -7,6 +7,7 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/grpc/dto"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 	pkglog "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/utils"
 	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -26,6 +27,7 @@ func NewUserHandler(client usersvc.UserServiceClient, logger *slog.Logger) *User
 
 func (h *UserHandler) Create(ctx context.Context, data model.UserCreate) (string, error) {
 	logger := pkglog.WithMethod(h.log, "Create")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &usersvc.CreateUserRequest{
 		Email:       data.Email,
@@ -55,6 +57,7 @@ func (h *UserHandler) Create(ctx context.Context, data model.UserCreate) (string
 
 func (h *UserHandler) Get(ctx context.Context, id string) (model.User, error) {
 	logger := pkglog.WithMethod(h.log, "Get")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetUser(ctx, &usersvc.GetUserRequest{Id: id})
 	if err != nil {
@@ -70,6 +73,7 @@ func (h *UserHandler) Get(ctx context.Context, id string) (model.User, error) {
 
 func (h *UserHandler) List(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
 	logger := pkglog.WithMethod(h.log, "List")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &usersvc.ListUsersRequest{
 		Email:              filter.Email,
@@ -106,6 +110,7 @@ func (h *UserHandler) List(ctx context.Context, filter model.UserFilter) ([]mode
 
 func (h *UserHandler) Update(ctx context.Context, id string, data model.UserUpdate) error {
 	logger := pkglog.WithMethod(h.log, "Update")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &usersvc.UpdateUserRequest{
 		Id:                 id,
@@ -141,6 +146,7 @@ func (h *UserHandler) Update(ctx context.Context, id string, data model.UserUpda
 
 func (h *UserHandler) Delete(ctx context.Context, id string) error {
 	logger := pkglog.WithMethod(h.log, "Delete")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.DeleteUser(ctx, &usersvc.DeleteUserRequest{Id: id})
 	if err != nil {
@@ -156,6 +162,7 @@ func (h *UserHandler) Delete(ctx context.Context, id string) error {
 
 func (h *UserHandler) Register(ctx context.Context, data model.UserCreate) (string, error) {
 	logger := pkglog.WithMethod(h.log, "Register")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &usersvc.RegisterRequest{
 		Email:       data.Email,
@@ -185,6 +192,7 @@ func (h *UserHandler) Register(ctx context.Context, data model.UserCreate) (stri
 
 func (h *UserHandler) SignIn(ctx context.Context, creds model.Credentials) (string, error) {
 	logger := pkglog.WithMethod(h.log, "SignIn")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &usersvc.SignInRequest{
 		Email:       creds.Email,
@@ -208,6 +216,7 @@ func (h *UserHandler) SignIn(ctx context.Context, creds model.Credentials) (stri
 
 func (h *UserHandler) SendActivationCode(ctx context.Context) error {
 	logger := pkglog.WithMethod(h.log, "SendActivationCode")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.SendActivationCode(ctx, &emptypb.Empty{})
 	if err != nil {
@@ -223,95 +232,9 @@ func (h *UserHandler) SendActivationCode(ctx context.Context) error {
 
 func (h *UserHandler) CheckActivationCode(ctx context.Context, code string) error {
 	logger := pkglog.WithMethod(h.log, "CheckActivationCode")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.CheckActivationCode(ctx, &usersvc.CheckActivationCodeRequest{Code: code})
-	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
-
-		return dto.FromGrpcErr(err)
-	}
-
-	return nil
-}
-
-func (h *UserHandler) CreateDocument(ctx context.Context, objectKey, imageType string) (string, error) {
-	logger := pkglog.WithMethod(h.log, "CreateDocument")
-
-	res, err := h.client.CreateDocument(ctx, &usersvc.CreateDocumentRequest{
-		ObjectKey: objectKey,
-		ImageType: imageType,
-	})
-	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
-
-		return "", dto.FromGrpcErr(err)
-	}
-
-	return res.GetId(), nil
-}
-
-func (h *UserHandler) GetDocumentImageUploadData(ctx context.Context, imageType string) (model.ImageUploadData, error) {
-	logger := pkglog.WithMethod(h.log, "GetDocumentImageUploadData")
-
-	res, err := h.client.GetUploadDocumentData(ctx, &usersvc.GetUploadDocumentDataRequest{ImageType: imageType})
-	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
-
-		return model.ImageUploadData{}, dto.FromGrpcErr(err)
-	}
-
-	return dto.ImageUploadDataFromProto(res.GetUploadData()), nil
-}
-
-func (h *UserHandler) GetProfileImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
-	logger := pkglog.WithMethod(h.log, "GetProfileImageUploadData")
-
-	res, err := h.client.GetProfileImageUploadData(ctx, &emptypb.Empty{})
-	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
-
-		return model.ImageUploadData{}, dto.FromGrpcErr(err)
-	}
-
-	return dto.ImageUploadDataFromProto(res.GetUploadData()), nil
-}
-
-func (h *UserHandler) GetProcessedDocumentsForUser(ctx context.Context, userID string) ([]model.Document, error) {
-	logger := pkglog.WithMethod(h.log, "GetProcessedDocumentsForUser")
-
-	res, err := h.client.GetProcessedDocumentsForUser(ctx, &usersvc.GetProcessedDocumentsForUserRequest{UserId: userID})
-	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
-
-		return nil, dto.FromGrpcErr(err)
-	}
-
-	docs := make([]model.Document, len(res.GetDocuments()))
-	for i, d := range res.GetDocuments() {
-		docs[i] = dto.DocumentFromProto(d)
-	}
-
-	return docs, nil
-}
-
-func (h *UserHandler) CheckDocument(ctx context.Context, docID, status string, reason *string) error {
-	logger := pkglog.WithMethod(h.log, "CheckDocument")
-
-	_, err := h.client.CheckDocument(ctx, &usersvc.CheckDocumentRequest{
-		DocId:  docID,
-		Status: status,
-		Error:  reason,
-	})
 	if err != nil {
 		if dto.IsSystemErr(err) {
 			logger.Error("grpc call failed", pkglog.Err(err))

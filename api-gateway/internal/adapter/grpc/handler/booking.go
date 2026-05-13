@@ -7,6 +7,7 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/grpc/dto"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 	pkglog "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/utils"
 	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
 	bookingsvc "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -26,6 +27,7 @@ func NewBookingHandler(client bookingsvc.BookingServiceClient, logger *slog.Logg
 
 func (h *BookingHandler) Create(ctx context.Context, data model.BookingCreate) (string, error) {
 	logger := pkglog.WithMethod(h.log, "Create")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &bookingsvc.CreateBookingRequest{
 		UserId:        data.UserID,
@@ -50,6 +52,7 @@ func (h *BookingHandler) Create(ctx context.Context, data model.BookingCreate) (
 
 func (h *BookingHandler) Get(ctx context.Context, id string) (model.Booking, error) {
 	logger := pkglog.WithMethod(h.log, "Get")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetBooking(ctx, &bookingsvc.GetBookingRequest{Id: id})
 	if err != nil {
@@ -65,6 +68,7 @@ func (h *BookingHandler) Get(ctx context.Context, id string) (model.Booking, err
 
 func (h *BookingHandler) List(ctx context.Context, filter model.BookingFilter) ([]model.Booking, error) {
 	logger := pkglog.WithMethod(h.log, "List")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &bookingsvc.ListBookingsRequest{
 		UserId:        filter.UserID,
@@ -98,6 +102,7 @@ func (h *BookingHandler) List(ctx context.Context, filter model.BookingFilter) (
 
 func (h *BookingHandler) Start(ctx context.Context, id string) error {
 	logger := pkglog.WithMethod(h.log, "Start")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.StartBooking(ctx, &bookingsvc.StartBookingRequest{Id: id})
 	if err != nil {
@@ -113,6 +118,7 @@ func (h *BookingHandler) Start(ctx context.Context, id string) error {
 
 func (h *BookingHandler) Cancel(ctx context.Context, id string) error {
 	logger := pkglog.WithMethod(h.log, "Cancel")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.CancelBooking(ctx, &bookingsvc.CancelBookingRequest{Id: id})
 	if err != nil {
@@ -128,6 +134,7 @@ func (h *BookingHandler) Cancel(ctx context.Context, id string) error {
 
 func (h *BookingHandler) UpdateStatus(ctx context.Context, id string, data model.BookingStatusUpdate) error {
 	logger := pkglog.WithMethod(h.log, "UpdateStatus")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &bookingsvc.UpdateBookingStatusRequest{
 		Id:     id,
@@ -149,6 +156,7 @@ func (h *BookingHandler) UpdateStatus(ctx context.Context, id string, data model
 
 func (h *BookingHandler) GetStatusHistory(ctx context.Context, id string, filter model.BookingStatusReadingFilter) ([]model.BookingStatusReading, error) {
 	logger := pkglog.WithMethod(h.log, "GetStatusHistory")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &bookingsvc.GetBookingStatusHistoryRequest{Id: id}
 	if filter.From != nil {

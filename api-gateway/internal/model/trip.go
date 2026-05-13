@@ -70,3 +70,9 @@ type TripStatusReadingFilter struct {
 	To         *time.Time
 	Pagination *Pagination
 }
+
+type TripLiveFeed struct {
+	ElapsedSeconds     int64
+	CurrentCostTenge   int32
+	DistanceTraveledKM float64
+}

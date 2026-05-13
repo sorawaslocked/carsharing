@@ -86,12 +86,11 @@ func (m *Manager) GenerateRefreshToken(userID string) (token string, exp time.Ti
 	return token, exp, nil
 }
 
-func (m *Manager) ParseToken(token string) (userID string, err error) {
+func (m *Manager) ParseToken(token string) (userID string, exp time.Time, err error) {
 	const method = "ParseToken"
 	logger := pkglog.WithMethod(m.log, method)
 
-	var tokenWithClaims *jwt.Token
-	tokenWithClaims, err = jwt.ParseWithClaims(token, &jwt.MapClaims{}, func(token *jwt.Token) (any, error) {
+	tokenWithClaims, err := jwt.ParseWithClaims(token, &jwt.MapClaims{}, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
@@ -100,27 +99,34 @@ func (m *Manager) ParseToken(token string) (userID string, err error) {
 	})
 	if err != nil {
 		if errors.Is(err, jwt.ErrTokenExpired) {
-			return "", ErrExpiredToken
+			return "", time.Time{}, ErrExpiredToken
 		}
 
 		logger.Warn("parsing token", pkglog.Err(err))
 
-		return "", ErrInvalidToken
+		return "", time.Time{}, ErrInvalidToken
 	}
 
 	claims, ok := tokenWithClaims.Claims.(*jwt.MapClaims)
 	if !ok {
 		logger.Error("unexpected claims type in token")
 
-		return "", ErrInvalidToken
+		return "", time.Time{}, ErrInvalidToken
 	}
 
 	subject, err := claims.GetSubject()
 	if err != nil {
 		logger.Error("getting subject from token claims", pkglog.Err(err))
 
-		return "", ErrInvalidToken
+		return "", time.Time{}, ErrInvalidToken
 	}
 
-	return subject, nil
+	expTime, err := claims.GetExpirationTime()
+	if err != nil || expTime == nil {
+		logger.Error("getting expiry from token claims", pkglog.Err(err))
+
+		return "", time.Time{}, ErrInvalidToken
+	}
+
+	return subject, expTime.Time, nil
 }

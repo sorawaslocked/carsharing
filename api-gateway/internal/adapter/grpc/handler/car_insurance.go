@@ -7,6 +7,7 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/grpc/dto"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 	pkglog "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/utils"
 	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -27,6 +28,7 @@ func NewCarInsuranceHandler(client carsvc.CarInsuranceServiceClient, logger *slo
 
 func (h *CarInsuranceHandler) Create(ctx context.Context, data model.CarInsuranceCreate) (string, error) {
 	logger := pkglog.WithMethod(h.log, "Create")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.CreateCarInsurance(ctx, &carsvc.CreateCarInsuranceRequest{
 		CarId:     data.CarID,
@@ -51,6 +53,7 @@ func (h *CarInsuranceHandler) Create(ctx context.Context, data model.CarInsuranc
 
 func (h *CarInsuranceHandler) Get(ctx context.Context, id string) (model.CarInsurance, error) {
 	logger := pkglog.WithMethod(h.log, "Get")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetCarInsurance(ctx, &carsvc.GetCarInsuranceRequest{Id: id})
 	if err != nil {
@@ -66,6 +69,7 @@ func (h *CarInsuranceHandler) Get(ctx context.Context, id string) (model.CarInsu
 
 func (h *CarInsuranceHandler) List(ctx context.Context, filter model.CarInsuranceFilter) ([]model.CarInsurance, error) {
 	logger := pkglog.WithMethod(h.log, "List")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.ListCarInsurancesRequest{
 		CarId:              filter.CarID,
@@ -99,6 +103,7 @@ func (h *CarInsuranceHandler) List(ctx context.Context, filter model.CarInsuranc
 
 func (h *CarInsuranceHandler) Update(ctx context.Context, id string, data model.CarInsuranceUpdate) error {
 	logger := pkglog.WithMethod(h.log, "Update")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.UpdateCarInsuranceRequest{
 		Id:        id,
@@ -130,6 +135,7 @@ func (h *CarInsuranceHandler) Update(ctx context.Context, id string, data model.
 
 func (h *CarInsuranceHandler) Delete(ctx context.Context, id string) error {
 	logger := pkglog.WithMethod(h.log, "Delete")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.DeleteCarInsurance(ctx, &carsvc.DeleteCarInsuranceRequest{Id: id})
 	if err != nil {
@@ -145,6 +151,7 @@ func (h *CarInsuranceHandler) Delete(ctx context.Context, id string) error {
 
 func (h *CarInsuranceHandler) GetImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
 	logger := pkglog.WithMethod(h.log, "GetImageUploadData")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetCarInsuranceImageUploadData(ctx, &emptypb.Empty{})
 	if err != nil {

@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/handler"
+	wshandler "github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/websocket/handler"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/config"
 )
 
@@ -26,6 +27,9 @@ type Server struct {
 	zoneHandler           *handler.ZoneHandler
 	bookingHandler        *handler.BookingHandler
 	tripHandler           *handler.TripHandler
+	userWsHandler         *wshandler.UserWsHandler
+	carWsHandler          *wshandler.CarWsHandler
+	tripWsHandler         *wshandler.TripWsHandler
 }
 
 func New(
@@ -45,6 +49,10 @@ func New(
 	tokenManager TokenParser,
 	userPermissionsCache UserPermissionsCache,
 	userSessionCache UserSessionCache,
+	carStreamService wshandler.CarStreamService,
+	tripStreamService wshandler.TripStreamService,
+	documentHub *wshandler.DocumentHub,
+	carStatusHub *wshandler.CarStatusHub,
 ) *Server {
 	httpLog := log.With(
 		slog.String("httpServerHost", httpCfg.Host),
@@ -66,6 +74,11 @@ func New(
 	bookingHandler := handler.NewBookingHandler(bookingService)
 	tripHandler := handler.NewTripHandler(tripService)
 
+	// WebSocket handlers
+	userWsHandler := wshandler.NewUserWsHandler(documentHub, log)
+	carWsHandler := wshandler.NewCarWsHandler(carStreamService, carStatusHub, log)
+	tripWsHandler := wshandler.NewTripWsHandler(tripStreamService, log)
+
 	server := &Server{
 		router:                router,
 		httpCfg:               httpCfg,
@@ -80,6 +93,9 @@ func New(
 		zoneHandler:           zoneHandler,
 		bookingHandler:        bookingHandler,
 		tripHandler:           tripHandler,
+		userWsHandler:         userWsHandler,
+		carWsHandler:          carWsHandler,
+		tripWsHandler:         tripWsHandler,
 	}
 
 	server.setupMiddleware()

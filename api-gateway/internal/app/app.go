@@ -13,6 +13,7 @@ import (
 	httphandler "github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/handler"
 	natshandler "github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/nats/handler"
 	redisadapter "github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/redis"
+	wshandler "github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/websocket/handler"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/config"
 	grpcconn "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/grpc"
 	pkgjwt "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/jwt"
@@ -42,10 +43,12 @@ func (l *lazySessionCache) SetSignedIn(ctx context.Context, userID, deviceID str
 }
 
 type App struct {
-	cfg            config.Config
-	log            *slog.Logger
-	httpServer     *httpserver.Server
-	natsSubscriber *natshandler.UserSubscriber
+	cfg                    config.Config
+	log                    *slog.Logger
+	httpServer             *httpserver.Server
+	natsUserSubscriber     *natshandler.UserSubscriber
+	natsDocumentSubscriber *natshandler.DocumentSubscriber
+	natsCarSubscriber      *natshandler.CarSubscriber
 }
 
 func New(cfg config.Config, log *slog.Logger) *App {
@@ -95,6 +98,7 @@ func New(cfg config.Config, log *slog.Logger) *App {
 	userGrpcClient := usersvc.NewUserServiceClient(userServiceGrpcConn)
 	userHealthGrpcClient := usersvc.NewHealthServiceClient(userServiceGrpcConn)
 	carGrpcClient := carsvc.NewCarServiceClient(carServiceGrpcConn)
+	carStreamGrpcClient := carsvc.NewCarStreamServiceClient(carServiceGrpcConn)
 	carHealthGrpcClient := carsvc.NewHealthServiceClient(carServiceGrpcConn)
 	carModelGrpcClient := carsvc.NewCarModelServiceClient(carServiceGrpcConn)
 	carInsuranceGrpcClient := carsvc.NewCarInsuranceServiceClient(carServiceGrpcConn)
@@ -104,12 +108,13 @@ func New(cfg config.Config, log *slog.Logger) *App {
 	bookingGrpcClient := bookingsvc.NewBookingServiceClient(bookingServiceGrpcConn)
 	bookingHealthGrpcClient := bookingsvc.NewHealthServiceClient(bookingServiceGrpcConn)
 	tripGrpcClient := tripsvc.NewTripServiceClient(tripServiceGrpcConn)
+	tripStreamGrpcClient := tripsvc.NewTripStreamServiceClient(tripServiceGrpcConn)
 	tripHealthGrpcClient := tripsvc.NewHealthServiceClient(tripServiceGrpcConn)
 
 	// gRPC handlers
 	userServiceGrpcHandler := grpchandler.NewUserHandler(userGrpcClient, log)
 	userHealthGrpcHandler := grpchandler.NewHealthHandler(userHealthGrpcClient, log)
-	carGrpcHandler := grpchandler.NewCarHandler(carGrpcClient, log)
+	carGrpcHandler := grpchandler.NewCarHandler(carGrpcClient, carStreamGrpcClient, log)
 	carHealthGrpcHandler := grpchandler.NewHealthHandler(carHealthGrpcClient, log)
 	carModelGrpcHandler := grpchandler.NewCarModelHandler(carModelGrpcClient, log)
 	carInsuranceGrpcHandler := grpchandler.NewCarInsuranceHandler(carInsuranceGrpcClient, log)
@@ -118,7 +123,7 @@ func New(cfg config.Config, log *slog.Logger) *App {
 	pricingRuleGrpcHandler := grpchandler.NewPricingRuleHandler(pricingRuleGrpcClient, log)
 	bookingGrpcHandler := grpchandler.NewBookingHandler(bookingGrpcClient, log)
 	bookingHealthGrpcHandler := grpchandler.NewHealthHandler(bookingHealthGrpcClient, log)
-	tripGrpcHandler := grpchandler.NewTripHandler(tripGrpcClient, log)
+	tripGrpcHandler := grpchandler.NewTripHandler(tripGrpcClient, tripStreamGrpcClient, log)
 	tripHealthGrpcHandler := grpchandler.NewHealthHandler(tripHealthGrpcClient, log)
 
 	// JWT
@@ -156,6 +161,19 @@ func New(cfg config.Config, log *slog.Logger) *App {
 		return nil
 	}
 
+	documentHub := wshandler.NewDocumentHub()
+	carStatusHub := wshandler.NewCarStatusHub()
+
+	natsDocumentSub := natshandler.NewDocumentSubscriber(natsConn, documentHub, log)
+	if err = natsDocumentSub.Subscribe(); err != nil {
+		return nil
+	}
+
+	natsCarSub := natshandler.NewCarSubscriber(natsConn, carStatusHub, log)
+	if err = natsCarSub.Subscribe(); err != nil {
+		return nil
+	}
+
 	healthCheckers := []httphandler.HealthChecker{
 		userHealthGrpcHandler,
 		carHealthGrpcHandler,
@@ -180,13 +198,19 @@ func New(cfg config.Config, log *slog.Logger) *App {
 		jwtManager,
 		userCache,
 		userCache,
+		carService,
+		tripService,
+		documentHub,
+		carStatusHub,
 	)
 
 	return &App{
-		cfg:            cfg,
-		log:            log,
-		httpServer:     httpServer,
-		natsSubscriber: natsUserSub,
+		cfg:                    cfg,
+		log:                    log,
+		httpServer:             httpServer,
+		natsUserSubscriber:     natsUserSub,
+		natsDocumentSubscriber: natsDocumentSub,
+		natsCarSubscriber:      natsCarSub,
 	}
 }
 
@@ -205,7 +229,9 @@ func (a *App) Run() {
 }
 
 func (a *App) Stop() {
-	a.natsSubscriber.Close()
+	a.natsUserSubscriber.Close()
+	a.natsDocumentSubscriber.Close()
+	a.natsCarSubscriber.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

@@ -7,6 +7,7 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/grpc/dto"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 	pkglog "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/utils"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 )
 
@@ -24,6 +25,7 @@ func NewZoneHandler(client carsvc.ZoneServiceClient, logger *slog.Logger) *ZoneH
 
 func (h *ZoneHandler) Create(ctx context.Context, data model.ZoneCreate) (string, error) {
 	logger := pkglog.WithMethod(h.log, "Create")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.CreateZone(ctx, &carsvc.CreateZoneRequest{
 		Name:            data.Name,
@@ -44,6 +46,7 @@ func (h *ZoneHandler) Create(ctx context.Context, data model.ZoneCreate) (string
 
 func (h *ZoneHandler) Get(ctx context.Context, id string) (model.Zone, error) {
 	logger := pkglog.WithMethod(h.log, "Get")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetZone(ctx, &carsvc.GetZoneRequest{Id: id})
 	if err != nil {
@@ -59,6 +62,7 @@ func (h *ZoneHandler) Get(ctx context.Context, id string) (model.Zone, error) {
 
 func (h *ZoneHandler) List(ctx context.Context, filter model.ZoneFilter) ([]model.Zone, error) {
 	logger := pkglog.WithMethod(h.log, "List")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.ListZones(ctx, &carsvc.ListZonesRequest{
 		Type:     filter.Type,
@@ -82,6 +86,7 @@ func (h *ZoneHandler) List(ctx context.Context, filter model.ZoneFilter) ([]mode
 
 func (h *ZoneHandler) Update(ctx context.Context, id string, data model.ZoneUpdate) error {
 	logger := pkglog.WithMethod(h.log, "Update")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.UpdateZone(ctx, &carsvc.UpdateZoneRequest{
 		Id:              id,
@@ -104,6 +109,7 @@ func (h *ZoneHandler) Update(ctx context.Context, id string, data model.ZoneUpda
 
 func (h *ZoneHandler) Delete(ctx context.Context, id string) error {
 	logger := pkglog.WithMethod(h.log, "Delete")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.DeleteZone(ctx, &carsvc.DeleteZoneRequest{Id: id})
 	if err != nil {

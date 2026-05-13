@@ -2,10 +2,11 @@ package middleware
 
 import (
 	"context"
+	"time"
 )
 
 type TokenParser interface {
-	ParseToken(token string) (userID string, err error)
+	ParseToken(token string) (userID string, exp time.Time, err error)
 }
 
 type UserPermissionsCache interface {

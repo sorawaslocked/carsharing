@@ -44,10 +44,11 @@ func (s *UserSubscriber) Subscribe() error {
 		{subjectUserDeleted, s.handleUserDeleted},
 	}
 
+	logger := pkglog.WithMethod(s.log, "Subscribe")
+
 	for _, e := range entries {
 		sub, err := s.conn.Subscribe(e.subject, e.handler)
 		if err != nil {
-			logger := pkglog.WithMethod(s.log, "Subscribe")
 			logger.Error("subscribing to subject",
 				slog.String("subject", e.subject),
 				pkglog.Err(err),
@@ -57,7 +58,7 @@ func (s *UserSubscriber) Subscribe() error {
 		}
 
 		s.subs = append(s.subs, sub)
-		s.log.Info("subscribed", slog.String("subject", e.subject))
+		logger.Info("subscribed", slog.String("subject", e.subject))
 	}
 
 	return nil
@@ -79,7 +80,7 @@ func (s *UserSubscriber) Close() {
 func (s *UserSubscriber) handleUserCreated(msg *nc.Msg) {
 	logger := pkglog.WithMethod(s.log, "handleUserCreated")
 
-	var event eventuserpb.CreateEvent
+	var event eventuserpb.UserCreatedEvent
 	if err := proto.Unmarshal(msg.Data, &event); err != nil {
 		logger.Error("unmarshalling event", pkglog.Err(err))
 		return
@@ -96,7 +97,7 @@ func (s *UserSubscriber) handleUserCreated(msg *nc.Msg) {
 func (s *UserSubscriber) handleUserUpdated(msg *nc.Msg) {
 	logger := pkglog.WithMethod(s.log, "handleUserUpdated")
 
-	var event eventuserpb.UpdateEvent
+	var event eventuserpb.UserUpdatedEvent
 	if err := proto.Unmarshal(msg.Data, &event); err != nil {
 		logger.Error("unmarshalling event", pkglog.Err(err))
 		return
@@ -113,7 +114,7 @@ func (s *UserSubscriber) handleUserUpdated(msg *nc.Msg) {
 func (s *UserSubscriber) handleUserDeleted(msg *nc.Msg) {
 	logger := pkglog.WithMethod(s.log, "handleUserDeleted")
 
-	var event eventuserpb.DeleteEvent
+	var event eventuserpb.UserDeletedEvent
 	if err := proto.Unmarshal(msg.Data, &event); err != nil {
 		logger.Error("unmarshalling event", pkglog.Err(err))
 		return

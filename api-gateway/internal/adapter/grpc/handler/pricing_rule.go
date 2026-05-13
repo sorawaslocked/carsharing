@@ -7,6 +7,7 @@ import (
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/grpc/dto"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 	pkglog "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/utils"
 	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
 	bookingsvc "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 )
@@ -25,6 +26,7 @@ func NewPricingRuleHandler(client bookingsvc.PricingRuleServiceClient, logger *s
 
 func (h *PricingRuleHandler) Create(ctx context.Context, data model.PricingRuleCreate) (string, error) {
 	logger := pkglog.WithMethod(h.log, "Create")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &bookingsvc.CreatePricingRuleRequest{
 		ModelId:           data.ModelID,
@@ -53,6 +55,7 @@ func (h *PricingRuleHandler) Create(ctx context.Context, data model.PricingRuleC
 
 func (h *PricingRuleHandler) Get(ctx context.Context, id string) (model.PricingRule, error) {
 	logger := pkglog.WithMethod(h.log, "Get")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetPricingRule(ctx, &bookingsvc.GetPricingRuleRequest{Id: id})
 	if err != nil {
@@ -68,6 +71,7 @@ func (h *PricingRuleHandler) Get(ctx context.Context, id string) (model.PricingR
 
 func (h *PricingRuleHandler) List(ctx context.Context, filter model.PricingRuleFilter) ([]model.PricingRule, error) {
 	logger := pkglog.WithMethod(h.log, "List")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &bookingsvc.ListPricingRulesRequest{
 		ModelId:  filter.ModelID,
@@ -102,6 +106,7 @@ func (h *PricingRuleHandler) List(ctx context.Context, filter model.PricingRuleF
 
 func (h *PricingRuleHandler) Update(ctx context.Context, id string, data model.PricingRuleUpdate) error {
 	logger := pkglog.WithMethod(h.log, "Update")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &bookingsvc.UpdatePricingRuleRequest{
 		Id:                id,
@@ -132,6 +137,7 @@ func (h *PricingRuleHandler) Update(ctx context.Context, id string, data model.P
 
 func (h *PricingRuleHandler) Delete(ctx context.Context, id string) error {
 	logger := pkglog.WithMethod(h.log, "Delete")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.DeletePricingRule(ctx, &bookingsvc.DeletePricingRuleRequest{Id: id})
 	if err != nil {

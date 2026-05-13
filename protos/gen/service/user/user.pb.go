@@ -578,6 +578,50 @@ func (x *DeleteUserRequest) GetId() string {
 	return ""
 }
 
+type GetProfileImageUploadDataResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UploadData    *base.ImageUploadData  `protobuf:"bytes,1,opt,name=upload_data,json=uploadData,proto3" json:"upload_data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetProfileImageUploadDataResponse) Reset() {
+	*x = GetProfileImageUploadDataResponse{}
+	mi := &file_service_user_user_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetProfileImageUploadDataResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetProfileImageUploadDataResponse) ProtoMessage() {}
+
+func (x *GetProfileImageUploadDataResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_service_user_user_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetProfileImageUploadDataResponse.ProtoReflect.Descriptor instead.
+func (*GetProfileImageUploadDataResponse) Descriptor() ([]byte, []int) {
+	return file_service_user_user_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *GetProfileImageUploadDataResponse) GetUploadData() *base.ImageUploadData {
+	if x != nil {
+		return x.UploadData
+	}
+	return nil
+}
+
 // Auth
 type RegisterRequest struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
@@ -594,7 +638,7 @@ type RegisterRequest struct {
 
 func (x *RegisterRequest) Reset() {
 	*x = RegisterRequest{}
-	mi := &file_service_user_user_proto_msgTypes[8]
+	mi := &file_service_user_user_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -606,7 +650,7 @@ func (x *RegisterRequest) String() string {
 func (*RegisterRequest) ProtoMessage() {}
 
 func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_user_user_proto_msgTypes[8]
+	mi := &file_service_user_user_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -619,7 +663,7 @@ func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterRequest.ProtoReflect.Descriptor instead.
 func (*RegisterRequest) Descriptor() ([]byte, []int) {
-	return file_service_user_user_proto_rawDescGZIP(), []int{8}
+	return file_service_user_user_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *RegisterRequest) GetEmail() string {
@@ -680,7 +724,7 @@ type RegisterResponse struct {
 
 func (x *RegisterResponse) Reset() {
 	*x = RegisterResponse{}
-	mi := &file_service_user_user_proto_msgTypes[9]
+	mi := &file_service_user_user_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -692,7 +736,7 @@ func (x *RegisterResponse) String() string {
 func (*RegisterResponse) ProtoMessage() {}
 
 func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_user_user_proto_msgTypes[9]
+	mi := &file_service_user_user_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -705,7 +749,7 @@ func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterResponse.ProtoReflect.Descriptor instead.
 func (*RegisterResponse) Descriptor() ([]byte, []int) {
-	return file_service_user_user_proto_rawDescGZIP(), []int{9}
+	return file_service_user_user_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *RegisterResponse) GetId() string {
@@ -726,7 +770,7 @@ type SignInRequest struct {
 
 func (x *SignInRequest) Reset() {
 	*x = SignInRequest{}
-	mi := &file_service_user_user_proto_msgTypes[10]
+	mi := &file_service_user_user_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -738,7 +782,7 @@ func (x *SignInRequest) String() string {
 func (*SignInRequest) ProtoMessage() {}
 
 func (x *SignInRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_user_user_proto_msgTypes[10]
+	mi := &file_service_user_user_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -751,7 +795,7 @@ func (x *SignInRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SignInRequest.ProtoReflect.Descriptor instead.
 func (*SignInRequest) Descriptor() ([]byte, []int) {
-	return file_service_user_user_proto_rawDescGZIP(), []int{10}
+	return file_service_user_user_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *SignInRequest) GetEmail() string {
@@ -784,7 +828,7 @@ type SignInResponse struct {
 
 func (x *SignInResponse) Reset() {
 	*x = SignInResponse{}
-	mi := &file_service_user_user_proto_msgTypes[11]
+	mi := &file_service_user_user_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -796,7 +840,7 @@ func (x *SignInResponse) String() string {
 func (*SignInResponse) ProtoMessage() {}
 
 func (x *SignInResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_user_user_proto_msgTypes[11]
+	mi := &file_service_user_user_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -809,7 +853,7 @@ func (x *SignInResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SignInResponse.ProtoReflect.Descriptor instead.
 func (*SignInResponse) Descriptor() ([]byte, []int) {
-	return file_service_user_user_proto_rawDescGZIP(), []int{11}
+	return file_service_user_user_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *SignInResponse) GetId() string {
@@ -829,7 +873,7 @@ type CheckActivationCodeRequest struct {
 
 func (x *CheckActivationCodeRequest) Reset() {
 	*x = CheckActivationCodeRequest{}
-	mi := &file_service_user_user_proto_msgTypes[12]
+	mi := &file_service_user_user_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -841,7 +885,7 @@ func (x *CheckActivationCodeRequest) String() string {
 func (*CheckActivationCodeRequest) ProtoMessage() {}
 
 func (x *CheckActivationCodeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_user_user_proto_msgTypes[12]
+	mi := &file_service_user_user_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -854,7 +898,7 @@ func (x *CheckActivationCodeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckActivationCodeRequest.ProtoReflect.Descriptor instead.
 func (*CheckActivationCodeRequest) Descriptor() ([]byte, []int) {
-	return file_service_user_user_proto_rawDescGZIP(), []int{12}
+	return file_service_user_user_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *CheckActivationCodeRequest) GetCode() string {
@@ -875,7 +919,7 @@ type CreateDocumentRequest struct {
 
 func (x *CreateDocumentRequest) Reset() {
 	*x = CreateDocumentRequest{}
-	mi := &file_service_user_user_proto_msgTypes[13]
+	mi := &file_service_user_user_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -887,7 +931,7 @@ func (x *CreateDocumentRequest) String() string {
 func (*CreateDocumentRequest) ProtoMessage() {}
 
 func (x *CreateDocumentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_user_user_proto_msgTypes[13]
+	mi := &file_service_user_user_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -900,7 +944,7 @@ func (x *CreateDocumentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateDocumentRequest.ProtoReflect.Descriptor instead.
 func (*CreateDocumentRequest) Descriptor() ([]byte, []int) {
-	return file_service_user_user_proto_rawDescGZIP(), []int{13}
+	return file_service_user_user_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *CreateDocumentRequest) GetObjectKey() string {
@@ -926,7 +970,7 @@ type CreateDocumentResponse struct {
 
 func (x *CreateDocumentResponse) Reset() {
 	*x = CreateDocumentResponse{}
-	mi := &file_service_user_user_proto_msgTypes[14]
+	mi := &file_service_user_user_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -938,7 +982,7 @@ func (x *CreateDocumentResponse) String() string {
 func (*CreateDocumentResponse) ProtoMessage() {}
 
 func (x *CreateDocumentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_user_user_proto_msgTypes[14]
+	mi := &file_service_user_user_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -951,7 +995,7 @@ func (x *CreateDocumentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateDocumentResponse.ProtoReflect.Descriptor instead.
 func (*CreateDocumentResponse) Descriptor() ([]byte, []int) {
-	return file_service_user_user_proto_rawDescGZIP(), []int{14}
+	return file_service_user_user_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *CreateDocumentResponse) GetId() string {
@@ -970,7 +1014,7 @@ type GetUploadDocumentDataRequest struct {
 
 func (x *GetUploadDocumentDataRequest) Reset() {
 	*x = GetUploadDocumentDataRequest{}
-	mi := &file_service_user_user_proto_msgTypes[15]
+	mi := &file_service_user_user_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -982,7 +1026,7 @@ func (x *GetUploadDocumentDataRequest) String() string {
 func (*GetUploadDocumentDataRequest) ProtoMessage() {}
 
 func (x *GetUploadDocumentDataRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_user_user_proto_msgTypes[15]
+	mi := &file_service_user_user_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -995,7 +1039,7 @@ func (x *GetUploadDocumentDataRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUploadDocumentDataRequest.ProtoReflect.Descriptor instead.
 func (*GetUploadDocumentDataRequest) Descriptor() ([]byte, []int) {
-	return file_service_user_user_proto_rawDescGZIP(), []int{15}
+	return file_service_user_user_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *GetUploadDocumentDataRequest) GetImageType() string {
@@ -1014,7 +1058,7 @@ type GetUploadDocumentDataResponse struct {
 
 func (x *GetUploadDocumentDataResponse) Reset() {
 	*x = GetUploadDocumentDataResponse{}
-	mi := &file_service_user_user_proto_msgTypes[16]
+	mi := &file_service_user_user_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1026,7 +1070,7 @@ func (x *GetUploadDocumentDataResponse) String() string {
 func (*GetUploadDocumentDataResponse) ProtoMessage() {}
 
 func (x *GetUploadDocumentDataResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_user_user_proto_msgTypes[16]
+	mi := &file_service_user_user_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1039,7 +1083,7 @@ func (x *GetUploadDocumentDataResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUploadDocumentDataResponse.ProtoReflect.Descriptor instead.
 func (*GetUploadDocumentDataResponse) Descriptor() ([]byte, []int) {
-	return file_service_user_user_proto_rawDescGZIP(), []int{16}
+	return file_service_user_user_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *GetUploadDocumentDataResponse) GetUploadData() *base.ImageUploadData {
@@ -1058,7 +1102,7 @@ type GetProcessedDocumentsForUserRequest struct {
 
 func (x *GetProcessedDocumentsForUserRequest) Reset() {
 	*x = GetProcessedDocumentsForUserRequest{}
-	mi := &file_service_user_user_proto_msgTypes[17]
+	mi := &file_service_user_user_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1070,7 +1114,7 @@ func (x *GetProcessedDocumentsForUserRequest) String() string {
 func (*GetProcessedDocumentsForUserRequest) ProtoMessage() {}
 
 func (x *GetProcessedDocumentsForUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_user_user_proto_msgTypes[17]
+	mi := &file_service_user_user_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1083,7 +1127,7 @@ func (x *GetProcessedDocumentsForUserRequest) ProtoReflect() protoreflect.Messag
 
 // Deprecated: Use GetProcessedDocumentsForUserRequest.ProtoReflect.Descriptor instead.
 func (*GetProcessedDocumentsForUserRequest) Descriptor() ([]byte, []int) {
-	return file_service_user_user_proto_rawDescGZIP(), []int{17}
+	return file_service_user_user_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *GetProcessedDocumentsForUserRequest) GetUserId() string {
@@ -1102,7 +1146,7 @@ type GetProcessedDocumentsForUserResponse struct {
 
 func (x *GetProcessedDocumentsForUserResponse) Reset() {
 	*x = GetProcessedDocumentsForUserResponse{}
-	mi := &file_service_user_user_proto_msgTypes[18]
+	mi := &file_service_user_user_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1114,7 +1158,7 @@ func (x *GetProcessedDocumentsForUserResponse) String() string {
 func (*GetProcessedDocumentsForUserResponse) ProtoMessage() {}
 
 func (x *GetProcessedDocumentsForUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_user_user_proto_msgTypes[18]
+	mi := &file_service_user_user_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1127,7 +1171,7 @@ func (x *GetProcessedDocumentsForUserResponse) ProtoReflect() protoreflect.Messa
 
 // Deprecated: Use GetProcessedDocumentsForUserResponse.ProtoReflect.Descriptor instead.
 func (*GetProcessedDocumentsForUserResponse) Descriptor() ([]byte, []int) {
-	return file_service_user_user_proto_rawDescGZIP(), []int{18}
+	return file_service_user_user_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *GetProcessedDocumentsForUserResponse) GetDocuments() []*user.Document {
@@ -1148,7 +1192,7 @@ type CheckDocumentRequest struct {
 
 func (x *CheckDocumentRequest) Reset() {
 	*x = CheckDocumentRequest{}
-	mi := &file_service_user_user_proto_msgTypes[19]
+	mi := &file_service_user_user_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1160,7 +1204,7 @@ func (x *CheckDocumentRequest) String() string {
 func (*CheckDocumentRequest) ProtoMessage() {}
 
 func (x *CheckDocumentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_user_user_proto_msgTypes[19]
+	mi := &file_service_user_user_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1173,7 +1217,7 @@ func (x *CheckDocumentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckDocumentRequest.ProtoReflect.Descriptor instead.
 func (*CheckDocumentRequest) Descriptor() ([]byte, []int) {
-	return file_service_user_user_proto_rawDescGZIP(), []int{19}
+	return file_service_user_user_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *CheckDocumentRequest) GetDocId() string {
@@ -1274,7 +1318,10 @@ const file_service_user_user_proto_rawDesc = "" +
 	"\x12_is_email_verifiedB\x0f\n" +
 	"\r_is_suspended\"#\n" +
 	"\x11DeleteUserRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\x8c\x02\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"[\n" +
+	"!GetProfileImageUploadDataResponse\x126\n" +
+	"\vupload_data\x18\x01 \x01(\v2\x15.base.ImageUploadDataR\n" +
+	"uploadData\"\x8c\x02\n" +
 	"\x0fRegisterRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12&\n" +
 	"\fphone_number\x18\x02 \x01(\tH\x00R\vphoneNumber\x88\x01\x01\x12\x1d\n" +
@@ -1319,7 +1366,7 @@ const file_service_user_user_proto_rawDesc = "" +
 	"\x06doc_id\x18\x01 \x01(\tR\x05docId\x12\x16\n" +
 	"\x06status\x18\x02 \x01(\tR\x06status\x12\x19\n" +
 	"\x05error\x18\x03 \x01(\tH\x00R\x05error\x88\x01\x01B\b\n" +
-	"\x06_error2\x97\t\n" +
+	"\x06_error2\xfd\t\n" +
 	"\vUserService\x12@\n" +
 	"\x06Health\x12\x16.google.protobuf.Empty\x1a\x1e.service.ServiceHealthResponse\x12O\n" +
 	"\n" +
@@ -1329,7 +1376,8 @@ const file_service_user_user_proto_rawDesc = "" +
 	"\n" +
 	"UpdateUser\x12\x1f.service.user.UpdateUserRequest\x1a\x16.google.protobuf.Empty\x12E\n" +
 	"\n" +
-	"DeleteUser\x12\x1f.service.user.DeleteUserRequest\x1a\x16.google.protobuf.Empty\x12I\n" +
+	"DeleteUser\x12\x1f.service.user.DeleteUserRequest\x1a\x16.google.protobuf.Empty\x12d\n" +
+	"\x19GetProfileImageUploadData\x12\x16.google.protobuf.Empty\x1a/.service.user.GetProfileImageUploadDataResponse\x12I\n" +
 	"\bRegister\x12\x1d.service.user.RegisterRequest\x1a\x1e.service.user.RegisterResponse\x12C\n" +
 	"\x06SignIn\x12\x1b.service.user.SignInRequest\x1a\x1c.service.user.SignInResponse\x12D\n" +
 	"\x12SendActivationCode\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\x12W\n" +
@@ -1351,7 +1399,7 @@ func file_service_user_user_proto_rawDescGZIP() []byte {
 	return file_service_user_user_proto_rawDescData
 }
 
-var file_service_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_service_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
 var file_service_user_user_proto_goTypes = []any{
 	(*CreateUserRequest)(nil),                    // 0: service.user.CreateUserRequest
 	(*CreateUserResponse)(nil),                   // 1: service.user.CreateUserResponse
@@ -1361,64 +1409,68 @@ var file_service_user_user_proto_goTypes = []any{
 	(*ListUsersResponse)(nil),                    // 5: service.user.ListUsersResponse
 	(*UpdateUserRequest)(nil),                    // 6: service.user.UpdateUserRequest
 	(*DeleteUserRequest)(nil),                    // 7: service.user.DeleteUserRequest
-	(*RegisterRequest)(nil),                      // 8: service.user.RegisterRequest
-	(*RegisterResponse)(nil),                     // 9: service.user.RegisterResponse
-	(*SignInRequest)(nil),                        // 10: service.user.SignInRequest
-	(*SignInResponse)(nil),                       // 11: service.user.SignInResponse
-	(*CheckActivationCodeRequest)(nil),           // 12: service.user.CheckActivationCodeRequest
-	(*CreateDocumentRequest)(nil),                // 13: service.user.CreateDocumentRequest
-	(*CreateDocumentResponse)(nil),               // 14: service.user.CreateDocumentResponse
-	(*GetUploadDocumentDataRequest)(nil),         // 15: service.user.GetUploadDocumentDataRequest
-	(*GetUploadDocumentDataResponse)(nil),        // 16: service.user.GetUploadDocumentDataResponse
-	(*GetProcessedDocumentsForUserRequest)(nil),  // 17: service.user.GetProcessedDocumentsForUserRequest
-	(*GetProcessedDocumentsForUserResponse)(nil), // 18: service.user.GetProcessedDocumentsForUserResponse
-	(*CheckDocumentRequest)(nil),                 // 19: service.user.CheckDocumentRequest
-	(*user.User)(nil),                            // 20: base.user.User
-	(*base.Pagination)(nil),                      // 21: base.Pagination
-	(*base.ImageUploadData)(nil),                 // 22: base.ImageUploadData
-	(*user.Document)(nil),                        // 23: base.user.Document
-	(*emptypb.Empty)(nil),                        // 24: google.protobuf.Empty
-	(*service.ServiceHealthResponse)(nil),        // 25: service.ServiceHealthResponse
+	(*GetProfileImageUploadDataResponse)(nil),    // 8: service.user.GetProfileImageUploadDataResponse
+	(*RegisterRequest)(nil),                      // 9: service.user.RegisterRequest
+	(*RegisterResponse)(nil),                     // 10: service.user.RegisterResponse
+	(*SignInRequest)(nil),                        // 11: service.user.SignInRequest
+	(*SignInResponse)(nil),                       // 12: service.user.SignInResponse
+	(*CheckActivationCodeRequest)(nil),           // 13: service.user.CheckActivationCodeRequest
+	(*CreateDocumentRequest)(nil),                // 14: service.user.CreateDocumentRequest
+	(*CreateDocumentResponse)(nil),               // 15: service.user.CreateDocumentResponse
+	(*GetUploadDocumentDataRequest)(nil),         // 16: service.user.GetUploadDocumentDataRequest
+	(*GetUploadDocumentDataResponse)(nil),        // 17: service.user.GetUploadDocumentDataResponse
+	(*GetProcessedDocumentsForUserRequest)(nil),  // 18: service.user.GetProcessedDocumentsForUserRequest
+	(*GetProcessedDocumentsForUserResponse)(nil), // 19: service.user.GetProcessedDocumentsForUserResponse
+	(*CheckDocumentRequest)(nil),                 // 20: service.user.CheckDocumentRequest
+	(*user.User)(nil),                            // 21: base.user.User
+	(*base.Pagination)(nil),                      // 22: base.Pagination
+	(*base.ImageUploadData)(nil),                 // 23: base.ImageUploadData
+	(*user.Document)(nil),                        // 24: base.user.Document
+	(*emptypb.Empty)(nil),                        // 25: google.protobuf.Empty
+	(*service.ServiceHealthResponse)(nil),        // 26: service.ServiceHealthResponse
 }
 var file_service_user_user_proto_depIdxs = []int32{
-	20, // 0: service.user.GetUserResponse.user:type_name -> base.user.User
-	21, // 1: service.user.ListUsersRequest.pagination:type_name -> base.Pagination
-	20, // 2: service.user.ListUsersResponse.users:type_name -> base.user.User
-	22, // 3: service.user.GetUploadDocumentDataResponse.upload_data:type_name -> base.ImageUploadData
-	23, // 4: service.user.GetProcessedDocumentsForUserResponse.documents:type_name -> base.user.Document
-	24, // 5: service.user.UserService.Health:input_type -> google.protobuf.Empty
-	0,  // 6: service.user.UserService.CreateUser:input_type -> service.user.CreateUserRequest
-	2,  // 7: service.user.UserService.GetUser:input_type -> service.user.GetUserRequest
-	4,  // 8: service.user.UserService.ListUsers:input_type -> service.user.ListUsersRequest
-	6,  // 9: service.user.UserService.UpdateUser:input_type -> service.user.UpdateUserRequest
-	7,  // 10: service.user.UserService.DeleteUser:input_type -> service.user.DeleteUserRequest
-	8,  // 11: service.user.UserService.Register:input_type -> service.user.RegisterRequest
-	10, // 12: service.user.UserService.SignIn:input_type -> service.user.SignInRequest
-	24, // 13: service.user.UserService.SendActivationCode:input_type -> google.protobuf.Empty
-	12, // 14: service.user.UserService.CheckActivationCode:input_type -> service.user.CheckActivationCodeRequest
-	13, // 15: service.user.UserService.CreateDocument:input_type -> service.user.CreateDocumentRequest
-	15, // 16: service.user.UserService.GetUploadDocumentData:input_type -> service.user.GetUploadDocumentDataRequest
-	17, // 17: service.user.UserService.GetProcessedDocumentsForUser:input_type -> service.user.GetProcessedDocumentsForUserRequest
-	19, // 18: service.user.UserService.CheckDocument:input_type -> service.user.CheckDocumentRequest
-	25, // 19: service.user.UserService.Health:output_type -> service.ServiceHealthResponse
-	1,  // 20: service.user.UserService.CreateUser:output_type -> service.user.CreateUserResponse
-	3,  // 21: service.user.UserService.GetUser:output_type -> service.user.GetUserResponse
-	5,  // 22: service.user.UserService.ListUsers:output_type -> service.user.ListUsersResponse
-	24, // 23: service.user.UserService.UpdateUser:output_type -> google.protobuf.Empty
-	24, // 24: service.user.UserService.DeleteUser:output_type -> google.protobuf.Empty
-	9,  // 25: service.user.UserService.Register:output_type -> service.user.RegisterResponse
-	11, // 26: service.user.UserService.SignIn:output_type -> service.user.SignInResponse
-	24, // 27: service.user.UserService.SendActivationCode:output_type -> google.protobuf.Empty
-	24, // 28: service.user.UserService.CheckActivationCode:output_type -> google.protobuf.Empty
-	14, // 29: service.user.UserService.CreateDocument:output_type -> service.user.CreateDocumentResponse
-	16, // 30: service.user.UserService.GetUploadDocumentData:output_type -> service.user.GetUploadDocumentDataResponse
-	18, // 31: service.user.UserService.GetProcessedDocumentsForUser:output_type -> service.user.GetProcessedDocumentsForUserResponse
-	24, // 32: service.user.UserService.CheckDocument:output_type -> google.protobuf.Empty
-	19, // [19:33] is the sub-list for method output_type
-	5,  // [5:19] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	21, // 0: service.user.GetUserResponse.user:type_name -> base.user.User
+	22, // 1: service.user.ListUsersRequest.pagination:type_name -> base.Pagination
+	21, // 2: service.user.ListUsersResponse.users:type_name -> base.user.User
+	23, // 3: service.user.GetProfileImageUploadDataResponse.upload_data:type_name -> base.ImageUploadData
+	23, // 4: service.user.GetUploadDocumentDataResponse.upload_data:type_name -> base.ImageUploadData
+	24, // 5: service.user.GetProcessedDocumentsForUserResponse.documents:type_name -> base.user.Document
+	25, // 6: service.user.UserService.Health:input_type -> google.protobuf.Empty
+	0,  // 7: service.user.UserService.CreateUser:input_type -> service.user.CreateUserRequest
+	2,  // 8: service.user.UserService.GetUser:input_type -> service.user.GetUserRequest
+	4,  // 9: service.user.UserService.ListUsers:input_type -> service.user.ListUsersRequest
+	6,  // 10: service.user.UserService.UpdateUser:input_type -> service.user.UpdateUserRequest
+	7,  // 11: service.user.UserService.DeleteUser:input_type -> service.user.DeleteUserRequest
+	25, // 12: service.user.UserService.GetProfileImageUploadData:input_type -> google.protobuf.Empty
+	9,  // 13: service.user.UserService.Register:input_type -> service.user.RegisterRequest
+	11, // 14: service.user.UserService.SignIn:input_type -> service.user.SignInRequest
+	25, // 15: service.user.UserService.SendActivationCode:input_type -> google.protobuf.Empty
+	13, // 16: service.user.UserService.CheckActivationCode:input_type -> service.user.CheckActivationCodeRequest
+	14, // 17: service.user.UserService.CreateDocument:input_type -> service.user.CreateDocumentRequest
+	16, // 18: service.user.UserService.GetUploadDocumentData:input_type -> service.user.GetUploadDocumentDataRequest
+	18, // 19: service.user.UserService.GetProcessedDocumentsForUser:input_type -> service.user.GetProcessedDocumentsForUserRequest
+	20, // 20: service.user.UserService.CheckDocument:input_type -> service.user.CheckDocumentRequest
+	26, // 21: service.user.UserService.Health:output_type -> service.ServiceHealthResponse
+	1,  // 22: service.user.UserService.CreateUser:output_type -> service.user.CreateUserResponse
+	3,  // 23: service.user.UserService.GetUser:output_type -> service.user.GetUserResponse
+	5,  // 24: service.user.UserService.ListUsers:output_type -> service.user.ListUsersResponse
+	25, // 25: service.user.UserService.UpdateUser:output_type -> google.protobuf.Empty
+	25, // 26: service.user.UserService.DeleteUser:output_type -> google.protobuf.Empty
+	8,  // 27: service.user.UserService.GetProfileImageUploadData:output_type -> service.user.GetProfileImageUploadDataResponse
+	10, // 28: service.user.UserService.Register:output_type -> service.user.RegisterResponse
+	12, // 29: service.user.UserService.SignIn:output_type -> service.user.SignInResponse
+	25, // 30: service.user.UserService.SendActivationCode:output_type -> google.protobuf.Empty
+	25, // 31: service.user.UserService.CheckActivationCode:output_type -> google.protobuf.Empty
+	15, // 32: service.user.UserService.CreateDocument:output_type -> service.user.CreateDocumentResponse
+	17, // 33: service.user.UserService.GetUploadDocumentData:output_type -> service.user.GetUploadDocumentDataResponse
+	19, // 34: service.user.UserService.GetProcessedDocumentsForUser:output_type -> service.user.GetProcessedDocumentsForUserResponse
+	25, // 35: service.user.UserService.CheckDocument:output_type -> google.protobuf.Empty
+	21, // [21:36] is the sub-list for method output_type
+	6,  // [6:21] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_service_user_user_proto_init() }
@@ -1430,16 +1482,16 @@ func file_service_user_user_proto_init() {
 	file_service_user_user_proto_msgTypes[1].OneofWrappers = []any{}
 	file_service_user_user_proto_msgTypes[4].OneofWrappers = []any{}
 	file_service_user_user_proto_msgTypes[6].OneofWrappers = []any{}
-	file_service_user_user_proto_msgTypes[8].OneofWrappers = []any{}
-	file_service_user_user_proto_msgTypes[10].OneofWrappers = []any{}
-	file_service_user_user_proto_msgTypes[19].OneofWrappers = []any{}
+	file_service_user_user_proto_msgTypes[9].OneofWrappers = []any{}
+	file_service_user_user_proto_msgTypes[11].OneofWrappers = []any{}
+	file_service_user_user_proto_msgTypes[20].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_service_user_user_proto_rawDesc), len(file_service_user_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   20,
+			NumMessages:   21,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

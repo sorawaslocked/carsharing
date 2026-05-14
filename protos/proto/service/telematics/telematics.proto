@@ -13,11 +13,6 @@ service CarTelematicsStreamService {
 
 message StreamCarTelematicsEventsRequest {
   string car_id                     = 1;
-  double current_location_latitude  = 2;
-  double current_location_longitude = 3;
-  optional float fuel_level         = 4;
-  optional float battery_level      = 5;
-  int64          odometer_km        = 6;
 }
 
 message StreamCarTelematicsEventsResponse {

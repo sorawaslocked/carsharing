@@ -14,6 +14,16 @@ message TripStartedEvent {
   google.protobuf.Timestamp started_at = 5;
 }
 
+message TripCancelledEvent {
+  string trip_id    = 1;
+  string booking_id = 2;
+  string car_id     = 3;
+  string user_id    = 4;
+  string reason = 5;
+
+  google.protobuf.Timestamp cancelled_at = 6;
+}
+
 message TripEndedEvent {
   string trip_id    = 1;
   string booking_id = 2;

@@ -15,8 +15,8 @@ type CarInsurance struct {
 	CostTenge int32
 	Status    InsuranceStatus
 
-	Notes     *string
-	ImageKeys []string
+	Notes  *string
+	Images []Image
 
 	CreatedAt time.Time
 	UpdatedAt time.Time

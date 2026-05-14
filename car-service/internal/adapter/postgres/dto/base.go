@@ -47,6 +47,25 @@ func column(tableAlias, name string) string {
 	return fmt.Sprintf("%s.%s", tableAlias, name)
 }
 
+func ImageKeysToImages(keys []string) []model.Image {
+	images := make([]model.Image, len(keys))
+	for i, k := range keys {
+		k := k
+		images[i] = model.Image{Key: &k}
+	}
+	return images
+}
+
+func ImagesToKeys(images []model.Image) []string {
+	keys := make([]string, len(images))
+	for i, img := range images {
+		if img.Key != nil {
+			keys[i] = *img.Key
+		}
+	}
+	return keys
+}
+
 func NullableFloat32(v *float32) sql.NullFloat64 {
 	if v == nil {
 		return sql.NullFloat64{}

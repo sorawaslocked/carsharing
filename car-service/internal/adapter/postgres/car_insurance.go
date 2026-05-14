@@ -46,7 +46,7 @@ func (r *CarInsuranceRepository) Insert(ctx context.Context, ins model.CarInsura
 		b.Add(ins.CostTenge),
 		b.Add(string(ins.Status)),
 		b.Add(ins.Notes),
-		b.Add(pq.StringArray(ins.ImageKeys)),
+		b.Add(pq.StringArray(dto.ImagesToKeys(ins.Images))),
 		b.Add(ins.CreatedAt),
 		b.Add(ins.UpdatedAt),
 	}, ", ") + `) RETURNING id`

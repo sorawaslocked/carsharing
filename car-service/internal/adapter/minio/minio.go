@@ -24,7 +24,23 @@ func NewObjectStorage(client *minio.Client, bucket string) *ObjectStorage {
 	}
 }
 
-func (s *ObjectStorage) GetImageUploadData(ctx context.Context, prefix string) (model.ImageUploadData, error) {
+func (s *ObjectStorage) GetCarImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+	return s.getImageUploadData(ctx, "cars")
+}
+
+func (s *ObjectStorage) GetCarModelImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+	return s.getImageUploadData(ctx, "car-models")
+}
+
+func (s *ObjectStorage) GetInsuranceImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+	return s.getImageUploadData(ctx, "insurance")
+}
+
+func (s *ObjectStorage) GetMaintenanceReceiptImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+	return s.getImageUploadData(ctx, "maintenance/receipts")
+}
+
+func (s *ObjectStorage) getImageUploadData(ctx context.Context, prefix string) (model.ImageUploadData, error) {
 	key := fmt.Sprintf("%s/uploads/%d", prefix, time.Now().UnixNano())
 
 	u, err := s.client.PresignedPutObject(ctx, s.bucket, key, presignedURLTTL)

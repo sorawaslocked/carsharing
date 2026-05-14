@@ -40,7 +40,7 @@ func (r carModelRow) toDomain() model.CarModel {
 		Seats:        r.Seats,
 		RangeKM:      r.RangeKM,
 		Features:     []string(r.Features),
-		ImageKeys:    []string(r.ImageKeys),
+		Images:       ImageKeysToImages([]string(r.ImageKeys)),
 		CreatedAt:    r.CreatedAt,
 		UpdatedAt:    r.UpdatedAt,
 	}

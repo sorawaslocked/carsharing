@@ -25,7 +25,6 @@ type CarModelService interface {
 	Update(ctx context.Context, id string, updateInput model.CarModelUpdateInput) error
 	Delete(ctx context.Context, id string) error
 	GetImageUploadData(ctx context.Context) (model.ImageUploadData, error)
-	GetImageURLs(ctx context.Context, id string) ([]string, error)
 }
 
 type CarService interface {
@@ -37,7 +36,6 @@ type CarService interface {
 	UpdateCarTelemetry(ctx context.Context, id string, input model.CarTelematicsUpdateInput) error
 	Delete(ctx context.Context, id string) error
 	GetImageUploadData(ctx context.Context) (model.ImageUploadData, error)
-	GetImageURLs(ctx context.Context, id string) ([]string, error)
 	GetCarStatusHistory(ctx context.Context, filter model.CarStatusLogFilter) ([]model.CarStatusLogEntry, error)
 	GetCarFuelHistory(ctx context.Context, filter model.TelematicsEventFilter) ([]model.CarTelematicsEvent, error)
 	GetCarLocationHistory(ctx context.Context, filter model.TelematicsEventFilter) ([]model.CarTelematicsEvent, error)
@@ -52,7 +50,6 @@ type CarInsuranceService interface {
 	Update(ctx context.Context, id string, updateInput model.CarInsuranceUpdateInput) error
 	Delete(ctx context.Context, id string) error
 	GetImageUploadData(ctx context.Context) (model.ImageUploadData, error)
-	GetImageURLs(ctx context.Context, id string) ([]string, error)
 }
 
 type CarMaintenanceService interface {

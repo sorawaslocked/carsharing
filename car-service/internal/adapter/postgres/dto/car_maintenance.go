@@ -118,14 +118,14 @@ type carMaintenanceRecordRow struct {
 
 func (r carMaintenanceRecordRow) toDomain() model.CarMaintenanceRecord {
 	rec := model.CarMaintenanceRecord{
-		ID:               r.ID,
-		CarID:            r.CarID,
-		TemplateID:       r.TemplateID,
-		Status:           model.MaintenanceRecordStatus(r.Status),
-		OdometerAt:       r.OdometerAt,
-		ReceiptImageKeys: []string(r.ReceiptKeys),
-		CreatedAt:        r.CreatedAt,
-		UpdatedAt:        r.UpdatedAt,
+		ID:            r.ID,
+		CarID:         r.CarID,
+		TemplateID:    r.TemplateID,
+		Status:        model.MaintenanceRecordStatus(r.Status),
+		OdometerAt:    r.OdometerAt,
+		ReceiptImages: ImageKeysToImages([]string(r.ReceiptKeys)),
+		CreatedAt:     r.CreatedAt,
+		UpdatedAt:     r.UpdatedAt,
 	}
 
 	if r.CompletedKM.Valid {

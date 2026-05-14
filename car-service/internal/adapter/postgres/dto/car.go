@@ -44,7 +44,7 @@ func (r carRow) toDomain() model.Car {
 			Longitude: r.Longitude,
 		},
 		Notes:      []string(r.Notes),
-		ImageKeys:  []string(r.ImageKeys),
+		Images:     ImageKeysToImages([]string(r.ImageKeys)),
 		LastSeenAt: r.LastSeenAt,
 		CreatedAt:  r.CreatedAt,
 		UpdatedAt:  r.UpdatedAt,

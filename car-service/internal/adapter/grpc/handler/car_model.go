@@ -49,12 +49,7 @@ func (h *CarModelHandler) GetCarModel(ctx context.Context, req *carsvc.GetCarMod
 		return nil, dto.FromErrorToStatusCode(err)
 	}
 
-	imageURLs, _ := h.carModelService.GetImageURLs(ctx, req.Id)
-
-	proto := dto.ToCarModelProto(carModel)
-	proto.ImageUrls = imageURLs
-
-	return &carsvc.GetCarModelResponse{CarModel: proto}, nil
+	return &carsvc.GetCarModelResponse{CarModel: dto.ToCarModelProto(carModel)}, nil
 }
 
 func (h *CarModelHandler) ListCarModels(ctx context.Context, req *carsvc.ListCarModelsRequest) (*carsvc.ListCarModelsResponse, error) {

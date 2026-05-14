@@ -15,9 +15,9 @@ type Car struct {
 	BatteryLevel *float32
 	Location     Location
 
-	Status    CarStatus
-	Notes     []string
-	ImageKeys []string
+	Status CarStatus
+	Notes  []string
+	Images []Image
 
 	LastSeenAt time.Time
 	CreatedAt  time.Time

@@ -293,6 +293,7 @@ func ToCarProto(c model.Car) *basecar.Car {
 		BatteryLevel:     c.BatteryLevel,
 		Status:           string(c.Status),
 		Notes:            sliceToPtr(c.Notes),
+		ImageUrls:        imageURLsFromImages(c.Images),
 		LastSeenAt:       timestamppb.New(c.LastSeenAt),
 		CreatedAt:        timestamppb.New(c.CreatedAt),
 		UpdatedAt:        timestamppb.New(c.UpdatedAt),
@@ -319,6 +320,19 @@ func ToImageUploadData(uploadURL, objectKey string) *base.ImageUploadData {
 		PresignedPutUrl: uploadURL,
 		ObjectKey:       objectKey,
 	}
+}
+
+func imageURLsFromImages(images []model.Image) []string {
+	if len(images) == 0 {
+		return nil
+	}
+	urls := make([]string, 0, len(images))
+	for _, img := range images {
+		if img.URL != nil {
+			urls = append(urls, *img.URL)
+		}
+	}
+	return urls
 }
 
 func ptrToSlice(s *string) []string {

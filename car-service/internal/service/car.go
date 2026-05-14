@@ -103,6 +103,14 @@ func (s *CarService) Get(ctx context.Context, id string) (model.Car, error) {
 		return model.Car{}, handleError(logger, err)
 	}
 
+	for i := range car.Images {
+		url, err := s.objectStorage.GetPresignedURL(ctx, *car.Images[i].Key)
+		if err != nil {
+			return model.Car{}, handleError(logger, err)
+		}
+		car.Images[i].URL = &url
+	}
+
 	return car, nil
 }
 
@@ -122,25 +130,14 @@ func (s *CarService) GetAll(ctx context.Context, filterInput model.CarFilterInpu
 		return nil, handleError(logger, err)
 	}
 
-	return cars, nil
-}
-
-func (s *CarService) GetAvailableCars(ctx context.Context, filterInput model.CarFilterInput) ([]model.Car, error) {
-	const method = "GetAvailableCars"
-	logger := pkglog.WithMethod(s.log, method)
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
-
-	err := validation.ValidateInput(s.validate, filterInput)
-	if err != nil {
-		return nil, handleError(logger, err)
-	}
-	filter := carFilterFromInput(filterInput)
-	available := model.CarStatusAvailable
-	filter.Status = &available
-
-	cars, err := s.carRepo.Find(ctx, filter)
-	if err != nil {
-		return nil, handleError(logger, err)
+	for i := range cars {
+		for j := range cars[i].Images {
+			url, err := s.objectStorage.GetPresignedURL(ctx, *cars[i].Images[j].Key)
+			if err != nil {
+				return nil, handleError(logger, err)
+			}
+			cars[i].Images[j].URL = &url
+		}
 	}
 
 	return cars, nil
@@ -347,43 +344,12 @@ func (s *CarService) GetImageUploadData(ctx context.Context) (model.ImageUploadD
 	logger := pkglog.WithMethod(s.log, method)
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
-	if s.objectStorage == nil {
-		logger.Error("object storage not configured")
-		return model.ImageUploadData{}, model.ErrInternalServerError
-	}
-
-	data, err := s.objectStorage.GetImageUploadData(ctx, storageKeyPrefixCar)
+	data, err := s.objectStorage.GetCarImageUploadData(ctx)
 	if err != nil {
 		return model.ImageUploadData{}, handleError(logger, err)
 	}
 
 	return data, nil
-}
-
-func (s *CarService) GetImageURLs(ctx context.Context, id string) ([]string, error) {
-	const method = "GetImageURLs"
-	logger := pkglog.WithMethod(s.log, method)
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
-
-	if s.objectStorage == nil {
-		return nil, nil
-	}
-
-	car, err := s.carRepo.FindByID(ctx, id)
-	if err != nil {
-		return nil, handleError(logger, err)
-	}
-
-	urls := make([]string, 0, len(car.ImageKeys))
-	for _, k := range car.ImageKeys {
-		url, err := s.objectStorage.GetPresignedURL(ctx, k)
-		if err != nil {
-			return nil, handleError(logger, err)
-		}
-		urls = append(urls, url)
-	}
-
-	return urls, nil
 }
 
 func (s *CarService) OnBookingCreated(ctx context.Context, event model.BookingCreatedEvent) error {

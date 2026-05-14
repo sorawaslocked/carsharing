@@ -81,6 +81,9 @@ type EventPublisher interface {
 }
 
 type ObjectStorage interface {
-	GetImageUploadData(ctx context.Context, prefix string) (model.ImageUploadData, error)
+	GetCarImageUploadData(ctx context.Context) (model.ImageUploadData, error)
+	GetCarModelImageUploadData(ctx context.Context) (model.ImageUploadData, error)
+	GetInsuranceImageUploadData(ctx context.Context) (model.ImageUploadData, error)
+	GetMaintenanceReceiptImageUploadData(ctx context.Context) (model.ImageUploadData, error)
 	GetPresignedURL(ctx context.Context, key string) (string, error)
 }

@@ -50,7 +50,7 @@ func (r *CarModelRepository) Insert(ctx context.Context, cm model.CarModel) (str
 		b.Add(dto.NullableFloat32(cm.EngineVolume)),
 		b.Add(cm.RangeKM),
 		b.Add(pq.StringArray(cm.Features)),
-		b.Add(pq.StringArray(cm.ImageKeys)),
+		b.Add(pq.StringArray(dto.ImagesToKeys(cm.Images))),
 		b.Add(cm.CreatedAt),
 		b.Add(cm.UpdatedAt),
 	}, ", ") + `)

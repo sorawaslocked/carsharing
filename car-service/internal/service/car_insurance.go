@@ -86,6 +86,14 @@ func (s *CarInsuranceService) Get(ctx context.Context, id string) (model.CarInsu
 		return model.CarInsurance{}, handleError(logger, err)
 	}
 
+	for i := range insurance.Images {
+		url, err := s.objectStorage.GetPresignedURL(ctx, *insurance.Images[i].Key)
+		if err != nil {
+			return model.CarInsurance{}, handleError(logger, err)
+		}
+		insurance.Images[i].URL = &url
+	}
+
 	return insurance, nil
 }
 
@@ -105,6 +113,16 @@ func (s *CarInsuranceService) GetAll(ctx context.Context, filterInput model.CarI
 	insurances, err := s.insuranceRepo.Find(ctx, filter)
 	if err != nil {
 		return nil, handleError(logger, err)
+	}
+
+	for i := range insurances {
+		for j := range insurances[i].Images {
+			url, err := s.objectStorage.GetPresignedURL(ctx, *insurances[i].Images[j].Key)
+			if err != nil {
+				return nil, handleError(logger, err)
+			}
+			insurances[i].Images[j].URL = &url
+		}
 	}
 
 	return insurances, nil
@@ -166,39 +184,10 @@ func (s *CarInsuranceService) GetImageUploadData(ctx context.Context) (model.Ima
 	md := utils.MetadataFromCtx(ctx)
 	logger = pkglog.WithMetadata(logger, md)
 
-	if s.objectStorage == nil {
-		logger.Error("object storage not configured")
-		return model.ImageUploadData{}, model.ErrInternalServerError
-	}
-
-	data, err := s.objectStorage.GetImageUploadData(ctx, storageKeyPrefixInsurance)
+	data, err := s.objectStorage.GetInsuranceImageUploadData(ctx)
 	if err != nil {
 		return model.ImageUploadData{}, handleError(logger, err)
 	}
 
 	return data, nil
-}
-
-func (s *CarInsuranceService) GetImageURLs(ctx context.Context, id string) ([]string, error) {
-	const method = "GetImageURLs"
-	logger := pkglog.WithMethod(s.log, method)
-
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
-
-	insurance, err := s.insuranceRepo.FindByID(ctx, id)
-	if err != nil {
-		return nil, handleError(logger, err)
-	}
-
-	urls := make([]string, 0, len(insurance.ImageKeys))
-	for _, key := range insurance.ImageKeys {
-		url, err := s.objectStorage.GetPresignedURL(ctx, key)
-		if err != nil {
-			return nil, handleError(logger, err)
-		}
-		urls = append(urls, url)
-	}
-
-	return urls, nil
 }

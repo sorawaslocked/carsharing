@@ -92,6 +92,14 @@ func (s *CarModelService) Get(ctx context.Context, id string) (model.CarModel, e
 		return model.CarModel{}, handleError(logger, err)
 	}
 
+	for i := range carModel.Images {
+		url, err := s.objectStorage.GetPresignedURL(ctx, *carModel.Images[i].Key)
+		if err != nil {
+			return model.CarModel{}, handleError(logger, err)
+		}
+		carModel.Images[i].URL = &url
+	}
+
 	return carModel, nil
 }
 
@@ -110,6 +118,16 @@ func (s *CarModelService) GetAll(ctx context.Context, filterInput model.CarModel
 	carModels, err := s.carModelRepo.Find(ctx, filter)
 	if err != nil {
 		return nil, handleError(logger, err)
+	}
+
+	for i := range carModels {
+		for j := range carModels[i].Images {
+			url, err := s.objectStorage.GetPresignedURL(ctx, *carModels[i].Images[j].Key)
+			if err != nil {
+				return nil, handleError(logger, err)
+			}
+			carModels[i].Images[j].URL = &url
+		}
 	}
 
 	return carModels, nil
@@ -183,43 +201,10 @@ func (s *CarModelService) GetImageUploadData(ctx context.Context) (model.ImageUp
 	md := utils.MetadataFromCtx(ctx)
 	logger = pkglog.WithMetadata(logger, md)
 
-	if s.objectStorage == nil {
-		logger.Error("object storage not configured")
-		return model.ImageUploadData{}, model.ErrInternalServerError
-	}
-
-	data, err := s.objectStorage.GetImageUploadData(ctx, storageKeyPrefixCarModel)
+	data, err := s.objectStorage.GetCarModelImageUploadData(ctx)
 	if err != nil {
 		return model.ImageUploadData{}, handleError(logger, err)
 	}
 
 	return data, nil
-}
-
-func (s *CarModelService) GetImageURLs(ctx context.Context, id string) ([]string, error) {
-	const method = "GetImageURLs"
-	logger := pkglog.WithMethod(s.log, method)
-
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
-
-	if s.objectStorage == nil {
-		return nil, nil
-	}
-
-	carModel, err := s.carModelRepo.FindByID(ctx, id)
-	if err != nil {
-		return nil, handleError(logger, err)
-	}
-
-	urls := make([]string, 0, len(carModel.ImageKeys))
-	for _, k := range carModel.ImageKeys {
-		url, err := s.objectStorage.GetPresignedURL(ctx, k)
-		if err != nil {
-			return nil, handleError(logger, err)
-		}
-		urls = append(urls, url)
-	}
-
-	return urls, nil
 }

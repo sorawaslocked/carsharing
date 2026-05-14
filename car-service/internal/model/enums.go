@@ -162,43 +162,6 @@ func ParseMaintenanceRecordStatus(s string) (MaintenanceRecordStatus, bool) {
 	}
 }
 
-type FuelStatus string
-
-const (
-	FuelStatusOK        FuelStatus = "ok"
-	FuelStatusWarn      FuelStatus = "warn"
-	FuelStatusUrgent    FuelStatus = "urgent"
-	FuelStatusPull      FuelStatus = "pull"
-	FuelStatusEmergency FuelStatus = "emergency"
-)
-
-var fuelStatusRanks = map[FuelStatus]int{
-	FuelStatusOK:        0,
-	FuelStatusWarn:      1,
-	FuelStatusUrgent:    2,
-	FuelStatusPull:      3,
-	FuelStatusEmergency: 4,
-}
-
-func FuelStatusRank(s FuelStatus) int {
-	return fuelStatusRanks[s]
-}
-
-func FuelStatusFromPct(pct int) FuelStatus {
-	switch {
-	case pct <= 8:
-		return FuelStatusEmergency
-	case pct <= 15:
-		return FuelStatusPull
-	case pct <= 25:
-		return FuelStatusUrgent
-	case pct <= 40:
-		return FuelStatusWarn
-	default:
-		return FuelStatusOK
-	}
-}
-
 type CarStatusActor string
 
 const (

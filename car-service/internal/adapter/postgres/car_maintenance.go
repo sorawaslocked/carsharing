@@ -204,7 +204,7 @@ func (r *CarMaintenanceRecordRepository) Insert(ctx context.Context, rec model.C
 		b.Add(rec.DueBy),
 		b.Add(rec.CompletedAt),
 		b.Add(rec.Notes),
-		b.Add(pq.StringArray(rec.ReceiptImageKeys)),
+		b.Add(pq.StringArray(dto.ImagesToKeys(rec.ReceiptImages))),
 		b.Add(rec.CreatedAt),
 		b.Add(rec.UpdatedAt),
 	}, ", ") + `) RETURNING id`

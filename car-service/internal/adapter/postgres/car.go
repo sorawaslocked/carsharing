@@ -52,7 +52,7 @@ func (r *CarRepository) Insert(ctx context.Context, car model.Car) (string, erro
 		b.Add(car.Location.Latitude),
 		b.Add(car.Location.Longitude),
 		b.Add(pq.StringArray(car.Notes)),
-		b.Add(pq.StringArray(car.ImageKeys)),
+		b.Add(pq.StringArray(dto.ImagesToKeys(car.Images))),
 		b.Add(car.LastSeenAt),
 		b.Add(car.CreatedAt),
 		b.Add(car.UpdatedAt),

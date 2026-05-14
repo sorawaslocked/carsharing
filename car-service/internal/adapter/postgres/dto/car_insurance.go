@@ -36,7 +36,7 @@ func (r carInsuranceRow) toDomain() model.CarInsurance {
 		ExpiresAt: r.ExpiresAt,
 		CostTenge: r.CostTenge,
 		Status:    model.InsuranceStatus(r.Status),
-		ImageKeys: []string(r.ImageKeys),
+		Images:    ImageKeysToImages([]string(r.ImageKeys)),
 		CreatedAt: r.CreatedAt,
 		UpdatedAt: r.UpdatedAt,
 	}

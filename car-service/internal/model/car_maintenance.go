@@ -37,8 +37,8 @@ type CarMaintenanceRecord struct {
 	DueBy       *time.Time
 	CompletedAt *time.Time
 
-	Notes            *string
-	ReceiptImageKeys []string
+	Notes         *string
+	ReceiptImages []Image
 
 	CreatedAt time.Time
 	UpdatedAt time.Time

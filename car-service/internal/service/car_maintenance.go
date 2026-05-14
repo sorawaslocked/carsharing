@@ -171,6 +171,14 @@ func (s *CarMaintenanceService) GetRecord(ctx context.Context, id string) (model
 		return model.CarMaintenanceRecord{}, handleError(logger, err)
 	}
 
+	for i := range record.ReceiptImages {
+		url, err := s.objectStorage.GetPresignedURL(ctx, *record.ReceiptImages[i].Key)
+		if err != nil {
+			return model.CarMaintenanceRecord{}, handleError(logger, err)
+		}
+		record.ReceiptImages[i].URL = &url
+	}
+
 	return record, nil
 }
 
@@ -190,6 +198,16 @@ func (s *CarMaintenanceService) GetRecords(ctx context.Context, filterInput mode
 	records, err := s.recordRepo.Find(ctx, filter)
 	if err != nil {
 		return nil, handleError(logger, err)
+	}
+
+	for i := range records {
+		for j := range records[i].ReceiptImages {
+			url, err := s.objectStorage.GetPresignedURL(ctx, *records[i].ReceiptImages[j].Key)
+			if err != nil {
+				return nil, handleError(logger, err)
+			}
+			records[i].ReceiptImages[j].URL = &url
+		}
 	}
 
 	return records, nil
@@ -273,41 +291,12 @@ func (s *CarMaintenanceService) GetReceiptImageUploadData(ctx context.Context) (
 	md := utils.MetadataFromCtx(ctx)
 	logger = pkglog.WithMetadata(logger, md)
 
-	if s.objectStorage == nil {
-		logger.Error("object storage not configured")
-		return model.ImageUploadData{}, model.ErrInternalServerError
-	}
-
-	data, err := s.objectStorage.GetImageUploadData(ctx, storageKeyPrefixMaintenanceReceipts)
+	data, err := s.objectStorage.GetMaintenanceReceiptImageUploadData(ctx)
 	if err != nil {
 		return model.ImageUploadData{}, handleError(logger, err)
 	}
 
 	return data, nil
-}
-
-func (s *CarMaintenanceService) GetReceiptImageURLs(ctx context.Context, recordID string) ([]string, error) {
-	const method = "GetReceiptImageURLs"
-	logger := pkglog.WithMethod(s.log, method)
-
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
-
-	record, err := s.recordRepo.FindByID(ctx, recordID)
-	if err != nil {
-		return nil, handleError(logger, err)
-	}
-
-	urls := make([]string, 0, len(record.ReceiptImageKeys))
-	for _, key := range record.ReceiptImageKeys {
-		url, err := s.objectStorage.GetPresignedURL(ctx, key)
-		if err != nil {
-			return nil, handleError(logger, err)
-		}
-		urls = append(urls, url)
-	}
-
-	return urls, nil
 }
 
 func (s *CarMaintenanceService) EvaluateCarMaintenance(ctx context.Context, carID string) error {

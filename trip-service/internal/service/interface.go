@@ -25,7 +25,6 @@ type TripStatusReadingRepository interface {
 
 type BookingClient interface {
 	GetBooking(ctx context.Context, id string) (model.Booking, error)
-	UpdateBookingStatus(ctx context.Context, id string, status string) error
 }
 
 type TelematicsClient interface {

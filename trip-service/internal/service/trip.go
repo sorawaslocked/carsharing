@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	"io"
 	"log/slog"
 	"time"
@@ -10,19 +9,16 @@ import (
 	"github.com/google/uuid"
 	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
 	pkglog "github.com/sorawaslocked/car-rental-trip-service/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/pkg/utils"
 )
 
-var ErrMissingMetadata = errors.New("missing metadata")
-
 type TripService struct {
-	log           *slog.Logger
-	tripRepo      TripRepository
-	summaryRepo   TripSummaryRepository
-	statusRepo    TripStatusReadingRepository
-	bookingClient BookingClient
-	telematics    TelematicsClient
-	publisher     EventPublisher
+	log         *slog.Logger
+	tripRepo    TripRepository
+	summaryRepo TripSummaryRepository
+	statusRepo  TripStatusReadingRepository
+	booking     BookingClient
+	telematics  TelematicsClient
+	publisher   EventPublisher
 }
 
 func NewTripService(
@@ -30,18 +26,18 @@ func NewTripService(
 	tripRepo TripRepository,
 	summaryRepo TripSummaryRepository,
 	statusRepo TripStatusReadingRepository,
-	bookingClient BookingClient,
+	booking BookingClient,
 	telematics TelematicsClient,
 	publisher EventPublisher,
 ) *TripService {
 	return &TripService{
-		log:           pkglog.WithComponent(log, "service.TripService"),
-		tripRepo:      tripRepo,
-		summaryRepo:   summaryRepo,
-		statusRepo:    statusRepo,
-		bookingClient: bookingClient,
-		telematics:    telematics,
-		publisher:     publisher,
+		log:         pkglog.WithComponent(log, "service.TripService"),
+		tripRepo:    tripRepo,
+		summaryRepo: summaryRepo,
+		statusRepo:  statusRepo,
+		booking:     booking,
+		telematics:  telematics,
+		publisher:   publisher,
 	}
 }
 
@@ -52,20 +48,11 @@ func (s *TripService) StartTrip(ctx context.Context, bookingID string) (string, 
 		return "", err
 	}
 
-	md := utils.MetadataFromCtx(ctx)
-	if md.UserID == nil {
-		return "", ErrMissingMetadata
-	}
-	userID := *md.UserID
-
-	booking, err := s.bookingClient.GetBooking(ctx, bookingID)
+	booking, err := s.booking.GetBooking(ctx, bookingID)
 	if err != nil {
 		return "", err
 	}
 
-	if booking.UserID != userID && !isPrivileged(md.UserRoles) {
-		return "", model.ErrInsufficientPermissions
-	}
 	if booking.Status != "reserved" {
 		return "", model.ErrBookingNotReserved
 	}
@@ -98,21 +85,17 @@ func (s *TripService) StartTrip(ctx context.Context, bookingID string) (string, 
 		return "", err
 	}
 
+	actorID := booking.UserID
 	_, err = s.statusRepo.Create(ctx, model.TripStatusReadingCreate{
 		TripID:     tripID,
 		FromStatus: model.TripStatus(""),
 		ToStatus:   model.TripStatusActive,
 		ActorType:  model.ActorTypeUser,
-		ActorID:    &userID,
+		ActorID:    &actorID,
 		ChangedAt:  now,
 	})
 	if err != nil {
 		log.Error("failed to create status reading", pkglog.Err(err))
-		return "", err
-	}
-
-	if err = s.bookingClient.UpdateBookingStatus(ctx, bookingID, "active"); err != nil {
-		log.Error("failed to update booking status", pkglog.Err(err))
 		return "", err
 	}
 
@@ -141,20 +124,11 @@ func (s *TripService) EndTrip(ctx context.Context, id string) error {
 		return err
 	}
 
-	md := utils.MetadataFromCtx(ctx)
-	if md.UserID == nil {
-		return ErrMissingMetadata
-	}
-	userID := *md.UserID
-
 	trip, err := s.tripRepo.GetByID(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	if trip.UserID != userID && !isPrivileged(md.UserRoles) {
-		return model.ErrInsufficientPermissions
-	}
 	if !trip.Status.CanTransitionTo(model.TripStatusCompleted) {
 		return model.ErrInvalidStatusTransition
 	}
@@ -165,7 +139,7 @@ func (s *TripService) EndTrip(ctx context.Context, id string) error {
 		return err
 	}
 
-	booking, err := s.bookingClient.GetBooking(ctx, trip.BookingID)
+	booking, err := s.booking.GetBooking(ctx, trip.BookingID)
 	if err != nil {
 		log.Error("failed to get booking", pkglog.Err(err))
 		return err
@@ -200,12 +174,13 @@ func (s *TripService) EndTrip(ctx context.Context, id string) error {
 		return err
 	}
 
+	actorID := trip.UserID
 	_, err = s.statusRepo.Create(ctx, model.TripStatusReadingCreate{
 		TripID:     id,
 		FromStatus: model.TripStatusActive,
 		ToStatus:   model.TripStatusCompleted,
 		ActorType:  model.ActorTypeUser,
-		ActorID:    &userID,
+		ActorID:    &actorID,
 		ChangedAt:  now,
 	})
 	if err != nil {
@@ -231,11 +206,6 @@ func (s *TripService) EndTrip(ctx context.Context, id string) error {
 		return err
 	}
 
-	if err = s.bookingClient.UpdateBookingStatus(ctx, trip.BookingID, "completed"); err != nil {
-		log.Error("failed to update booking status", pkglog.Err(err))
-		return err
-	}
-
 	if err = s.publisher.PublishTripEnded(ctx, updatedTrip); err != nil {
 		log.Error("failed to publish trip ended event", pkglog.Err(err))
 	}
@@ -250,20 +220,11 @@ func (s *TripService) CancelTrip(ctx context.Context, id string, reason *string)
 		return err
 	}
 
-	md := utils.MetadataFromCtx(ctx)
-	if md.UserID == nil {
-		return ErrMissingMetadata
-	}
-	userID := *md.UserID
-
 	trip, err := s.tripRepo.GetByID(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	if trip.UserID != userID && !isPrivileged(md.UserRoles) {
-		return model.ErrInsufficientPermissions
-	}
 	if !trip.Status.CanTransitionTo(model.TripStatusCancelled) {
 		return model.ErrInvalidStatusTransition
 	}
@@ -280,22 +241,18 @@ func (s *TripService) CancelTrip(ctx context.Context, id string, reason *string)
 		return err
 	}
 
+	actorID := trip.UserID
 	_, err = s.statusRepo.Create(ctx, model.TripStatusReadingCreate{
 		TripID:     id,
 		FromStatus: model.TripStatusActive,
 		ToStatus:   model.TripStatusCancelled,
 		ActorType:  model.ActorTypeUser,
-		ActorID:    &userID,
+		ActorID:    &actorID,
 		Reason:     reason,
 		ChangedAt:  now,
 	})
 	if err != nil {
 		log.Error("failed to create status reading", pkglog.Err(err))
-		return err
-	}
-
-	if err = s.bookingClient.UpdateBookingStatus(ctx, trip.BookingID, "cancelled"); err != nil {
-		log.Error("failed to update booking status", pkglog.Err(err))
 		return err
 	}
 
@@ -335,7 +292,7 @@ func (s *TripService) StreamTripLiveFeed(ctx context.Context, tripID string, sen
 		return model.ErrTripNotActive
 	}
 
-	booking, err := s.bookingClient.GetBooking(ctx, trip.BookingID)
+	booking, err := s.booking.GetBooking(ctx, trip.BookingID)
 	if err != nil {
 		return err
 	}

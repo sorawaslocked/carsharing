@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+	"time"
 
 	natsio "github.com/nats-io/nats.go"
 	"google.golang.org/grpc"
@@ -81,7 +82,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 
 	tripHandler := handler.NewTripHandler(log, tripSvc)
 	streamHandler := handler.NewTripStreamHandler(log, tripSvc)
-	healthHandler := handler.NewHealthHandler(log)
+	healthHandler := handler.NewHealthHandler(log, db, nc, carConn, streamConn, bookingConn)
 
 	srv := grpcserver.NewServer(log, tripHandler, streamHandler, healthHandler)
 
@@ -108,7 +109,21 @@ func (a *App) Run() error {
 
 func (a *App) Stop() {
 	a.log.Info("shutting down")
-	a.grpcServer.GracefulStop()
+
+	stopped := make(chan struct{})
+	go func() {
+		a.grpcServer.GracefulStop()
+		close(stopped)
+	}()
+
+	select {
+	case <-stopped:
+		a.log.Info("grpc server stopped gracefully")
+	case <-time.After(15 * time.Second):
+		a.log.Warn("graceful stop timed out, forcing stop")
+		a.grpcServer.Stop()
+	}
+
 	_ = a.db.Close()
 	a.natsConn.Close()
 	_ = a.carConn.Close()

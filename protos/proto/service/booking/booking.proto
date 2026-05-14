@@ -13,7 +13,6 @@ service BookingService {
   rpc CreateBooking(CreateBookingRequest) returns (CreateBookingResponse);
   rpc GetBooking(GetBookingRequest) returns (GetBookingResponse);
   rpc ListBookings(ListBookingsRequest) returns (ListBookingsResponse);
-  rpc StartBooking(StartBookingRequest) returns (google.protobuf.Empty);
   rpc CancelBooking(CancelBookingRequest) returns (google.protobuf.Empty);
   rpc UpdateBookingStatus(UpdateBookingStatusRequest) returns (google.protobuf.Empty);
   rpc GetBookingStatusHistory(GetBookingStatusHistoryRequest) returns (GetBookingStatusHistoryResponse);
@@ -51,10 +50,6 @@ message ListBookingsRequest {
 
 message ListBookingsResponse {
   repeated base.booking.Booking bookings = 1;
-}
-
-message StartBookingRequest {
-  string id = 1;
 }
 
 message CancelBookingRequest {

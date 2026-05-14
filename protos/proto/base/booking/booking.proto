@@ -17,8 +17,9 @@ message Booking {
   string pricing_rule_id = 6;
   base.PricingSnapshot pricing_snapshot = 7;
 
-  google.protobuf.Timestamp created_at = 8;
-  google.protobuf.Timestamp updated_at = 9;
+  google.protobuf.Timestamp expires_at = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
 }
 
 message BookingStatusReading {

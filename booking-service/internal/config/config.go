@@ -5,30 +5,16 @@ import (
 	"os"
 
 	"github.com/ilyakaznacheev/cleanenv"
+	grpcserver "github.com/sorawaslocked/car-rental-booking-service/internal/adapter/grpc"
+	pkgnats "github.com/sorawaslocked/car-rental-booking-service/internal/pkg/nats"
+	pkgpostgres "github.com/sorawaslocked/car-rental-booking-service/internal/pkg/postgres"
 )
 
 type Config struct {
-	Env        string     `yaml:"env"         env:"ENV"          env-required:"true"`
-	GRPCServer GRPCServer `yaml:"grpc_server"`
-	Postgres   Postgres   `yaml:"postgres"`
-	NATS       NATS       `yaml:"nats"`
-}
-
-type GRPCServer struct {
-	Address string `yaml:"address" env:"GRPC_ADDRESS" env-default:"0.0.0.0:9997"`
-}
-
-type Postgres struct {
-	Host     string `yaml:"host"     env:"PG_HOST"     env-required:"true"`
-	Port     int    `yaml:"port"     env:"PG_PORT"     env-default:"5432"`
-	User     string `yaml:"user"     env:"PG_USER"     env-required:"true"`
-	Password string `yaml:"password" env:"PG_PASSWORD" env-required:"true"`
-	Database string `yaml:"database" env:"PG_DATABASE" env-required:"true"`
-	SSLMode  string `yaml:"ssl_mode" env:"PG_SSL_MODE" env-default:"disable"`
-}
-
-type NATS struct {
-	URL string `yaml:"url" env:"NATS_URL" env-required:"true"`
+	Env        string             `yaml:"env"         env:"ENV" env-required:"true"`
+	GRPCServer grpcserver.Config  `yaml:"grpc_server"`
+	Postgres   pkgpostgres.Config `yaml:"postgres"`
+	NATS       pkgnats.Config     `yaml:"nats"`
 }
 
 func MustLoad() Config {

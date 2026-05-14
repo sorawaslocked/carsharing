@@ -51,7 +51,7 @@ func New(ctx context.Context, log *slog.Logger, cfg config.Config) (*App, error)
 
 	baseInterceptor := interceptor.NewBaseInterceptor()
 	loggerInterceptor := interceptor.NewLoggerInterceptor(log)
-	authInterceptor := interceptor.NewAuthInterceptor()
+	authInterceptor := interceptor.NewAuthInterceptor(log)
 
 	grpcSrv := grpcserver.NewServer(
 		log, cfg.GRPCServer,

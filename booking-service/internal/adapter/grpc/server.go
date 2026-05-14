@@ -6,11 +6,14 @@ import (
 
 	"github.com/sorawaslocked/car-rental-booking-service/internal/adapter/grpc/handler"
 	"github.com/sorawaslocked/car-rental-booking-service/internal/adapter/grpc/interceptor"
-	"github.com/sorawaslocked/car-rental-booking-service/internal/config"
 	pkglog "github.com/sorawaslocked/car-rental-booking-service/internal/pkg/log"
 	servicebookingpb "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 	"google.golang.org/grpc"
 )
+
+type Config struct {
+	Address string `yaml:"address" env:"GRPC_ADDRESS" env-default:"0.0.0.0:9997"`
+}
 
 type Server struct {
 	log    *slog.Logger
@@ -20,7 +23,7 @@ type Server struct {
 
 func NewServer(
 	log *slog.Logger,
-	cfg config.GRPCServer,
+	cfg Config,
 	bookingHandler *handler.BookingHandler,
 	ruleHandler *handler.PricingRuleHandler,
 	healthHandler *handler.HealthHandler,

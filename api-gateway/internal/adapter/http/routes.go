@@ -149,7 +149,6 @@ func (s *Server) setupRoutes(
 				bookings.POST("", s.bookingHandler.Create)
 				bookings.GET("/:id", s.bookingHandler.Get)
 				bookings.GET("", s.bookingHandler.List)
-				bookings.POST("/:id/start", s.bookingHandler.Start)
 				bookings.POST("/:id/cancel", s.bookingHandler.Cancel)
 				bookings.PATCH("/:id/status", s.bookingHandler.UpdateStatus)
 				bookings.GET("/:id/status-history", s.bookingHandler.GetStatusHistory)

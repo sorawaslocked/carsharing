@@ -26,10 +26,6 @@ func (s *BookingService) List(ctx context.Context, filter model.BookingFilter) (
 	return s.presenter.List(ctx, filter)
 }
 
-func (s *BookingService) Start(ctx context.Context, id string) error {
-	return s.presenter.Start(ctx, id)
-}
-
 func (s *BookingService) Cancel(ctx context.Context, id string) error {
 	return s.presenter.Cancel(ctx, id)
 }

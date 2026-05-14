@@ -100,7 +100,6 @@ type BookingPresenter interface {
 	Create(ctx context.Context, data model.BookingCreate) (string, error)
 	Get(ctx context.Context, id string) (model.Booking, error)
 	List(ctx context.Context, filter model.BookingFilter) ([]model.Booking, error)
-	Start(ctx context.Context, id string) error
 	Cancel(ctx context.Context, id string) error
 	UpdateStatus(ctx context.Context, id string, data model.BookingStatusUpdate) error
 	GetStatusHistory(ctx context.Context, id string, filter model.BookingStatusReadingFilter) ([]model.BookingStatusReading, error)

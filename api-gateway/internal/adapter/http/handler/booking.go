@@ -115,36 +115,6 @@ func (h *BookingHandler) List(ctx *gin.Context) {
 	dto.Ok(ctx, gin.H{"bookings": response})
 }
 
-// Start (Booking) godoc
-// @Summary      Start a booking
-// @Description  Transitions a reserved booking to active, beginning the trip.
-// @Tags         bookings
-// @Produce      json
-// @Security     BearerAuth
-// @Param        id   path  string  true  "Booking UUID"
-// @Success      204
-// @Failure      400  {object}  dto.ErrorResponse
-// @Failure      401  {object}  dto.ErrorResponse
-// @Failure      404  {object}  dto.ErrorResponse
-// @Failure      500  {object}  dto.ErrorResponse
-// @Router       /bookings/{id}/start [post]
-func (h *BookingHandler) Start(ctx *gin.Context) {
-	id, err := dto.IDParam(ctx)
-	if err != nil {
-		dto.FromError(ctx, err)
-
-		return
-	}
-
-	if err = h.svc.Start(ctx, id); err != nil {
-		dto.FromError(ctx, err)
-
-		return
-	}
-
-	dto.NoContent(ctx)
-}
-
 // Cancel (Booking) godoc
 // @Summary      Cancel a booking
 // @Description  Cancels a reserved or active booking.

@@ -23,6 +23,10 @@ func BookingFromProto(b *basebookingpb.Booking) model.Booking {
 		booking.PricingSnapshot = PricingSnapshotFromProto(s)
 	}
 
+	if b.GetExpiresAt() != nil {
+		v := b.GetExpiresAt().AsTime()
+		booking.ExpiresAt = &v
+	}
 	if b.GetCreatedAt() != nil {
 		booking.CreatedAt = b.GetCreatedAt().AsTime()
 	}

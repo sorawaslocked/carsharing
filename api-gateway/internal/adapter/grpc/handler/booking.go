@@ -100,22 +100,6 @@ func (h *BookingHandler) List(ctx context.Context, filter model.BookingFilter) (
 	return bookings, nil
 }
 
-func (h *BookingHandler) Start(ctx context.Context, id string) error {
-	logger := pkglog.WithMethod(h.log, "Start")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
-
-	_, err := h.client.StartBooking(ctx, &bookingsvc.StartBookingRequest{Id: id})
-	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
-
-		return dto.FromGrpcErr(err)
-	}
-
-	return nil
-}
-
 func (h *BookingHandler) Cancel(ctx context.Context, id string) error {
 	logger := pkglog.WithMethod(h.log, "Cancel")
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))

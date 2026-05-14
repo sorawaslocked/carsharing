@@ -449,61 +449,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/bookings/{id}/start": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Transitions a reserved booking to active, beginning the trip.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "bookings"
-                ],
-                "summary": "Start a booking",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Booking UUID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/bookings/{id}/status": {
             "patch": {
                 "security": [
@@ -5003,6 +4948,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "createdAt": {
+                    "type": "string"
+                },
+                "expiresAt": {
                     "type": "string"
                 },
                 "id": {

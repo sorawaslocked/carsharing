@@ -24,6 +24,7 @@ type Booking struct {
 	Status           string          `json:"status"`
 	PricingRuleID    string          `json:"pricingRuleID"`
 	PricingSnapshot  PricingSnapshot `json:"pricingSnapshot"`
+	ExpiresAt        *time.Time      `json:"expiresAt,omitempty"`
 	CreatedAt        time.Time       `json:"createdAt"`
 	UpdatedAt        time.Time       `json:"updatedAt"`
 }
@@ -148,6 +149,7 @@ func ToBookingResponse(m model.Booking) Booking {
 			OvertimePolicy:    m.PricingSnapshot.OvertimePolicy,
 			OvertimeRateTenge: m.PricingSnapshot.OvertimeRateTenge,
 		},
+		ExpiresAt: m.ExpiresAt,
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
 	}

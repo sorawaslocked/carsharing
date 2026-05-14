@@ -11,6 +11,7 @@ type Booking struct {
 	Status           string // "reserved" | "active" | "completed" | "cancelled"
 	PricingRuleID    string
 	PricingSnapshot  PricingSnapshot
+	ExpiresAt        *time.Time
 
 	CreatedAt time.Time
 	UpdatedAt time.Time

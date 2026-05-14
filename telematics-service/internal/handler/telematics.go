@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"database/sql"
+	"errors"
 	"log/slog"
 
 	"google.golang.org/grpc"
@@ -9,41 +11,61 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	telematicspb "github.com/sorawaslocked/car-rental-protos/gen/service/telematics"
+	"github.com/sorawaslocked/car-rental-telematics/internal/db"
 	"github.com/sorawaslocked/car-rental-telematics/internal/service"
 )
 
-// TelematicsHandler implements the CarTelematicsStreamServiceServer interface.
 type TelematicsHandler struct {
 	telematicspb.UnimplementedCarTelematicsStreamServiceServer
-	simSvc *service.SimulationService
+	simSvc  *service.SimulationService
+	carRepo *db.CarRepository
 }
 
-func NewTelematicsHandler(simSvc *service.SimulationService) *TelematicsHandler {
-	return &TelematicsHandler{simSvc: simSvc}
+func NewTelematicsHandler(simSvc *service.SimulationService, carRepo *db.CarRepository) *TelematicsHandler {
+	return &TelematicsHandler{simSvc: simSvc, carRepo: carRepo}
 }
 
-// StreamCarTelematicsEvents starts a telematics simulation for the requested car
-// and streams one update every 15 seconds until the trip ends or the client disconnects.
 func (h *TelematicsHandler) StreamCarTelematicsEvents(
 	req *telematicspb.StreamCarTelematicsEventsRequest,
 	stream grpc.ServerStreamingServer[telematicspb.StreamCarTelematicsEventsResponse],
 ) error {
 	slog.Info("telematics stream opened", "car_id", req.CarId)
 
-	updates, err := h.simSvc.StartSimulation(stream.Context(), &service.SimulationRequest{
+	telemetry, err := h.carRepo.GetCarTelemetry(req.CarId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return status.Errorf(codes.NotFound, "car %s not found", req.CarId)
+		}
+		return status.Errorf(codes.Internal, "fetch car telemetry: %v", err)
+	}
+
+	// Send the current idle state immediately so the client has an initial position.
+	if err := stream.Send(&telematicspb.StreamCarTelematicsEventsResponse{
 		CarId:        req.CarId,
-		Latitude:     req.CurrentLocationLatitude,
-		Longitude:    req.CurrentLocationLongitude,
-		FuelLevel:    req.FuelLevel,
-		BatteryLevel: req.BatteryLevel,
-		OdometerKm:   req.OdometerKm,
+		Latitude:     telemetry.Latitude,
+		Longitude:    telemetry.Longitude,
+		FuelLevel:    telemetry.FuelLevel,
+		BatteryLevel: telemetry.BatteryLevel,
+		OdometerKm:   telemetry.MileageKm,
+		RecordedAt:   timestamppb.Now(),
+	}); err != nil {
+		return err
+	}
+
+	updates, err := h.simSvc.RegisterStream(stream.Context(), &service.SimulationRequest{
+		CarId:        req.CarId,
+		Latitude:     telemetry.Latitude,
+		Longitude:    telemetry.Longitude,
+		FuelLevel:    telemetry.FuelLevel,
+		BatteryLevel: telemetry.BatteryLevel,
+		OdometerKm:   telemetry.MileageKm,
 	})
 	if err != nil {
-		return status.Errorf(codes.Internal, "start simulation: %v", err)
+		return status.Errorf(codes.Internal, "register stream: %v", err)
 	}
 
 	for update := range updates {
-		resp := &telematicspb.StreamCarTelematicsEventsResponse{
+		if err := stream.Send(&telematicspb.StreamCarTelematicsEventsResponse{
 			CarId:        update.CarId,
 			Latitude:     update.Latitude,
 			Longitude:    update.Longitude,
@@ -51,8 +73,7 @@ func (h *TelematicsHandler) StreamCarTelematicsEvents(
 			BatteryLevel: update.BatteryLevel,
 			OdometerKm:   update.OdometerKm,
 			RecordedAt:   timestamppb.New(update.RecordedAt),
-		}
-		if err := stream.Send(resp); err != nil {
+		}); err != nil {
 			slog.Warn("stream send failed", "car_id", req.CarId, "error", err)
 			return err
 		}

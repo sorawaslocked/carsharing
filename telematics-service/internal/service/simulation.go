@@ -11,16 +11,12 @@ import (
 )
 
 const (
-	// speedKmh is the simulated driving speed.
-	speedKmh = 40.0
-	// distPerTickM is the distance covered in one 15-second tick at speedKmh.
-	distPerTickM = speedKmh * 1000.0 / 3600.0 * 15.0 // ~166.7 m
-
-	fuelConsumPerKm    = float32(0.2)  // % fuel consumed per km (0–100 scale)
-	batteryConsumPerKm = float32(0.25) // % battery consumed per km (0–100 scale)
+	speedKmh           = 40.0
+	fuelConsumPerKm    = float32(0.2)
+	batteryConsumPerKm = float32(0.25)
 )
 
-// SimulationRequest carries the initial car state for a new simulation.
+// SimulationRequest carries the initial car state when registering a stream.
 type SimulationRequest struct {
 	CarId        string
 	Latitude     float64
@@ -30,7 +26,7 @@ type SimulationRequest struct {
 	OdometerKm   int64
 }
 
-// SimulationUpdate is one telemetry snapshot emitted every 15 seconds.
+// SimulationUpdate is one telemetry snapshot emitted every interval while a trip is active.
 type SimulationUpdate struct {
 	CarId        string
 	Latitude     float64
@@ -42,60 +38,102 @@ type SimulationUpdate struct {
 }
 
 type simEntry struct {
-	cancel context.CancelFunc
-	token  uint64
+	cancel  context.CancelFunc
+	token   uint64
+	startCh chan struct{}
+	stopCh  chan struct{}
 }
 
 // SimulationService manages per-car telematics simulations.
 type SimulationService struct {
 	osrmClient  *osrm.OSRM
 	osrmProfile string
+	interval    time.Duration
 	mu          sync.Mutex
 	activeSims  map[string]*simEntry
 	counter     atomic.Uint64
 }
 
-func NewSimulationService(osrmClient *osrm.OSRM, osrmProfile string) *SimulationService {
+func NewSimulationService(osrmClient *osrm.OSRM, osrmProfile string, interval time.Duration) *SimulationService {
 	return &SimulationService{
 		osrmClient:  osrmClient,
 		osrmProfile: osrmProfile,
+		interval:    interval,
 		activeSims:  make(map[string]*simEntry),
 	}
 }
 
-// StartSimulation begins a simulation for the given car and returns a channel of
-// updates that will receive one event every 15 seconds until the simulation stops.
-// A pre-existing simulation for the same carId is cancelled before starting the new one.
-func (s *SimulationService) StartSimulation(ctx context.Context, req *SimulationRequest) (<-chan *SimulationUpdate, error) {
+// RegisterStream registers a car for idle streaming and returns a channel of updates.
+// The car starts in the idle state; updates are only emitted while a trip is active.
+// Call StartTrip / EndTrip to transition between states.
+func (s *SimulationService) RegisterStream(ctx context.Context, req *SimulationRequest) (<-chan *SimulationUpdate, error) {
 	simCtx, cancel := context.WithCancel(ctx)
 	token := s.counter.Add(1)
+	entry := &simEntry{
+		cancel:  cancel,
+		token:   token,
+		startCh: make(chan struct{}, 1),
+		stopCh:  make(chan struct{}, 1),
+	}
 
 	s.mu.Lock()
 	if existing, ok := s.activeSims[req.CarId]; ok {
 		existing.cancel()
 	}
-	s.activeSims[req.CarId] = &simEntry{cancel: cancel, token: token}
+	s.activeSims[req.CarId] = entry
 	s.mu.Unlock()
 
 	updates := make(chan *SimulationUpdate, 1)
-	go s.runSimulation(simCtx, req, token, updates)
+	go s.runStream(simCtx, req, token, entry.startCh, entry.stopCh, updates)
 	return updates, nil
 }
 
-// StopSimulation cancels a running simulation for the given car.
-func (s *SimulationService) StopSimulation(carId string) {
+// StartTrip signals the car's simulation to begin movement.
+func (s *SimulationService) StartTrip(carID string) {
 	s.mu.Lock()
-	defer s.mu.Unlock()
-	if entry, ok := s.activeSims[carId]; ok {
-		entry.cancel()
-		delete(s.activeSims, carId)
+	entry, ok := s.activeSims[carID]
+	s.mu.Unlock()
+	if !ok {
+		slog.Warn("StartTrip: no active stream", "car_id", carID)
+		return
+	}
+	select {
+	case entry.startCh <- struct{}{}:
+	default:
 	}
 }
 
-func (s *SimulationService) runSimulation(
+// EndTrip signals the car's simulation to stop movement and return to idle.
+func (s *SimulationService) EndTrip(carID string) {
+	s.mu.Lock()
+	entry, ok := s.activeSims[carID]
+	s.mu.Unlock()
+	if !ok {
+		slog.Warn("EndTrip: no active stream", "car_id", carID)
+		return
+	}
+	select {
+	case entry.stopCh <- struct{}{}:
+	default:
+	}
+}
+
+// UnregisterStream cancels and removes the stream for the given car.
+func (s *SimulationService) UnregisterStream(carID string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if entry, ok := s.activeSims[carID]; ok {
+		entry.cancel()
+		delete(s.activeSims, carID)
+	}
+}
+
+func (s *SimulationService) runStream(
 	ctx context.Context,
 	req *SimulationRequest,
 	token uint64,
+	startCh <-chan struct{},
+	stopCh <-chan struct{},
 	updates chan<- *SimulationUpdate,
 ) {
 	defer close(updates)
@@ -110,7 +148,7 @@ func (s *SimulationService) runSimulation(
 	lat := req.Latitude
 	lng := req.Longitude
 	odometer := req.OdometerKm
-	var subKmAccM float64 // sub-km distance accumulator for odometer
+	var subKmAccM float64
 
 	var fuelLevel *float32
 	if req.FuelLevel != nil {
@@ -123,66 +161,86 @@ func (s *SimulationService) runSimulation(
 		batteryLevel = &v
 	}
 
-	walker := s.fetchRoute(ctx, lat, lng)
-
-	ticker := time.NewTicker(15 * time.Second)
-	defer ticker.Stop()
-
-	slog.Info("simulation started", "car_id", req.CarId, "lat", lat, "lng", lng)
+	slog.Info("stream registered (idle)", "car_id", req.CarId)
 
 	for {
+		// Idle: wait for a trip start signal or stream closure.
 		select {
 		case <-ctx.Done():
-			slog.Info("simulation stopped", "car_id", req.CarId)
+			slog.Info("stream closed (idle)", "car_id", req.CarId)
 			return
-		case <-ticker.C:
-			if walker.done() {
-				walker = s.fetchRoute(ctx, lat, lng)
-			}
+		case <-startCh:
+		}
 
-			newLat, newLng := walker.advance(distPerTickM)
-			distM := haversineMeters(lat, lng, newLat, newLng)
+		slog.Info("trip started, simulation running", "car_id", req.CarId)
 
-			lat = newLat
-			lng = newLng
+		walker := s.fetchRoute(ctx, lat, lng)
+		distPerTick := speedKmh * 1000.0 / 3600.0 * s.interval.Seconds()
+		ticker := time.NewTicker(s.interval)
 
-			subKmAccM += distM
-			kmDelta := int64(subKmAccM / 1000)
-			subKmAccM -= float64(kmDelta) * 1000
-			odometer += kmDelta
-
-			distKm := float32(distM / 1000)
-
-			if fuelLevel != nil {
-				v := *fuelLevel - distKm*fuelConsumPerKm
-				if v < 0 {
-					v = 0
-				}
-				fuelLevel = &v
-			}
-			if batteryLevel != nil {
-				v := *batteryLevel - distKm*batteryConsumPerKm
-				if v < 0 {
-					v = 0
-				}
-				batteryLevel = &v
-			}
-
-			update := &SimulationUpdate{
-				CarId:        req.CarId,
-				Latitude:     lat,
-				Longitude:    lng,
-				FuelLevel:    cloneFloat32Ptr(fuelLevel),
-				BatteryLevel: cloneFloat32Ptr(batteryLevel),
-				OdometerKm:   odometer,
-				RecordedAt:   time.Now(),
-			}
-
+		tripActive := true
+		for tripActive {
 			select {
-			case updates <- update:
 			case <-ctx.Done():
-				slog.Info("simulation stopped", "car_id", req.CarId)
+				ticker.Stop()
+				slog.Info("stream closed (active trip)", "car_id", req.CarId)
 				return
+
+			case <-stopCh:
+				ticker.Stop()
+				slog.Info("trip ended, simulation idle", "car_id", req.CarId)
+				tripActive = false
+
+			case <-ticker.C:
+				if walker.done() {
+					walker = s.fetchRoute(ctx, lat, lng)
+				}
+
+				newLat, newLng := walker.advance(distPerTick)
+				distM := haversineMeters(lat, lng, newLat, newLng)
+
+				lat = newLat
+				lng = newLng
+
+				subKmAccM += distM
+				kmDelta := int64(subKmAccM / 1000)
+				subKmAccM -= float64(kmDelta) * 1000
+				odometer += kmDelta
+
+				distKm := float32(distM / 1000)
+
+				if fuelLevel != nil {
+					v := *fuelLevel - distKm*fuelConsumPerKm
+					if v < 0 {
+						v = 0
+					}
+					fuelLevel = &v
+				}
+				if batteryLevel != nil {
+					v := *batteryLevel - distKm*batteryConsumPerKm
+					if v < 0 {
+						v = 0
+					}
+					batteryLevel = &v
+				}
+
+				update := &SimulationUpdate{
+					CarId:        req.CarId,
+					Latitude:     lat,
+					Longitude:    lng,
+					FuelLevel:    cloneFloat32Ptr(fuelLevel),
+					BatteryLevel: cloneFloat32Ptr(batteryLevel),
+					OdometerKm:   odometer,
+					RecordedAt:   time.Now(),
+				}
+
+				select {
+				case updates <- update:
+				case <-ctx.Done():
+					ticker.Stop()
+					slog.Info("stream closed (active trip)", "car_id", req.CarId)
+					return
+				}
 			}
 		}
 	}

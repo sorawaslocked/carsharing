@@ -1,43 +1,64 @@
 package main
 
 import (
+	"flag"
 	"log/slog"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	osrm "github.com/gojuno/go.osrm"
-	natsgo "github.com/nats-io/nats.go"
 
 	"github.com/sorawaslocked/car-rental-telematics/internal/config"
+	"github.com/sorawaslocked/car-rental-telematics/internal/db"
 	"github.com/sorawaslocked/car-rental-telematics/internal/handler"
-	internalnats "github.com/sorawaslocked/car-rental-telematics/internal/nats"
+	natssub "github.com/sorawaslocked/car-rental-telematics/internal/nats"
 	"github.com/sorawaslocked/car-rental-telematics/internal/server"
 	"github.com/sorawaslocked/car-rental-telematics/internal/service"
 )
 
 func main() {
-	cfg := config.Load()
+	configPath := flag.String("config", "config.yaml", "path to YAML config file")
+	flag.Parse()
 
-	nc, err := natsgo.Connect(cfg.NATSUrl)
+	cfg, err := config.Load(*configPath)
 	if err != nil {
-		slog.Error("NATS connect failed", "url", cfg.NATSUrl, "error", err)
+		slog.Error("failed to load config", "path", *configPath, "error", err)
 		os.Exit(1)
 	}
-	defer nc.Close()
-	slog.Info("connected to NATS", "url", cfg.NATSUrl)
+
+	interval, err := time.ParseDuration(cfg.TelemetryInterval)
+	if err != nil {
+		slog.Error("invalid telemetry_interval", "value", cfg.TelemetryInterval, "error", err)
+		os.Exit(1)
+	}
+
+	carRepo, err := db.NewCarRepository(cfg.DBUrl)
+	if err != nil {
+		slog.Error("failed to connect to database", "url", cfg.DBUrl, "error", err)
+		os.Exit(1)
+	}
+	defer carRepo.Close()
+	slog.Info("connected to database")
 
 	osrmClient := osrm.NewFromURL(cfg.OSRMUrl)
-	simSvc := service.NewSimulationService(osrmClient, cfg.OSRMProfile)
+	simSvc := service.NewSimulationService(osrmClient, cfg.OSRMProfile, interval)
 
-	sub := internalnats.NewSubscriber(nc, simSvc, cfg)
-	if err := sub.Subscribe(); err != nil {
-		slog.Error("NATS subscribe failed", "error", err)
+	tripSub, err := natssub.NewTripSubscriber(cfg.NATSUrl, cfg.TripStartedSubject, cfg.TripEndedSubject, cfg.TripCancelledSubject, simSvc)
+	if err != nil {
+		slog.Error("failed to connect to NATS", "url", cfg.NATSUrl, "error", err)
+		os.Exit(1)
+	}
+	defer tripSub.Close()
+
+	if err := tripSub.Subscribe(); err != nil {
+		slog.Error("failed to subscribe to trip events", "error", err)
 		os.Exit(1)
 	}
 
-	grpcServer := server.NewGRPCServer(handler.NewTelematicsHandler(simSvc))
+	grpcServer := server.NewGRPCServer(handler.NewTelematicsHandler(simSvc, carRepo))
 
 	lis, err := net.Listen("tcp", cfg.GRPCPort)
 	if err != nil {

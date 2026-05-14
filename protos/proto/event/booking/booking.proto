@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package event.booking;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/event/booking";
+
+message BookingCreatedEvent {
+  string booking_id = 1;
+  string car_id     = 2;
+  string user_id    = 3;
+  google.protobuf.Timestamp starts_at = 4;
+  google.protobuf.Timestamp ends_at   = 5;
+}
+
+message BookingCancelledEvent {
+  string booking_id = 1;
+  string car_id     = 2;
+  string user_id    = 3;
+  string reason     = 4;
+}

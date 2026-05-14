@@ -1,60 +1,94 @@
 package nats
 
 import (
+	"fmt"
 	"log/slog"
 
-	natsgo "github.com/nats-io/nats.go"
-	"google.golang.org/protobuf/proto"
-
+	"github.com/nats-io/nats.go"
 	tripevent "github.com/sorawaslocked/car-rental-protos/gen/event/trip"
-	"github.com/sorawaslocked/car-rental-telematics/internal/config"
 	"github.com/sorawaslocked/car-rental-telematics/internal/service"
+	"google.golang.org/protobuf/proto"
 )
 
-// Subscriber listens on NATS for trip lifecycle events and drives the
-// simulation service accordingly.
-type Subscriber struct {
-	conn   *natsgo.Conn
-	simSvc *service.SimulationService
-	cfg    *config.Config
+// TripSubscriber listens for trip lifecycle events and drives the simulation state machine.
+type TripSubscriber struct {
+	conn             *nats.Conn
+	simSvc           *service.SimulationService
+	subs             []*nats.Subscription
+	startedSubject   string
+	endedSubject     string
+	cancelledSubject string
 }
 
-func NewSubscriber(conn *natsgo.Conn, simSvc *service.SimulationService, cfg *config.Config) *Subscriber {
-	return &Subscriber{conn: conn, simSvc: simSvc, cfg: cfg}
+func NewTripSubscriber(url, startedSubject, endedSubject, cancelledSubject string, simSvc *service.SimulationService) (*TripSubscriber, error) {
+	conn, err := nats.Connect(url)
+	if err != nil {
+		return nil, fmt.Errorf("connect nats: %w", err)
+	}
+	return &TripSubscriber{
+		conn:             conn,
+		simSvc:           simSvc,
+		startedSubject:   startedSubject,
+		endedSubject:     endedSubject,
+		cancelledSubject: cancelledSubject,
+	}, nil
 }
 
-// Subscribe registers handlers for TripStartedEvent and TripEndedEvent.
-func (s *Subscriber) Subscribe() error {
-	if _, err := s.conn.Subscribe(s.cfg.TripStartedSubject, s.handleTripStarted); err != nil {
-		return err
+func (s *TripSubscriber) Subscribe() error {
+	startSub, err := s.conn.Subscribe(s.startedSubject, func(msg *nats.Msg) {
+		var ev tripevent.TripStartedEvent
+		if err := proto.Unmarshal(msg.Data, &ev); err != nil {
+			slog.Warn("invalid trip started payload", "subject", s.startedSubject, "error", err)
+			return
+		}
+		slog.Info("trip started event received", "car_id", ev.GetCarId(), "trip_id", ev.GetTripId())
+		s.simSvc.StartTrip(ev.GetCarId())
+	})
+	if err != nil {
+		return fmt.Errorf("subscribe %s: %w", s.startedSubject, err)
 	}
-	if _, err := s.conn.Subscribe(s.cfg.TripEndedSubject, s.handleTripEnded); err != nil {
-		return err
+
+	endSub, err := s.conn.Subscribe(s.endedSubject, func(msg *nats.Msg) {
+		var ev tripevent.TripEndedEvent
+		if err := proto.Unmarshal(msg.Data, &ev); err != nil {
+			slog.Warn("invalid trip ended payload", "subject", s.endedSubject, "error", err)
+			return
+		}
+		slog.Info("trip ended event received", "car_id", ev.GetCarId(), "trip_id", ev.GetTripId())
+		s.simSvc.EndTrip(ev.GetCarId())
+	})
+	if err != nil {
+		startSub.Unsubscribe()
+		return fmt.Errorf("subscribe %s: %w", s.endedSubject, err)
 	}
-	slog.Info("subscribed to NATS trip events",
-		"started_subject", s.cfg.TripStartedSubject,
-		"ended_subject", s.cfg.TripEndedSubject,
+
+	cancelSub, err := s.conn.Subscribe(s.cancelledSubject, func(msg *nats.Msg) {
+		var ev tripevent.TripCancelledEvent
+		if err := proto.Unmarshal(msg.Data, &ev); err != nil {
+			slog.Warn("invalid trip cancelled payload", "subject", s.cancelledSubject, "error", err)
+			return
+		}
+		slog.Info("trip cancelled event received", "car_id", ev.GetCarId(), "trip_id", ev.GetTripId(), "reason", ev.GetReason())
+		s.simSvc.EndTrip(ev.GetCarId())
+	})
+	if err != nil {
+		startSub.Unsubscribe()
+		endSub.Unsubscribe()
+		return fmt.Errorf("subscribe %s: %w", s.cancelledSubject, err)
+	}
+
+	s.subs = []*nats.Subscription{startSub, endSub, cancelSub}
+	slog.Info("NATS trip subscriptions active",
+		"started", s.startedSubject,
+		"ended", s.endedSubject,
+		"cancelled", s.cancelledSubject,
 	)
 	return nil
 }
 
-func (s *Subscriber) handleTripStarted(msg *natsgo.Msg) {
-	var ev tripevent.TripStartedEvent
-	if err := proto.Unmarshal(msg.Data, &ev); err != nil {
-		slog.Warn("failed to unmarshal TripStartedEvent", "error", err)
-		return
+func (s *TripSubscriber) Close() {
+	for _, sub := range s.subs {
+		_ = sub.Unsubscribe()
 	}
-	slog.Info("trip started", "car_id", ev.CarId, "trip_id", ev.TripId)
-	// Simulation is started by the gRPC client via StreamCarTelematicsEvents,
-	// which provides the initial car state (location, fuel, battery, odometer).
-}
-
-func (s *Subscriber) handleTripEnded(msg *natsgo.Msg) {
-	var ev tripevent.TripEndedEvent
-	if err := proto.Unmarshal(msg.Data, &ev); err != nil {
-		slog.Warn("failed to unmarshal TripEndedEvent", "error", err)
-		return
-	}
-	slog.Info("trip ended — stopping simulation", "car_id", ev.CarId, "trip_id", ev.TripId)
-	s.simSvc.StopSimulation(ev.CarId)
+	s.conn.Close()
 }

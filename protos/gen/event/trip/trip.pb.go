@@ -98,6 +98,90 @@ func (x *TripStartedEvent) GetStartedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+type TripCancelledEvent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TripId        string                 `protobuf:"bytes,1,opt,name=trip_id,json=tripId,proto3" json:"trip_id,omitempty"`
+	BookingId     string                 `protobuf:"bytes,2,opt,name=booking_id,json=bookingId,proto3" json:"booking_id,omitempty"`
+	CarId         string                 `protobuf:"bytes,3,opt,name=car_id,json=carId,proto3" json:"car_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,4,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Reason        string                 `protobuf:"bytes,5,opt,name=reason,proto3" json:"reason,omitempty"`
+	CancelledAt   *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=cancelled_at,json=cancelledAt,proto3" json:"cancelled_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TripCancelledEvent) Reset() {
+	*x = TripCancelledEvent{}
+	mi := &file_event_trip_trip_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TripCancelledEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TripCancelledEvent) ProtoMessage() {}
+
+func (x *TripCancelledEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_event_trip_trip_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TripCancelledEvent.ProtoReflect.Descriptor instead.
+func (*TripCancelledEvent) Descriptor() ([]byte, []int) {
+	return file_event_trip_trip_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *TripCancelledEvent) GetTripId() string {
+	if x != nil {
+		return x.TripId
+	}
+	return ""
+}
+
+func (x *TripCancelledEvent) GetBookingId() string {
+	if x != nil {
+		return x.BookingId
+	}
+	return ""
+}
+
+func (x *TripCancelledEvent) GetCarId() string {
+	if x != nil {
+		return x.CarId
+	}
+	return ""
+}
+
+func (x *TripCancelledEvent) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *TripCancelledEvent) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+func (x *TripCancelledEvent) GetCancelledAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CancelledAt
+	}
+	return nil
+}
+
 type TripEndedEvent struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TripId        string                 `protobuf:"bytes,1,opt,name=trip_id,json=tripId,proto3" json:"trip_id,omitempty"`
@@ -111,7 +195,7 @@ type TripEndedEvent struct {
 
 func (x *TripEndedEvent) Reset() {
 	*x = TripEndedEvent{}
-	mi := &file_event_trip_trip_proto_msgTypes[1]
+	mi := &file_event_trip_trip_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -123,7 +207,7 @@ func (x *TripEndedEvent) String() string {
 func (*TripEndedEvent) ProtoMessage() {}
 
 func (x *TripEndedEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_event_trip_trip_proto_msgTypes[1]
+	mi := &file_event_trip_trip_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -136,7 +220,7 @@ func (x *TripEndedEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TripEndedEvent.ProtoReflect.Descriptor instead.
 func (*TripEndedEvent) Descriptor() ([]byte, []int) {
-	return file_event_trip_trip_proto_rawDescGZIP(), []int{1}
+	return file_event_trip_trip_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *TripEndedEvent) GetTripId() string {
@@ -187,7 +271,15 @@ const file_event_trip_trip_proto_rawDesc = "" +
 	"\x06car_id\x18\x03 \x01(\tR\x05carId\x12\x17\n" +
 	"\auser_id\x18\x04 \x01(\tR\x06userId\x129\n" +
 	"\n" +
-	"started_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\"\xaf\x01\n" +
+	"started_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\"\xd3\x01\n" +
+	"\x12TripCancelledEvent\x12\x17\n" +
+	"\atrip_id\x18\x01 \x01(\tR\x06tripId\x12\x1d\n" +
+	"\n" +
+	"booking_id\x18\x02 \x01(\tR\tbookingId\x12\x15\n" +
+	"\x06car_id\x18\x03 \x01(\tR\x05carId\x12\x17\n" +
+	"\auser_id\x18\x04 \x01(\tR\x06userId\x12\x16\n" +
+	"\x06reason\x18\x05 \x01(\tR\x06reason\x12=\n" +
+	"\fcancelled_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\vcancelledAt\"\xaf\x01\n" +
 	"\x0eTripEndedEvent\x12\x17\n" +
 	"\atrip_id\x18\x01 \x01(\tR\x06tripId\x12\x1d\n" +
 	"\n" +
@@ -208,20 +300,22 @@ func file_event_trip_trip_proto_rawDescGZIP() []byte {
 	return file_event_trip_trip_proto_rawDescData
 }
 
-var file_event_trip_trip_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_event_trip_trip_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_event_trip_trip_proto_goTypes = []any{
 	(*TripStartedEvent)(nil),      // 0: event.trip.TripStartedEvent
-	(*TripEndedEvent)(nil),        // 1: event.trip.TripEndedEvent
-	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
+	(*TripCancelledEvent)(nil),    // 1: event.trip.TripCancelledEvent
+	(*TripEndedEvent)(nil),        // 2: event.trip.TripEndedEvent
+	(*timestamppb.Timestamp)(nil), // 3: google.protobuf.Timestamp
 }
 var file_event_trip_trip_proto_depIdxs = []int32{
-	2, // 0: event.trip.TripStartedEvent.started_at:type_name -> google.protobuf.Timestamp
-	2, // 1: event.trip.TripEndedEvent.ended_at:type_name -> google.protobuf.Timestamp
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	3, // 0: event.trip.TripStartedEvent.started_at:type_name -> google.protobuf.Timestamp
+	3, // 1: event.trip.TripCancelledEvent.cancelled_at:type_name -> google.protobuf.Timestamp
+	3, // 2: event.trip.TripEndedEvent.ended_at:type_name -> google.protobuf.Timestamp
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_event_trip_trip_proto_init() }
@@ -235,7 +329,7 @@ func file_event_trip_trip_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_event_trip_trip_proto_rawDesc), len(file_event_trip_trip_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -98,6 +98,142 @@ func (x *BookingCreatedEvent) GetEndsAt() *timestamppb.Timestamp {
 	return nil
 }
 
+type BookingExpiredEvent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	BookingId     string                 `protobuf:"bytes,1,opt,name=booking_id,json=bookingId,proto3" json:"booking_id,omitempty"`
+	CarId         string                 `protobuf:"bytes,2,opt,name=car_id,json=carId,proto3" json:"car_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	ExpiredAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=expired_at,json=expiredAt,proto3" json:"expired_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BookingExpiredEvent) Reset() {
+	*x = BookingExpiredEvent{}
+	mi := &file_event_booking_booking_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BookingExpiredEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BookingExpiredEvent) ProtoMessage() {}
+
+func (x *BookingExpiredEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_event_booking_booking_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BookingExpiredEvent.ProtoReflect.Descriptor instead.
+func (*BookingExpiredEvent) Descriptor() ([]byte, []int) {
+	return file_event_booking_booking_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *BookingExpiredEvent) GetBookingId() string {
+	if x != nil {
+		return x.BookingId
+	}
+	return ""
+}
+
+func (x *BookingExpiredEvent) GetCarId() string {
+	if x != nil {
+		return x.CarId
+	}
+	return ""
+}
+
+func (x *BookingExpiredEvent) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *BookingExpiredEvent) GetExpiredAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ExpiredAt
+	}
+	return nil
+}
+
+type BookingCompletedEvent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	BookingId     string                 `protobuf:"bytes,1,opt,name=booking_id,json=bookingId,proto3" json:"booking_id,omitempty"`
+	CarId         string                 `protobuf:"bytes,2,opt,name=car_id,json=carId,proto3" json:"car_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	CompletedAt   *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=completed_at,json=completedAt,proto3" json:"completed_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BookingCompletedEvent) Reset() {
+	*x = BookingCompletedEvent{}
+	mi := &file_event_booking_booking_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BookingCompletedEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BookingCompletedEvent) ProtoMessage() {}
+
+func (x *BookingCompletedEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_event_booking_booking_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BookingCompletedEvent.ProtoReflect.Descriptor instead.
+func (*BookingCompletedEvent) Descriptor() ([]byte, []int) {
+	return file_event_booking_booking_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *BookingCompletedEvent) GetBookingId() string {
+	if x != nil {
+		return x.BookingId
+	}
+	return ""
+}
+
+func (x *BookingCompletedEvent) GetCarId() string {
+	if x != nil {
+		return x.CarId
+	}
+	return ""
+}
+
+func (x *BookingCompletedEvent) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *BookingCompletedEvent) GetCompletedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CompletedAt
+	}
+	return nil
+}
+
 type BookingCancelledEvent struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	BookingId     string                 `protobuf:"bytes,1,opt,name=booking_id,json=bookingId,proto3" json:"booking_id,omitempty"`
@@ -110,7 +246,7 @@ type BookingCancelledEvent struct {
 
 func (x *BookingCancelledEvent) Reset() {
 	*x = BookingCancelledEvent{}
-	mi := &file_event_booking_booking_proto_msgTypes[1]
+	mi := &file_event_booking_booking_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -122,7 +258,7 @@ func (x *BookingCancelledEvent) String() string {
 func (*BookingCancelledEvent) ProtoMessage() {}
 
 func (x *BookingCancelledEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_event_booking_booking_proto_msgTypes[1]
+	mi := &file_event_booking_booking_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -135,7 +271,7 @@ func (x *BookingCancelledEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BookingCancelledEvent.ProtoReflect.Descriptor instead.
 func (*BookingCancelledEvent) Descriptor() ([]byte, []int) {
-	return file_event_booking_booking_proto_rawDescGZIP(), []int{1}
+	return file_event_booking_booking_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *BookingCancelledEvent) GetBookingId() string {
@@ -177,7 +313,20 @@ const file_event_booking_booking_proto_rawDesc = "" +
 	"\x06car_id\x18\x02 \x01(\tR\x05carId\x12\x17\n" +
 	"\auser_id\x18\x03 \x01(\tR\x06userId\x127\n" +
 	"\tstarts_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\bstartsAt\x123\n" +
-	"\aends_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\x06endsAt\"~\n" +
+	"\aends_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\x06endsAt\"\x9f\x01\n" +
+	"\x13BookingExpiredEvent\x12\x1d\n" +
+	"\n" +
+	"booking_id\x18\x01 \x01(\tR\tbookingId\x12\x15\n" +
+	"\x06car_id\x18\x02 \x01(\tR\x05carId\x12\x17\n" +
+	"\auser_id\x18\x03 \x01(\tR\x06userId\x129\n" +
+	"\n" +
+	"expired_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\texpiredAt\"\xa5\x01\n" +
+	"\x15BookingCompletedEvent\x12\x1d\n" +
+	"\n" +
+	"booking_id\x18\x01 \x01(\tR\tbookingId\x12\x15\n" +
+	"\x06car_id\x18\x02 \x01(\tR\x05carId\x12\x17\n" +
+	"\auser_id\x18\x03 \x01(\tR\x06userId\x12=\n" +
+	"\fcompleted_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\vcompletedAt\"~\n" +
 	"\x15BookingCancelledEvent\x12\x1d\n" +
 	"\n" +
 	"booking_id\x18\x01 \x01(\tR\tbookingId\x12\x15\n" +
@@ -197,20 +346,24 @@ func file_event_booking_booking_proto_rawDescGZIP() []byte {
 	return file_event_booking_booking_proto_rawDescData
 }
 
-var file_event_booking_booking_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_event_booking_booking_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_event_booking_booking_proto_goTypes = []any{
 	(*BookingCreatedEvent)(nil),   // 0: event.booking.BookingCreatedEvent
-	(*BookingCancelledEvent)(nil), // 1: event.booking.BookingCancelledEvent
-	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
+	(*BookingExpiredEvent)(nil),   // 1: event.booking.BookingExpiredEvent
+	(*BookingCompletedEvent)(nil), // 2: event.booking.BookingCompletedEvent
+	(*BookingCancelledEvent)(nil), // 3: event.booking.BookingCancelledEvent
+	(*timestamppb.Timestamp)(nil), // 4: google.protobuf.Timestamp
 }
 var file_event_booking_booking_proto_depIdxs = []int32{
-	2, // 0: event.booking.BookingCreatedEvent.starts_at:type_name -> google.protobuf.Timestamp
-	2, // 1: event.booking.BookingCreatedEvent.ends_at:type_name -> google.protobuf.Timestamp
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	4, // 0: event.booking.BookingCreatedEvent.starts_at:type_name -> google.protobuf.Timestamp
+	4, // 1: event.booking.BookingCreatedEvent.ends_at:type_name -> google.protobuf.Timestamp
+	4, // 2: event.booking.BookingExpiredEvent.expired_at:type_name -> google.protobuf.Timestamp
+	4, // 3: event.booking.BookingCompletedEvent.completed_at:type_name -> google.protobuf.Timestamp
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_event_booking_booking_proto_init() }
@@ -224,7 +377,7 @@ func file_event_booking_booking_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_event_booking_booking_proto_rawDesc), len(file_event_booking_booking_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

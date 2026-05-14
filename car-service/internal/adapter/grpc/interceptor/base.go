@@ -2,19 +2,20 @@ package interceptor
 
 import (
 	"context"
+
 	"github.com/sorawaslocked/car-rental-car-service/internal/adapter/grpc/dto"
 	"github.com/sorawaslocked/car-rental-car-service/internal/model"
+	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/utils"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
 const (
-	requestIDKey        = "x-request-id"
-	requestClientIPKey  = "x-client-ip"
-	requestUserIDKey    = "x-user-id"
-	requestUserRoles    = "x-user-roles"
-	requestUserVerified = "x-user-verified"
+	mdKeyRequestID = "x-request-id"
+	mdKeyClientIP  = "x-client-ip"
+	mdKeyUserID    = "x-user-id"
+	mdKeyUserRoles = "x-user-roles"
 )
 
 type BaseInterceptor struct{}
@@ -29,56 +30,20 @@ func (i *BaseInterceptor) Unary(ctx context.Context, req any, _ *grpc.UnaryServe
 		return nil, dto.FromErrorToStatusCode(model.ErrMissingMetadata)
 	}
 
-	ctx = context.WithValue(ctx, requestIDKey, requestIDFromMetadata(md))
-	ctx = context.WithValue(ctx, requestClientIPKey, requestClientIPFromMetadata(md))
-	ctx = context.WithValue(ctx, requestUserIDKey, requestUserIDFromMetadata(md))
-	ctx = context.WithValue(ctx, requestUserRoles, requestUserRolesFromMetadata(md))
-	ctx = context.WithValue(ctx, requestUserVerified, requestUserVerifiedFromMetadata(md))
+	ctx = utils.SetMetadata(
+		ctx,
+		firstVal(md.Get(mdKeyRequestID)),
+		firstVal(md.Get(mdKeyClientIP)),
+		firstVal(md.Get(mdKeyUserID)),
+		firstVal(md.Get(mdKeyUserRoles)),
+	)
 
 	return handler(ctx, req)
 }
 
-func requestClientIPFromMetadata(md metadata.MD) string {
-	clientIP := md.Get(requestClientIPKey)
-	if len(clientIP) > 0 {
-		return clientIP[0]
+func firstVal(vals []string) string {
+	if len(vals) > 0 {
+		return vals[0]
 	}
-
-	return ""
-}
-
-func requestIDFromMetadata(md metadata.MD) string {
-	requestID := md.Get(requestIDKey)
-	if len(requestID) > 0 {
-		return requestID[0]
-	}
-
-	return ""
-}
-
-func requestUserIDFromMetadata(md metadata.MD) string {
-	requestUserID := md.Get(requestUserIDKey)
-	if len(requestUserID) > 0 {
-		return requestUserID[0]
-	}
-
-	return ""
-}
-
-func requestUserRolesFromMetadata(md metadata.MD) string {
-	requestUserRolesStr := md.Get(requestUserRoles)
-	if len(requestUserRolesStr) > 0 {
-		return requestUserRolesStr[0]
-	}
-
-	return ""
-}
-
-func requestUserVerifiedFromMetadata(md metadata.MD) string {
-	requestUserVerifiedStr := md.Get(requestUserVerified)
-	if len(requestUserVerifiedStr) > 0 {
-		return requestUserVerifiedStr[0]
-	}
-
 	return ""
 }

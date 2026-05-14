@@ -23,6 +23,7 @@ type carRow struct {
 	Latitude         float64         `db:"latitude"`
 	Longitude        float64         `db:"longitude"`
 	Notes            pq.StringArray  `db:"notes"`
+	ImageKeys        pq.StringArray  `db:"image_keys"`
 	LastSeenAt       time.Time       `db:"last_seen_at"`
 	CreatedAt        time.Time       `db:"created_at"`
 	UpdatedAt        time.Time       `db:"updated_at"`
@@ -43,15 +44,18 @@ func (r carRow) toDomain() model.Car {
 			Longitude: r.Longitude,
 		},
 		Notes:      []string(r.Notes),
+		ImageKeys:  []string(r.ImageKeys),
 		LastSeenAt: r.LastSeenAt,
 		CreatedAt:  r.CreatedAt,
 		UpdatedAt:  r.UpdatedAt,
 	}
 	if r.FuelLevel.Valid {
-		c.FuelLevel = new(float32(r.FuelLevel.Float64))
+		f := float32(r.FuelLevel.Float64)
+		c.FuelLevel = &f
 	}
 	if r.BatteryLevel.Valid {
-		c.BatteryLevel = new(float32(r.BatteryLevel.Float64))
+		bv := float32(r.BatteryLevel.Float64)
+		c.BatteryLevel = &bv
 	}
 
 	return c
@@ -65,7 +69,7 @@ func ScanCarRow(s scanner) (model.Car, error) {
 		&r.YearManufactured, &r.Status, &r.MileageKM,
 		&r.FuelLevel, &r.BatteryLevel,
 		&r.Latitude, &r.Longitude,
-		&r.Notes, &r.LastSeenAt, &r.CreatedAt, &r.UpdatedAt,
+		&r.Notes, &r.ImageKeys, &r.LastSeenAt, &r.CreatedAt, &r.UpdatedAt,
 	)
 	if err != nil {
 		return model.Car{}, err

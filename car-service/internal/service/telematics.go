@@ -2,84 +2,160 @@ package service
 
 import (
 	"context"
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
 	"log/slog"
+	"sync"
 	"time"
 
-	"github.com/go-playground/validator/v10"
+	"github.com/sorawaslocked/car-rental-car-service/internal/model"
+	pkglog "github.com/sorawaslocked/car-rental-car-service/internal/pkg/log"
 )
 
-type TelematicsService struct {
-	telematicsRepo  TelematicsRepository
-	telematicsQueue TelematicsQueue
-	carRepo         CarRepository
+const telematicsReconnectDelay = 5 * time.Second
 
-	validate *validator.Validate
-	log      *slog.Logger
+type TelematicsService struct {
+	streamClient   TelematicsStreamClient
+	telematicsRepo TelematicsRepository
+	carRepo        CarRepository
+
+	mu  sync.Mutex
+	ctx context.Context
+	wg  sync.WaitGroup
+
+	log *slog.Logger
 }
 
 func NewTelematicsService(
+	streamClient TelematicsStreamClient,
 	telematicsRepo TelematicsRepository,
-	telematicsQueue TelematicsQueue,
 	carRepo CarRepository,
 	log *slog.Logger,
 ) *TelematicsService {
 	s := &TelematicsService{
-		telematicsRepo:  telematicsRepo,
-		telematicsQueue: telematicsQueue,
-		carRepo:         carRepo,
+		streamClient:   streamClient,
+		telematicsRepo: telematicsRepo,
+		carRepo:        carRepo,
 	}
 
-	s.log = log.With(
-		slog.Group("src",
-			slog.String("component", "TelematicsService"),
-		),
-	)
+	s.log = pkglog.WithComponent(log, "service.TelematicsService")
 
 	return s
 }
 
-func (s *TelematicsService) ProcessNextUpdate(ctx context.Context) error {
-	const method = "ProcessNextUpdate"
+// Start loads all cars and subscribes to each car's telematics stream in a
+// dedicated goroutine. Goroutines run until ctx is cancelled.
+func (s *TelematicsService) Start(ctx context.Context) error {
+	logger := pkglog.WithMethod(s.log, "Start")
 
-	logger := s.log.With(slog.Group("src", slog.String("method", method)))
-
-	update, ack, err := s.telematicsQueue.Pop(ctx)
+	cars, err := s.carRepo.Find(ctx, model.CarFilter{})
 	if err != nil {
 		return handleError(logger, err)
 	}
 
-	if err = s.applyUpdate(ctx, logger, update); err != nil {
-		if nackErr := ack(err); nackErr != nil {
-			logger.Error("failed to nack telemetry event",
-				slog.String("carID", update.CarID),
-				slog.String("error", nackErr.Error()),
-			)
-		}
-		return err
-	}
+	s.mu.Lock()
+	s.ctx = ctx
+	s.mu.Unlock()
 
-	if err = ack(nil); err != nil {
-		return handleError(logger, err)
+	logger.Info("subscribing to telematics streams", slog.Int("cars", len(cars)))
+
+	for _, car := range cars {
+		s.wg.Add(1)
+		go func(c model.Car) {
+			defer s.wg.Done()
+			s.subscribeToCarStream(ctx, c)
+		}(car)
 	}
 
 	return nil
 }
 
-func (s *TelematicsService) applyUpdate(ctx context.Context, logger *slog.Logger, update model.TelematicsUpdate) error {
-	carID := update.CarID
-	carFilter := model.CarFilter{ID: &carID}
+// Stop waits for all telematics goroutines to finish after the context is cancelled.
+func (s *TelematicsService) Stop() {
+	s.wg.Wait()
+}
 
-	current, err := s.carRepo.FindOne(ctx, carFilter)
+// OnCarCreated starts a telematics stream goroutine for a newly created car.
+func (s *TelematicsService) OnCarCreated(car model.Car) {
+	s.mu.Lock()
+	ctx := s.ctx
+	s.mu.Unlock()
+
+	if ctx == nil {
+		s.log.Warn("OnCarCreated called before Start",
+			slog.String("carID", car.ID),
+		)
+		return
+	}
+
+	s.wg.Add(1)
+	go func() {
+		defer s.wg.Done()
+		s.subscribeToCarStream(ctx, car)
+	}()
+}
+
+// SubscribeCarStream opens a live telematics stream for a single car and returns
+// a channel of updates. Used by the gRPC streaming handler.
+func (s *TelematicsService) SubscribeCarStream(ctx context.Context, carID string) (<-chan model.TelematicsUpdate, error) {
+	logger := pkglog.WithMethod(s.log, "SubscribeCarStream")
+
+	car, err := s.carRepo.FindByID(ctx, carID)
+	if err != nil {
+		return nil, handleError(logger, err)
+	}
+
+	return s.streamClient.Subscribe(ctx, car)
+}
+
+func (s *TelematicsService) subscribeToCarStream(ctx context.Context, car model.Car) {
+	logger := pkglog.WithMethod(s.log, "subscribeToCarStream")
+	logger = logger.With(slog.String("carID", car.ID))
+
+	for {
+		ch, err := s.streamClient.Subscribe(ctx, car)
+		if err != nil {
+			if ctx.Err() != nil {
+				return
+			}
+			logger.Error("failed to subscribe to telematics stream", pkglog.Err(err))
+			select {
+			case <-ctx.Done():
+				return
+			case <-time.After(telematicsReconnectDelay):
+			}
+			continue
+		}
+
+		for update := range ch {
+			if err := s.applyUpdate(ctx, logger, update); err != nil {
+				logger.Error("failed to apply telematics update", pkglog.Err(err))
+			}
+		}
+
+		if ctx.Err() != nil {
+			return
+		}
+
+		logger.Info("telematics stream closed, reconnecting",
+			slog.Duration("in", telematicsReconnectDelay),
+		)
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(telematicsReconnectDelay):
+		}
+	}
+}
+
+func (s *TelematicsService) applyUpdate(ctx context.Context, logger *slog.Logger, update model.TelematicsUpdate) error {
+	current, err := s.carRepo.FindByID(ctx, update.CarID)
 	if err != nil {
 		return handleError(logger, err)
 	}
 
 	if update.OdometerKM < current.MileageKM {
-		logger.Info("rejected telemetry update due to odometer regression",
-			slog.String("carID", carID),
-			slog.Int64("currentMileageKM", current.MileageKM),
-			slog.Int64("incomingOdometerKM", update.OdometerKM),
+		logger.Info("rejected telematics update: odometer regression",
+			slog.Int64("current", current.MileageKM),
+			slog.Int64("incoming", update.OdometerKM),
 		)
 		return ErrOdometerRegression
 	}
@@ -93,6 +169,7 @@ func (s *TelematicsService) applyUpdate(ctx context.Context, logger *slog.Logger
 		FuelLevel:    update.FuelLevel,
 		BatteryLevel: update.BatteryLevel,
 		OdometerKM:   update.OdometerKM,
+		ActorType:    string(model.CarStatusActorTelematics),
 		RecordedAt:   update.RecordedAt,
 		ReceivedAt:   now,
 	}
@@ -101,7 +178,7 @@ func (s *TelematicsService) applyUpdate(ctx context.Context, logger *slog.Logger
 		return handleError(logger, err)
 	}
 
-	carUpdate := model.CarUpdate{
+	if err = s.carRepo.Update(ctx, update.CarID, model.CarUpdate{
 		MileageKM:    &update.OdometerKM,
 		FuelLevel:    update.FuelLevel,
 		BatteryLevel: update.BatteryLevel,
@@ -111,14 +188,11 @@ func (s *TelematicsService) applyUpdate(ctx context.Context, logger *slog.Logger
 		},
 		LastSeenAt: &now,
 		UpdatedAt:  now,
-	}
-
-	if err = s.carRepo.Update(ctx, carFilter, carUpdate); err != nil {
+	}); err != nil {
 		return handleError(logger, err)
 	}
 
-	logger.Info("telemetry event applied",
-		slog.String("carID", update.CarID),
+	logger.Info("telematics update applied",
 		slog.Int64("odometerKM", update.OdometerKM),
 		slog.Time("recordedAt", update.RecordedAt),
 	)

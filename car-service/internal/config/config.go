@@ -5,15 +5,24 @@ import (
 	"os"
 
 	"github.com/ilyakaznacheev/cleanenv"
-	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/grpc"
+	grpccfg "github.com/sorawaslocked/car-rental-car-service/internal/pkg/grpc"
+	miniocfg "github.com/sorawaslocked/car-rental-car-service/internal/pkg/minio"
+	natscfg "github.com/sorawaslocked/car-rental-car-service/internal/pkg/nats"
 	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/postgres"
 )
 
+type TelematicsStreamConfig struct {
+	Addr string `yaml:"addr" env:"TELEMATICS_STREAM_ADDR" env-required:"true"`
+}
+
 type (
 	Config struct {
-		Env      string          `yaml:"env" env:"ENV" env-required:"true"`
-		Postgres postgres.Config `yaml:"postgres" env-required:"true"`
-		GRPC     grpc.Config     `yaml:"grpc" env-required:"true"`
+		Env              string                 `yaml:"env"               env:"ENV"      env-required:"true"`
+		Postgres         postgres.Config        `yaml:"postgres"          env-required:"true"`
+		GRPC             grpccfg.Config         `yaml:"grpc"              env-required:"true"`
+		MinIO            miniocfg.Config        `yaml:"minio"             env-required:"true"`
+		NATS             natscfg.Config         `yaml:"nats"              env-required:"true"`
+		TelematicsStream TelematicsStreamConfig `yaml:"telematics_stream" env-required:"true"`
 	}
 )
 

@@ -2,17 +2,20 @@ package service
 
 import (
 	"context"
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
-	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/utils"
-	"github.com/sorawaslocked/car-rental-car-service/internal/validation"
 	"log/slog"
 	"time"
+
+	"github.com/sorawaslocked/car-rental-car-service/internal/model"
+	pkglog "github.com/sorawaslocked/car-rental-car-service/internal/pkg/log"
+	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/utils"
+	"github.com/sorawaslocked/car-rental-car-service/internal/validation"
 
 	"github.com/go-playground/validator/v10"
 )
 
 type CarModelService struct {
-	carModelRepo CarModelRepository
+	carModelRepo  CarModelRepository
+	objectStorage ObjectStorage
 
 	validate *validator.Validate
 	log      *slog.Logger
@@ -20,30 +23,27 @@ type CarModelService struct {
 
 func NewCarModelService(
 	carModelRepo CarModelRepository,
+	objectStorage ObjectStorage,
+	validate *validator.Validate,
 	log *slog.Logger,
 ) *CarModelService {
 	s := &CarModelService{
-		carModelRepo: carModelRepo,
+		carModelRepo:  carModelRepo,
+		objectStorage: objectStorage,
+		validate:      validate,
 	}
 
-	s.log = log.With(
-		slog.Group("src",
-			slog.String("component", "CarModelService"),
-		),
-	)
+	s.log = pkglog.WithComponent(log, "service.CarModelService")
 
 	return s
 }
 
 func (s *CarModelService) Create(ctx context.Context, createInput model.CarModelCreateInput) (string, error) {
 	const method = "Create"
-	logger := defaultLogger(s.log, method)
+	logger := pkglog.WithMethod(s.log, method)
 
-	md, ok := utils.MetadataFromCtx(ctx)
-	if !ok {
-		return "", handleError(logger, model.ErrMissingMetadata)
-	}
-	logger = loggerWithMetadata(logger, md)
+	md := utils.MetadataFromCtx(ctx)
+	logger = pkglog.WithMetadata(logger, md)
 
 	err := validation.ValidateInput(s.validate, createInput)
 	if err != nil {
@@ -80,23 +80,14 @@ func (s *CarModelService) Create(ctx context.Context, createInput model.CarModel
 	return id, nil
 }
 
-func (s *CarModelService) Get(ctx context.Context, filterInput model.CarModelFilterInput) (model.CarModel, error) {
+func (s *CarModelService) Get(ctx context.Context, id string) (model.CarModel, error) {
 	const method = "Get"
-	logger := defaultLogger(s.log, method)
+	logger := pkglog.WithMethod(s.log, method)
 
-	md, ok := utils.MetadataFromCtx(ctx)
-	if !ok {
-		return model.CarModel{}, handleError(logger, model.ErrMissingMetadata)
-	}
-	logger = loggerWithMetadata(logger, md)
+	md := utils.MetadataFromCtx(ctx)
+	logger = pkglog.WithMetadata(logger, md)
 
-	err := validation.ValidateInput(s.validate, filterInput)
-	if err != nil {
-		return model.CarModel{}, handleError(logger, err)
-	}
-	filter := carModelFilterFromInput(filterInput, true)
-
-	carModel, err := s.carModelRepo.FindOne(ctx, filter)
+	carModel, err := s.carModelRepo.FindByID(ctx, id)
 	if err != nil {
 		return model.CarModel{}, handleError(logger, err)
 	}
@@ -106,19 +97,15 @@ func (s *CarModelService) Get(ctx context.Context, filterInput model.CarModelFil
 
 func (s *CarModelService) GetAll(ctx context.Context, filterInput model.CarModelFilterInput) ([]model.CarModel, error) {
 	const method = "GetAll"
-	logger := defaultLogger(s.log, method)
+	logger := pkglog.WithMethod(s.log, method)
 
-	md, ok := utils.MetadataFromCtx(ctx)
-	if !ok {
-		return []model.CarModel{}, handleError(logger, model.ErrMissingMetadata)
-	}
-	logger = loggerWithMetadata(logger, md)
+	md := utils.MetadataFromCtx(ctx)
+	logger = pkglog.WithMetadata(logger, md)
 
-	err := validation.ValidateInput(s.validate, filterInput)
-	if err != nil {
+	if err := validation.ValidateInput(s.validate, filterInput); err != nil {
 		return nil, handleError(logger, err)
 	}
-	filter := carModelFilterFromInput(filterInput, false)
+	filter := carModelFilterFromInput(filterInput)
 
 	carModels, err := s.carModelRepo.Find(ctx, filter)
 	if err != nil {
@@ -128,28 +115,17 @@ func (s *CarModelService) GetAll(ctx context.Context, filterInput model.CarModel
 	return carModels, nil
 }
 
-func (s *CarModelService) Update(ctx context.Context, filterInput model.CarModelFilterInput, updateInput model.CarModelUpdateInput) error {
+func (s *CarModelService) Update(ctx context.Context, id string, updateInput model.CarModelUpdateInput) error {
 	const method = "Update"
-	logger := defaultLogger(s.log, method)
+	logger := pkglog.WithMethod(s.log, method)
 
-	md, ok := utils.MetadataFromCtx(ctx)
-	if !ok {
-		return handleError(logger, model.ErrMissingMetadata)
-	}
-	logger = loggerWithMetadata(logger, md)
+	md := utils.MetadataFromCtx(ctx)
+	logger = pkglog.WithMetadata(logger, md)
 
-	err := validation.ValidateInput(s.validate, filterInput)
-	if err != nil {
-		return handleError(logger, err)
-	}
-	filter := carModelFilterFromInput(filterInput, true)
-
-	err = validation.ValidateInput(s.validate, updateInput)
-	if err != nil {
+	if err := validation.ValidateInput(s.validate, updateInput); err != nil {
 		return handleError(logger, err)
 	}
 
-	now := time.Now()
 	update := model.CarModelUpdate{
 		Brand:        updateInput.Brand,
 		Model:        updateInput.Model,
@@ -158,7 +134,8 @@ func (s *CarModelService) Update(ctx context.Context, filterInput model.CarModel
 		EngineVolume: updateInput.EngineVolume,
 		RangeKM:      updateInput.RangeKM,
 		Features:     updateInput.Features,
-		UpdatedAt:    now,
+		ImageKeys:    updateInput.ImageKeys,
+		UpdatedAt:    time.Now(),
 	}
 
 	if updateInput.FuelType != nil {
@@ -172,41 +149,77 @@ func (s *CarModelService) Update(ctx context.Context, filterInput model.CarModel
 	if updateInput.BodyType != nil {
 		bodyType, _ := model.ParseCarBodyType(*updateInput.BodyType)
 		update.BodyType = &bodyType
-
 	}
 	if updateInput.Class != nil {
 		class, _ := model.ParseCarClass(*updateInput.Class)
 		update.Class = &class
 	}
 
-	err = s.carModelRepo.Update(ctx, filter, update)
-	if err != nil {
+	if err := s.carModelRepo.Update(ctx, id, update); err != nil {
 		return handleError(logger, err)
 	}
 
 	return nil
 }
 
-func (s *CarModelService) Delete(ctx context.Context, filterInput model.CarModelFilterInput) error {
+func (s *CarModelService) Delete(ctx context.Context, id string) error {
 	const method = "Delete"
-	logger := defaultLogger(s.log, method)
+	logger := pkglog.WithMethod(s.log, method)
 
-	md, ok := utils.MetadataFromCtx(ctx)
-	if !ok {
-		return handleError(logger, model.ErrMissingMetadata)
-	}
-	logger = loggerWithMetadata(logger, md)
+	md := utils.MetadataFromCtx(ctx)
+	logger = pkglog.WithMetadata(logger, md)
 
-	err := validation.ValidateInput(s.validate, filterInput)
-	if err != nil {
-		return handleError(logger, err)
-	}
-	filter := carModelFilterFromInput(filterInput, true)
-
-	err = s.carModelRepo.Delete(ctx, filter)
-	if err != nil {
+	if err := s.carModelRepo.Delete(ctx, id); err != nil {
 		return handleError(logger, err)
 	}
 
 	return nil
+}
+
+func (s *CarModelService) GetImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+	const method = "GetImageUploadData"
+	logger := pkglog.WithMethod(s.log, method)
+
+	md := utils.MetadataFromCtx(ctx)
+	logger = pkglog.WithMetadata(logger, md)
+
+	if s.objectStorage == nil {
+		logger.Error("object storage not configured")
+		return model.ImageUploadData{}, model.ErrInternalServerError
+	}
+
+	data, err := s.objectStorage.GetImageUploadData(ctx, storageKeyPrefixCarModel)
+	if err != nil {
+		return model.ImageUploadData{}, handleError(logger, err)
+	}
+
+	return data, nil
+}
+
+func (s *CarModelService) GetImageURLs(ctx context.Context, id string) ([]string, error) {
+	const method = "GetImageURLs"
+	logger := pkglog.WithMethod(s.log, method)
+
+	md := utils.MetadataFromCtx(ctx)
+	logger = pkglog.WithMetadata(logger, md)
+
+	if s.objectStorage == nil {
+		return nil, nil
+	}
+
+	carModel, err := s.carModelRepo.FindByID(ctx, id)
+	if err != nil {
+		return nil, handleError(logger, err)
+	}
+
+	urls := make([]string, 0, len(carModel.ImageKeys))
+	for _, k := range carModel.ImageKeys {
+		url, err := s.objectStorage.GetPresignedURL(ctx, k)
+		if err != nil {
+			return nil, handleError(logger, err)
+		}
+		urls = append(urls, url)
+	}
+
+	return urls, nil
 }

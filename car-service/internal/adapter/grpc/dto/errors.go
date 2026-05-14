@@ -21,8 +21,17 @@ func FromErrorToStatusCode(err error) error {
 	case errors.Is(err, model.ErrMissingMetadata):
 		return status.Error(codes.InvalidArgument, err.Error())
 
-	case errors.Is(err, model.ErrUnauthorized):
+	case errors.Is(err, model.ErrUnauthenticated):
+		return status.Error(codes.Unauthenticated, err.Error())
+
+	case errors.Is(err, model.ErrUnauthorized), errors.Is(err, model.ErrInsufficientPermissions):
 		return status.Error(codes.PermissionDenied, err.Error())
+
+	case errors.Is(err, model.ErrNotFound):
+		return status.Error(codes.NotFound, err.Error())
+
+	case errors.Is(err, model.ErrConflict):
+		return status.Error(codes.AlreadyExists, err.Error())
 
 	case errors.Is(err, model.ErrInternalServerError):
 		return status.Error(codes.Internal, err.Error())

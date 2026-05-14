@@ -15,6 +15,7 @@ type CarModel struct {
 	EngineVolume *float32
 	RangeKM      int32
 	Features     []string
+	ImageKeys    []string
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -45,11 +46,12 @@ type CarModelUpdate struct {
 	EngineVolume *float32
 	RangeKM      *int32
 	Features     []string
+	ImageKeys    []string
 	UpdatedAt    time.Time
 }
 
 type CarModelFilterInput struct {
-	ID           *string `validate:"required_without_all=Brand Model FuelType Transmission BodyType Class MinSeats"`
+	ID           *string `validate:"omitempty,uuid"`
 	Brand        *string `validate:"omitempty,min=1,max=100"`
 	Model        *string `validate:"omitempty,min=1,max=100"`
 	FuelType     *string `validate:"omitempty,carfueltype"`
@@ -87,4 +89,5 @@ type CarModelUpdateInput struct {
 	EngineVolume *float32 `validate:"omitempty,min=0.1,max=28.5"`
 	RangeKM      *int32   `validate:"omitempty,min=0"`
 	Features     []string `validate:"omitempty,max=50,dive,min=1,max=50"`
+	ImageKeys    []string `validate:"omitempty,max=20,dive,min=1"`
 }

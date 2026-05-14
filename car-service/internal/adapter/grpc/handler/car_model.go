@@ -2,10 +2,12 @@ package handler
 
 import (
 	"context"
-	"github.com/sorawaslocked/car-rental-car-service/internal/adapter/grpc/dto"
 	"log/slog"
 
+	"github.com/sorawaslocked/car-rental-car-service/internal/adapter/grpc/dto"
+
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type CarModelHandler struct {
@@ -38,55 +40,61 @@ func (h *CarModelHandler) CreateCarModel(ctx context.Context, req *carsvc.Create
 		return nil, dto.FromErrorToStatusCode(err)
 	}
 
-	return &carsvc.CreateCarModelResponse{
-		ID: id,
-	}, nil
+	return &carsvc.CreateCarModelResponse{Id: id}, nil
 }
 
 func (h *CarModelHandler) GetCarModel(ctx context.Context, req *carsvc.GetCarModelRequest) (*carsvc.GetCarModelResponse, error) {
-	filterInput := dto.FromGetCarModelRequest(req)
-
-	carModel, err := h.carModelService.Get(ctx, filterInput)
+	carModel, err := h.carModelService.Get(ctx, req.Id)
 	if err != nil {
 		return nil, dto.FromErrorToStatusCode(err)
 	}
 
-	return &carsvc.GetCarModelResponse{
-		CarModel: dto.ToCarModelProto(carModel),
-	}, nil
+	imageURLs, _ := h.carModelService.GetImageURLs(ctx, req.Id)
+
+	proto := dto.ToCarModelProto(carModel)
+	proto.ImageUrls = imageURLs
+
+	return &carsvc.GetCarModelResponse{CarModel: proto}, nil
 }
 
-func (h *CarModelHandler) GetCarModels(ctx context.Context, req *carsvc.GetCarModelsRequest) (*carsvc.GetCarModelsResponse, error) {
-	filterInput := dto.FromGetCarModelsRequest(req)
+func (h *CarModelHandler) ListCarModels(ctx context.Context, req *carsvc.ListCarModelsRequest) (*carsvc.ListCarModelsResponse, error) {
+	filterInput := dto.FromListCarModelsRequest(req)
 
 	carModels, err := h.carModelService.GetAll(ctx, filterInput)
 	if err != nil {
 		return nil, dto.FromErrorToStatusCode(err)
 	}
 
-	return &carsvc.GetCarModelsResponse{
+	return &carsvc.ListCarModelsResponse{
 		CarModels: dto.ToCarModelProtos(carModels),
 	}, nil
 }
 
-func (h *CarModelHandler) UpdateCarModel(ctx context.Context, req *carsvc.UpdateCarModelRequest) (*carsvc.UpdateCarModelResponse, error) {
-	filterInput, updateInput := dto.FromUpdateCarModelRequest(req)
+func (h *CarModelHandler) UpdateCarModel(ctx context.Context, req *carsvc.UpdateCarModelRequest) (*emptypb.Empty, error) {
+	updateInput := dto.FromUpdateCarModelRequest(req)
 
-	err := h.carModelService.Update(ctx, filterInput, updateInput)
-	if err != nil {
+	if err := h.carModelService.Update(ctx, req.Id, updateInput); err != nil {
 		return nil, dto.FromErrorToStatusCode(err)
 	}
 
-	return &carsvc.UpdateCarModelResponse{}, nil
+	return &emptypb.Empty{}, nil
 }
 
-func (h *CarModelHandler) DeleteCarModel(ctx context.Context, req *carsvc.DeleteCarModelRequest) (*carsvc.DeleteCarModelResponse, error) {
-	filterInput := dto.FromDeleteCarModelRequest(req)
+func (h *CarModelHandler) DeleteCarModel(ctx context.Context, req *carsvc.DeleteCarModelRequest) (*emptypb.Empty, error) {
+	if err := h.carModelService.Delete(ctx, req.Id); err != nil {
+		return nil, dto.FromErrorToStatusCode(err)
+	}
 
-	err := h.carModelService.Delete(ctx, filterInput)
+	return &emptypb.Empty{}, nil
+}
+
+func (h *CarModelHandler) GetCarModelImageUploadData(ctx context.Context, _ *emptypb.Empty) (*carsvc.GetCarModelImageUploadDataResponse, error) {
+	data, err := h.carModelService.GetImageUploadData(ctx)
 	if err != nil {
 		return nil, dto.FromErrorToStatusCode(err)
 	}
 
-	return &carsvc.DeleteCarModelResponse{}, nil
+	return &carsvc.GetCarModelImageUploadDataResponse{
+		UploadData: dto.ToImageUploadData(data.URL, data.ObjectKey),
+	}, nil
 }

@@ -2,10 +2,11 @@ package service
 
 import (
 	"errors"
+	"log/slog"
+
 	"github.com/sorawaslocked/car-rental-car-service/internal/model"
 	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/log"
 	"github.com/sorawaslocked/car-rental-car-service/internal/validation"
-	"log/slog"
 )
 
 type ErrInvalidStatusTransition struct {
@@ -24,7 +25,6 @@ var (
 func handleError(logger *slog.Logger, err error) error {
 	if _, ok := errors.AsType[validation.Errors](err); ok {
 		logger.Info("invalid request input", log.Err(err))
-
 		return err
 	}
 
@@ -37,10 +37,8 @@ func handleError(logger *slog.Logger, err error) error {
 			log.Err(err),
 		)
 
-		var ve validation.Errors
-		ve = make(map[string]error)
+		ve := make(validation.Errors)
 		ve["status"] = err
-
 		return ve
 	}
 
@@ -49,6 +47,17 @@ func handleError(logger *slog.Logger, err error) error {
 		logger.Error("invalid request source", log.Err(err))
 
 		return err
+
+	case errors.Is(err, model.ErrNotFound):
+		logger.Info("resource not found", log.Err(err))
+
+		return err
+
+	case errors.Is(err, model.ErrConflict):
+		logger.Info("resource conflict", log.Err(err))
+
+		return err
+
 	default:
 		logger.Error("internal server error", log.Err(err))
 

@@ -19,3 +19,13 @@ type PaginationInput struct {
 	Limit  *int64 `validate:"omitempty,min=1,max=100"`
 	Offset *int64 `validate:"omitempty,min=0"`
 }
+
+type Image struct {
+	Key *string
+	URL *string
+}
+
+type ImageUploadData struct {
+	ObjectKey string
+	URL       string
+}

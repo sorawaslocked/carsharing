@@ -2,8 +2,6 @@ package service
 
 import (
 	"github.com/sorawaslocked/car-rental-car-service/internal/model"
-	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/utils"
-	"log/slog"
 )
 
 const (
@@ -11,35 +9,32 @@ const (
 	defaultPaginationOffset int64 = 0
 )
 
-func defaultLogger(oldLog *slog.Logger, method string) *slog.Logger {
-	return oldLog.With(
-		slog.Group("src",
-			slog.String("method", method),
-		),
-	)
-}
+func paginationFromInput(input model.PaginationInput) model.Pagination {
+	defLimit := defaultPaginationLimit
+	defOffset := defaultPaginationOffset
 
-func loggerWithMetadata(oldLog *slog.Logger, md utils.Metadata) *slog.Logger {
-	return oldLog.With(
-		slog.Group("metadata",
-			slog.String("clientIP", md.ClientIP),
-			slog.String("requestID", md.RequestID),
-			slog.Group("user",
-				slog.String("id", md.UserID),
-				slog.Any("roles", md.UserRoles),
-				slog.Bool("verified", md.UserVerified),
-			),
-		),
-	)
-}
+	p := model.Pagination{}
 
-func carModelFilterFromInput(filterInput model.CarModelFilterInput, ignoreNonUnique bool) model.CarModelFilter {
-	filter := model.CarModelFilter{
-		ID: filterInput.ID,
+	if input.Limit != nil {
+		p.Limit = input.Limit
+	} else {
+		p.Limit = &defLimit
 	}
 
-	if ignoreNonUnique {
-		return filter
+	if input.Offset != nil {
+		p.Offset = input.Offset
+	} else {
+		p.Offset = &defOffset
+	}
+
+	return p
+}
+
+func carModelFilterFromInput(filterInput model.CarModelFilterInput) model.CarModelFilter {
+	filter := model.CarModelFilter{
+		Brand:    filterInput.Brand,
+		Model:    filterInput.Model,
+		MinSeats: filterInput.MinSeats,
 	}
 
 	if filterInput.FuelType != nil {
@@ -58,24 +53,14 @@ func carModelFilterFromInput(filterInput model.CarModelFilterInput, ignoreNonUni
 		class, _ := model.ParseCarClass(*filterInput.Class)
 		filter.Class = &class
 	}
-	if filterInput.PaginationInput.Limit == nil {
-		filter.Limit = new(defaultPaginationLimit)
-	}
-	if filterInput.PaginationInput.Offset == nil {
-		filter.Offset = new(defaultPaginationOffset)
-	}
+
+	filter.Pagination = paginationFromInput(filterInput.PaginationInput)
 
 	return filter
 }
 
-func carFilterFromInput(filterInput model.CarFilterInput, ignoreNonUnique bool) model.CarFilter {
-	filter := model.CarFilter{
-		ID: filterInput.ID,
-	}
-
-	if ignoreNonUnique {
-		return filter
-	}
+func carFilterFromInput(filterInput model.CarFilterInput) model.CarFilter {
+	filter := model.CarFilter{}
 
 	if filterInput.Status != nil {
 		status, _ := model.ParseCarStatus(*filterInput.Status)
@@ -83,7 +68,8 @@ func carFilterFromInput(filterInput model.CarFilterInput, ignoreNonUnique bool) 
 	}
 
 	if filterInput.ModelFilter != nil {
-		filter.ModelFilter = new(carModelFilterFromInput(*filterInput.ModelFilter, false))
+		mf := carModelFilterFromInput(*filterInput.ModelFilter)
+		filter.ModelFilter = &mf
 	}
 
 	if filterInput.LocationFilter != nil {
@@ -96,16 +82,69 @@ func carFilterFromInput(filterInput model.CarFilterInput, ignoreNonUnique bool) 
 		}
 	}
 
-	if filterInput.PaginationInput.Limit == nil {
-		filter.Limit = new(defaultPaginationLimit)
-	} else {
-		filter.Limit = filterInput.PaginationInput.Limit
+	filter.Pagination = paginationFromInput(filterInput.PaginationInput)
+
+	return filter
+}
+
+func zoneFilterFromInput(filterInput model.ZoneFilterInput) model.ZoneFilter {
+	filter := model.ZoneFilter{
+		IsActive: filterInput.IsActive,
 	}
-	if filterInput.PaginationInput.Offset == nil {
-		filter.Offset = new(defaultPaginationOffset)
-	} else {
-		filter.Offset = filterInput.PaginationInput.Offset
+
+	if filterInput.Type != nil {
+		zoneType, _ := model.ParseZoneType(*filterInput.Type)
+		filter.Type = &zoneType
 	}
+
+	filter.Pagination = paginationFromInput(filterInput.PaginationInput)
+
+	return filter
+}
+
+func insuranceFilterFromInput(filterInput model.CarInsuranceFilterInput) model.CarInsuranceFilter {
+	filter := model.CarInsuranceFilter{
+		CarID:              filterInput.CarID,
+		ExpiringWithinDays: filterInput.ExpiringWithinDays,
+	}
+
+	if filterInput.Type != nil {
+		insType, _ := model.ParseInsuranceType(*filterInput.Type)
+		filter.Type = &insType
+	}
+
+	if filterInput.Status != nil {
+		status, _ := model.ParseInsuranceStatus(*filterInput.Status)
+		filter.Status = &status
+	}
+
+	filter.Pagination = paginationFromInput(filterInput.PaginationInput)
+
+	return filter
+}
+
+func maintenanceTemplateFilterFromInput(filterInput model.CarMaintenanceTemplateFilterInput) model.CarMaintenanceTemplateFilter {
+	filter := model.CarMaintenanceTemplateFilter{
+		IsMandatory: filterInput.IsMandatory,
+	}
+
+	filter.Pagination = paginationFromInput(filterInput.PaginationInput)
+
+	return filter
+}
+
+func maintenanceRecordFilterFromInput(filterInput model.CarMaintenanceRecordFilterInput) model.CarMaintenanceRecordFilter {
+	filter := model.CarMaintenanceRecordFilter{
+		CarID:      filterInput.CarID,
+		TemplateID: filterInput.TemplateID,
+	}
+
+	if filterInput.Status != nil {
+		status, _ := model.ParseMaintenanceRecordStatus(*filterInput.Status)
+		filter.Status = &status
+	}
+
+	filter.Pagination = paginationFromInput(filterInput.PaginationInput)
 
 	return filter
 }

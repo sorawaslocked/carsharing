@@ -15,8 +15,9 @@ type Car struct {
 	BatteryLevel *float32
 	Location     Location
 
-	Status CarStatus
-	Notes  []string
+	Status    CarStatus
+	Notes     []string
+	ImageKeys []string
 
 	LastSeenAt time.Time
 	CreatedAt  time.Time
@@ -42,15 +43,16 @@ type CarUpdate struct {
 	BatteryLevel *float32
 	Location     *Location
 
-	Status *CarStatus
-	Notes  []string
+	Status    *CarStatus
+	Notes     []string
+	ImageKeys []string
 
 	LastSeenAt *time.Time
 	UpdatedAt  time.Time
 }
 
 type CarFilterInput struct {
-	ID             *string              `validate:"omitempty,uuid,required_without_all=ModelFilter Status LocationFilter"`
+	ID             *string              `validate:"omitempty,uuid"`
 	ModelFilter    *CarModelFilterInput `validate:"omitempty"`
 	Status         *string              `validate:"omitempty,carstatus"`
 	LocationFilter *LocationFilter      `validate:"omitempty"`
@@ -75,6 +77,7 @@ type CarUpdateInput struct {
 	LicensePlate *string  `validate:"omitempty,min=1,max=20"`
 	Color        *string  `validate:"omitempty,min=1,max=50"`
 	Notes        []string `validate:"omitempty,max=20,dive,min=1,max=500"`
+	ImageKeys    []string `validate:"omitempty,max=20,dive,min=1"`
 }
 
 type CarStatusUpdateInput struct {

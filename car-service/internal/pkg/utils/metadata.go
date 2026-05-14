@@ -2,62 +2,54 @@ package utils
 
 import (
 	"context"
-	"strconv"
 	"strings"
+
+	"github.com/sorawaslocked/car-rental-car-service/internal/model"
 )
 
+type contextKey string
+
 const (
-	ctxRequestIDKey        = "x-request-id"
-	ctxRequestClientIPKey  = "x-client-ip"
-	ctxRequestUserIDKey    = "x-user-id"
-	ctxRequestUserRoles    = "x-user-roles"
-	ctxRequestUserVerified = "x-user-verified"
+	ctxKeyRequestID contextKey = "x-request-id"
+	ctxKeyClientIP  contextKey = "x-client-ip"
+	ctxKeyUserID    contextKey = "x-user-id"
+	ctxKeyUserRoles contextKey = "x-user-roles"
 )
 
 type Metadata struct {
-	ClientIP     string
-	RequestID    string
-	UserID       string
-	UserRoles    []string
-	UserVerified bool
+	ClientIP  string
+	RequestID string
+	UserID    *string
+	UserRoles []model.Role
 }
 
-func MetadataFromCtx(ctx context.Context) (Metadata, bool) {
-	clientIP, ok := ctx.Value(ctxRequestClientIPKey).(string)
-	if !ok {
-		return Metadata{}, false
+func SetMetadata(ctx context.Context, requestID, clientIP, userID, userRoles string) context.Context {
+	ctx = context.WithValue(ctx, ctxKeyRequestID, requestID)
+	ctx = context.WithValue(ctx, ctxKeyClientIP, clientIP)
+	ctx = context.WithValue(ctx, ctxKeyUserID, userID)
+	ctx = context.WithValue(ctx, ctxKeyUserRoles, userRoles)
+	return ctx
+}
+
+func MetadataFromCtx(ctx context.Context) Metadata {
+	md := Metadata{}
+
+	if v, ok := ctx.Value(ctxKeyClientIP).(string); ok {
+		md.ClientIP = v
+	}
+	if v, ok := ctx.Value(ctxKeyRequestID).(string); ok {
+		md.RequestID = v
+	}
+	if v, ok := ctx.Value(ctxKeyUserID).(string); ok && v != "" {
+		md.UserID = &v
+	}
+	if v, ok := ctx.Value(ctxKeyUserRoles).(string); ok && v != "" {
+		for _, s := range strings.Split(v, ",") {
+			if s = strings.TrimSpace(s); s != "" {
+				md.UserRoles = append(md.UserRoles, model.Role(s))
+			}
+		}
 	}
 
-	requestID, ok := ctx.Value(ctxRequestIDKey).(string)
-	if !ok {
-		return Metadata{}, false
-	}
-
-	userID, ok := ctx.Value(ctxRequestUserIDKey).(string)
-	if !ok {
-		return Metadata{}, false
-	}
-
-	userRolesStr, ok := ctx.Value(ctxRequestUserRoles).(string)
-	if !ok || userRolesStr == "" {
-		return Metadata{}, false
-	}
-	userRoles := strings.Split(userRolesStr, ",")
-
-	userVerifiedStr, ok := ctx.Value(ctxRequestUserVerified).(string)
-	if !ok || userVerifiedStr == "" {
-		return Metadata{}, false
-	}
-	userVerified, err := strconv.ParseBool(userVerifiedStr)
-	if err != nil {
-		return Metadata{}, false
-	}
-
-	return Metadata{
-		ClientIP:     clientIP,
-		RequestID:    requestID,
-		UserID:       userID,
-		UserRoles:    userRoles,
-		UserVerified: userVerified,
-	}, true
+	return md
 }

@@ -1,0 +1,204 @@
+package service
+
+import (
+	"context"
+	"log/slog"
+	"time"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/sorawaslocked/car-rental-car-service/internal/model"
+	pkglog "github.com/sorawaslocked/car-rental-car-service/internal/pkg/log"
+	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/utils"
+	"github.com/sorawaslocked/car-rental-car-service/internal/validation"
+)
+
+type CarInsuranceService struct {
+	insuranceRepo CarInsuranceRepository
+	objectStorage ObjectStorage
+
+	validate *validator.Validate
+	log      *slog.Logger
+}
+
+func NewCarInsuranceService(
+	insuranceRepo CarInsuranceRepository,
+	objectStorage ObjectStorage,
+	validate *validator.Validate,
+	log *slog.Logger,
+) *CarInsuranceService {
+	s := &CarInsuranceService{
+		insuranceRepo: insuranceRepo,
+		objectStorage: objectStorage,
+		validate:      validate,
+	}
+
+	s.log = pkglog.WithComponent(log, "service.CarInsuranceService")
+
+	return s
+}
+
+func (s *CarInsuranceService) Create(ctx context.Context, createInput model.CarInsuranceCreateInput) (string, error) {
+	const method = "Create"
+	logger := pkglog.WithMethod(s.log, method)
+
+	md := utils.MetadataFromCtx(ctx)
+	logger = pkglog.WithMetadata(logger, md)
+
+	err := validation.ValidateInput(s.validate, createInput)
+	if err != nil {
+		return "", handleError(logger, err)
+	}
+
+	insType, _ := model.ParseInsuranceType(createInput.Type)
+	now := time.Now()
+
+	insurance := model.CarInsurance{
+		CarID:     createInput.CarID,
+		Type:      insType,
+		Provider:  createInput.Provider,
+		PolicyNum: createInput.PolicyNum,
+		StartsAt:  createInput.StartsAt,
+		ExpiresAt: createInput.ExpiresAt,
+		CostTenge: createInput.CostTenge,
+		Status:    model.InsuranceStatusActive,
+		Notes:     createInput.Notes,
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+
+	id, err := s.insuranceRepo.Insert(ctx, insurance)
+	if err != nil {
+		return "", handleError(logger, err)
+	}
+
+	return id, nil
+}
+
+func (s *CarInsuranceService) Get(ctx context.Context, id string) (model.CarInsurance, error) {
+	const method = "Get"
+	logger := pkglog.WithMethod(s.log, method)
+
+	md := utils.MetadataFromCtx(ctx)
+	logger = pkglog.WithMetadata(logger, md)
+
+	insurance, err := s.insuranceRepo.FindByID(ctx, id)
+	if err != nil {
+		return model.CarInsurance{}, handleError(logger, err)
+	}
+
+	return insurance, nil
+}
+
+func (s *CarInsuranceService) GetAll(ctx context.Context, filterInput model.CarInsuranceFilterInput) ([]model.CarInsurance, error) {
+	const method = "GetAll"
+	logger := pkglog.WithMethod(s.log, method)
+
+	md := utils.MetadataFromCtx(ctx)
+	logger = pkglog.WithMetadata(logger, md)
+
+	err := validation.ValidateInput(s.validate, filterInput)
+	if err != nil {
+		return nil, handleError(logger, err)
+	}
+	filter := insuranceFilterFromInput(filterInput)
+
+	insurances, err := s.insuranceRepo.Find(ctx, filter)
+	if err != nil {
+		return nil, handleError(logger, err)
+	}
+
+	return insurances, nil
+}
+
+func (s *CarInsuranceService) Update(ctx context.Context, id string, updateInput model.CarInsuranceUpdateInput) error {
+	const method = "Update"
+	logger := pkglog.WithMethod(s.log, method)
+
+	md := utils.MetadataFromCtx(ctx)
+	logger = pkglog.WithMetadata(logger, md)
+
+	if err := validation.ValidateInput(s.validate, updateInput); err != nil {
+		return handleError(logger, err)
+	}
+
+	update := model.CarInsuranceUpdate{
+		Provider:  updateInput.Provider,
+		PolicyNum: updateInput.PolicyNum,
+		StartsAt:  updateInput.StartsAt,
+		ExpiresAt: updateInput.ExpiresAt,
+		CostTenge: updateInput.CostTenge,
+		Notes:     updateInput.Notes,
+		ImageKeys: updateInput.ImageKeys,
+		UpdatedAt: time.Now(),
+	}
+
+	if updateInput.Status != nil {
+		status, _ := model.ParseInsuranceStatus(*updateInput.Status)
+		update.Status = &status
+	}
+
+	err := s.insuranceRepo.Update(ctx, id, update)
+	if err != nil {
+		return handleError(logger, err)
+	}
+
+	return nil
+}
+
+func (s *CarInsuranceService) Delete(ctx context.Context, id string) error {
+	const method = "Delete"
+	logger := pkglog.WithMethod(s.log, method)
+
+	md := utils.MetadataFromCtx(ctx)
+	logger = pkglog.WithMetadata(logger, md)
+
+	if err := s.insuranceRepo.Delete(ctx, id); err != nil {
+		return handleError(logger, err)
+	}
+
+	return nil
+}
+
+func (s *CarInsuranceService) GetImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+	const method = "GetImageUploadData"
+	logger := pkglog.WithMethod(s.log, method)
+
+	md := utils.MetadataFromCtx(ctx)
+	logger = pkglog.WithMetadata(logger, md)
+
+	if s.objectStorage == nil {
+		logger.Error("object storage not configured")
+		return model.ImageUploadData{}, model.ErrInternalServerError
+	}
+
+	data, err := s.objectStorage.GetImageUploadData(ctx, storageKeyPrefixInsurance)
+	if err != nil {
+		return model.ImageUploadData{}, handleError(logger, err)
+	}
+
+	return data, nil
+}
+
+func (s *CarInsuranceService) GetImageURLs(ctx context.Context, id string) ([]string, error) {
+	const method = "GetImageURLs"
+	logger := pkglog.WithMethod(s.log, method)
+
+	md := utils.MetadataFromCtx(ctx)
+	logger = pkglog.WithMetadata(logger, md)
+
+	insurance, err := s.insuranceRepo.FindByID(ctx, id)
+	if err != nil {
+		return nil, handleError(logger, err)
+	}
+
+	urls := make([]string, 0, len(insurance.ImageKeys))
+	for _, key := range insurance.ImageKeys {
+		url, err := s.objectStorage.GetPresignedURL(ctx, key)
+		if err != nil {
+			return nil, handleError(logger, err)
+		}
+		urls = append(urls, url)
+	}
+
+	return urls, nil
+}

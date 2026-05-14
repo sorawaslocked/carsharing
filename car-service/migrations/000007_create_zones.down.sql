@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS zones;
+DROP TYPE  IF EXISTS zone_type;

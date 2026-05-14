@@ -1,9 +1,10 @@
 package log
 
 import (
-	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/log/pretty"
 	"log/slog"
 	"os"
+
+	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/log/pretty"
 )
 
 const (
@@ -43,8 +44,4 @@ func setupPrettyLogger() *slog.Logger {
 	handler := opts.PrettyHandler(os.Stdout)
 
 	return slog.New(handler)
-}
-
-func Err(err error) slog.Attr {
-	return slog.String("error", err.Error())
 }

@@ -3,10 +3,10 @@ package dto
 import (
 	"database/sql"
 	"fmt"
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
 	"time"
 
 	"github.com/lib/pq"
+	"github.com/sorawaslocked/car-rental-car-service/internal/model"
 )
 
 type carModelRow struct {
@@ -22,6 +22,7 @@ type carModelRow struct {
 	EngineVolume sql.NullFloat64 `db:"engine_volume"`
 	RangeKM      int32           `db:"range_km"`
 	Features     pq.StringArray  `db:"features"`
+	ImageKeys    pq.StringArray  `db:"image_keys"`
 	CreatedAt    time.Time       `db:"created_at"`
 	UpdatedAt    time.Time       `db:"updated_at"`
 }
@@ -39,12 +40,14 @@ func (r carModelRow) toDomain() model.CarModel {
 		Seats:        r.Seats,
 		RangeKM:      r.RangeKM,
 		Features:     []string(r.Features),
+		ImageKeys:    []string(r.ImageKeys),
 		CreatedAt:    r.CreatedAt,
 		UpdatedAt:    r.UpdatedAt,
 	}
 
 	if r.EngineVolume.Valid {
-		cm.EngineVolume = new(float32(r.EngineVolume.Float64))
+		v := float32(r.EngineVolume.Float64)
+		cm.EngineVolume = &v
 	}
 
 	return cm
@@ -56,7 +59,7 @@ func ScanCarModelRow(s scanner) (model.CarModel, error) {
 	err := s.Scan(
 		&r.ID, &r.Brand, &r.Model, &r.Year,
 		&r.FuelType, &r.Transmission, &r.BodyType, &r.Class,
-		&r.Seats, &r.EngineVolume, &r.RangeKM, &r.Features,
+		&r.Seats, &r.EngineVolume, &r.RangeKM, &r.Features, &r.ImageKeys,
 		&r.CreatedAt, &r.UpdatedAt,
 	)
 
@@ -92,7 +95,7 @@ func BuildCarModelWhereClauses(b *ArgsBuilder, f model.CarModelFilter, tableAlia
 		clauses = append(clauses, fmt.Sprintf("%s = %s", column(tableAlias, "class"), b.Add(string(*f.Class))))
 	}
 	if f.MinSeats != nil {
-		clauses = append(clauses, fmt.Sprintf("%s >= %s", column(tableAlias, "min_seats"), b.Add(*f.MinSeats)))
+		clauses = append(clauses, fmt.Sprintf("%s >= %s", column(tableAlias, "seats"), b.Add(*f.MinSeats)))
 	}
 
 	return clauses
@@ -133,6 +136,9 @@ func BuildCarModelSetClauses(u model.CarModelUpdate, b *ArgsBuilder) []string {
 	}
 	if u.Features != nil {
 		clauses = append(clauses, fmt.Sprintf("features = %s", b.Add(pq.StringArray(u.Features))))
+	}
+	if u.ImageKeys != nil {
+		clauses = append(clauses, fmt.Sprintf("image_keys = %s", b.Add(pq.StringArray(u.ImageKeys))))
 	}
 
 	clauses = append(clauses, fmt.Sprintf("updated_at = %s", b.Add(u.UpdatedAt)))

@@ -9,12 +9,30 @@ const (
 	CarFuelTypeHybrid   CarFuelType = "hybrid"
 )
 
+func ParseCarFuelType(s string) (CarFuelType, bool) {
+	switch CarFuelType(s) {
+	case CarFuelTypePetrol, CarFuelTypeDiesel, CarFuelTypeElectric, CarFuelTypeHybrid:
+		return CarFuelType(s), true
+	default:
+		return "", false
+	}
+}
+
 type CarTransmission string
 
 const (
 	CarTransmissionManual CarTransmission = "manual"
 	CarTransmissionAuto   CarTransmission = "auto"
 )
+
+func ParseCarTransmission(s string) (CarTransmission, bool) {
+	switch CarTransmission(s) {
+	case CarTransmissionManual, CarTransmissionAuto:
+		return CarTransmission(s), true
+	default:
+		return "", false
+	}
+}
 
 type CarBodyType string
 
@@ -29,6 +47,15 @@ const (
 	CarBodyTypePickup      CarBodyType = "pickup"
 )
 
+func ParseCarBodyType(s string) (CarBodyType, bool) {
+	switch CarBodyType(s) {
+	case CarBodyTypeSedan, CarBodyTypeHatchback, CarBodyTypeSUV, CarBodyTypeCrossover, CarBodyTypeMinivan, CarBodyTypeCoupe, CarBodyTypeConvertible, CarBodyTypePickup:
+		return CarBodyType(s), true
+	default:
+		return "", false
+	}
+}
+
 type CarClass string
 
 const (
@@ -38,6 +65,15 @@ const (
 	CarClassBusiness CarClass = "business"
 	CarClassLuxury   CarClass = "luxury"
 )
+
+func ParseCarClass(s string) (CarClass, bool) {
+	switch CarClass(s) {
+	case CarClassEconomy, CarClassCompact, CarClassComfort, CarClassBusiness, CarClassLuxury:
+		return CarClass(s), true
+	default:
+		return "", false
+	}
+}
 
 type CarStatus string
 
@@ -49,42 +85,6 @@ const (
 	CarStatusOutOfService CarStatus = "out_of_service"
 )
 
-func ParseCarFuelType(s string) (CarFuelType, bool) {
-	switch CarFuelType(s) {
-	case CarFuelTypePetrol, CarFuelTypeDiesel, CarFuelTypeElectric, CarFuelTypeHybrid:
-		return CarFuelType(s), true
-	default:
-		return "", false
-	}
-}
-
-func ParseCarTransmission(s string) (CarTransmission, bool) {
-	switch CarTransmission(s) {
-	case CarTransmissionManual, CarTransmissionAuto:
-		return CarTransmission(s), true
-	default:
-		return "", false
-	}
-}
-
-func ParseCarBodyType(s string) (CarBodyType, bool) {
-	switch CarBodyType(s) {
-	case CarBodyTypeSedan, CarBodyTypeHatchback, CarBodyTypeSUV, CarBodyTypeCrossover, CarBodyTypeMinivan, CarBodyTypeCoupe, CarBodyTypeConvertible, CarBodyTypePickup:
-		return CarBodyType(s), true
-	default:
-		return "", false
-	}
-}
-
-func ParseCarClass(s string) (CarClass, bool) {
-	switch CarClass(s) {
-	case CarClassEconomy, CarClassCompact, CarClassComfort, CarClassBusiness, CarClassLuxury:
-		return CarClass(s), true
-	default:
-		return "", false
-	}
-}
-
 func ParseCarStatus(s string) (CarStatus, bool) {
 	switch CarStatus(s) {
 	case CarStatusAvailable, CarStatusReserved, CarStatusInUse, CarStatusMaintenance, CarStatusOutOfService:
@@ -93,3 +93,118 @@ func ParseCarStatus(s string) (CarStatus, bool) {
 		return "", false
 	}
 }
+
+type ZoneType string
+
+const (
+	ZoneTypeOperating ZoneType = "operating"
+	ZoneTypeNoDrop    ZoneType = "no_drop"
+	ZoneParkingHub    ZoneType = "parking_hub"
+	ZoneTypeSurcharge ZoneType = "surcharge"
+)
+
+func ParseZoneType(s string) (ZoneType, bool) {
+	switch ZoneType(s) {
+	case ZoneTypeOperating, ZoneTypeNoDrop, ZoneParkingHub, ZoneTypeSurcharge:
+		return ZoneType(s), true
+	default:
+		return "", false
+	}
+}
+
+type InsuranceType string
+
+const (
+	InsuranceTypeOSAGO InsuranceType = "osago"
+	InsuranceTypeKASKO InsuranceType = "kasko"
+)
+
+func ParseInsuranceType(s string) (InsuranceType, bool) {
+	switch InsuranceType(s) {
+	case InsuranceTypeOSAGO, InsuranceTypeKASKO:
+		return InsuranceType(s), true
+	default:
+		return "", false
+	}
+}
+
+type InsuranceStatus string
+
+const (
+	InsuranceStatusActive    InsuranceStatus = "active"
+	InsuranceStatusExpired   InsuranceStatus = "expired"
+	InsuranceStatusCancelled InsuranceStatus = "cancelled"
+)
+
+func ParseInsuranceStatus(s string) (InsuranceStatus, bool) {
+	switch InsuranceStatus(s) {
+	case InsuranceStatusActive, InsuranceStatusExpired, InsuranceStatusCancelled:
+		return InsuranceStatus(s), true
+	default:
+		return "", false
+	}
+}
+
+type MaintenanceRecordStatus string
+
+const (
+	MaintenanceRecordStatusPending    MaintenanceRecordStatus = "pending"
+	MaintenanceRecordStatusInProgress MaintenanceRecordStatus = "in_progress"
+	MaintenanceRecordStatusCompleted  MaintenanceRecordStatus = "completed"
+)
+
+func ParseMaintenanceRecordStatus(s string) (MaintenanceRecordStatus, bool) {
+	switch MaintenanceRecordStatus(s) {
+	case MaintenanceRecordStatusPending, MaintenanceRecordStatusInProgress, MaintenanceRecordStatusCompleted:
+		return MaintenanceRecordStatus(s), true
+	default:
+		return "", false
+	}
+}
+
+type FuelStatus string
+
+const (
+	FuelStatusOK        FuelStatus = "ok"
+	FuelStatusWarn      FuelStatus = "warn"
+	FuelStatusUrgent    FuelStatus = "urgent"
+	FuelStatusPull      FuelStatus = "pull"
+	FuelStatusEmergency FuelStatus = "emergency"
+)
+
+var fuelStatusRanks = map[FuelStatus]int{
+	FuelStatusOK:        0,
+	FuelStatusWarn:      1,
+	FuelStatusUrgent:    2,
+	FuelStatusPull:      3,
+	FuelStatusEmergency: 4,
+}
+
+func FuelStatusRank(s FuelStatus) int {
+	return fuelStatusRanks[s]
+}
+
+func FuelStatusFromPct(pct int) FuelStatus {
+	switch {
+	case pct <= 8:
+		return FuelStatusEmergency
+	case pct <= 15:
+		return FuelStatusPull
+	case pct <= 25:
+		return FuelStatusUrgent
+	case pct <= 40:
+		return FuelStatusWarn
+	default:
+		return FuelStatusOK
+	}
+}
+
+type CarStatusActor string
+
+const (
+	CarStatusActorUser       CarStatusActor = "user"
+	CarStatusActorOps        CarStatusActor = "ops"
+	CarStatusActorSystem     CarStatusActor = "system"
+	CarStatusActorScheduler  CarStatusActor = "scheduler"
+	CarStatusActorTelematics CarStatusActor = "telematics"
+)

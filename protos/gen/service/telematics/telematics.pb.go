@@ -23,10 +23,15 @@ const (
 )
 
 type StreamCarTelematicsEventsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	CarId         string                 `protobuf:"bytes,1,opt,name=car_id,json=carId,proto3" json:"car_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                    protoimpl.MessageState `protogen:"open.v1"`
+	CarId                    string                 `protobuf:"bytes,1,opt,name=car_id,json=carId,proto3" json:"car_id,omitempty"`
+	CurrentLocationLatitude  float64                `protobuf:"fixed64,2,opt,name=current_location_latitude,json=currentLocationLatitude,proto3" json:"current_location_latitude,omitempty"`
+	CurrentLocationLongitude float64                `protobuf:"fixed64,3,opt,name=current_location_longitude,json=currentLocationLongitude,proto3" json:"current_location_longitude,omitempty"`
+	FuelLevel                *float32               `protobuf:"fixed32,4,opt,name=fuel_level,json=fuelLevel,proto3,oneof" json:"fuel_level,omitempty"`
+	BatteryLevel             *float32               `protobuf:"fixed32,5,opt,name=battery_level,json=batteryLevel,proto3,oneof" json:"battery_level,omitempty"`
+	OdometerKm               int64                  `protobuf:"varint,6,opt,name=odometer_km,json=odometerKm,proto3" json:"odometer_km,omitempty"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
 }
 
 func (x *StreamCarTelematicsEventsRequest) Reset() {
@@ -64,6 +69,41 @@ func (x *StreamCarTelematicsEventsRequest) GetCarId() string {
 		return x.CarId
 	}
 	return ""
+}
+
+func (x *StreamCarTelematicsEventsRequest) GetCurrentLocationLatitude() float64 {
+	if x != nil {
+		return x.CurrentLocationLatitude
+	}
+	return 0
+}
+
+func (x *StreamCarTelematicsEventsRequest) GetCurrentLocationLongitude() float64 {
+	if x != nil {
+		return x.CurrentLocationLongitude
+	}
+	return 0
+}
+
+func (x *StreamCarTelematicsEventsRequest) GetFuelLevel() float32 {
+	if x != nil && x.FuelLevel != nil {
+		return *x.FuelLevel
+	}
+	return 0
+}
+
+func (x *StreamCarTelematicsEventsRequest) GetBatteryLevel() float32 {
+	if x != nil && x.BatteryLevel != nil {
+		return *x.BatteryLevel
+	}
+	return 0
+}
+
+func (x *StreamCarTelematicsEventsRequest) GetOdometerKm() int64 {
+	if x != nil {
+		return x.OdometerKm
+	}
+	return 0
 }
 
 type StreamCarTelematicsEventsResponse struct {
@@ -162,9 +202,18 @@ var File_service_telematics_telematics_proto protoreflect.FileDescriptor
 
 const file_service_telematics_telematics_proto_rawDesc = "" +
 	"\n" +
-	"#service/telematics/telematics.proto\x12\x12service.telematics\x1a\x1fgoogle/protobuf/timestamp.proto\"9\n" +
+	"#service/telematics/telematics.proto\x12\x12service.telematics\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc3\x02\n" +
 	" StreamCarTelematicsEventsRequest\x12\x15\n" +
-	"\x06car_id\x18\x01 \x01(\tR\x05carId\"\xc1\x02\n" +
+	"\x06car_id\x18\x01 \x01(\tR\x05carId\x12:\n" +
+	"\x19current_location_latitude\x18\x02 \x01(\x01R\x17currentLocationLatitude\x12<\n" +
+	"\x1acurrent_location_longitude\x18\x03 \x01(\x01R\x18currentLocationLongitude\x12\"\n" +
+	"\n" +
+	"fuel_level\x18\x04 \x01(\x02H\x00R\tfuelLevel\x88\x01\x01\x12(\n" +
+	"\rbattery_level\x18\x05 \x01(\x02H\x01R\fbatteryLevel\x88\x01\x01\x12\x1f\n" +
+	"\vodometer_km\x18\x06 \x01(\x03R\n" +
+	"odometerKmB\r\n" +
+	"\v_fuel_levelB\x10\n" +
+	"\x0e_battery_level\"\xc1\x02\n" +
 	"!StreamCarTelematicsEventsResponse\x12\x15\n" +
 	"\x06car_id\x18\x01 \x01(\tR\x05carId\x12\x1a\n" +
 	"\blatitude\x18\x02 \x01(\x01R\blatitude\x12\x1c\n" +
@@ -215,6 +264,7 @@ func file_service_telematics_telematics_proto_init() {
 	if File_service_telematics_telematics_proto != nil {
 		return
 	}
+	file_service_telematics_telematics_proto_msgTypes[0].OneofWrappers = []any{}
 	file_service_telematics_telematics_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

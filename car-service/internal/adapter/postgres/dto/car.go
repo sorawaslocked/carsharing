@@ -109,6 +109,9 @@ func BuildCarSetClauses(u model.CarUpdate, b *ArgsBuilder) []string {
 	if u.Notes != nil {
 		clauses = append(clauses, fmt.Sprintf("notes = %s", b.Add(pq.StringArray(u.Notes))))
 	}
+	if u.ImageKeys != nil {
+		clauses = append(clauses, fmt.Sprintf("image_keys = %s", b.Add(pq.StringArray(u.ImageKeys))))
+	}
 	if u.LastSeenAt != nil {
 		clauses = append(clauses, fmt.Sprintf("last_seen_at = %s", b.Add(*u.LastSeenAt)))
 	}

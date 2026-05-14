@@ -12,6 +12,7 @@ import (
 
 	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
 	pkglog "github.com/sorawaslocked/car-rental-trip-service/internal/pkg/log"
+	"github.com/sorawaslocked/car-rental-trip-service/internal/pkg/utils"
 )
 
 type TelematicsClient struct {
@@ -29,10 +30,15 @@ func NewTelematicsClient(log *slog.Logger, carConn, streamConn *grpc.ClientConn)
 }
 
 func (c *TelematicsClient) GetLatestTelemetry(ctx context.Context, carID string) (model.CarTelemetry, error) {
+	log := pkglog.WithMethod(c.log, "GetLatestTelemetry")
+	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+
 	resp, err := c.carClient.GetCar(ctx, &carsvc.GetCarRequest{Id: carID})
 	if err != nil {
+		log.Error("failed to get car", pkglog.Err(err))
 		return model.CarTelemetry{}, err
 	}
+
 	car := resp.Car
 	t := model.CarTelemetry{
 		CarID:      car.Id,
@@ -53,18 +59,25 @@ func (c *TelematicsClient) GetLatestTelemetry(ctx context.Context, carID string)
 }
 
 func (c *TelematicsClient) StreamTelemetry(ctx context.Context, carID string, fn func(model.CarTelemetry) error) error {
+	log := pkglog.WithMethod(c.log, "StreamTelemetry")
+	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+
 	stream, err := c.streamClient.StreamCarTelemetry(ctx, &carsvc.StreamCarTelemetryRequest{CarId: carID})
 	if err != nil {
+		log.Error("failed to open telemetry stream", pkglog.Err(err))
 		return err
 	}
+
 	for {
 		resp, err := stream.Recv()
 		if err == io.EOF {
 			return io.EOF
 		}
 		if err != nil {
+			log.Error("telemetry stream error", pkglog.Err(err))
 			return err
 		}
+
 		t := model.CarTelemetry{
 			CarID:      carID,
 			OdometerKM: resp.MileageKm,

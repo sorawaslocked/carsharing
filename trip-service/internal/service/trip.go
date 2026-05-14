@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
 	pkglog "github.com/sorawaslocked/car-rental-trip-service/internal/pkg/log"
+	"github.com/sorawaslocked/car-rental-trip-service/internal/pkg/utils"
 )
 
 type TripService struct {
@@ -43,10 +44,7 @@ func NewTripService(
 
 func (s *TripService) StartTrip(ctx context.Context, bookingID string) (string, error) {
 	log := pkglog.WithMethod(s.log, "StartTrip")
-
-	if err := validateBookingID(bookingID); err != nil {
-		return "", err
-	}
+	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
 	booking, err := s.booking.GetBooking(ctx, bookingID)
 	if err != nil {
@@ -107,9 +105,6 @@ func (s *TripService) StartTrip(ctx context.Context, bookingID string) (string, 
 }
 
 func (s *TripService) GetTrip(ctx context.Context, id string) (model.Trip, error) {
-	if err := validateID(id); err != nil {
-		return model.Trip{}, err
-	}
 	return s.tripRepo.GetByID(ctx, id)
 }
 
@@ -119,10 +114,7 @@ func (s *TripService) ListTrips(ctx context.Context, filter model.TripFilter) ([
 
 func (s *TripService) EndTrip(ctx context.Context, id string) error {
 	log := pkglog.WithMethod(s.log, "EndTrip")
-
-	if err := validateID(id); err != nil {
-		return err
-	}
+	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
 	trip, err := s.tripRepo.GetByID(ctx, id)
 	if err != nil {
@@ -215,10 +207,7 @@ func (s *TripService) EndTrip(ctx context.Context, id string) error {
 
 func (s *TripService) CancelTrip(ctx context.Context, id string, reason *string) error {
 	log := pkglog.WithMethod(s.log, "CancelTrip")
-
-	if err := validateID(id); err != nil {
-		return err
-	}
+	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
 	trip, err := s.tripRepo.GetByID(ctx, id)
 	if err != nil {
@@ -264,25 +253,18 @@ func (s *TripService) CancelTrip(ctx context.Context, id string, reason *string)
 }
 
 func (s *TripService) GetTripSummary(ctx context.Context, tripID string) (model.TripSummary, error) {
-	if err := validateID(tripID); err != nil {
-		return model.TripSummary{}, err
-	}
 	return s.summaryRepo.GetByTripID(ctx, tripID)
 }
 
 func (s *TripService) GetTripStatusHistory(ctx context.Context, filter model.TripStatusReadingFilter) ([]model.TripStatusReading, error) {
-	if err := validateID(filter.TripID); err != nil {
-		return nil, err
-	}
 	return s.statusRepo.List(ctx, filter)
 }
 
 // StreamTripLiveFeed calls send for each telemetry event while the trip remains active.
 // It returns io.EOF when the trip ends normally; any other error indicates a failure.
 func (s *TripService) StreamTripLiveFeed(ctx context.Context, tripID string, send func(model.TripLiveFeed) error) error {
-	if err := validateID(tripID); err != nil {
-		return err
-	}
+	log := pkglog.WithMethod(s.log, "StreamTripLiveFeed")
+	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
 	trip, err := s.tripRepo.GetByID(ctx, tripID)
 	if err != nil {
@@ -300,6 +282,7 @@ func (s *TripService) StreamTripLiveFeed(ctx context.Context, tripID string, sen
 	return s.telematics.StreamTelemetry(ctx, trip.CarID, func(t model.CarTelemetry) error {
 		current, err := s.tripRepo.GetByID(ctx, tripID)
 		if err != nil {
+			log.Error("failed to poll trip status", pkglog.Err(err))
 			return err
 		}
 		if current.Status != model.TripStatusActive {

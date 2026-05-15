@@ -1,0 +1,28 @@
+env: "dev"
+
+grpc_server:
+  addr: "0.0.0.0:9998"
+
+postgres:
+  host: "postgres"
+  port: 5432
+  user: "car_rental"
+  password: "car_rental"
+  database: "car_rental"
+  ssl_mode: "disable"
+  max_open_connections: 25
+  max_idle_connections: 25
+  max_idle_time: "15m"
+
+minio:
+  endpoint: "minio:9000"
+  access_key_id: "minioadmin"
+  secret_access_key: "minioadmin"
+  bucket: "car-rental"
+  use_ssl: false
+
+nats:
+  url: "nats://nats:4222"
+
+telematics_stream:
+  addr: "telematics:50051"

@@ -5,16 +5,16 @@ import (
 	"os"
 
 	"github.com/ilyakaznacheev/cleanenv"
-	grpcserver "github.com/sorawaslocked/car-rental-booking-service/internal/adapter/grpc"
+	pkggrpc "github.com/sorawaslocked/car-rental-booking-service/internal/pkg/grpc"
 	pkgnats "github.com/sorawaslocked/car-rental-booking-service/internal/pkg/nats"
 	pkgpostgres "github.com/sorawaslocked/car-rental-booking-service/internal/pkg/postgres"
 )
 
 type Config struct {
-	Env        string             `yaml:"env"         env:"ENV" env-required:"true"`
-	GRPCServer grpcserver.Config  `yaml:"grpc_server"`
-	Postgres   pkgpostgres.Config `yaml:"postgres"`
-	NATS       pkgnats.Config     `yaml:"nats"`
+	Env  string               `yaml:"env"         env:"ENV"  env-default:"local"`
+	GRPC pkggrpc.ServerConfig `yaml:"grpc_server"`
+	PG   pkgpostgres.Config   `yaml:"postgres"`
+	NATS pkgnats.Config       `yaml:"nats"`
 }
 
 func MustLoad() Config {

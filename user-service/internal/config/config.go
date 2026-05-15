@@ -6,7 +6,7 @@ import (
 
 	"github.com/ilyakaznacheev/cleanenv"
 	grpccfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/grpc"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/mailer"
+	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/mailtrap"
 	miniocfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/minio"
 	natscfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/nats"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/postgres"
@@ -14,13 +14,13 @@ import (
 )
 
 type Config struct {
-	Env              string               `yaml:"env"               env:"ENV"               env-default:"local"`
-	GRPC             grpccfg.ServerConfig `yaml:"grpc_server"`
-	Postgres         postgres.Config      `yaml:"postgres"`
-	Redis            redis.Config         `yaml:"redis"`
-	NATS             natscfg.Config       `yaml:"nats"`
-	Minio            miniocfg.Config      `yaml:"minio"`
-	Mailer           mailer.Config
+	Env              string                         `yaml:"env"               env:"ENV"               env-default:"local"`
+	GRPC             grpccfg.ServerConfig           `yaml:"grpc_server"`
+	Postgres         postgres.Config                `yaml:"postgres"`
+	Redis            redis.Config                   `yaml:"redis"`
+	NATS             natscfg.Config                 `yaml:"nats"`
+	Minio            miniocfg.Config                `yaml:"minio"`
+	Mailtrap         mailtrap.Config                `yaml:"mailtrap"`
 	DocumentAnalyzer grpccfg.DocumentAnalyzerConfig `yaml:"document_analyzer"`
 }
 

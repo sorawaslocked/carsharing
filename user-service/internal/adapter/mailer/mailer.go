@@ -10,7 +10,7 @@ import (
 
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
-	mailercfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/mailer"
+	mailercfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/mailtrap"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/utils"
 )
 
@@ -38,7 +38,7 @@ type sendRequest struct {
 
 func New(log *slog.Logger, cfg mailercfg.Config) *Mailer {
 	return &Mailer{
-		log:    pkglog.WithComponent(log, "adapter.Mailer"),
+		log:    pkglog.WithComponent(log, "adapter.Mailtrap"),
 		client: &http.Client{},
 		token:  cfg.Token,
 		from:   emailAddr{Email: cfg.From, Name: cfg.FromName},

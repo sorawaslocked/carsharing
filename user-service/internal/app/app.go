@@ -93,7 +93,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	}
 
 	activationCodeCache := redisadapter.NewActivationCodeRedisCache(redisClient)
-	msMailer := mailer.New(log, cfg.Mailer)
+	msMailer := mailer.New(log, cfg.Mailtrap)
 	userRepo := postgres.NewUserRepository(log, db)
 	docRepo := postgres.NewDocumentRepository(log, db)
 	publisher := natsadapter.NewPublisher(log, natsConn)

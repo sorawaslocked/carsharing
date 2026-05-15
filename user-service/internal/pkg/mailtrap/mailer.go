@@ -1,4 +1,4 @@
-package mailer
+package mailtrap
 
 type Config struct {
 	Token    string `yaml:"token" env:"MAILTRAP_TOKEN" env-required:"true"`

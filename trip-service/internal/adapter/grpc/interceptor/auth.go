@@ -12,26 +12,9 @@ import (
 	"github.com/sorawaslocked/car-rental-trip-service/internal/pkg/utils"
 )
 
-// ownerExtractFn extracts the target user ID from the request so the interceptor
-// can check whether the caller is operating on their own resource.
-type ownerExtractFn func(req any) (userID string, ok bool)
-
 type methodPolicy struct {
 	public       bool
 	allowedRoles []model.Role
-	ownerExtract ownerExtractFn
-}
-
-// Duck-typing interface — avoids importing concrete proto request types here.
-type userIDCarrier interface{ GetUserId() string }
-
-func extractByUserID(req any) (string, bool) {
-	c, ok := req.(userIDCarrier)
-	if !ok {
-		return "", false
-	}
-	id := c.GetUserId()
-	return id, id != ""
 }
 
 type AuthInterceptor struct {
@@ -65,24 +48,15 @@ func (i *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 			return nil, dto.ToStatusError(model.ErrUnauthenticated)
 		}
 
-		// No role or owner restrictions — any authenticated caller may proceed.
-		if len(policy.allowedRoles) == 0 && policy.ownerExtract == nil {
+		if len(policy.allowedRoles) == 0 {
 			return handler(ctx, req)
 		}
 
-		// Role check: any matching privileged role grants access.
 		for _, allowed := range policy.allowedRoles {
 			for _, callerRole := range md.UserRoles {
 				if callerRole == allowed {
 					return handler(ctx, req)
 				}
-			}
-		}
-
-		// Owner check: caller operates on their own resource.
-		if policy.ownerExtract != nil {
-			if ownerID, ok := policy.ownerExtract(req); ok && ownerID == *md.UserID {
-				return handler(ctx, req)
 			}
 		}
 
@@ -111,8 +85,6 @@ func (i *AuthInterceptor) Stream() grpc.StreamServerInterceptor {
 			return dto.ToStatusError(model.ErrUnauthenticated)
 		}
 
-		// No role restrictions — any authenticated caller may proceed.
-		// Owner check is not possible at stream intercept time (request not yet received).
 		if len(policy.allowedRoles) == 0 {
 			return handler(srv, ss)
 		}

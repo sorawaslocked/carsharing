@@ -121,6 +121,13 @@ func (s *TripService) GetTrip(ctx context.Context, id string) (model.Trip, error
 }
 
 func (s *TripService) ListTrips(ctx context.Context, filter model.TripFilter) ([]model.Trip, error) {
+	md := utils.MetadataFromCtx(ctx)
+	for _, r := range md.UserRoles {
+		if r == model.RoleAdmin || r == model.RoleBookingManager {
+			return s.tripRepo.List(ctx, filter)
+		}
+	}
+	filter.UserID = md.UserID
 	return s.tripRepo.List(ctx, filter)
 }
 

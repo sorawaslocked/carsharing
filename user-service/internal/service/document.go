@@ -20,17 +20,11 @@ func (s *UserService) CreateDocument(ctx context.Context, objectKey string, imag
 		return "", err
 	}
 
-	imageURL, err := s.objectStorage.GetImageURL(ctx, objectKey)
-	if err != nil {
-		logger.Error("object storage: resolving image url", pkglog.Err(err))
-		return "", err
-	}
-
 	doc := model.Document{
 		UserID:    userID,
 		ImageType: imageType,
 		Status:    model.DocumentStatusPending,
-		Image:     &model.Image{Key: objectKey, URL: imageURL},
+		Image:     &model.Image{Key: objectKey},
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -41,7 +35,7 @@ func (s *UserService) CreateDocument(ctx context.Context, objectKey string, imag
 		return "", err
 	}
 
-	s.documentAnalyzer.Analyze(ctx, id, imageURL)
+	s.documentAnalyzer.Analyze(ctx, id, objectKey)
 
 	return id, nil
 }

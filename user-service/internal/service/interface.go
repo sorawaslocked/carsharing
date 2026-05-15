@@ -29,7 +29,7 @@ type ObjectStorage interface {
 }
 
 type DocumentAnalyzer interface {
-	Analyze(ctx context.Context, documentID string, storageURL string)
+	Analyze(ctx context.Context, documentID string, objectKey string)
 }
 
 type Publisher interface {

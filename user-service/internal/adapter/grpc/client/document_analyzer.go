@@ -22,12 +22,12 @@ func NewDocumentAnalyzer(log *slog.Logger, conn *grpc.ClientConn) *DocumentAnaly
 	}
 }
 
-func (c *DocumentAnalyzer) Analyze(ctx context.Context, documentID string, storageURL string) {
+func (c *DocumentAnalyzer) Analyze(ctx context.Context, documentID string, objectKey string) {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(c.log, "Analyze"), utils.MetadataFromCtx(ctx))
 
 	if _, err := c.client.Analyze(ctx, &usersvc.AnalyzeRequest{
 		DocumentId: documentID,
-		StorageUrl: storageURL,
+		ObjectKey:  objectKey,
 	}); err != nil {
 		logger.Error("grpc: analyzing document",
 			slog.String("documentID", documentID),

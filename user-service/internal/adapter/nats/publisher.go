@@ -32,17 +32,17 @@ func NewPublisher(log *slog.Logger, conn *nats.Conn) *Publisher {
 
 func (p *Publisher) PublishUserCreated(ctx context.Context, id string) error {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(p.log, "PublishUserCreated"), utils.MetadataFromCtx(ctx))
-	return p.publish(logger, subjectUserCreated, &eventuserpb.CreateEvent{Id: id})
+	return p.publish(logger, subjectUserCreated, &eventuserpb.UserCreatedEvent{Id: id})
 }
 
 func (p *Publisher) PublishUserUpdated(ctx context.Context, id string, isSecurityUpdate bool) error {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(p.log, "PublishUserUpdated"), utils.MetadataFromCtx(ctx))
-	return p.publish(logger, subjectUserUpdated, &eventuserpb.UpdateEvent{Id: id, IsSecurityUpdate: isSecurityUpdate})
+	return p.publish(logger, subjectUserUpdated, &eventuserpb.UserUpdatedEvent{Id: id, IsSecurityUpdate: isSecurityUpdate})
 }
 
 func (p *Publisher) PublishUserDeleted(ctx context.Context, id string) error {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(p.log, "PublishUserDeleted"), utils.MetadataFromCtx(ctx))
-	return p.publish(logger, subjectUserDeleted, &eventuserpb.DeleteEvent{Id: id})
+	return p.publish(logger, subjectUserDeleted, &eventuserpb.UserDeletedEvent{Id: id})
 }
 
 func (p *Publisher) publish(logger *slog.Logger, subject string, msg proto.Message) error {

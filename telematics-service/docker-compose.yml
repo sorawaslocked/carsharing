@@ -1,0 +1,12 @@
+services:
+  telematics:
+    container_name: telematics
+    build: .
+    ports:
+      - "50051:50051"
+    networks:
+      - car-rental-net
+
+networks:
+  car-rental-net:
+    external: true

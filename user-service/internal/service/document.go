@@ -73,6 +73,18 @@ func (s *UserService) GetProcessedDocumentsForUser(ctx context.Context, userID s
 		return nil, err
 	}
 
+	for i, doc := range docs {
+		if doc.Image == nil || doc.Image.Key == "" {
+			continue
+		}
+		url, err := s.objectStorage.GetImageURL(ctx, doc.Image.Key)
+		if err != nil {
+			logger.Error("object storage: resolving document image url", pkglog.Err(err))
+			return nil, err
+		}
+		docs[i].Image.URL = url
+	}
+
 	return docs, nil
 }
 

@@ -10,11 +10,24 @@ import (
 )
 
 func FromCreateDocumentRequest(req *usersvc.CreateDocumentRequest) (objectKey string, imageType model.ImageType, err error) {
+	objectKey = req.GetObjectKey()
+	if objectKey == "" {
+		return "", "", model.ValidationErrors{"object_key": model.ErrRequiredField}
+	}
+
 	imageType, err = model.ImageTypeFromString(req.GetImageType())
 	if err != nil {
 		return "", "", model.ValidationErrors{"image_type": model.ErrInvalidImageType}
 	}
-	return req.GetObjectKey(), imageType, nil
+	return objectKey, imageType, nil
+}
+
+func FromGetUploadDocumentDataRequest(req *usersvc.GetUploadDocumentDataRequest) (model.ImageType, error) {
+	imageType, err := model.ImageTypeFromString(req.GetImageType())
+	if err != nil {
+		return "", model.ValidationErrors{"image_type": model.ErrInvalidImageType}
+	}
+	return imageType, nil
 }
 
 func FromCheckDocumentRequest(req *usersvc.CheckDocumentRequest) (docID string, status model.DocumentStatus, docError *string, err error) {

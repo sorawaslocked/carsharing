@@ -192,7 +192,12 @@ func (h *UserHandler) CreateDocument(ctx context.Context, req *usersvc.CreateDoc
 func (h *UserHandler) GetUploadDocumentData(ctx context.Context, req *usersvc.GetUploadDocumentDataRequest) (*usersvc.GetUploadDocumentDataResponse, error) {
 	logger := h.logger(ctx, "GetUploadDocumentData")
 
-	data, err := h.userService.GetDocumentImageUploadData(ctx, req.GetImageType())
+	imageType, err := dto.FromGetUploadDocumentDataRequest(req)
+	if err != nil {
+		return nil, dto.ToStatusError(err)
+	}
+
+	data, err := h.userService.GetDocumentImageUploadData(ctx, imageType.String())
 	if err != nil {
 		logger.Error("getting document upload data", pkglog.Err(err))
 		return nil, dto.ToStatusError(err)

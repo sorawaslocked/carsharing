@@ -1,0 +1,20 @@
+with-expecter: true
+packages:
+  github.com/sorawaslocked/car-rental-user-service/internal/service:
+    config:
+      dir: "internal/service/mocks"
+      outpkg: "mocks"
+    interfaces:
+      UserRepository:
+      DocumentRepository:
+      ObjectStorage:
+      DocumentAnalyzer:
+      Publisher:
+      ActivationCodeStorage:
+      Mailer:
+  github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/handler:
+    config:
+      dir: "internal/adapter/grpc/handler/mocks"
+      outpkg: "mocks"
+    interfaces:
+      UserService:

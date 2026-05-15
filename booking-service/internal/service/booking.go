@@ -36,6 +36,10 @@ func (s *BookingService) Create(ctx context.Context, data model.BookingCreate) (
 	md := utils.MetadataFromCtx(ctx)
 	log = pkglog.WithMetadata(log, md)
 
+	if !isPrivileged(md.UserRoles) && (md.UserID == nil || data.UserID != *md.UserID) {
+		return "", model.ErrInsufficientPermissions
+	}
+
 	if _, err := s.ruleRepo.GetByID(ctx, data.PricingRuleID); err != nil {
 		return "", err
 	}
@@ -74,6 +78,10 @@ func (s *BookingService) GetByID(ctx context.Context, id string) (model.Booking,
 		return model.Booking{}, err
 	}
 
+	if !isPrivileged(md.UserRoles) && (md.UserID == nil || booking.UserID != *md.UserID) {
+		return model.Booking{}, model.ErrInsufficientPermissions
+	}
+
 	return booking, nil
 }
 
@@ -81,6 +89,10 @@ func (s *BookingService) List(ctx context.Context, filter model.BookingListFilte
 	log := pkglog.WithMethod(s.log, "List")
 	md := utils.MetadataFromCtx(ctx)
 	log = pkglog.WithMetadata(log, md)
+
+	if !isPrivileged(md.UserRoles) {
+		filter.UserID = md.UserID
+	}
 
 	bookings, err := s.bookingRepo.List(ctx, filter)
 	if err != nil {
@@ -102,6 +114,10 @@ func (s *BookingService) Cancel(ctx context.Context, id string, reason *string) 
 			log.Error("failed to get booking for cancel", pkglog.Err(err))
 		}
 		return err
+	}
+
+	if !isPrivileged(md.UserRoles) && (md.UserID == nil || booking.UserID != *md.UserID) {
+		return model.ErrInsufficientPermissions
 	}
 
 	if err := model.ValidateTransition(booking.Status, model.BookingStatusCancelled); err != nil {
@@ -217,6 +233,15 @@ func (s *BookingService) StartExpiryWatcher(ctx context.Context) {
 			s.expireBookings(ctx)
 		}
 	}
+}
+
+func isPrivileged(roles []model.Role) bool {
+	for _, r := range roles {
+		if r == model.RoleAdmin || r == model.RoleBookingManager {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *BookingService) expireBookings(ctx context.Context) {

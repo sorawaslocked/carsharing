@@ -291,6 +291,9 @@ func (c *UserCache) getBool(
 }
 
 func (c *UserCache) restore(ctx context.Context, userID string) (model.User, error) {
+	ctx = context.WithValue(ctx, "x-user-id", userID)
+	ctx = context.WithValue(ctx, "x-user-roles", []string{"user"})
+
 	user, err := c.userProvider.Get(ctx, userID)
 	if err != nil {
 		return model.User{}, err

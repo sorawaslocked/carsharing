@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/dto"
 	"github.com/sorawaslocked/car-rental-api-gateway/internal/config"
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )
 
 type UserHandler struct {
@@ -441,5 +442,11 @@ func (h *UserHandler) clearRefreshCookies(c *gin.Context) {
 }
 
 func (h *UserHandler) getRefreshTokenFromRequest(c *gin.Context) (string, error) {
-	return c.Cookie("refresh_token")
+	refresh, err := c.Cookie("refresh_token")
+
+	if err != nil {
+		return "", model.ErrUnauthorized
+	}
+
+	return refresh, nil
 }

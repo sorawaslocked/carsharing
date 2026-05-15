@@ -51,7 +51,7 @@ func (m *Manager) GenerateAccessToken(userID string) (token string, exp time.Tim
 
 	tokenWithClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	token, err = tokenWithClaims.SignedString(m.secret)
+	token, err = tokenWithClaims.SignedString([]byte(m.secret))
 	if err != nil {
 		logger.Error("generating access token", pkglog.Err(err))
 
@@ -76,7 +76,7 @@ func (m *Manager) GenerateRefreshToken(userID string) (token string, exp time.Ti
 
 	tokenWithClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	token, err = tokenWithClaims.SignedString(m.secret)
+	token, err = tokenWithClaims.SignedString([]byte(m.secret))
 	if err != nil {
 		logger.Error("generating refresh token", pkglog.Err(err))
 
@@ -95,7 +95,7 @@ func (m *Manager) ParseToken(token string) (userID string, exp time.Time, err er
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return m.secret, nil
+		return []byte(m.secret), nil
 	})
 	if err != nil {
 		if errors.Is(err, jwt.ErrTokenExpired) {

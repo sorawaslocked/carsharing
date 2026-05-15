@@ -49,7 +49,7 @@ var privilegedRoles = []model.Role{model.RoleAdmin, model.RoleUserManager}
 func buildPolicies() map[string]methodPolicy {
 	return map[string]methodPolicy{
 		// Public — no authentication required.
-		usersvc.UserService_Health_FullMethodName:   {public: true},
+		usersvc.HealthService_Health_FullMethodName: {public: true},
 		usersvc.UserService_Register_FullMethodName: {public: true},
 		usersvc.UserService_SignIn_FullMethodName:   {public: true},
 

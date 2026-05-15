@@ -1,6 +1,8 @@
 package minio
 
 import (
+	"context"
+	"fmt"
 	"time"
 
 	"github.com/minio/minio-go/v7"
@@ -22,4 +24,19 @@ func NewClient(cfg Config) (*minio.Client, error) {
 		Creds:  credentials.NewStaticV4(cfg.AccessKeyID, cfg.SecretAccessKey, ""),
 		Secure: cfg.UseSSL,
 	})
+}
+
+// EnsureBucket creates the bucket if it does not already exist.
+func EnsureBucket(ctx context.Context, client *minio.Client, cfg Config) error {
+	exists, err := client.BucketExists(ctx, cfg.BucketName)
+	if err != nil {
+		return fmt.Errorf("checking bucket existence: %w", err)
+	}
+	if exists {
+		return nil
+	}
+	if err := client.MakeBucket(ctx, cfg.BucketName, minio.MakeBucketOptions{}); err != nil {
+		return fmt.Errorf("creating bucket: %w", err)
+	}
+	return nil
 }

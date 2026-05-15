@@ -122,6 +122,10 @@ func (s *UserService) Get(ctx context.Context, id string) (model.User, error) {
 		return model.User{}, err
 	}
 
+	if err := s.resolveProfileImageURL(ctx, logger, &user); err != nil {
+		return model.User{}, err
+	}
+
 	return user, nil
 }
 
@@ -134,7 +138,28 @@ func (s *UserService) List(ctx context.Context, filter model.UserFilter) ([]mode
 		return nil, err
 	}
 
+	for i := range users {
+		if err := s.resolveProfileImageURL(ctx, logger, &users[i]); err != nil {
+			return nil, err
+		}
+	}
+
 	return users, nil
+}
+
+func (s *UserService) resolveProfileImageURL(ctx context.Context, logger *slog.Logger, user *model.User) error {
+	if user.ProfileImage == nil || user.ProfileImage.Key == "" {
+		return nil
+	}
+
+	imageURL, err := s.objectStorage.GetImageURL(ctx, user.ProfileImage.Key)
+	if err != nil {
+		logger.Error("object storage: resolving profile image url", pkglog.Err(err))
+		return err
+	}
+
+	user.ProfileImage.URL = imageURL
+	return nil
 }
 
 func (s *UserService) Update(ctx context.Context, id string, data model.UserUpdate) error {

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log/slog"
@@ -82,6 +83,13 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 		_ = analyzerConn.Close()
 		_ = redisClient.Close()
 		return nil, fmt.Errorf("minio: %w", err)
+	}
+	if err := miniocfg.EnsureBucket(context.Background(), minioClient, cfg.Minio); err != nil {
+		_ = db.Close()
+		natsConn.Close()
+		_ = analyzerConn.Close()
+		_ = redisClient.Close()
+		return nil, fmt.Errorf("minio bucket: %w", err)
 	}
 
 	activationCodeCache := redisadapter.NewActivationCodeRedisCache(redisClient)

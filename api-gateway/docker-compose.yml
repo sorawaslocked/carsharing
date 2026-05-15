@@ -16,7 +16,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: car-rental-redis
+    container_name: api-gateway-redis
     command: "redis-server --requirepass secret"
     environment:
       REDIS_PASSWORD: secret

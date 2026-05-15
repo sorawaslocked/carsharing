@@ -5,26 +5,20 @@ import (
 	"os"
 
 	"github.com/ilyakaznacheev/cleanenv"
-	grpccfg "github.com/sorawaslocked/car-rental-car-service/internal/pkg/grpc"
-	miniocfg "github.com/sorawaslocked/car-rental-car-service/internal/pkg/minio"
-	natscfg "github.com/sorawaslocked/car-rental-car-service/internal/pkg/nats"
-	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/postgres"
+	pkggrpc "github.com/sorawaslocked/car-rental-car-service/internal/pkg/grpc"
+	pkgminio "github.com/sorawaslocked/car-rental-car-service/internal/pkg/minio"
+	pkgnats "github.com/sorawaslocked/car-rental-car-service/internal/pkg/nats"
+	pkgpostgres "github.com/sorawaslocked/car-rental-car-service/internal/pkg/postgres"
 )
 
-type TelematicsStreamConfig struct {
-	Addr string `yaml:"addr" env:"TELEMATICS_STREAM_ADDR" env-required:"true"`
+type Config struct {
+	Env              string                                `yaml:"env"                env:"ENV"                      env-default:"local"`
+	GRPC             pkggrpc.ServerConfig                  `yaml:"grpc_server"`
+	PG               pkgpostgres.Config                    `yaml:"postgres"`
+	NATS             pkgnats.Config                        `yaml:"nats"`
+	MinIO            pkgminio.Config                       `yaml:"minio"`
+	TelematicsStream pkggrpc.TelematicsStreamServiceConfig `yaml:"telematics_stream"`
 }
-
-type (
-	Config struct {
-		Env              string                 `yaml:"env"               env:"ENV"      env-required:"true"`
-		Postgres         postgres.Config        `yaml:"postgres"          env-required:"true"`
-		GRPC             grpccfg.Config         `yaml:"grpc"              env-required:"true"`
-		MinIO            miniocfg.Config        `yaml:"minio"             env-required:"true"`
-		NATS             natscfg.Config         `yaml:"nats"              env-required:"true"`
-		TelematicsStream TelematicsStreamConfig `yaml:"telematics_stream" env-required:"true"`
-	}
-)
 
 func MustLoad() Config {
 	cfgPath := fetchConfigPath()

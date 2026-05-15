@@ -3,17 +3,21 @@ package main
 import (
 	"github.com/sorawaslocked/car-rental-car-service/internal/app"
 	"github.com/sorawaslocked/car-rental-car-service/internal/config"
-	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/log"
+	pkglog "github.com/sorawaslocked/car-rental-car-service/internal/pkg/log"
 )
 
 func main() {
 	cfg := config.MustLoad()
+	log := pkglog.SetupLogger(cfg.Env)
 
-	logger := log.SetupLogger(cfg.Env)
-
-	application, err := app.New(cfg, logger)
+	a, err := app.New(log, cfg)
 	if err != nil {
+		log.Error("failed to initialize app", pkglog.Err(err))
 		panic(err)
 	}
-	application.Run()
+
+	if err = a.Run(); err != nil {
+		log.Error("app run failed", pkglog.Err(err))
+		panic(err)
+	}
 }

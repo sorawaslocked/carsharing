@@ -12,5 +12,5 @@ service DocumentAnalyzerService {
 
 message AnalyzeRequest {
   string document_id = 1;
-  string storage_url = 2;
+  string object_key = 2;
 }

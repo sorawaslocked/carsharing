@@ -18,13 +18,15 @@ func NewServer(
 	streamHandler *handler.TripStreamHandler,
 	healthHandler *handler.HealthHandler,
 ) *grpc.Server {
+	auth := interceptor.NewAuthInterceptor(log)
+
 	srv := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
-			interceptor.AuthUnaryInterceptor,
+			auth.Unary(),
 			interceptor.LoggerUnaryInterceptor(log),
 		),
 		grpc.ChainStreamInterceptor(
-			interceptor.AuthStreamInterceptor,
+			auth.Stream(),
 			interceptor.LoggerStreamInterceptor(log),
 		),
 	)

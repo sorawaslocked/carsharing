@@ -43,12 +43,17 @@ func NewTripService(
 }
 
 func (s *TripService) StartTrip(ctx context.Context, bookingID string) (string, error) {
+	md := utils.MetadataFromCtx(ctx)
 	log := pkglog.WithMethod(s.log, "StartTrip")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+	log = pkglog.WithMetadata(log, md)
 
 	booking, err := s.booking.GetBooking(ctx, bookingID)
 	if err != nil {
 		return "", err
+	}
+
+	if !canAccess(md, booking.UserID) {
+		return "", model.ErrInsufficientPermissions
 	}
 
 	if booking.Status != "reserved" {
@@ -105,7 +110,14 @@ func (s *TripService) StartTrip(ctx context.Context, bookingID string) (string, 
 }
 
 func (s *TripService) GetTrip(ctx context.Context, id string) (model.Trip, error) {
-	return s.tripRepo.GetByID(ctx, id)
+	trip, err := s.tripRepo.GetByID(ctx, id)
+	if err != nil {
+		return model.Trip{}, err
+	}
+	if !canAccess(utils.MetadataFromCtx(ctx), trip.UserID) {
+		return model.Trip{}, model.ErrInsufficientPermissions
+	}
+	return trip, nil
 }
 
 func (s *TripService) ListTrips(ctx context.Context, filter model.TripFilter) ([]model.Trip, error) {
@@ -113,12 +125,17 @@ func (s *TripService) ListTrips(ctx context.Context, filter model.TripFilter) ([
 }
 
 func (s *TripService) EndTrip(ctx context.Context, id string) error {
+	md := utils.MetadataFromCtx(ctx)
 	log := pkglog.WithMethod(s.log, "EndTrip")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+	log = pkglog.WithMetadata(log, md)
 
 	trip, err := s.tripRepo.GetByID(ctx, id)
 	if err != nil {
 		return err
+	}
+
+	if !canAccess(md, trip.UserID) {
+		return model.ErrInsufficientPermissions
 	}
 
 	if !trip.Status.CanTransitionTo(model.TripStatusCompleted) {
@@ -206,12 +223,17 @@ func (s *TripService) EndTrip(ctx context.Context, id string) error {
 }
 
 func (s *TripService) CancelTrip(ctx context.Context, id string, reason *string) error {
+	md := utils.MetadataFromCtx(ctx)
 	log := pkglog.WithMethod(s.log, "CancelTrip")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+	log = pkglog.WithMetadata(log, md)
 
 	trip, err := s.tripRepo.GetByID(ctx, id)
 	if err != nil {
 		return err
+	}
+
+	if !canAccess(md, trip.UserID) {
+		return model.ErrInsufficientPermissions
 	}
 
 	if !trip.Status.CanTransitionTo(model.TripStatusCancelled) {
@@ -253,10 +275,24 @@ func (s *TripService) CancelTrip(ctx context.Context, id string, reason *string)
 }
 
 func (s *TripService) GetTripSummary(ctx context.Context, tripID string) (model.TripSummary, error) {
+	trip, err := s.tripRepo.GetByID(ctx, tripID)
+	if err != nil {
+		return model.TripSummary{}, err
+	}
+	if !canAccess(utils.MetadataFromCtx(ctx), trip.UserID) {
+		return model.TripSummary{}, model.ErrInsufficientPermissions
+	}
 	return s.summaryRepo.GetByTripID(ctx, tripID)
 }
 
 func (s *TripService) GetTripStatusHistory(ctx context.Context, filter model.TripStatusReadingFilter) ([]model.TripStatusReading, error) {
+	trip, err := s.tripRepo.GetByID(ctx, filter.TripID)
+	if err != nil {
+		return nil, err
+	}
+	if !canAccess(utils.MetadataFromCtx(ctx), trip.UserID) {
+		return nil, model.ErrInsufficientPermissions
+	}
 	return s.statusRepo.List(ctx, filter)
 }
 
@@ -272,6 +308,9 @@ func (s *TripService) StreamTripLiveFeed(ctx context.Context, tripID string, sen
 	}
 	if trip.Status != model.TripStatusActive {
 		return model.ErrTripNotActive
+	}
+	if !canAccess(utils.MetadataFromCtx(ctx), trip.UserID) {
+		return model.ErrInsufficientPermissions
 	}
 
 	booking, err := s.booking.GetBooking(ctx, trip.BookingID)
@@ -299,6 +338,18 @@ func (s *TripService) StreamTripLiveFeed(ctx context.Context, tripID string, sen
 			DistanceTraveledKM: distanceKM,
 		})
 	})
+}
+
+func canAccess(md utils.Metadata, ownerID string) bool {
+	if md.UserID != nil && *md.UserID == ownerID {
+		return true
+	}
+	for _, r := range md.UserRoles {
+		if r == model.RoleAdmin || r == model.RoleBookingManager {
+			return true
+		}
+	}
+	return false
 }
 
 func ptr[T any](v T) *T {

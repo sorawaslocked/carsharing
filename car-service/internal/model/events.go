@@ -40,3 +40,26 @@ type TripEndedEvent struct {
 	UserID    string
 	EndedAt   time.Time
 }
+
+type BookingExpiredEvent struct {
+	BookingID string
+	CarID     string
+	UserID    string
+	ExpiredAt time.Time
+}
+
+type BookingCompletedEvent struct {
+	BookingID   string
+	CarID       string
+	UserID      string
+	CompletedAt time.Time
+}
+
+type TripCancelledEvent struct {
+	TripID      string
+	BookingID   string
+	CarID       string
+	UserID      string
+	Reason      string
+	CancelledAt time.Time
+}

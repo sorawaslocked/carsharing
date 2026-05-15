@@ -25,16 +25,7 @@ func NewTelematicsStreamClient(conn *grpc.ClientConn, log *slog.Logger) *Telemat
 
 func (c *TelematicsStreamClient) Subscribe(ctx context.Context, car model.Car) (<-chan model.TelematicsUpdate, error) {
 	req := &telematicspb.StreamCarTelematicsEventsRequest{
-		CarId:                    car.ID,
-		CurrentLocationLatitude:  car.Location.Latitude,
-		CurrentLocationLongitude: car.Location.Longitude,
-		OdometerKm:               car.MileageKM,
-	}
-	if car.FuelLevel != nil {
-		req.FuelLevel = car.FuelLevel
-	}
-	if car.BatteryLevel != nil {
-		req.BatteryLevel = car.BatteryLevel
+		CarId: car.ID,
 	}
 
 	stream, err := c.client.StreamCarTelematicsEvents(ctx, req)

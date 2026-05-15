@@ -15,15 +15,21 @@ import (
 const (
 	subjectBookingCreated   = "booking.created"
 	subjectBookingCancelled = "booking.cancelled"
+	subjectBookingExpired   = "booking.expired"
+	subjectBookingCompleted = "booking.completed"
 	subjectTripStarted      = "trip.started"
 	subjectTripEnded        = "trip.ended"
+	subjectTripCancelled    = "trip.cancelled"
 )
 
 type CarEventHandler interface {
 	OnBookingCreated(ctx context.Context, event model.BookingCreatedEvent) error
 	OnBookingCancelled(ctx context.Context, event model.BookingCancelledEvent) error
+	OnBookingExpired(ctx context.Context, event model.BookingExpiredEvent) error
+	OnBookingCompleted(ctx context.Context, event model.BookingCompletedEvent) error
 	OnTripStarted(ctx context.Context, event model.TripStartedEvent) error
 	OnTripEnded(ctx context.Context, event model.TripEndedEvent) error
+	OnTripCancelled(ctx context.Context, event model.TripCancelledEvent) error
 }
 
 type Subscriber struct {
@@ -47,8 +53,11 @@ func (s *Subscriber) Subscribe() error {
 	}{
 		{subjectBookingCreated, s.handleBookingCreated},
 		{subjectBookingCancelled, s.handleBookingCancelled},
+		{subjectBookingExpired, s.handleBookingExpired},
+		{subjectBookingCompleted, s.handleBookingCompleted},
 		{subjectTripStarted, s.handleTripStarted},
 		{subjectTripEnded, s.handleTripEnded},
+		{subjectTripCancelled, s.handleTripCancelled},
 	}
 
 	for _, sub := range subs {
@@ -157,6 +166,83 @@ func (s *Subscriber) handleTripEnded(msg *nats.Msg) {
 
 	if err := s.carHandler.OnTripEnded(context.Background(), event); err != nil {
 		s.log.Error("OnTripEnded failed",
+			pkglog.Err(err),
+			slog.String("tripID", event.TripID),
+			slog.String("carID", event.CarID),
+		)
+	}
+}
+
+func (s *Subscriber) handleBookingExpired(msg *nats.Msg) {
+	var pb eventbooking.BookingExpiredEvent
+	if err := proto.Unmarshal(msg.Data, &pb); err != nil {
+		s.log.Error("failed to unmarshal BookingExpiredEvent", pkglog.Err(err))
+		return
+	}
+
+	event := model.BookingExpiredEvent{
+		BookingID: pb.GetBookingId(),
+		CarID:     pb.GetCarId(),
+		UserID:    pb.GetUserId(),
+	}
+	if pb.GetExpiredAt() != nil {
+		event.ExpiredAt = pb.GetExpiredAt().AsTime()
+	}
+
+	if err := s.carHandler.OnBookingExpired(context.Background(), event); err != nil {
+		s.log.Error("OnBookingExpired failed",
+			pkglog.Err(err),
+			slog.String("bookingID", event.BookingID),
+			slog.String("carID", event.CarID),
+		)
+	}
+}
+
+func (s *Subscriber) handleBookingCompleted(msg *nats.Msg) {
+	var pb eventbooking.BookingCompletedEvent
+	if err := proto.Unmarshal(msg.Data, &pb); err != nil {
+		s.log.Error("failed to unmarshal BookingCompletedEvent", pkglog.Err(err))
+		return
+	}
+
+	event := model.BookingCompletedEvent{
+		BookingID: pb.GetBookingId(),
+		CarID:     pb.GetCarId(),
+		UserID:    pb.GetUserId(),
+	}
+	if pb.GetCompletedAt() != nil {
+		event.CompletedAt = pb.GetCompletedAt().AsTime()
+	}
+
+	if err := s.carHandler.OnBookingCompleted(context.Background(), event); err != nil {
+		s.log.Error("OnBookingCompleted failed",
+			pkglog.Err(err),
+			slog.String("bookingID", event.BookingID),
+			slog.String("carID", event.CarID),
+		)
+	}
+}
+
+func (s *Subscriber) handleTripCancelled(msg *nats.Msg) {
+	var pb eventtrip.TripCancelledEvent
+	if err := proto.Unmarshal(msg.Data, &pb); err != nil {
+		s.log.Error("failed to unmarshal TripCancelledEvent", pkglog.Err(err))
+		return
+	}
+
+	event := model.TripCancelledEvent{
+		TripID:    pb.GetTripId(),
+		BookingID: pb.GetBookingId(),
+		CarID:     pb.GetCarId(),
+		UserID:    pb.GetUserId(),
+		Reason:    pb.GetReason(),
+	}
+	if pb.GetCancelledAt() != nil {
+		event.CancelledAt = pb.GetCancelledAt().AsTime()
+	}
+
+	if err := s.carHandler.OnTripCancelled(context.Background(), event); err != nil {
+		s.log.Error("OnTripCancelled failed",
 			pkglog.Err(err),
 			slog.String("tripID", event.TripID),
 			slog.String("carID", event.CarID),

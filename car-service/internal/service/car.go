@@ -429,3 +429,61 @@ func (s *CarService) OnTripEnded(ctx context.Context, event model.TripEndedEvent
 
 	return nil
 }
+
+func (s *CarService) OnBookingExpired(ctx context.Context, event model.BookingExpiredEvent) error {
+	const method = "OnBookingExpired"
+	logger := pkglog.WithMethod(s.log, method)
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+
+	if err := s.UpdateCarStatus(ctx, event.CarID, model.CarStatusUpdateInput{
+		Status: string(model.CarStatusAvailable),
+	}); err != nil {
+		return handleError(logger, err)
+	}
+
+	logger.Info("car released on booking expired",
+		slog.String("carID", event.CarID),
+		slog.String("bookingID", event.BookingID),
+	)
+
+	return nil
+}
+
+func (s *CarService) OnBookingCompleted(ctx context.Context, event model.BookingCompletedEvent) error {
+	const method = "OnBookingCompleted"
+	logger := pkglog.WithMethod(s.log, method)
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+
+	if err := s.UpdateCarStatus(ctx, event.CarID, model.CarStatusUpdateInput{
+		Status: string(model.CarStatusAvailable),
+	}); err != nil {
+		return handleError(logger, err)
+	}
+
+	logger.Info("car released on booking completed",
+		slog.String("carID", event.CarID),
+		slog.String("bookingID", event.BookingID),
+	)
+
+	return nil
+}
+
+func (s *CarService) OnTripCancelled(ctx context.Context, event model.TripCancelledEvent) error {
+	const method = "OnTripCancelled"
+	logger := pkglog.WithMethod(s.log, method)
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+
+	if err := s.UpdateCarStatus(ctx, event.CarID, model.CarStatusUpdateInput{
+		Status: string(model.CarStatusAvailable),
+	}); err != nil {
+		return handleError(logger, err)
+	}
+
+	logger.Info("car released on trip cancelled",
+		slog.String("carID", event.CarID),
+		slog.String("tripID", event.TripID),
+		slog.String("bookingID", event.BookingID),
+	)
+
+	return nil
+}

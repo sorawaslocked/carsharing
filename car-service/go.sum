@@ -75,6 +75,8 @@ github.com/sorawaslocked/car-rental-protos v0.0.27 h1:IAMlpFxnjdu+aoM75EpO7fz2Ea
 github.com/sorawaslocked/car-rental-protos v0.0.27/go.mod h1:ThSVtD+dtUfuaRpaZSzXPeF+RVNI6ii4AhcSH5hY7es=
 github.com/sorawaslocked/car-rental-protos v0.0.28 h1:Nk8NnyLljYjvReUFaPHT7sA5iWUNIFOJVmWrnIIP8GM=
 github.com/sorawaslocked/car-rental-protos v0.0.28/go.mod h1:ThSVtD+dtUfuaRpaZSzXPeF+RVNI6ii4AhcSH5hY7es=
+github.com/sorawaslocked/car-rental-protos v0.0.32 h1:yDx+yRJej0GgiYuhehlcss6qjM9NT4+8Efi12I1y2Lo=
+github.com/sorawaslocked/car-rental-protos v0.0.32/go.mod h1:ThSVtD+dtUfuaRpaZSzXPeF+RVNI6ii4AhcSH5hY7es=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
 github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=

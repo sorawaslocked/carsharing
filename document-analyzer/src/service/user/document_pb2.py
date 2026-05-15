@@ -25,7 +25,7 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1bservice/user/document.proto\x12\x0cservice.user\x1a\x1bgoogle/protobuf/empty.proto\":\n\x0e\x41nalyzeRequest\x12\x13\n\x0b\x64ocument_id\x18\x01 \x01(\t\x12\x13\n\x0bstorage_url\x18\x02 \x01(\t2Z\n\x17\x44ocumentAnalyzerService\x12?\n\x07\x41nalyze\x12\x1c.service.user.AnalyzeRequest\x1a\x16.google.protobuf.EmptyB=Z;github.com/sorawaslocked/car-rental-protos/gen/service/userb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1bservice/user/document.proto\x12\x0cservice.user\x1a\x1bgoogle/protobuf/empty.proto\"9\n\x0e\x41nalyzeRequest\x12\x13\n\x0b\x64ocument_id\x18\x01 \x01(\t\x12\x12\n\x0aobject_key\x18\x02 \x01(\t2Z\n\x17\x44ocumentAnalyzerService\x12?\n\x07\x41nalyze\x12\x1c.service.user.AnalyzeRequest\x1a\x16.google.protobuf.EmptyB=Z;github.com/sorawaslocked/car-rental-protos/gen/service/userb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -34,7 +34,7 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z;github.com/sorawaslocked/car-rental-protos/gen/service/user'
   _globals['_ANALYZEREQUEST']._serialized_start=74
-  _globals['_ANALYZEREQUEST']._serialized_end=132
-  _globals['_DOCUMENTANALYZERSERVICE']._serialized_start=134
-  _globals['_DOCUMENTANALYZERSERVICE']._serialized_end=224
+  _globals['_ANALYZEREQUEST']._serialized_end=131
+  _globals['_DOCUMENTANALYZERSERVICE']._serialized_start=133
+  _globals['_DOCUMENTANALYZERSERVICE']._serialized_end=223
 # @@protoc_insertion_point(module_scope)

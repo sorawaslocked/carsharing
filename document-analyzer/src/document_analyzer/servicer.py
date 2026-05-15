@@ -29,10 +29,10 @@ class DocumentAnalyzerServicer(document_pb2_grpc.DocumentAnalyzerServiceServicer
         request: document_pb2.AnalyzeRequest,
         context: grpc.aio.ServicerContext,
     ) -> empty_pb2.Empty:
-        logger.info("Analyze request: document_id=%s storage_url=%s", request.document_id, request.storage_url)
+        logger.info("Analyze request: document_id=%s object_key=%s", request.document_id, request.object_key)
 
         try:
-            image_bytes = await asyncio.to_thread(self._storage.get_object_bytes, request.storage_url)
+            image_bytes = await asyncio.to_thread(self._storage.get_object_bytes, request.object_key)
         except Exception as exc:
             logger.error("MinIO fetch failed for %s: %s", request.document_id, exc)
             await context.abort(grpc.StatusCode.NOT_FOUND, f"Could not retrieve document: {exc}")

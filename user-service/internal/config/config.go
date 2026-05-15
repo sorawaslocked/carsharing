@@ -14,14 +14,14 @@ import (
 )
 
 type Config struct {
-	Env        string               `yaml:"env" env:"ENV" env-required:"true"`
-	Postgres   postgres.Config      `yaml:"postgres" env-required:"true"`
-	Redis      redis.Config         `yaml:"redis" env-required:"true"`
-	NATS       natscfg.Config       `yaml:"nats" env-required:"true"`
-	GRPC       grpccfg.ServerConfig `yaml:"grpc" env-required:"true"`
-	GRPCClient grpccfg.Config       `yaml:"grpc_client"`
-	Minio      miniocfg.Config      `yaml:"minio" env-required:"true"`
-	Mailer     mailer.Config
+	Env              string               `yaml:"env"               env:"ENV"               env-default:"local"`
+	GRPC             grpccfg.ServerConfig `yaml:"grpc_server"`
+	Postgres         postgres.Config      `yaml:"postgres"`
+	Redis            redis.Config         `yaml:"redis"`
+	NATS             natscfg.Config       `yaml:"nats"`
+	Minio            miniocfg.Config      `yaml:"minio"`
+	Mailer           mailer.Config
+	DocumentAnalyzer grpccfg.DocumentAnalyzerConfig `yaml:"document_analyzer"`
 }
 
 func MustLoad() Config {

@@ -1,22 +1,23 @@
 package main
 
 import (
-	"context"
 	"github.com/sorawaslocked/car-rental-user-service/internal/app"
 	"github.com/sorawaslocked/car-rental-user-service/internal/config"
 	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
 )
 
 func main() {
-	ctx := context.Background()
-
 	cfg := config.MustLoad()
-
 	log := pkglog.SetupLogger(cfg.Env)
 
-	application, err := app.New(ctx, cfg, log)
+	a, err := app.New(log, cfg)
 	if err != nil {
+		log.Error("failed to initialize app", pkglog.Err(err))
 		panic(err)
 	}
-	application.Run()
+
+	if err = a.Run(); err != nil {
+		log.Error("app run failed", pkglog.Err(err))
+		panic(err)
+	}
 }

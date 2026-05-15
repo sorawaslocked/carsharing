@@ -9,12 +9,12 @@ import (
 )
 
 type Config struct {
-	Host               string        `yaml:"host"                    env:"PG_HOST"                       env-required:"true"`
-	Port               int           `yaml:"port"                    env:"PG_PORT"                       env-default:"5432"`
-	User               string        `yaml:"user"                    env:"PG_USER"                       env-required:"true"`
-	Password           string        `yaml:"password"                env:"PG_PASSWORD"                   env-required:"true"`
-	Database           string        `yaml:"database"                env:"PG_DATABASE"                   env-required:"true"`
-	SSLMode            string        `yaml:"ssl_mode"                env:"PG_SSL_MODE"                   env-default:"disable"`
+	Host               string        `yaml:"host"                    env:"POSTGRES_HOST"                 env-required:"true"`
+	Port               int           `yaml:"port"                    env:"POSTGRES_PORT"                 env-default:"5432"`
+	User               string        `yaml:"user"                    env:"POSTGRES_USER"                 env-required:"true"`
+	Password           string        `yaml:"password"                env:"POSTGRES_PASSWORD"             env-required:"true"`
+	Database           string        `yaml:"database"                env:"POSTGRES_DATABASE"             env-required:"true"`
+	SSLMode            string        `yaml:"ssl_mode"                env:"POSTGRES_SSL_MODE"             env-default:"disable"`
 	MaxOpenConnections int           `yaml:"max_open_connections"    env:"POSTGRES_MAX_OPEN_CONNECTIONS" env-default:"25"`
 	MaxIdleConnections int           `yaml:"max_idle_connections"    env:"POSTGRES_MAX_IDLE_CONNECTIONS" env-default:"25"`
 	MaxIdleTime        time.Duration `yaml:"max_idle_time"           env:"POSTGRES_MAX_IDLE_TIME"        env-default:"15m"`

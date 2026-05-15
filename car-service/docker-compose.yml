@@ -15,29 +15,6 @@ services:
       timeout: 5s
       retries: 5
 
-  nats:
-    image: nats:2-alpine
-    ports:
-      - "4222:4222"
-
-  minio:
-    image: minio/minio:latest
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - minio_data:/data
-    healthcheck:
-      test: ["CMD-SHELL", "mc ready local"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
   migrate:
     image: migrate/migrate
     volumes:
@@ -56,16 +33,20 @@ services:
       - "9998:9998"
     environment:
       POSTGRES_PASSWORD: car_rental
+      MINIO_ENDPOINT: minio:9000
       MINIO_ACCESS_KEY_ID: minioadmin
       MINIO_SECRET_ACCESS_KEY: minioadmin
+      NATS_URL: nats://nats:4222
+    networks:
+      - default
+      - car-rental-net
     depends_on:
       migrate:
         condition: service_completed_successfully
-      minio:
-        condition: service_healthy
-      nats:
-        condition: service_started
+
+networks:
+  car-rental-net:
+    external: true
 
 volumes:
   postgres_data:
-  minio_data:

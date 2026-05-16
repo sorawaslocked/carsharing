@@ -8,7 +8,7 @@ postgres:
   port: 5432
   user: "car_rental"
   password: "car_rental"
-  database: "car_rental_trips"
+  database: "car_rental"
   ssl_mode: "disable"
   max_open_connections: 25
   max_idle_connections: 25

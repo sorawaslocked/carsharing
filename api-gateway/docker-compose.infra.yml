@@ -1,4 +1,23 @@
 services:
+  postgres:
+    container_name: car-service-postgres
+    image: postgis/postgis:17-3.5-alpine
+    environment:
+      POSTGRES_USER: car_rental
+      POSTGRES_PASSWORD: car_rental
+      POSTGRES_DB: car_rental
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U car_rental"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - car-rental-net
+
   nats:
     image: nats:2-alpine
     ports:
@@ -31,4 +50,5 @@ networks:
     name: car-rental-net
 
 volumes:
+  postgres_data:
   minio_data:

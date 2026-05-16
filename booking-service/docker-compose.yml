@@ -1,0 +1,30 @@
+services:
+  migrate:
+    container_name: booking-service-migrate
+    image: migrate/migrate
+    volumes:
+      - ./migrations:/migrations
+    command:
+      - "-path=/migrations"
+      - "-database=postgres://car_rental:car_rental@postgres:5432/car_rental_booking?sslmode=disable"
+      - "up"
+    networks:
+      - car-rental-net
+
+  booking-service:
+    container_name: booking-service
+    build: .
+    ports:
+      - "9997:9997"
+    environment:
+      POSTGRES_PASSWORD: car_rental
+      NATS_URL: nats://nats:4222
+    networks:
+      - car-rental-net
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+networks:
+  car-rental-net:
+    external: true

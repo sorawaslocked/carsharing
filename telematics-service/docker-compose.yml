@@ -4,6 +4,9 @@ services:
     build: .
     ports:
       - "50051:50051"
+    environment:
+      DB_URL: "postgres://car_rental:car_rental@car-service-postgres:5432/car_rental?sslmode=disable"
+      NATS_URL: "nats://nats:4222"
     networks:
       - car-rental-net
 

@@ -1,3 +1,4 @@
+import argparse
 import asyncio
 import logging
 import signal
@@ -22,7 +23,11 @@ logger = logging.getLogger(__name__)
 
 
 async def main() -> None:
-    cfg = load_config(Path("config/config.yaml"))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-config", default="config/config.yaml")
+    args = parser.parse_args()
+
+    cfg = load_config(Path(args.config))
 
     nc = await nats.connect(cfg.nats.url)
     logger.info("Connected to NATS at %s", cfg.nats.url)

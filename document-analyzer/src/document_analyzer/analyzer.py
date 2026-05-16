@@ -67,7 +67,7 @@ class DocumentAnalyzer:
             ))
 
         # Check 3: no clear text via OCR confidence
-        doc = DocumentFile.from_images([image_np])
+        doc = DocumentFile.from_images([image_bytes])
         result = self._predictor(doc)
 
         words = [

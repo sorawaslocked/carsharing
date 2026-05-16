@@ -1,0 +1,12 @@
+services:
+  document-analyzer:
+    container_name: document-analyzer
+    build: .
+    ports:
+      - "9002:9002"
+    networks:
+      - car-rental-net
+
+networks:
+  car-rental-net:
+    external: true

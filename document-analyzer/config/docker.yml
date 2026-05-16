@@ -1,0 +1,22 @@
+grpc:
+  host: "0.0.0.0"
+  port: 9002
+  max_workers: 10
+
+minio:
+  endpoint: "minio:9000"
+  access_key: "minioadmin"
+  secret_key: "minioadmin"
+  secure: false
+  bucket: "car-rental"
+
+nats:
+  url: "nats://nats:4222"
+  subject: "document.analyzed"
+
+analyzer:
+  min_width: 800
+  min_height: 600
+  blur_threshold: 80.0
+  ocr_confidence_threshold: 0.5
+  min_word_count: 3

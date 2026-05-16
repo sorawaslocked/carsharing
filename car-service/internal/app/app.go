@@ -88,7 +88,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	telematicsService := service.NewTelematicsService(telematicsStreamClient, telematicsRepo, carRepo, log)
 
 	carModelService := service.NewCarModelService(carModelRepo, objectStorage, validate, log)
-	carService := service.NewCarService(carRepo, statusLogRepo, telematicsRepo, objectStorage, natsPublisher, validate, log)
+	carService := service.NewCarService(carModelRepo, carRepo, statusLogRepo, telematicsRepo, objectStorage, natsPublisher, validate, log)
 	carService.SetCarCreatedNotifier(telematicsService)
 
 	carInsuranceService := service.NewCarInsuranceService(carInsuranceRepo, objectStorage, validate, log)

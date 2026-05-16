@@ -14,6 +14,7 @@ import (
 )
 
 type CarService struct {
+	carModelRepo       CarModelRepository
 	carRepo            CarRepository
 	statusLogRepo      CarStatusLogRepository
 	telematicsRepo     TelematicsRepository
@@ -26,6 +27,7 @@ type CarService struct {
 }
 
 func NewCarService(
+	carModelRepo CarModelRepository,
 	carRepo CarRepository,
 	statusLogRepo CarStatusLogRepository,
 	telematicsRepo TelematicsRepository,
@@ -35,6 +37,7 @@ func NewCarService(
 	log *slog.Logger,
 ) *CarService {
 	s := &CarService{
+		carModelRepo:   carModelRepo,
 		carRepo:        carRepo,
 		statusLogRepo:  statusLogRepo,
 		telematicsRepo: telematicsRepo,
@@ -59,6 +62,10 @@ func (s *CarService) Create(ctx context.Context, createInput model.CarCreateInpu
 
 	err := validation.ValidateInput(s.validate, createInput)
 	if err != nil {
+		return "", handleError(logger, err)
+	}
+
+	if _, err = s.carModelRepo.FindByID(ctx, createInput.ModelID); err != nil {
 		return "", handleError(logger, err)
 	}
 

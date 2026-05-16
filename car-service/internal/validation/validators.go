@@ -37,6 +37,26 @@ func RegisterCustomValidators(v *validator.Validate) error {
 		return err
 	}
 
+	err = v.RegisterValidation("zonetype", zoneTypeValidator)
+	if err != nil {
+		return err
+	}
+
+	err = v.RegisterValidation("insurancetype", insuranceTypeValidator)
+	if err != nil {
+		return err
+	}
+
+	err = v.RegisterValidation("insurancestatus", insuranceStatusValidator)
+	if err != nil {
+		return err
+	}
+
+	err = v.RegisterValidation("maintenancerecordstatus", maintenanceRecordStatusValidator)
+	if err != nil {
+		return err
+	}
+
 	v.RegisterStructValidation(locationFilterValidator, model.LocationFilter{})
 
 	return nil
@@ -69,6 +89,26 @@ func carClassValidator(fl validator.FieldLevel) bool {
 func carStatusValidator(fl validator.FieldLevel) bool {
 	_, ok := model.ParseCarStatus(fl.Field().String())
 
+	return ok
+}
+
+func zoneTypeValidator(fl validator.FieldLevel) bool {
+	_, ok := model.ParseZoneType(fl.Field().String())
+	return ok
+}
+
+func insuranceTypeValidator(fl validator.FieldLevel) bool {
+	_, ok := model.ParseInsuranceType(fl.Field().String())
+	return ok
+}
+
+func insuranceStatusValidator(fl validator.FieldLevel) bool {
+	_, ok := model.ParseInsuranceStatus(fl.Field().String())
+	return ok
+}
+
+func maintenanceRecordStatusValidator(fl validator.FieldLevel) bool {
+	_, ok := model.ParseMaintenanceRecordStatus(fl.Field().String())
 	return ok
 }
 

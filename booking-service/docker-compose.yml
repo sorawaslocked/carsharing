@@ -6,7 +6,7 @@ services:
       - ./migrations:/migrations
     command:
       - "-path=/migrations"
-      - "-database=postgres://car_rental:car_rental@postgres:5432/car_rental_booking?sslmode=disable"
+      - "-database=postgres://car_rental:car_rental@postgres:5432/car_rental?sslmode=disable&x-migrations-table=booking_service_migrations"
       - "up"
     networks:
       - car-rental-net

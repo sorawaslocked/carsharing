@@ -25,4 +25,4 @@ mailtrap:
   from: "car-rental@demomailtrap.co"
 
 document_analyzer:
-  addr: document-analyzer:9001
+  addr: document-analyzer:9002

@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/ilyakaznacheev/cleanenv"
+	brevocfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/brevo"
 	grpccfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/grpc"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/mailtrap"
 	miniocfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/minio"
 	natscfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/nats"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/postgres"
@@ -20,7 +20,7 @@ type Config struct {
 	Redis            redis.Config                   `yaml:"redis"`
 	NATS             natscfg.Config                 `yaml:"nats"`
 	Minio            miniocfg.Config                `yaml:"minio"`
-	Mailtrap         mailtrap.Config                `yaml:"mailtrap"`
+	Brevo            brevocfg.Config                `yaml:"brevo"`
 	DocumentAnalyzer grpccfg.DocumentAnalyzerConfig `yaml:"document_analyzer"`
 }
 

@@ -21,8 +21,8 @@ minio:
   bucket_name: car-rental
   use_ssl: false
 
-mailtrap:
-  from: "car-rental@demomailtrap.co"
+brevo:
+  from: ""
 
 document_analyzer:
   addr: document-analyzer:9002

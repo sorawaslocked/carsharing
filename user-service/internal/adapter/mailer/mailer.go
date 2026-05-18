@@ -9,17 +9,17 @@ import (
 	"net/http"
 
 	"github.com/sorawaslocked/car-rental-user-service/internal/model"
+	brevocfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/brevo"
 	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
-	mailercfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/mailtrap"
 	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/utils"
 )
 
-const sendURL = "https://send.api.mailtrap.io/api/send"
+const sendURL = "https://api.brevo.com/v3/smtp/email"
 
 type Mailer struct {
 	log    *slog.Logger
 	client *http.Client
-	token  string
+	apiKey string
 	from   emailAddr
 }
 
@@ -29,18 +29,18 @@ type emailAddr struct {
 }
 
 type sendRequest struct {
-	From    emailAddr   `json:"from"`
-	To      []emailAddr `json:"to"`
-	Subject string      `json:"subject"`
-	Text    string      `json:"text"`
-	HTML    string      `json:"html"`
+	Sender      emailAddr   `json:"sender"`
+	To          []emailAddr `json:"to"`
+	Subject     string      `json:"subject"`
+	TextContent string      `json:"textContent"`
+	HTMLContent string      `json:"htmlContent"`
 }
 
-func New(log *slog.Logger, cfg mailercfg.Config) *Mailer {
+func New(log *slog.Logger, cfg brevocfg.Config) *Mailer {
 	return &Mailer{
-		log:    pkglog.WithComponent(log, "adapter.Mailtrap"),
+		log:    pkglog.WithComponent(log, "adapter.Brevo"),
 		client: &http.Client{},
-		token:  cfg.Token,
+		apiKey: cfg.APIKey,
 		from:   emailAddr{Email: cfg.From, Name: cfg.FromName},
 	}
 }
@@ -56,11 +56,11 @@ func (m *Mailer) send(ctx context.Context, to, subject, text, html string) error
 	logger := pkglog.WithMetadata(pkglog.WithMethod(m.log, "send"), utils.MetadataFromCtx(ctx))
 
 	payload := sendRequest{
-		From:    m.from,
-		To:      []emailAddr{{Email: to}},
-		Subject: subject,
-		Text:    text,
-		HTML:    html,
+		Sender:      m.from,
+		To:          []emailAddr{{Email: to}},
+		Subject:     subject,
+		TextContent: text,
+		HTMLContent: html,
 	}
 
 	body, err := json.Marshal(payload)
@@ -74,7 +74,7 @@ func (m *Mailer) send(ctx context.Context, to, subject, text, html string) error
 		logger.Error("building request", pkglog.Err(err))
 		return model.ErrMailer
 	}
-	req.Header.Set("Authorization", "Bearer "+m.token)
+	req.Header.Set("api-key", m.apiKey)
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := m.client.Do(req)

@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	wsdto "carsharing/api-gateway/internal/adapter/websocket/dto"
-	pkglog "carsharing/api-gateway/internal/pkg/log"
+	pkglog "carsharing/shared/pkg/log"
 	"github.com/coder/websocket"
 	"github.com/coder/websocket/wsjson"
 	"github.com/gin-gonic/gin"

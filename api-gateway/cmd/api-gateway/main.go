@@ -20,7 +20,7 @@ package main
 import (
 	"carsharing/api-gateway/internal/app"
 	"carsharing/api-gateway/internal/config"
-	"carsharing/api-gateway/internal/pkg/log"
+	"carsharing/shared/pkg/log"
 
 	_ "carsharing/api-gateway/docs"
 )

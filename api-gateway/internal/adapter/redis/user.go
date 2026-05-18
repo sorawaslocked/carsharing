@@ -6,35 +6,29 @@ import (
 	"fmt"
 	"log/slog"
 
+	"carsharing/api-gateway/internal/config"
 	"carsharing/api-gateway/internal/model"
-	"carsharing/api-gateway/internal/pkg/log"
-	rediscfg "carsharing/api-gateway/internal/pkg/redis"
-	"carsharing/api-gateway/internal/pkg/utils"
+	"carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	"github.com/redis/go-redis/v9"
 )
 
 type UserCache struct {
 	rdb          *redis.Client
 	userProvider UserProvider
-	cfg          rediscfg.Config
+	cfg          config.CacheConfig
 
 	log *slog.Logger
 }
 
-func NewUserCache(rdb *redis.Client, userProvider UserProvider, cfg rediscfg.Config, logger *slog.Logger) *UserCache {
-	const component = "redis.UserCache"
-
+func NewUserCache(rdb *redis.Client, userProvider UserProvider, cfg config.CacheConfig, logger *slog.Logger) *UserCache {
 	c := &UserCache{
 		rdb:          rdb,
 		userProvider: userProvider,
 		cfg:          cfg,
 	}
 
-	c.log = log.WithComponent(logger, component)
-	c.log = c.log.With(slog.Group("redis",
-		slog.String("address", c.cfg.Address),
-		slog.Int("db", c.cfg.DB),
-	))
+	c.log = log.WithComponent(logger, "redis.UserCache")
 
 	return c
 }

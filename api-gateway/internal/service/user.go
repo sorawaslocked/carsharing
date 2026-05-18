@@ -62,11 +62,11 @@ func (s *UserService) SignIn(ctx context.Context, creds model.Credentials) (mode
 		return model.AccessToken{}, model.RefreshToken{}, err
 	}
 
-	accessToken, accessTokenExp, err := s.tokenManager.GenerateAccessToken(id)
+	accessToken, accessTokenExp, err := s.tokenManager.GenerateAccessToken(ctx, id)
 	if err != nil {
 		return model.AccessToken{}, model.RefreshToken{}, err
 	}
-	refreshToken, refreshTokenExp, err := s.tokenManager.GenerateRefreshToken(id)
+	refreshToken, refreshTokenExp, err := s.tokenManager.GenerateRefreshToken(ctx, id)
 	if err != nil {
 		return model.AccessToken{}, model.RefreshToken{}, err
 	}
@@ -83,7 +83,7 @@ func (s *UserService) SignIn(ctx context.Context, creds model.Credentials) (mode
 func (s *UserService) RefreshToken(ctx context.Context, refreshToken string) (model.AccessToken, model.RefreshToken, error) {
 	deviceID := ctx.Value(ctxDeviceIDKey).(string)
 
-	id, _, err := s.tokenManager.ParseToken(refreshToken)
+	id, _, err := s.tokenManager.ParseToken(ctx, refreshToken)
 	if err != nil {
 		return model.AccessToken{}, model.RefreshToken{}, err
 	}
@@ -101,11 +101,11 @@ func (s *UserService) RefreshToken(ctx context.Context, refreshToken string) (mo
 		return model.AccessToken{}, model.RefreshToken{}, err
 	}
 
-	newAccessToken, newAccessTokenExp, err := s.tokenManager.GenerateAccessToken(id)
+	newAccessToken, newAccessTokenExp, err := s.tokenManager.GenerateAccessToken(ctx, id)
 	if err != nil {
 		return model.AccessToken{}, model.RefreshToken{}, err
 	}
-	newRefreshToken, newRefreshTokenExp, err := s.tokenManager.GenerateRefreshToken(id)
+	newRefreshToken, newRefreshTokenExp, err := s.tokenManager.GenerateRefreshToken(ctx, id)
 	if err != nil {
 		return model.AccessToken{}, model.RefreshToken{}, err
 	}

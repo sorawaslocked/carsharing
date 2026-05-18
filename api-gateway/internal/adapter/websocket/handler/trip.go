@@ -5,8 +5,8 @@ import (
 
 	wsdto "carsharing/api-gateway/internal/adapter/websocket/dto"
 	"carsharing/api-gateway/internal/model"
-	pkglog "carsharing/api-gateway/internal/pkg/log"
-	"carsharing/api-gateway/internal/pkg/utils"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	"github.com/coder/websocket"
 	"github.com/coder/websocket/wsjson"
 	"github.com/gin-gonic/gin"

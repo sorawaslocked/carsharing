@@ -6,8 +6,8 @@ import (
 
 	"carsharing/api-gateway/internal/adapter/grpc/dto"
 	"carsharing/api-gateway/internal/model"
-	pkglog "carsharing/api-gateway/internal/pkg/log"
-	"carsharing/api-gateway/internal/pkg/utils"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
 	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
 	"google.golang.org/protobuf/types/known/timestamppb"

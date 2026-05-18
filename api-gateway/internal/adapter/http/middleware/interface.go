@@ -6,7 +6,7 @@ import (
 )
 
 type TokenParser interface {
-	ParseToken(token string) (userID string, exp time.Time, err error)
+	ParseToken(ctx context.Context, token string) (userID string, exp time.Time, err error)
 }
 
 type UserPermissionsCache interface {

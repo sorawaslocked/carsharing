@@ -6,7 +6,7 @@ import (
 
 	"carsharing/api-gateway/internal/adapter/nats/dto"
 	"carsharing/api-gateway/internal/model"
-	pkglog "carsharing/api-gateway/internal/pkg/log"
+	pkglog "carsharing/shared/pkg/log"
 	nc "github.com/nats-io/nats.go"
 	eventuserpb "github.com/sorawaslocked/car-rental-protos/gen/event/user"
 	"google.golang.org/protobuf/proto"

@@ -46,7 +46,7 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 			return
 		}
 
-		userID, exp, err := a.parseClaims(header)
+		userID, exp, err := a.parseClaims(c, header)
 		if err != nil {
 			dto.FromError(c, err)
 			c.Abort()
@@ -122,10 +122,10 @@ func authHeader(c *gin.Context) (string, error) {
 	return header, nil
 }
 
-func (a *Authentication) parseClaims(authHeader string) (userID string, exp time.Time, err error) {
+func (a *Authentication) parseClaims(c *gin.Context, authHeader string) (userID string, exp time.Time, err error) {
 	token := strings.TrimPrefix(authHeader, "Bearer ")
 
-	userID, exp, err = a.tokenParser.ParseToken(token)
+	userID, exp, err = a.tokenParser.ParseToken(c.Request.Context(), token)
 	if err != nil {
 		return "", time.Time{}, model.ErrUnauthorized
 	}

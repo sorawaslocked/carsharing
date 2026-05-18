@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"carsharing/api-gateway/internal/model"
-	"carsharing/api-gateway/internal/pkg/jwt"
+	"carsharing/shared/pkg/jwt"
 	"github.com/gin-gonic/gin"
 )
 

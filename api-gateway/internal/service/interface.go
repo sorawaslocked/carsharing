@@ -8,9 +8,9 @@ import (
 )
 
 type TokenManager interface {
-	GenerateAccessToken(userID string) (token string, exp time.Time, err error)
-	GenerateRefreshToken(userID string) (token string, exp time.Time, err error)
-	ParseToken(token string) (userID string, exp time.Time, err error)
+	GenerateAccessToken(ctx context.Context, userID string) (token string, exp time.Time, err error)
+	GenerateRefreshToken(ctx context.Context, userID string) (token string, exp time.Time, err error)
+	ParseToken(ctx context.Context, token string) (userID string, exp time.Time, err error)
 }
 
 type UserSessionCache interface {

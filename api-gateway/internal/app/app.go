@@ -9,22 +9,24 @@ import (
 	"time"
 
 	grpchandler "carsharing/api-gateway/internal/adapter/grpc/handler"
+	"carsharing/api-gateway/internal/adapter/grpc/interceptor"
 	httpserver "carsharing/api-gateway/internal/adapter/http"
 	httphandler "carsharing/api-gateway/internal/adapter/http/handler"
 	natshandler "carsharing/api-gateway/internal/adapter/nats/handler"
 	redisadapter "carsharing/api-gateway/internal/adapter/redis"
 	wshandler "carsharing/api-gateway/internal/adapter/websocket/handler"
 	"carsharing/api-gateway/internal/config"
-	grpcconn "carsharing/api-gateway/internal/pkg/grpc"
-	pkgjwt "carsharing/api-gateway/internal/pkg/jwt"
-	pkglog "carsharing/api-gateway/internal/pkg/log"
-	pkgnats "carsharing/api-gateway/internal/pkg/nats"
-	pkgredis "carsharing/api-gateway/internal/pkg/redis"
 	"carsharing/api-gateway/internal/service"
+	pkggrpc "carsharing/shared/pkg/grpc"
+	pkgjwt "carsharing/shared/pkg/jwt"
+	pkglog "carsharing/shared/pkg/log"
+	pkgnats "carsharing/shared/pkg/nats"
+	pkgredis "carsharing/shared/pkg/redis"
 	bookingsvc "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
+	"google.golang.org/grpc"
 )
 
 // lazySessionCache breaks the init cycle between UserService and UserCache:
@@ -54,41 +56,45 @@ type App struct {
 func New(cfg config.Config, log *slog.Logger) *App {
 	log = log.With(slog.String("appID", "api-gateway"))
 
+	baseInterceptor := interceptor.NewBaseInterceptor()
+	unaryOpt := grpc.WithUnaryInterceptor(baseInterceptor.Unary)
+	streamOpt := grpc.WithStreamInterceptor(baseInterceptor.Stream)
+
 	// User service gRPC connection
-	userServiceLog := log.With(slog.String("grpcURL", cfg.GRPCServer.Client.UserServiceURL))
+	userServiceLog := log.With(slog.String("grpcService", "user-service"))
 	userServiceLog.Info("connecting to grpc server")
 
-	userServiceGrpcConn, err := grpcconn.Connect(cfg.GRPCServer.Client.UserServiceURL, cfg.GRPCServer.Client)
+	userServiceGrpcConn, err := pkggrpc.NewClientConn(userServiceLog, cfg.GRPCServer.UserService, unaryOpt, streamOpt)
 	if err != nil {
 		userServiceLog.Error("connecting to grpc server", pkglog.Err(err))
 		return nil
 	}
 
 	// Car service gRPC connection
-	carServiceLog := log.With(slog.String("grpcURL", cfg.GRPCServer.Client.CarServiceURL))
+	carServiceLog := log.With(slog.String("grpcService", "car-service"))
 	carServiceLog.Info("connecting to grpc server")
 
-	carServiceGrpcConn, err := grpcconn.Connect(cfg.GRPCServer.Client.CarServiceURL, cfg.GRPCServer.Client)
+	carServiceGrpcConn, err := pkggrpc.NewClientConn(carServiceLog, cfg.GRPCServer.CarService, unaryOpt, streamOpt)
 	if err != nil {
 		carServiceLog.Error("connecting to grpc server", pkglog.Err(err))
 		return nil
 	}
 
 	// Booking service gRPC connection
-	bookingServiceLog := log.With(slog.String("grpcURL", cfg.GRPCServer.Client.BookingServiceURL))
+	bookingServiceLog := log.With(slog.String("grpcService", "booking-service"))
 	bookingServiceLog.Info("connecting to grpc server")
 
-	bookingServiceGrpcConn, err := grpcconn.Connect(cfg.GRPCServer.Client.BookingServiceURL, cfg.GRPCServer.Client)
+	bookingServiceGrpcConn, err := pkggrpc.NewClientConn(bookingServiceLog, cfg.GRPCServer.BookingService, unaryOpt, streamOpt)
 	if err != nil {
 		bookingServiceLog.Error("connecting to grpc server", pkglog.Err(err))
 		return nil
 	}
 
 	// Trip service gRPC connection
-	tripServiceLog := log.With(slog.String("grpcURL", cfg.GRPCServer.Client.TripServiceURL))
+	tripServiceLog := log.With(slog.String("grpcService", "trip-service"))
 	tripServiceLog.Info("connecting to grpc server")
 
-	tripServiceGrpcConn, err := grpcconn.Connect(cfg.GRPCServer.Client.TripServiceURL, cfg.GRPCServer.Client)
+	tripServiceGrpcConn, err := pkggrpc.NewClientConn(tripServiceLog, cfg.GRPCServer.TripService, unaryOpt, streamOpt)
 	if err != nil {
 		tripServiceLog.Error("connecting to grpc server", pkglog.Err(err))
 		return nil
@@ -142,16 +148,16 @@ func New(cfg config.Config, log *slog.Logger) *App {
 	tripService := service.NewTripService(tripGrpcHandler)
 
 	// Redis
-	rdb, err := pkgredis.NewClient(context.Background(), &cfg.Redis, log)
+	rdb, err := pkgredis.NewClient(log, cfg.Redis)
 	if err != nil {
 		return nil
 	}
 
-	userCache := redisadapter.NewUserCache(rdb, userService, cfg.Redis, log)
+	userCache := redisadapter.NewUserCache(rdb, userService, cfg.Cache, log)
 	lazy.real = userCache
 
 	// NATS
-	natsConn, err := pkgnats.Connect(cfg.NATS, log)
+	natsConn, err := pkgnats.NewSubscriber(log, cfg.NATS)
 	if err != nil {
 		return nil
 	}

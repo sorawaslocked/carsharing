@@ -3,22 +3,36 @@ package config
 import (
 	"flag"
 	"os"
+	"time"
 
-	pkggrpc "carsharing/api-gateway/internal/pkg/grpc"
-	pkgjwt "carsharing/api-gateway/internal/pkg/jwt"
-	pkgnats "carsharing/api-gateway/internal/pkg/nats"
-	pkgredis "carsharing/api-gateway/internal/pkg/redis"
+	pkggrpc "carsharing/shared/pkg/grpc"
+	pkgjwt "carsharing/shared/pkg/jwt"
+	pkgnats "carsharing/shared/pkg/nats"
+	pkgredis "carsharing/shared/pkg/redis"
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
 type (
 	Config struct {
-		HTTPServer HTTPServer      `yaml:"http_server" env-required:"true"`
-		GRPCServer pkggrpc.Config  `yaml:"grpc_server" env-required:"true"`
-		Redis      pkgredis.Config `yaml:"redis" env-required:"true"`
-		NATS       pkgnats.Config  `yaml:"nats" env-required:"true"`
-		JWT        pkgjwt.Config   `yaml:"jwt" env-required:"true"`
-		Env        string          `yaml:"env" env-required:"true"`
+		HTTPServer HTTPServer               `yaml:"http_server" env-required:"true"`
+		GRPCServer GRPCServer               `yaml:"grpc_server" env-required:"true"`
+		Redis      pkgredis.Config          `yaml:"redis" env-required:"true"`
+		Cache      CacheConfig              `yaml:"cache"`
+		NATS       pkgnats.SubscriberConfig `yaml:"nats" env-required:"true"`
+		JWT        pkgjwt.Config            `yaml:"jwt" env-required:"true"`
+		Env        string                   `yaml:"env" env-required:"true"`
+	}
+
+	GRPCServer struct {
+		UserService    pkggrpc.ClientConfig `yaml:"user_service" env-required:"true"`
+		CarService     pkggrpc.ClientConfig `yaml:"car_service" env-required:"true"`
+		BookingService pkggrpc.ClientConfig `yaml:"booking_service" env-required:"true"`
+		TripService    pkggrpc.ClientConfig `yaml:"trip_service" env-required:"true"`
+	}
+
+	CacheConfig struct {
+		MetadataTTL time.Duration `yaml:"metadata_ttl" env:"CACHE_METADATA_TTL" env-default:"1h"`
+		SessionTTL  time.Duration `yaml:"session_ttl" env:"CACHE_SESSION_TTL" env-default:"24h"`
 	}
 
 	HTTPServer struct {

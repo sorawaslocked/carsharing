@@ -3,7 +3,7 @@ package model_test
 import (
 	"testing"
 
-	"github.com/sorawaslocked/car-rental-booking-service/internal/model"
+	"carsharing/booking-service/internal/model"
 )
 
 func TestValidateTransition(t *testing.T) {

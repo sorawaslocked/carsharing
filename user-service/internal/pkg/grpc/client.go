@@ -3,7 +3,7 @@ package grpc
 import (
 	"time"
 
-	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/interceptor"
+	"carsharing/user-service/internal/adapter/grpc/interceptor"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/keepalive"

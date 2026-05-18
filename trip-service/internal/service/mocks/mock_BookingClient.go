@@ -5,7 +5,7 @@ package svcmocks
 import (
 	context "context"
 
-	model "github.com/sorawaslocked/car-rental-trip-service/internal/model"
+	model "carsharing/trip-service/internal/model"
 	mock "github.com/stretchr/testify/mock"
 )
 

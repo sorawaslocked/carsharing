@@ -5,9 +5,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/sorawaslocked/car-rental-booking-service/internal/model"
-	"github.com/sorawaslocked/car-rental-booking-service/internal/service"
-	"github.com/sorawaslocked/car-rental-booking-service/internal/service/mocks"
+	"carsharing/booking-service/internal/model"
+	"carsharing/booking-service/internal/service"
+	"carsharing/booking-service/internal/service/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

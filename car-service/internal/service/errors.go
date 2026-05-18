@@ -4,9 +4,9 @@ import (
 	"errors"
 	"log/slog"
 
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
-	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-car-service/internal/validation"
+	"carsharing/car-service/internal/model"
+	"carsharing/car-service/internal/pkg/log"
+	"carsharing/car-service/internal/validation"
 )
 
 type ErrInvalidStatusTransition struct {

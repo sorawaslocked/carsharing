@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
+	"carsharing/api-gateway/internal/model"
 	basecarpb "github.com/sorawaslocked/car-rental-protos/gen/base/car"
 )
 

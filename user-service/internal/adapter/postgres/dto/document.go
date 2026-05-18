@@ -3,7 +3,7 @@ package dto
 import (
 	"fmt"
 
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
+	"carsharing/user-service/internal/model"
 )
 
 func WhereClausesFromDocumentFilter(filter model.DocumentFilter, args []any, argNumber int) ([]string, []any, int) {

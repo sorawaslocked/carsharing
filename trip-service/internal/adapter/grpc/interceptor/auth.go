@@ -6,10 +6,10 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/sorawaslocked/car-rental-trip-service/internal/adapter/grpc/dto"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-trip-service/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/pkg/utils"
+	"carsharing/trip-service/internal/adapter/grpc/dto"
+	"carsharing/trip-service/internal/model"
+	pkglog "carsharing/trip-service/internal/pkg/log"
+	"carsharing/trip-service/internal/pkg/utils"
 )
 
 type methodPolicy struct {

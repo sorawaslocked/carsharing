@@ -5,10 +5,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/security"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/utils"
+	"carsharing/user-service/internal/model"
+	pkglog "carsharing/user-service/internal/pkg/log"
+	"carsharing/user-service/internal/pkg/security"
+	"carsharing/user-service/internal/pkg/utils"
 )
 
 func (s *UserService) SendActivationCode(ctx context.Context) error {

@@ -3,9 +3,9 @@ package grpc
 import (
 	"log/slog"
 
+	"carsharing/user-service/internal/adapter/grpc/handler"
+	"carsharing/user-service/internal/adapter/grpc/interceptor"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
-	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/handler"
-	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/interceptor"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )

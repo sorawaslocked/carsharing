@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
-	"github.com/sorawaslocked/car-rental-car-service/internal/service/mocks"
+	"carsharing/car-service/internal/model"
+	"carsharing/car-service/internal/service/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

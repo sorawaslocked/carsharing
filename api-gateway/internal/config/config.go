@@ -4,11 +4,11 @@ import (
 	"flag"
 	"os"
 
+	pkggrpc "carsharing/api-gateway/internal/pkg/grpc"
+	pkgjwt "carsharing/api-gateway/internal/pkg/jwt"
+	pkgnats "carsharing/api-gateway/internal/pkg/nats"
+	pkgredis "carsharing/api-gateway/internal/pkg/redis"
 	"github.com/ilyakaznacheev/cleanenv"
-	pkggrpc "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/grpc"
-	pkgjwt "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/jwt"
-	pkgnats "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/nats"
-	pkgredis "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/redis"
 )
 
 type (

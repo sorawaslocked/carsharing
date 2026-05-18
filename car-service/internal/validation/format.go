@@ -1,9 +1,9 @@
 package validation
 
 import (
+	"carsharing/car-service/internal/pkg/utils"
 	"errors"
 	"fmt"
-	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/utils"
 
 	"github.com/go-playground/validator/v10"
 )

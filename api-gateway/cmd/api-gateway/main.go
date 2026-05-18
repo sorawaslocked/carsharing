@@ -18,11 +18,11 @@
 package main
 
 import (
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/app"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/config"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
+	"carsharing/api-gateway/internal/app"
+	"carsharing/api-gateway/internal/config"
+	"carsharing/api-gateway/internal/pkg/log"
 
-	_ "github.com/sorawaslocked/car-rental-api-gateway/docs"
+	_ "carsharing/api-gateway/docs"
 )
 
 func main() {

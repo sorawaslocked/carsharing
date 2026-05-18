@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
+	"carsharing/car-service/internal/model"
 )
 
 type zoneRow struct {

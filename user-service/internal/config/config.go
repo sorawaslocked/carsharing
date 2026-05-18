@@ -4,13 +4,13 @@ import (
 	"flag"
 	"os"
 
+	brevocfg "carsharing/user-service/internal/pkg/brevo"
+	grpccfg "carsharing/user-service/internal/pkg/grpc"
+	miniocfg "carsharing/user-service/internal/pkg/minio"
+	natscfg "carsharing/user-service/internal/pkg/nats"
+	"carsharing/user-service/internal/pkg/postgres"
+	"carsharing/user-service/internal/pkg/redis"
 	"github.com/ilyakaznacheev/cleanenv"
-	brevocfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/brevo"
-	grpccfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/grpc"
-	miniocfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/minio"
-	natscfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/nats"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/postgres"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/redis"
 )
 
 type Config struct {

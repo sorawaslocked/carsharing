@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
+	"carsharing/car-service/internal/model"
 )
 
 type TelematicsSubscriber interface {

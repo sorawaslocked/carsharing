@@ -9,11 +9,11 @@ import (
 	"net/url"
 	"time"
 
+	"carsharing/user-service/internal/model"
+	pkglog "carsharing/user-service/internal/pkg/log"
+	miniocfg "carsharing/user-service/internal/pkg/minio"
+	"carsharing/user-service/internal/pkg/utils"
 	"github.com/minio/minio-go/v7"
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
-	miniocfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/minio"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/utils"
 )
 
 type MinioObjectStorage struct {

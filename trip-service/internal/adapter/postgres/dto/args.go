@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
+	"carsharing/trip-service/internal/model"
 )
 
 type ArgsBuilder struct {

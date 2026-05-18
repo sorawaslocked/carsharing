@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
+	"carsharing/car-service/internal/model"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 )
 

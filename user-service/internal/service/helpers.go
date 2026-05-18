@@ -3,9 +3,9 @@ package service
 import (
 	"strings"
 
+	"carsharing/user-service/internal/model"
+	"carsharing/user-service/internal/pkg/utils"
 	"context"
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/utils"
 )
 
 func uncapitalize(s string) string {

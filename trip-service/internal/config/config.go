@@ -6,9 +6,9 @@ import (
 
 	"github.com/ilyakaznacheev/cleanenv"
 
-	pkggrpc "github.com/sorawaslocked/car-rental-trip-service/internal/pkg/grpc"
-	pkgnats "github.com/sorawaslocked/car-rental-trip-service/internal/pkg/nats"
-	pkgpostgres "github.com/sorawaslocked/car-rental-trip-service/internal/pkg/postgres"
+	pkggrpc "carsharing/trip-service/internal/pkg/grpc"
+	pkgnats "carsharing/trip-service/internal/pkg/nats"
+	pkgpostgres "carsharing/trip-service/internal/pkg/postgres"
 )
 
 type Config struct {

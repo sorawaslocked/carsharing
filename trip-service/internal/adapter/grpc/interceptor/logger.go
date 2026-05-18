@@ -7,8 +7,8 @@ import (
 
 	"google.golang.org/grpc"
 
-	pkglog "github.com/sorawaslocked/car-rental-trip-service/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/pkg/utils"
+	pkglog "carsharing/trip-service/internal/pkg/log"
+	"carsharing/trip-service/internal/pkg/utils"
 )
 
 func LoggerUnaryInterceptor(log *slog.Logger) grpc.UnaryServerInterceptor {

@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-car-service/internal/pkg/log"
+	"carsharing/car-service/internal/model"
+	pkglog "carsharing/car-service/internal/pkg/log"
 )
 
 const telematicsReconnectDelay = 5 * time.Second

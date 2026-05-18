@@ -7,8 +7,8 @@
 package booking
 
 import (
-	base "github.com/sorawaslocked/car-rental-protos/gen/base"
-	booking "github.com/sorawaslocked/car-rental-protos/gen/base/booking"
+	base "carsharing/protos/gen/base"
+	booking "carsharing/protos/gen/base/booking"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"

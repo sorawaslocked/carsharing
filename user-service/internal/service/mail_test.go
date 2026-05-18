@@ -3,7 +3,7 @@ package service_test
 import (
 	"testing"
 
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
+	"carsharing/user-service/internal/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"

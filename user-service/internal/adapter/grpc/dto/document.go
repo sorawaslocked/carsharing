@@ -3,10 +3,10 @@ package dto
 import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"carsharing/user-service/internal/model"
 	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
 	baseuserpb "github.com/sorawaslocked/car-rental-protos/gen/base/user"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 )
 
 func FromCreateDocumentRequest(req *usersvc.CreateDocumentRequest) (objectKey string, imageType model.ImageType, err error) {

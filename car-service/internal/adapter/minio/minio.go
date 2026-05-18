@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"time"
 
+	"carsharing/car-service/internal/model"
 	"github.com/minio/minio-go/v7"
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
 )
 
 const presignedURLTTL = 15 * time.Minute

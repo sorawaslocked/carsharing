@@ -4,7 +4,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/sorawaslocked/car-rental-trip-service/internal/adapter/grpc/interceptor"
+	"carsharing/trip-service/internal/adapter/grpc/interceptor"
 )
 
 type ServerConfig struct {

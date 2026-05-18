@@ -4,8 +4,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
+	"carsharing/telematics-service/internal/handler"
 	telematicspb "github.com/sorawaslocked/car-rental-protos/gen/service/telematics"
-	"github.com/sorawaslocked/car-rental-telematics/internal/handler"
 )
 
 // NewGRPCServer creates a gRPC server with the telematics streaming service registered.

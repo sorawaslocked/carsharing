@@ -6,10 +6,10 @@ import (
 	"log/slog"
 	"testing"
 
+	"carsharing/car-service/internal/model"
+	"carsharing/car-service/internal/service/mocks"
+	"carsharing/car-service/internal/validation"
 	"github.com/go-playground/validator/v10"
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
-	"github.com/sorawaslocked/car-rental-car-service/internal/service/mocks"
-	"github.com/sorawaslocked/car-rental-car-service/internal/validation"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

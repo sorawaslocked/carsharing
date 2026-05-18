@@ -1,8 +1,8 @@
 package interceptor
 
 import (
+	"carsharing/trip-service/internal/model"
 	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
 )
 
 // tripManagerRoles — roles that may view status history for any trip.

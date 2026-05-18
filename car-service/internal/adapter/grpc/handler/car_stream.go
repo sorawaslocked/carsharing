@@ -4,8 +4,8 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/sorawaslocked/car-rental-car-service/internal/adapter/grpc/dto"
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
+	"carsharing/car-service/internal/adapter/grpc/dto"
+	"carsharing/car-service/internal/model"
 
 	"github.com/sorawaslocked/car-rental-protos/gen/base"
 	basecar "github.com/sorawaslocked/car-rental-protos/gen/base/car"

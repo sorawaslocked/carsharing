@@ -5,10 +5,10 @@ import (
 	"log/slog"
 	"time"
 
+	"carsharing/booking-service/internal/model"
+	pkglog "carsharing/booking-service/internal/pkg/log"
+	"carsharing/booking-service/internal/pkg/utils"
 	natsgo "github.com/nats-io/nats.go"
-	"github.com/sorawaslocked/car-rental-booking-service/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-booking-service/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-booking-service/internal/pkg/utils"
 	eventbookingpb "github.com/sorawaslocked/car-rental-protos/gen/event/booking"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"

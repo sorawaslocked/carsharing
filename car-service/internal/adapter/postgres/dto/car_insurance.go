@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"carsharing/car-service/internal/model"
 	"github.com/lib/pq"
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
 )
 
 type carInsuranceRow struct {

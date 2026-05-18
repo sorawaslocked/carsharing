@@ -1,8 +1,8 @@
 package grpc
 
 import (
-	"github.com/sorawaslocked/car-rental-booking-service/internal/adapter/grpc/handler"
-	"github.com/sorawaslocked/car-rental-booking-service/internal/adapter/grpc/interceptor"
+	"carsharing/booking-service/internal/adapter/grpc/handler"
+	"carsharing/booking-service/internal/adapter/grpc/interceptor"
 	servicebookingpb "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"

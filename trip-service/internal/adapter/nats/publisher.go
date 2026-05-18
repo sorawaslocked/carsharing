@@ -10,8 +10,8 @@ import (
 
 	eventtripmb "github.com/sorawaslocked/car-rental-protos/gen/event/trip"
 
-	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-trip-service/internal/pkg/log"
+	"carsharing/trip-service/internal/model"
+	pkglog "carsharing/trip-service/internal/pkg/log"
 )
 
 const (

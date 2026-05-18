@@ -4,9 +4,9 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/sorawaslocked/car-rental-booking-service/internal/adapter/grpc/dto"
-	pkglog "github.com/sorawaslocked/car-rental-booking-service/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-booking-service/internal/pkg/utils"
+	"carsharing/booking-service/internal/adapter/grpc/dto"
+	pkglog "carsharing/booking-service/internal/pkg/log"
+	"carsharing/booking-service/internal/pkg/utils"
 	basebookingpb "github.com/sorawaslocked/car-rental-protos/gen/base/booking"
 	servicebookingpb "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 	"google.golang.org/protobuf/types/known/emptypb"

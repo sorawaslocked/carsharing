@@ -15,7 +15,7 @@ import (
 	protosvc "github.com/sorawaslocked/car-rental-protos/gen/service"
 	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
 
-	pkglog "github.com/sorawaslocked/car-rental-trip-service/internal/pkg/log"
+	pkglog "carsharing/trip-service/internal/pkg/log"
 )
 
 const depCheckTimeout = 3 * time.Second

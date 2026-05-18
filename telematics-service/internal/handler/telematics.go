@@ -10,9 +10,9 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"carsharing/telematics-service/internal/db"
+	"carsharing/telematics-service/internal/service"
 	telematicspb "github.com/sorawaslocked/car-rental-protos/gen/service/telematics"
-	"github.com/sorawaslocked/car-rental-telematics/internal/db"
-	"github.com/sorawaslocked/car-rental-telematics/internal/service"
 )
 
 type TelematicsHandler struct {

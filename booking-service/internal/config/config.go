@@ -4,10 +4,10 @@ import (
 	"flag"
 	"os"
 
+	pkggrpc "carsharing/booking-service/internal/pkg/grpc"
+	pkgnats "carsharing/booking-service/internal/pkg/nats"
+	pkgpostgres "carsharing/booking-service/internal/pkg/postgres"
 	"github.com/ilyakaznacheev/cleanenv"
-	pkggrpc "github.com/sorawaslocked/car-rental-booking-service/internal/pkg/grpc"
-	pkgnats "github.com/sorawaslocked/car-rental-booking-service/internal/pkg/nats"
-	pkgpostgres "github.com/sorawaslocked/car-rental-booking-service/internal/pkg/postgres"
 )
 
 type Config struct {

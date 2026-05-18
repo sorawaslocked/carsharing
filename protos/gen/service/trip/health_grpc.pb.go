@@ -7,8 +7,8 @@
 package trip
 
 import (
+	service "carsharing/protos/gen/service"
 	context "context"
-	service "github.com/sorawaslocked/car-rental-protos/gen/service"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"

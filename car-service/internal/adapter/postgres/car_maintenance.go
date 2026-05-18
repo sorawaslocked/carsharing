@@ -7,11 +7,11 @@ import (
 	"log/slog"
 	"strings"
 
+	"carsharing/car-service/internal/adapter/postgres/dto"
+	"carsharing/car-service/internal/model"
+	pkglog "carsharing/car-service/internal/pkg/log"
+	"carsharing/car-service/internal/pkg/utils"
 	"github.com/lib/pq"
-	"github.com/sorawaslocked/car-rental-car-service/internal/adapter/postgres/dto"
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-car-service/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/utils"
 )
 
 // --- CarMaintenanceTemplateRepository ---

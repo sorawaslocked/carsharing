@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
+	"carsharing/user-service/internal/model"
 )
 
 type DocumentService interface {

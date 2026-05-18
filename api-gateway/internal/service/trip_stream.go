@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
+	"carsharing/api-gateway/internal/model"
 )
 
 func (s *TripService) StreamTripLiveFeed(ctx context.Context, tripID string, send func(model.TripLiveFeed) error) error {

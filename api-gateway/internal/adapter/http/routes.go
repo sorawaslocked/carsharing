@@ -1,10 +1,10 @@
 package http
 
 import (
+	_ "carsharing/api-gateway/docs"
+	"carsharing/api-gateway/internal/adapter/http/middleware"
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
-	_ "github.com/sorawaslocked/car-rental-api-gateway/docs"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/middleware"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )

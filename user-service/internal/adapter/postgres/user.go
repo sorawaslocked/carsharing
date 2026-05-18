@@ -8,11 +8,11 @@ import (
 	"log/slog"
 	"strings"
 
+	pgdto "carsharing/user-service/internal/adapter/postgres/dto"
+	"carsharing/user-service/internal/model"
+	pkglog "carsharing/user-service/internal/pkg/log"
+	"carsharing/user-service/internal/pkg/utils"
 	"github.com/lib/pq"
-	pgdto "github.com/sorawaslocked/car-rental-user-service/internal/adapter/postgres/dto"
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/utils"
 )
 
 type UserRepository struct {

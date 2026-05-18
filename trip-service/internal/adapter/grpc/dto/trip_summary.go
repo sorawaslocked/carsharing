@@ -6,7 +6,7 @@ import (
 	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
 	basetripmb "github.com/sorawaslocked/car-rental-protos/gen/base/trip"
 
-	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
+	"carsharing/trip-service/internal/model"
 )
 
 func TripSummaryToProto(s model.TripSummary) *basetripmb.TripSummary {

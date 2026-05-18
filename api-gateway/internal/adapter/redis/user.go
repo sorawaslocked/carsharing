@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"log/slog"
 
+	"carsharing/api-gateway/internal/model"
+	"carsharing/api-gateway/internal/pkg/log"
+	rediscfg "carsharing/api-gateway/internal/pkg/redis"
+	"carsharing/api-gateway/internal/pkg/utils"
 	"github.com/redis/go-redis/v9"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
-	rediscfg "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/redis"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/utils"
 )
 
 type UserCache struct {

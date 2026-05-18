@@ -5,9 +5,9 @@ import (
 	"errors"
 	"log/slog"
 
+	"carsharing/trip-service/internal/model"
+	pkglog "carsharing/trip-service/internal/pkg/log"
 	"github.com/lib/pq"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-trip-service/internal/pkg/log"
 )
 
 func mapSQLError(log *slog.Logger, err error, msg string) error {

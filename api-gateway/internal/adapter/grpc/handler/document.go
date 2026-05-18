@@ -3,10 +3,10 @@ package handler
 import (
 	"context"
 
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/grpc/dto"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/utils"
+	"carsharing/api-gateway/internal/adapter/grpc/dto"
+	"carsharing/api-gateway/internal/model"
+	pkglog "carsharing/api-gateway/internal/pkg/log"
+	"carsharing/api-gateway/internal/pkg/utils"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"google.golang.org/protobuf/types/known/emptypb"
 )

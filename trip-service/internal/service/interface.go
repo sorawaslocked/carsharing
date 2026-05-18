@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
+	"carsharing/trip-service/internal/model"
 )
 
 type TripRepository interface {

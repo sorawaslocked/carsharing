@@ -8,10 +8,10 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
-	brevocfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/brevo"
-	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/utils"
+	"carsharing/user-service/internal/model"
+	brevocfg "carsharing/user-service/internal/pkg/brevo"
+	pkglog "carsharing/user-service/internal/pkg/log"
+	"carsharing/user-service/internal/pkg/utils"
 )
 
 const sendURL = "https://api.brevo.com/v3/smtp/email"

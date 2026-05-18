@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	model "github.com/sorawaslocked/car-rental-car-service/internal/model"
+	model "carsharing/car-service/internal/model"
 	mock "github.com/stretchr/testify/mock"
 )
 

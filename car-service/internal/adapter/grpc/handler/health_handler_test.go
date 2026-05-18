@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/sorawaslocked/car-rental-car-service/internal/adapter/grpc/handler/mocks"
+	"carsharing/car-service/internal/adapter/grpc/handler/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/emptypb"

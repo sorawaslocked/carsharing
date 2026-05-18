@@ -1,6 +1,6 @@
 package dto
 
-import "github.com/sorawaslocked/car-rental-api-gateway/internal/model"
+import "carsharing/api-gateway/internal/model"
 
 type HealthResponse struct {
 	Status   string                  `json:"status"`

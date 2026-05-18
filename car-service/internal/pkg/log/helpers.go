@@ -3,7 +3,7 @@ package log
 import (
 	"log/slog"
 
-	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/utils"
+	"carsharing/car-service/internal/pkg/utils"
 )
 
 func Err(err error) slog.Attr {

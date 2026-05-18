@@ -13,17 +13,17 @@ import (
 	natsio "github.com/nats-io/nats.go"
 	"google.golang.org/grpc"
 
-	grpcserver "github.com/sorawaslocked/car-rental-trip-service/internal/adapter/grpc"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/adapter/grpc/client"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/adapter/grpc/handler"
-	natspub "github.com/sorawaslocked/car-rental-trip-service/internal/adapter/nats"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/adapter/postgres"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/config"
-	pkggrpc "github.com/sorawaslocked/car-rental-trip-service/internal/pkg/grpc"
-	pkglog "github.com/sorawaslocked/car-rental-trip-service/internal/pkg/log"
-	pkgnats "github.com/sorawaslocked/car-rental-trip-service/internal/pkg/nats"
-	pkgpostgres "github.com/sorawaslocked/car-rental-trip-service/internal/pkg/postgres"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/service"
+	grpcserver "carsharing/trip-service/internal/adapter/grpc"
+	"carsharing/trip-service/internal/adapter/grpc/client"
+	"carsharing/trip-service/internal/adapter/grpc/handler"
+	natspub "carsharing/trip-service/internal/adapter/nats"
+	"carsharing/trip-service/internal/adapter/postgres"
+	"carsharing/trip-service/internal/config"
+	pkggrpc "carsharing/trip-service/internal/pkg/grpc"
+	pkglog "carsharing/trip-service/internal/pkg/log"
+	pkgnats "carsharing/trip-service/internal/pkg/nats"
+	pkgpostgres "carsharing/trip-service/internal/pkg/postgres"
+	"carsharing/trip-service/internal/service"
 )
 
 type App struct {

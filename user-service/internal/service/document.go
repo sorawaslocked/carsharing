@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/utils"
+	"carsharing/user-service/internal/model"
+	pkglog "carsharing/user-service/internal/pkg/log"
+	"carsharing/user-service/internal/pkg/utils"
 )
 
 func (s *UserService) CreateDocument(ctx context.Context, objectKey string, imageType model.ImageType) (string, error) {

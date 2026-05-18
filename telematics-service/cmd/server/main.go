@@ -11,12 +11,12 @@ import (
 
 	osrm "github.com/gojuno/go.osrm"
 
-	"github.com/sorawaslocked/car-rental-telematics/internal/config"
-	"github.com/sorawaslocked/car-rental-telematics/internal/db"
-	"github.com/sorawaslocked/car-rental-telematics/internal/handler"
-	natssub "github.com/sorawaslocked/car-rental-telematics/internal/nats"
-	"github.com/sorawaslocked/car-rental-telematics/internal/server"
-	"github.com/sorawaslocked/car-rental-telematics/internal/service"
+	"carsharing/telematics-service/internal/config"
+	"carsharing/telematics-service/internal/db"
+	"carsharing/telematics-service/internal/handler"
+	natssub "carsharing/telematics-service/internal/nats"
+	"carsharing/telematics-service/internal/server"
+	"carsharing/telematics-service/internal/service"
 )
 
 func main() {

@@ -6,10 +6,10 @@ import (
 	"log/slog"
 	"time"
 
+	"carsharing/trip-service/internal/model"
+	pkglog "carsharing/trip-service/internal/pkg/log"
+	"carsharing/trip-service/internal/pkg/utils"
 	"github.com/google/uuid"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-trip-service/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/pkg/utils"
 )
 
 type TripService struct {

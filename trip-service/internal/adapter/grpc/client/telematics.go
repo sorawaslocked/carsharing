@@ -10,9 +10,9 @@ import (
 
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 
-	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-trip-service/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/pkg/utils"
+	"carsharing/trip-service/internal/model"
+	pkglog "carsharing/trip-service/internal/pkg/log"
+	"carsharing/trip-service/internal/pkg/utils"
 )
 
 type TelematicsClient struct {

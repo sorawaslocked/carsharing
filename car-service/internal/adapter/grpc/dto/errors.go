@@ -3,8 +3,8 @@ package dto
 import (
 	"errors"
 
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
-	"github.com/sorawaslocked/car-rental-car-service/internal/validation"
+	"carsharing/car-service/internal/model"
+	"carsharing/car-service/internal/validation"
 
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"

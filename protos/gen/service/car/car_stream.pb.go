@@ -7,8 +7,8 @@
 package car
 
 import (
-	base "github.com/sorawaslocked/car-rental-protos/gen/base"
-	car "github.com/sorawaslocked/car-rental-protos/gen/base/car"
+	base "carsharing/protos/gen/base"
+	car "carsharing/protos/gen/base/car"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"

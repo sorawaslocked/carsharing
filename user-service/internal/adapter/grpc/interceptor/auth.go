@@ -4,11 +4,11 @@ import (
 	"context"
 	"log/slog"
 
+	"carsharing/user-service/internal/adapter/grpc/dto"
+	"carsharing/user-service/internal/model"
+	pkglog "carsharing/user-service/internal/pkg/log"
+	"carsharing/user-service/internal/pkg/utils"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
-	"github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/dto"
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/utils"
 	"google.golang.org/grpc"
 )
 

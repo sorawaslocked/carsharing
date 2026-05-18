@@ -6,7 +6,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
+	"carsharing/trip-service/internal/model"
 )
 
 func ToStatusError(err error) error {

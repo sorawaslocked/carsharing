@@ -1,6 +1,6 @@
 package service
 
-import "github.com/sorawaslocked/car-rental-trip-service/internal/model"
+import "carsharing/trip-service/internal/model"
 
 // calculateCosts breaks down the total fare into base, distance, and overtime components.
 // durationSeconds is the elapsed trip time; distanceKM is the odometer delta.

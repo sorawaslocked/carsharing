@@ -3,8 +3,8 @@ package dto
 import (
 	"strconv"
 
+	"carsharing/api-gateway/internal/model"
 	"github.com/gin-gonic/gin"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )
 
 type location struct {

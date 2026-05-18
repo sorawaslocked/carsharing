@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
+	"carsharing/user-service/internal/model"
 )
 
 func validationError(ve model.ValidationErrors) error {

@@ -7,8 +7,8 @@
 package trip
 
 import (
-	base "github.com/sorawaslocked/car-rental-protos/gen/base"
-	trip "github.com/sorawaslocked/car-rental-protos/gen/base/trip"
+	base "carsharing/protos/gen/base"
+	trip "carsharing/protos/gen/base/trip"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"

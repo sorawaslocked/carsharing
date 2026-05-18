@@ -1,9 +1,9 @@
 package middleware
 
 import (
+	"carsharing/api-gateway/internal/adapter/http/dto"
+	"carsharing/api-gateway/internal/model"
 	"github.com/gin-gonic/gin"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/dto"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )
 
 func DocumentVerificationChecker() gin.HandlerFunc {

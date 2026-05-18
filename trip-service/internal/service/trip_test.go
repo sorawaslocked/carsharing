@@ -13,10 +13,10 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/pkg/utils"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/service"
-	svcmocks "github.com/sorawaslocked/car-rental-trip-service/internal/service/mocks"
+	"carsharing/trip-service/internal/model"
+	"carsharing/trip-service/internal/pkg/utils"
+	"carsharing/trip-service/internal/service"
+	svcmocks "carsharing/trip-service/internal/service/mocks"
 )
 
 // ── helpers ──────────────────────────────────────────────────────────────────

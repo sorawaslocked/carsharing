@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log/slog"
 
+	"carsharing/telematics-service/internal/service"
 	"github.com/nats-io/nats.go"
 	tripevent "github.com/sorawaslocked/car-rental-protos/gen/event/trip"
-	"github.com/sorawaslocked/car-rental-telematics/internal/service"
 	"google.golang.org/protobuf/proto"
 )
 

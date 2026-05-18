@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-car-service/internal/pkg/log"
+	"carsharing/car-service/internal/model"
+	pkglog "carsharing/car-service/internal/pkg/log"
 	telematicspb "github.com/sorawaslocked/car-rental-protos/gen/service/telematics"
 	"google.golang.org/grpc"
 )

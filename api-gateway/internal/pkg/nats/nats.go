@@ -3,8 +3,8 @@ package nats
 import (
 	"log/slog"
 
+	pkglog "carsharing/api-gateway/internal/pkg/log"
 	nc "github.com/nats-io/nats.go"
-	pkglog "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
 )
 
 type Config struct {

@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"time"
 
+	"carsharing/api-gateway/internal/pkg/log"
 	"github.com/redis/go-redis/v9"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
 )
 
 type Config struct {

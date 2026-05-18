@@ -3,8 +3,8 @@ package service
 import (
 	"errors"
 
+	"carsharing/user-service/internal/model"
 	"github.com/go-playground/validator/v10"
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 )
 
 type activationCodeValidation struct {

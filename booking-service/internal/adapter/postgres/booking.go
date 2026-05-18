@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sorawaslocked/car-rental-booking-service/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-booking-service/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-booking-service/internal/pkg/utils"
+	"carsharing/booking-service/internal/model"
+	pkglog "carsharing/booking-service/internal/pkg/log"
+	"carsharing/booking-service/internal/pkg/utils"
 )
 
 type pricingSnapshotJSON struct {

@@ -3,8 +3,8 @@ package service
 import (
 	"fmt"
 
+	"carsharing/user-service/internal/model"
 	"github.com/go-playground/validator/v10"
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
 )
 
 func validationError(fieldErr validator.FieldError) error {

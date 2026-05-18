@@ -3,10 +3,10 @@ package handler
 import (
 	"net/http"
 
+	"carsharing/api-gateway/internal/adapter/http/dto"
+	"carsharing/api-gateway/internal/config"
+	"carsharing/api-gateway/internal/model"
 	"github.com/gin-gonic/gin"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/dto"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/config"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )
 
 type UserHandler struct {

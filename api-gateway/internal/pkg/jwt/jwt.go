@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"time"
 
+	pkglog "carsharing/api-gateway/internal/pkg/log"
 	"github.com/golang-jwt/jwt/v5"
-	pkglog "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
 )
 
 type Config struct {

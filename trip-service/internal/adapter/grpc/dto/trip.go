@@ -9,7 +9,7 @@ import (
 	basetripmb "github.com/sorawaslocked/car-rental-protos/gen/base/trip"
 	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
 
-	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
+	"carsharing/trip-service/internal/model"
 )
 
 func TripToProto(t model.Trip) *basetripmb.Trip {

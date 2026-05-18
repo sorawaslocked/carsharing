@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
+	"carsharing/trip-service/internal/model"
 )
 
 const TripColumns = `

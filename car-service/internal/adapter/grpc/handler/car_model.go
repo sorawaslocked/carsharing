@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/sorawaslocked/car-rental-car-service/internal/adapter/grpc/dto"
+	"carsharing/car-service/internal/adapter/grpc/dto"
 
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"google.golang.org/protobuf/types/known/emptypb"

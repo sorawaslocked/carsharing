@@ -1,4 +1,4 @@
-module github.com/sorawaslocked/car-rental-telematics
+module carsharing/telematics-service
 
 go 1.26
 

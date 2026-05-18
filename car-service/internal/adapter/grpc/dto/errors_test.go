@@ -4,9 +4,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/sorawaslocked/car-rental-car-service/internal/adapter/grpc/dto"
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
-	"github.com/sorawaslocked/car-rental-car-service/internal/validation"
+	"carsharing/car-service/internal/adapter/grpc/dto"
+	"carsharing/car-service/internal/model"
+	"carsharing/car-service/internal/validation"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

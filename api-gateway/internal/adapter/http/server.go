@@ -7,10 +7,10 @@ import (
 	"log/slog"
 	"net/http"
 
+	"carsharing/api-gateway/internal/adapter/http/handler"
+	wshandler "carsharing/api-gateway/internal/adapter/websocket/handler"
+	"carsharing/api-gateway/internal/config"
 	"github.com/gin-gonic/gin"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/handler"
-	wshandler "github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/websocket/handler"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/config"
 )
 
 type Server struct {

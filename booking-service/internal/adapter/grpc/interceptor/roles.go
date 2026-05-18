@@ -1,7 +1,7 @@
 package interceptor
 
 import (
-	"github.com/sorawaslocked/car-rental-booking-service/internal/model"
+	"carsharing/booking-service/internal/model"
 	bookingpb "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 )
 

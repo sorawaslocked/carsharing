@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
+	"carsharing/api-gateway/internal/model"
 )
 
 type UserEventHandler interface {

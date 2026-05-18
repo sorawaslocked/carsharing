@@ -11,17 +11,18 @@ import (
 	"syscall"
 	"time"
 
+	grpcadapter "carsharing/booking-service/internal/adapter/grpc"
+	"carsharing/booking-service/internal/adapter/grpc/handler"
+	"carsharing/booking-service/internal/adapter/grpc/interceptor"
+	natsadapter "carsharing/booking-service/internal/adapter/nats"
+	"carsharing/booking-service/internal/adapter/postgres"
+	"carsharing/booking-service/internal/config"
+	pkglog "carsharing/booking-service/internal/pkg/log"
+	pkgnats "carsharing/booking-service/internal/pkg/nats"
+	pkgpostgres "carsharing/booking-service/internal/pkg/postgres"
+	"carsharing/booking-service/internal/service"
+
 	natsgo "github.com/nats-io/nats.go"
-	grpcadapter "github.com/sorawaslocked/car-rental-booking-service/internal/adapter/grpc"
-	"github.com/sorawaslocked/car-rental-booking-service/internal/adapter/grpc/handler"
-	"github.com/sorawaslocked/car-rental-booking-service/internal/adapter/grpc/interceptor"
-	natsadapter "github.com/sorawaslocked/car-rental-booking-service/internal/adapter/nats"
-	"github.com/sorawaslocked/car-rental-booking-service/internal/adapter/postgres"
-	"github.com/sorawaslocked/car-rental-booking-service/internal/config"
-	pkglog "github.com/sorawaslocked/car-rental-booking-service/internal/pkg/log"
-	pkgnats "github.com/sorawaslocked/car-rental-booking-service/internal/pkg/nats"
-	pkgpostgres "github.com/sorawaslocked/car-rental-booking-service/internal/pkg/postgres"
-	"github.com/sorawaslocked/car-rental-booking-service/internal/service"
 	"google.golang.org/grpc"
 )
 

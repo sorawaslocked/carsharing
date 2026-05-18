@@ -1,4 +1,4 @@
-module github.com/sorawaslocked/car-rental-car-service
+module carsharing/car-service
 
 go 1.26
 

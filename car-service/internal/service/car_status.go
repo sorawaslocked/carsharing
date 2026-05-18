@@ -1,6 +1,6 @@
 package service
 
-import "github.com/sorawaslocked/car-rental-car-service/internal/model"
+import "carsharing/car-service/internal/model"
 
 var allowedCarStatusTransitions = map[model.CarStatus][]model.CarStatus{
 	model.CarStatusAvailable:    {model.CarStatusReserved, model.CarStatusMaintenance, model.CarStatusOutOfService},

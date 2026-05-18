@@ -3,9 +3,9 @@ package dto
 import (
 	"net/http"
 
+	"carsharing/api-gateway/internal/model"
+	"carsharing/api-gateway/internal/pkg/jwt"
 	"github.com/gin-gonic/gin"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/jwt"
 )
 
 func Ok(ctx *gin.Context, body any) {

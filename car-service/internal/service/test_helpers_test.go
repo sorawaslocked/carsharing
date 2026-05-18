@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"testing"
 
+	"carsharing/car-service/internal/validation"
 	"github.com/go-playground/validator/v10"
-	"github.com/sorawaslocked/car-rental-car-service/internal/validation"
 )
 
 func newTestValidator(t *testing.T) *validator.Validate {

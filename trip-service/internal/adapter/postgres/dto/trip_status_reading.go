@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
+	"carsharing/trip-service/internal/model"
 )
 
 type statusReadingRow struct {

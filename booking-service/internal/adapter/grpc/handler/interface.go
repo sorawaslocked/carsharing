@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 
-	"github.com/sorawaslocked/car-rental-booking-service/internal/model"
+	"carsharing/booking-service/internal/model"
 )
 
 type BookingService interface {

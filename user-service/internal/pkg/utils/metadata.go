@@ -3,7 +3,7 @@ package utils
 import (
 	"context"
 
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
+	"carsharing/user-service/internal/model"
 )
 
 const (

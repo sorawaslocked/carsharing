@@ -8,8 +8,8 @@ import (
 
 	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
 
-	"github.com/sorawaslocked/car-rental-trip-service/internal/adapter/grpc/handler"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/adapter/grpc/interceptor"
+	"carsharing/trip-service/internal/adapter/grpc/handler"
+	"carsharing/trip-service/internal/adapter/grpc/interceptor"
 )
 
 func NewServer(

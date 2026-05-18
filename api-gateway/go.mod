@@ -1,4 +1,4 @@
-module github.com/sorawaslocked/car-rental-api-gateway
+module carsharing/api-gateway
 
 go 1.25.0
 

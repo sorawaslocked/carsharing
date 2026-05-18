@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"github.com/sorawaslocked/car-rental-booking-service/internal/model"
+	"carsharing/booking-service/internal/model"
 	basebookingpb "github.com/sorawaslocked/car-rental-protos/gen/base/booking"
 	servicebookingpb "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 	"google.golang.org/protobuf/types/known/timestamppb"

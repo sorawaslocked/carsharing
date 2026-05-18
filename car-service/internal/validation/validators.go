@@ -1,7 +1,7 @@
 package validation
 
 import (
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
+	"carsharing/car-service/internal/model"
 
 	"github.com/go-playground/validator/v10"
 )

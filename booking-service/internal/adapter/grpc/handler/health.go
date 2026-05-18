@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"log/slog"
 
+	pkglog "carsharing/booking-service/internal/pkg/log"
 	natsgo "github.com/nats-io/nats.go"
-	pkglog "github.com/sorawaslocked/car-rental-booking-service/internal/pkg/log"
 	servicepb "github.com/sorawaslocked/car-rental-protos/gen/service"
 	servicebookingpb "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 	"google.golang.org/protobuf/types/known/emptypb"

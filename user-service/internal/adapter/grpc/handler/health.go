@@ -5,9 +5,9 @@ import (
 	"log/slog"
 	"time"
 
+	pkglog "carsharing/user-service/internal/pkg/log"
 	servicepb "github.com/sorawaslocked/car-rental-protos/gen/service"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
-	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

@@ -17,9 +17,9 @@ import (
 
 	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
 
-	"github.com/sorawaslocked/car-rental-trip-service/internal/adapter/grpc/handler"
-	handlermocks "github.com/sorawaslocked/car-rental-trip-service/internal/adapter/grpc/handler/mocks"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
+	"carsharing/trip-service/internal/adapter/grpc/handler"
+	handlermocks "carsharing/trip-service/internal/adapter/grpc/handler/mocks"
+	"carsharing/trip-service/internal/model"
 )
 
 // ── helpers ───────────────────────────────────────────────────────────────────

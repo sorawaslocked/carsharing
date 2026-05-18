@@ -9,10 +9,10 @@ import (
 	basebookingpb "github.com/sorawaslocked/car-rental-protos/gen/base/booking"
 	bookingsvc "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 
-	"github.com/sorawaslocked/car-rental-trip-service/internal/adapter/grpc/dto"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-trip-service/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-trip-service/internal/pkg/utils"
+	"carsharing/trip-service/internal/adapter/grpc/dto"
+	"carsharing/trip-service/internal/model"
+	pkglog "carsharing/trip-service/internal/pkg/log"
+	"carsharing/trip-service/internal/pkg/utils"
 )
 
 type BookingClient struct {

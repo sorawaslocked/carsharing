@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
+	"carsharing/car-service/internal/model"
 )
 
 type contextKey string

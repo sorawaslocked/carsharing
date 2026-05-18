@@ -1,8 +1,8 @@
 package handler
 
 import (
+	"carsharing/api-gateway/internal/adapter/http/dto"
 	"github.com/gin-gonic/gin"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/dto"
 )
 
 // CreateDocument godoc

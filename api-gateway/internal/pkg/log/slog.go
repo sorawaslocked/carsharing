@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log/pretty"
+	"carsharing/api-gateway/internal/pkg/log/pretty"
 )
 
 const (

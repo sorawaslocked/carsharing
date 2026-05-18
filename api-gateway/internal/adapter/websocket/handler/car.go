@@ -3,14 +3,14 @@ package handler
 import (
 	"log/slog"
 
+	httpdto "carsharing/api-gateway/internal/adapter/http/dto"
+	wsdto "carsharing/api-gateway/internal/adapter/websocket/dto"
+	"carsharing/api-gateway/internal/model"
+	pkglog "carsharing/api-gateway/internal/pkg/log"
+	"carsharing/api-gateway/internal/pkg/utils"
 	"github.com/coder/websocket"
 	"github.com/coder/websocket/wsjson"
 	"github.com/gin-gonic/gin"
-	httpdto "github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/http/dto"
-	wsdto "github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/websocket/dto"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/utils"
 )
 
 type CarWsHandler struct {

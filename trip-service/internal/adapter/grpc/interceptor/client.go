@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/sorawaslocked/car-rental-trip-service/internal/pkg/utils"
+	"carsharing/trip-service/internal/pkg/utils"
 )
 
 func MetadataForwardingUnaryInterceptor(ctx context.Context, method string, req, reply any, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {

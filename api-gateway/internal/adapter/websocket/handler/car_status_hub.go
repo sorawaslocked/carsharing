@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
+	"carsharing/api-gateway/internal/model"
 )
 
 // CarStatusHub routes CarStatusUpdated events to waiting WebSocket connections

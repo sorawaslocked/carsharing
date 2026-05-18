@@ -3,7 +3,7 @@ package dto
 import (
 	"fmt"
 
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
+	"carsharing/user-service/internal/model"
 )
 
 // WhereClausesFromFilter builds parameterised WHERE clauses from a UserFilter.

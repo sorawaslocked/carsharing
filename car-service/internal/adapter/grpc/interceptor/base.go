@@ -3,9 +3,9 @@ package interceptor
 import (
 	"context"
 
-	"github.com/sorawaslocked/car-rental-car-service/internal/adapter/grpc/dto"
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
-	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/utils"
+	"carsharing/car-service/internal/adapter/grpc/dto"
+	"carsharing/car-service/internal/model"
+	"carsharing/car-service/internal/pkg/utils"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"

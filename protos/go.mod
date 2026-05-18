@@ -1,4 +1,4 @@
-module github.com/sorawaslocked/car-rental-protos
+module carsharing/protos
 
 go 1.24.0
 

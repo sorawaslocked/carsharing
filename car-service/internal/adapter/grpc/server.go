@@ -3,9 +3,9 @@ package grpc
 import (
 	"log/slog"
 
-	"github.com/sorawaslocked/car-rental-car-service/internal/adapter/grpc/handler"
-	"github.com/sorawaslocked/car-rental-car-service/internal/adapter/grpc/interceptor"
-	authinterceptor "github.com/sorawaslocked/car-rental-car-service/internal/adapter/grpc/interceptor/auth"
+	"carsharing/car-service/internal/adapter/grpc/handler"
+	"carsharing/car-service/internal/adapter/grpc/interceptor"
+	authinterceptor "carsharing/car-service/internal/adapter/grpc/interceptor/auth"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"

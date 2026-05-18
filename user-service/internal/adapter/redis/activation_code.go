@@ -7,9 +7,9 @@ import (
 	"errors"
 	"fmt"
 
+	"carsharing/user-service/internal/model"
+	"carsharing/user-service/internal/pkg/security"
 	"github.com/redis/go-redis/v9"
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/security"
 	"time"
 )
 

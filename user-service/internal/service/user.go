@@ -6,11 +6,11 @@ import (
 	"log/slog"
 	"time"
 
+	"carsharing/user-service/internal/model"
+	pkglog "carsharing/user-service/internal/pkg/log"
+	"carsharing/user-service/internal/pkg/security"
+	"carsharing/user-service/internal/pkg/utils"
 	"github.com/go-playground/validator/v10"
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/security"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/utils"
 )
 
 type UserService struct {

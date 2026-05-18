@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/sorawaslocked/car-rental-user-service/internal/app"
-	"github.com/sorawaslocked/car-rental-user-service/internal/config"
-	pkglog "github.com/sorawaslocked/car-rental-user-service/internal/pkg/log"
+	"carsharing/user-service/internal/app"
+	"carsharing/user-service/internal/config"
+	pkglog "carsharing/user-service/internal/pkg/log"
 )
 
 func main() {

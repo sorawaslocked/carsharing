@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"time"
 
+	"carsharing/api-gateway/internal/model"
 	"github.com/gin-gonic/gin"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
 )
 
 // Response envelope types used in swagger annotations.

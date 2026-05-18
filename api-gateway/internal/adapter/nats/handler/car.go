@@ -4,10 +4,10 @@ import (
 	"context"
 	"log/slog"
 
+	"carsharing/api-gateway/internal/adapter/nats/dto"
+	"carsharing/api-gateway/internal/model"
+	pkglog "carsharing/api-gateway/internal/pkg/log"
 	nc "github.com/nats-io/nats.go"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/nats/dto"
-	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
 	eventcarpb "github.com/sorawaslocked/car-rental-protos/gen/event/car"
 	"google.golang.org/protobuf/proto"
 )

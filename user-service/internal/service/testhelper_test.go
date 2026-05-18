@@ -7,12 +7,12 @@ import (
 	"testing"
 	"time"
 
+	"carsharing/user-service/internal/model"
+	"carsharing/user-service/internal/pkg/security"
+	validatecfg "carsharing/user-service/internal/pkg/validate"
+	"carsharing/user-service/internal/service"
+	"carsharing/user-service/internal/service/mocks"
 	"github.com/go-playground/validator/v10"
-	"github.com/sorawaslocked/car-rental-user-service/internal/model"
-	"github.com/sorawaslocked/car-rental-user-service/internal/pkg/security"
-	validatecfg "github.com/sorawaslocked/car-rental-user-service/internal/pkg/validate"
-	"github.com/sorawaslocked/car-rental-user-service/internal/service"
-	"github.com/sorawaslocked/car-rental-user-service/internal/service/mocks"
 	"github.com/stretchr/testify/require"
 )
 

@@ -1,6 +1,6 @@
 package service
 
-import "github.com/sorawaslocked/car-rental-trip-service/internal/model"
+import "carsharing/trip-service/internal/model"
 
 func validateID(id string) error {
 	if id == "" {

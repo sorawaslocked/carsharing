@@ -5,10 +5,10 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/sorawaslocked/car-rental-car-service/internal/model"
-	pkglog "github.com/sorawaslocked/car-rental-car-service/internal/pkg/log"
-	"github.com/sorawaslocked/car-rental-car-service/internal/pkg/utils"
-	"github.com/sorawaslocked/car-rental-car-service/internal/validation"
+	"carsharing/car-service/internal/model"
+	pkglog "carsharing/car-service/internal/pkg/log"
+	"carsharing/car-service/internal/pkg/utils"
+	"carsharing/car-service/internal/validation"
 
 	"github.com/go-playground/validator/v10"
 )

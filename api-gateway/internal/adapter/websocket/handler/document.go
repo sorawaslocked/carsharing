@@ -4,11 +4,11 @@ import (
 	"log/slog"
 	"net/http"
 
+	wsdto "carsharing/api-gateway/internal/adapter/websocket/dto"
+	pkglog "carsharing/api-gateway/internal/pkg/log"
 	"github.com/coder/websocket"
 	"github.com/coder/websocket/wsjson"
 	"github.com/gin-gonic/gin"
-	wsdto "github.com/sorawaslocked/car-rental-api-gateway/internal/adapter/websocket/dto"
-	pkglog "github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/log"
 )
 
 type UserWsHandler struct {

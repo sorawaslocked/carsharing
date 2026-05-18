@@ -3,7 +3,7 @@ package interceptor
 import (
 	"context"
 
-	"github.com/sorawaslocked/car-rental-booking-service/internal/pkg/utils"
+	"carsharing/booking-service/internal/pkg/utils"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )

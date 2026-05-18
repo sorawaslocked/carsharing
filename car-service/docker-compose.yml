@@ -1,0 +1,33 @@
+services:
+  migrate:
+    container_name: car-service-migrate
+    image: migrate/migrate
+    volumes:
+      - ./migrations:/migrations
+    command:
+      - "-path=/migrations"
+      - "-database=postgres://car_rental:car_rental@car-service-postgres:5432/car_rental?sslmode=disable"
+      - "up"
+    networks:
+      - car-rental-net
+
+  car-service:
+    container_name: car-service
+    build: .
+    ports:
+      - "9998:9998"
+    environment:
+      POSTGRES_PASSWORD: car_rental
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY_ID: minioadmin
+      MINIO_SECRET_ACCESS_KEY: minioadmin
+      NATS_URL: nats://nats:4222
+    networks:
+      - car-rental-net
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+networks:
+  car-rental-net:
+    external: true

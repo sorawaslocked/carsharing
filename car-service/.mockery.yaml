@@ -1,0 +1,33 @@
+with-expecter: true
+resolve-type-alias: false
+disable-version-string: true
+issue-845-fix: true
+packages:
+  github.com/sorawaslocked/car-rental-car-service/internal/service:
+    config:
+      dir: "internal/service/mocks"
+      outpkg: "mocks"
+    interfaces:
+      CarRepository:
+      CarStatusLogRepository:
+      CarModelRepository:
+      ZoneRepository:
+      CarInsuranceRepository:
+      CarMaintenanceTemplateRepository:
+      CarMaintenanceRecordRepository:
+      CarServiceStateRepository:
+      ObjectStorage:
+      EventPublisher:
+  github.com/sorawaslocked/car-rental-car-service/internal/adapter/grpc/handler:
+    config:
+      dir: "internal/adapter/grpc/handler/mocks"
+      outpkg: "mocks"
+    interfaces:
+      CarModelService:
+      CarService:
+      CarInsuranceService:
+      CarMaintenanceService:
+      ZoneService:
+      DBPinger:
+      NATSChecker:
+      TelematicsSubscriber:

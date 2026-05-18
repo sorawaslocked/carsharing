@@ -1,0 +1,20 @@
+with-expecter: true
+resolve-type-alias: false
+disable-version-string: true
+issue-845-fix: true
+packages:
+  github.com/sorawaslocked/car-rental-booking-service/internal/service:
+    interfaces:
+      BookingRepository:
+      PricingRuleRepository:
+      EventPublisher:
+    config:
+      dir: internal/service/mocks
+      outpkg: mocks
+  github.com/sorawaslocked/car-rental-booking-service/internal/adapter/grpc/handler:
+    interfaces:
+      BookingService:
+      PricingRuleService:
+    config:
+      dir: internal/adapter/grpc/handler/mocks
+      outpkg: mocks

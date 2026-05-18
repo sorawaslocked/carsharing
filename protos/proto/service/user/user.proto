@@ -1,0 +1,160 @@
+syntax = "proto3";
+
+package service.user;
+
+import "base/user/user.proto";
+import "base/common.proto";
+import "google/protobuf/empty.proto";
+import "service/common.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/user";
+
+service UserService {
+  rpc Health(google.protobuf.Empty) returns (ServiceHealthResponse);
+
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (google.protobuf.Empty);
+  rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty);
+  rpc GetProfileImageUploadData(google.protobuf.Empty) returns (GetProfileImageUploadDataResponse);
+
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc SignIn(SignInRequest) returns (SignInResponse);
+
+  rpc SendActivationCode(google.protobuf.Empty) returns (google.protobuf.Empty);
+  rpc CheckActivationCode(CheckActivationCodeRequest) returns (google.protobuf.Empty);
+
+  rpc CreateDocument(CreateDocumentRequest) returns (CreateDocumentResponse);
+  rpc GetUploadDocumentData(GetUploadDocumentDataRequest) returns (GetUploadDocumentDataResponse);
+  rpc GetProcessedDocumentsForUser(GetProcessedDocumentsForUserRequest) returns (GetProcessedDocumentsForUserResponse);
+  rpc CheckDocument(CheckDocumentRequest) returns (google.protobuf.Empty);
+}
+
+// CRUD
+message CreateUserRequest {
+  string email = 1;
+  optional string phone_number = 2;
+  string first_name = 3;
+  string last_name = 4;
+  string birth_date = 5;
+  string password = 6;
+  string password_confirmation = 7;
+}
+
+message CreateUserResponse {
+  optional string id = 1;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message GetUserResponse {
+  base.user.User user = 1;
+}
+
+message ListUsersRequest {
+  optional string email = 1;
+  optional string phone_number = 2;
+  optional string first_name = 3;
+  optional string last_name = 4;
+
+  optional bool is_document_verified = 5;
+  optional bool is_email_verified = 6;
+  optional bool is_suspended = 7;
+
+  optional base.Pagination pagination = 8;
+}
+
+message ListUsersResponse {
+  repeated base.user.User users = 1;
+}
+
+message UpdateUserRequest {
+  string id = 1;
+
+  optional string email = 2;
+  optional string phone_number = 3;
+  optional string first_name = 4;
+  optional string last_name = 5;
+  optional string birth_date = 6;
+  optional string password = 7;
+  optional string password_confirmation = 8;
+  optional string profile_image_key = 9;
+
+  repeated string roles = 10;
+  optional bool is_document_verified = 11;
+  optional bool is_email_verified = 12;
+  optional bool is_suspended = 13;
+}
+
+message DeleteUserRequest {
+  string id = 1;
+}
+
+message GetProfileImageUploadDataResponse {
+  base.ImageUploadData upload_data = 1;
+}
+
+// Auth
+message RegisterRequest {
+  string email = 1;
+  optional string phone_number = 2;
+  string first_name = 3;
+  string last_name = 4;
+  string birth_date = 5;
+  string password = 6;
+  string password_confirmation = 7;
+}
+
+message RegisterResponse {
+  string id = 1;
+}
+
+message SignInRequest {
+  optional string email = 1;
+  optional string phone_number = 2;
+  string password = 3;
+}
+
+message SignInResponse {
+  string id = 1;
+}
+
+// Activation Code
+message CheckActivationCodeRequest {
+  string code = 1;
+}
+
+// Document
+message CreateDocumentRequest {
+  string object_key = 2;
+  string image_type = 3;
+}
+
+message CreateDocumentResponse {
+  string id = 1;
+}
+
+message GetUploadDocumentDataRequest {
+  string image_type = 1;
+}
+
+message GetUploadDocumentDataResponse {
+  base.ImageUploadData upload_data = 1;
+}
+
+message GetProcessedDocumentsForUserRequest {
+  string user_id = 1;
+}
+
+message GetProcessedDocumentsForUserResponse {
+  repeated base.user.Document documents = 1;
+}
+
+message CheckDocumentRequest {
+  string doc_id = 1;
+  string status = 2;
+  optional string error = 3;
+}

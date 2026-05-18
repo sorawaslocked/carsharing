@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package service.booking;
+
+import "base/booking/booking.proto";
+import "base/common.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/booking";
+
+service BookingService {
+  rpc CreateBooking(CreateBookingRequest) returns (CreateBookingResponse);
+  rpc GetBooking(GetBookingRequest) returns (GetBookingResponse);
+  rpc ListBookings(ListBookingsRequest) returns (ListBookingsResponse);
+  rpc CancelBooking(CancelBookingRequest) returns (google.protobuf.Empty);
+  rpc UpdateBookingStatus(UpdateBookingStatusRequest) returns (google.protobuf.Empty);
+  rpc GetBookingStatusHistory(GetBookingStatusHistoryRequest) returns (GetBookingStatusHistoryResponse);
+}
+
+message CreateBookingRequest {
+  string user_id = 1;
+  string car_id = 2;
+
+  optional int32 committed_periods = 3;
+  string pricing_rule_id = 4;
+}
+
+message CreateBookingResponse {
+  string id = 1;
+}
+
+message GetBookingRequest {
+  string id = 1;
+}
+
+message GetBookingResponse {
+  base.booking.Booking booking = 1;
+}
+
+message ListBookingsRequest {
+  optional string user_id = 1;
+  optional string car_id = 2;
+
+  optional string status = 3;
+  optional string pricing_rule_id = 4;
+
+  optional base.Pagination pagination = 5;
+}
+
+message ListBookingsResponse {
+  repeated base.booking.Booking bookings = 1;
+}
+
+message CancelBookingRequest {
+  string id = 1;
+}
+
+message UpdateBookingStatusRequest {
+  string id = 1;
+  string status = 2;
+  optional string reason = 3;
+}
+
+message GetBookingStatusHistoryRequest {
+  string id = 1;
+  optional google.protobuf.Timestamp from = 2;
+  optional google.protobuf.Timestamp to = 3;
+
+  optional base.Pagination pagination = 4;
+}
+
+message GetBookingStatusHistoryResponse {
+  repeated base.booking.BookingStatusReading status_history = 1;
+}

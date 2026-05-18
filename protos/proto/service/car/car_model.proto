@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package service.car;
+
+import "base/car/car_model.proto";
+import "base/common.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/car";
+
+service CarModelService {
+  rpc CreateCarModel (CreateCarModelRequest) returns (CreateCarModelResponse);
+  rpc GetCarModel (GetCarModelRequest) returns (GetCarModelResponse);
+  rpc ListCarModels (ListCarModelsRequest) returns (ListCarModelsResponse);
+  rpc UpdateCarModel (UpdateCarModelRequest) returns (google.protobuf.Empty);
+  rpc DeleteCarModel (DeleteCarModelRequest) returns (google.protobuf.Empty);
+
+  rpc GetCarModelImageUploadData(google.protobuf.Empty) returns (GetCarModelImageUploadDataResponse);
+}
+
+message CreateCarModelRequest {
+  string brand = 1;
+  string model = 2;
+  int32 year = 3;
+
+  string fuel_type = 4;
+  string transmission = 5;
+  string body_type = 6;
+  string class = 7;
+
+  int32 seats = 8;
+  optional float engine_volume = 9;
+  int32 range_km = 10;
+
+  repeated string features = 11;
+}
+
+message CreateCarModelResponse {
+  string id = 1;
+}
+
+message GetCarModelRequest {
+  string id = 1;
+}
+
+message GetCarModelResponse {
+  base.car.CarModel car_model = 1;
+}
+
+message ListCarModelsRequest {
+  optional string brand = 1;
+  optional string model = 2;
+  optional string fuel_type = 3;
+  optional string transmission = 4;
+  optional string body_type = 5;
+  optional string class = 6;
+  optional int32 min_seats = 7;
+
+  optional base.Pagination pagination = 8;
+}
+
+message ListCarModelsResponse {
+  repeated base.car.CarModel car_models = 1;
+}
+
+message UpdateCarModelRequest {
+  string id = 1;
+  optional string brand = 2;
+  optional string model = 3;
+  optional int32 year = 4;
+  optional string fuel_type = 5;
+  optional string transmission = 6;
+  optional string body_type = 7;
+  optional string class = 8;
+  optional int32 seats = 9;
+  optional float engine_volume = 10;
+  optional int32 range_km = 11;
+  repeated string features = 12;
+  repeated string image_keys = 13;
+}
+
+message DeleteCarModelRequest {
+  string id = 1;
+}
+
+message GetCarModelImageUploadDataResponse {
+  base.ImageUploadData upload_data = 1;
+}

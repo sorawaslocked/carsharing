@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package service.car;
+
+import "service/common.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/car";
+
+service HealthService {
+  rpc Health(google.protobuf.Empty) returns (ServiceHealthResponse);
+}

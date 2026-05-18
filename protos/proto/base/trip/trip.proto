@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package base.trip;
+
+import "base/common.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base/trip";
+
+message Trip {
+  string id = 1;
+  string booking_id = 2;
+  string user_id = 3;
+  string car_id = 4;
+  string status = 5;
+
+  google.protobuf.Timestamp started_at = 6;
+  base.Location start_location = 7;
+  int64 start_mileage_km = 8;
+  optional float start_fuel_level = 9;
+
+  optional google.protobuf.Timestamp ended_at = 10;
+  optional base.Location end_location = 11;
+  optional int64 end_mileage_km = 12;
+  optional float end_fuel_level = 13;
+
+  optional double distance_traveled_km = 14;
+  optional int64 duration_seconds = 15;
+  optional int32 final_cost_tenge = 16;
+
+  optional string cancel_reason = 17;
+
+  google.protobuf.Timestamp created_at = 18;
+  google.protobuf.Timestamp updated_at = 19;
+}
+
+message TripSummary {
+  string trip_id = 1;
+  string booking_id = 2;
+  google.protobuf.Timestamp started_at = 3;
+  google.protobuf.Timestamp ended_at = 4;
+
+  int64 duration_seconds = 5;
+  double distance_traveled_km = 6;
+
+  base.PricingSnapshot pricing_snapshot = 7;
+  int32 base_cost_tenge = 8;
+  int32 distance_cost_tenge = 9;
+  int32 overtime_cost_tenge = 10;
+  int32 total_cost_tenge = 11;
+}
+
+message TripStatusReading {
+  string id = 1;
+  string trip_id = 2;
+  string from_status = 3;
+  string to_status = 4;
+  string actor_type = 5;
+  optional string actor_id = 6;
+  optional string reason = 7;
+  google.protobuf.Timestamp changed_at = 8;
+}

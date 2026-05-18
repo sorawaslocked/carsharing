@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package service.user;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/user";
+
+service DocumentAnalyzerService {
+  rpc Analyze(AnalyzeRequest) returns (google.protobuf.Empty);
+}
+
+message AnalyzeRequest {
+  string document_id = 1;
+  string object_key = 2;
+}

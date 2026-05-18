@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package service.booking;
+
+import "base/booking/pricing_rule.proto";
+import "base/common.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/booking";
+
+service PricingRuleService {
+  rpc CreatePricingRule(CreatePricingRuleRequest) returns (CreatePricingRuleResponse);
+  rpc GetPricingRule(GetPricingRuleRequest) returns (GetPricingRuleResponse);
+  rpc ListPricingRules(ListPricingRulesRequest) returns (ListPricingRulesResponse);
+  rpc UpdatePricingRule(UpdatePricingRuleRequest) returns (google.protobuf.Empty);
+  rpc DeletePricingRule(DeletePricingRuleRequest) returns (google.protobuf.Empty);
+}
+
+message CreatePricingRuleRequest {
+  optional string model_id = 1;
+  optional string zone_id = 2;
+  optional string class = 3;
+
+  string type = 4;
+  int32 rate_tenge = 5;
+
+  optional int32 rate_per_km_tenge = 6;
+  optional int32 free_minutes = 7;
+  optional int32 min_charge_tenge = 8;
+
+  optional string overtime_policy = 9;
+  optional int32 overtime_rate_tenge = 10;
+}
+
+message CreatePricingRuleResponse {
+  string id = 1;
+}
+
+message GetPricingRuleRequest {
+  string id = 1;
+}
+
+message GetPricingRuleResponse {
+  base.booking.PricingRule rule = 1;
+}
+
+message ListPricingRulesRequest {
+  optional string model_id = 1;
+  optional string zone_id = 2;
+  optional string class = 3;
+  optional string type = 4;
+  optional bool is_active = 5;
+  optional base.Pagination pagination = 6;
+}
+
+message ListPricingRulesResponse {
+  repeated base.booking.PricingRule rules = 1;
+}
+
+message UpdatePricingRuleRequest {
+  string id = 1;
+  optional string model_id = 2;
+  optional string zone_id = 3;
+  optional string class = 4;
+
+  optional string type = 5;
+  optional int32 rate_tenge = 6;
+
+  optional int32 rate_per_km_tenge = 7;
+  optional int32 free_minutes = 8;
+  optional int32 min_charge_tenge = 9;
+
+  optional string overtime_policy = 10;
+  optional int32 overtime_rate_tenge = 11;
+
+  optional bool is_active = 12;
+}
+
+message DeletePricingRuleRequest {
+  string id = 1;
+}

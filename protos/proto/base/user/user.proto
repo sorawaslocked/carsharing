@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package base.user;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base/user";
+
+message User {
+  string id = 1;
+  string email = 2;
+  optional string phone_number = 3;
+  string first_name = 4;
+  string last_name = 5;
+  string birth_date = 6;
+  bytes password_hash = 7;
+  optional string profile_image_url = 8;
+
+  repeated string roles = 9;
+  bool is_document_verified = 10;
+  bool is_email_verified = 11;
+  bool is_suspended = 12;
+
+  google.protobuf.Timestamp created_at = 13;
+  google.protobuf.Timestamp updated_at = 14;
+}
+
+message Document {
+  string id = 1;
+  string user_id = 2;
+  string image_type = 3;
+  string status = 4;
+  optional string error = 5;
+  string image_url = 6;
+
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}

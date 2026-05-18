@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package base;
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base";
+
+message ImageUploadData {
+  string presigned_put_url = 1;
+  string object_key = 2;
+}
+
+message Pagination {
+  int64 limit = 1;
+  int64 offset = 2;
+}
+
+message Location {
+  double latitude = 1;
+  double longitude = 2;
+}
+
+message PricingSnapshot {
+  int32 rate_tenge = 1;
+  optional int32 rate_per_km_tenge = 2;
+  optional int32 free_minutes = 3;
+  optional int32 min_charge_tenge = 4;
+  optional string overtime_policy = 5;
+  optional int32 overtime_rate_tenge = 6;
+}

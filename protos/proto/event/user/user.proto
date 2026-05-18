@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package event.user;
+
+option go_package = "github.com/sorawaslocked/car-rental-protos/gen/event/user";
+
+message UserCreatedEvent {
+  string id = 1;
+}
+
+message UserUpdatedEvent {
+  string id = 1;
+  bool is_security_update = 2;
+}
+
+message UserDeletedEvent {
+  string id = 1;
+}

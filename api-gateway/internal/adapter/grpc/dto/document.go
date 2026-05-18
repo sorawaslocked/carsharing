@@ -1,0 +1,19 @@
+package dto
+
+import (
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
+	baseuser "github.com/sorawaslocked/car-rental-protos/gen/base/user"
+)
+
+func DocumentFromProto(d *baseuser.Document) model.Document {
+	return model.Document{
+		ID:        d.GetId(),
+		UserID:    d.GetUserId(),
+		ImageType: d.GetImageType(),
+		Status:    d.GetStatus(),
+		Reason:    d.Error,
+		ImageURL:  d.GetImageUrl(),
+		CreatedAt: d.GetCreatedAt().AsTime(),
+		UpdatedAt: d.GetUpdatedAt().AsTime(),
+	}
+}

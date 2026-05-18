@@ -1,0 +1,20 @@
+env: "dev"
+
+http_server:
+  host: "0.0.0.0"
+  port: 4000
+  cookie:
+    secure: false
+
+grpc_server:
+  client:
+    user_service_url: "user-service:9999"
+    car_service_url: "car-service:9998"
+    booking_service_url: "booking-service:9997"
+    trip_service_url: "trip-service:9996"
+
+nats:
+  url: "nats:4222"
+
+redis:
+  address: "redis:6379"

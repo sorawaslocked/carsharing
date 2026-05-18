@@ -1,0 +1,73 @@
+package dto
+
+import (
+	"errors"
+
+	"github.com/gin-gonic/gin"
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/model"
+	"github.com/sorawaslocked/car-rental-api-gateway/internal/pkg/jwt"
+)
+
+type ErrorDetail struct {
+	Message string `json:"message"`
+}
+
+type ErrorResponse struct {
+	Error ErrorDetail `json:"error"`
+}
+
+func errorBody(message string, metadata map[string]any) map[string]any {
+	body := map[string]any{
+		"error": map[string]any{
+			"message": message,
+		},
+	}
+
+	for k, v := range metadata {
+		body["error"].(map[string]any)[k] = v
+	}
+
+	return body
+}
+
+func FromError(ctx *gin.Context, err error) {
+	var ve model.ValidationErrors
+
+	switch {
+	case errors.Is(err, model.ErrInvalidArgument):
+		badRequest(ctx, err.Error())
+
+	case errors.Is(err, model.ErrUnauthorized):
+		unauthorized(ctx, nil)
+
+	case errors.Is(err, model.ErrForbidden):
+		forbidden(ctx)
+
+	case errors.Is(err, model.ErrNotFound):
+		notFound(ctx)
+
+	case errors.Is(err, model.ErrAlreadyExists):
+		conflict(ctx)
+
+	case errors.Is(err, model.ErrInternalServerError):
+		internalServerError(ctx)
+
+	case errors.As(err, &ve):
+		validationError(ctx, ve)
+
+	case errors.Is(err, jwt.ErrInvalidToken):
+		invalidToken(ctx)
+
+	case errors.Is(err, jwt.ErrExpiredToken):
+		expiredToken(ctx)
+
+	case errors.Is(err, model.ErrInvalidQueryParam):
+		invalidQueryParams(ctx)
+
+	case errors.Is(err, model.ErrEmptyIDParam):
+		emptyIDParam(ctx)
+
+	default:
+		internalServerError(ctx)
+	}
+}

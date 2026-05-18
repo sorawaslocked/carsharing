@@ -1,7 +1,8 @@
 env: dev
 
 grpc_server:
-  addr: ":9999"
+  host: "0.0.0.0"
+  port: 9999
 
 postgres:
   host: postgres
@@ -11,18 +12,29 @@ postgres:
   ssl_mode: disable
 
 redis:
-  address: redis:6379
+  host: redis
+  port: 6379
+  username: ""
+  password: ""
 
 nats:
-  url: nats://nats:4222
+  urls:
+    - nats://nats:4222
+  name: user-service
+  username: ""
+  password: ""
 
 minio:
   endpoint: minio:9000
-  bucket_name: car-rental
+  access_key_id: ""
+  secret_access_key: ""
+  bucket: car-rental
   use_ssl: false
 
 brevo:
+  api_key: ""
   from: ""
 
 document_analyzer:
-  addr: document-analyzer:9002
+  host: document-analyzer
+  port: 9002

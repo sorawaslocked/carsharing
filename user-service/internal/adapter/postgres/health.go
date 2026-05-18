@@ -2,17 +2,21 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
+	"log/slog"
+
+	pkgpostgres "carsharing/shared/pkg/postgres"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Checker struct {
-	db *sql.DB
+	log  *slog.Logger
+	pool *pgxpool.Pool
 }
 
-func NewChecker(db *sql.DB) *Checker {
-	return &Checker{db: db}
+func NewChecker(log *slog.Logger, pool *pgxpool.Pool) *Checker {
+	return &Checker{log: log, pool: pool}
 }
 
 func (c *Checker) Ping(ctx context.Context) error {
-	return c.db.PingContext(ctx)
+	return pkgpostgres.Ping(ctx, c.log, c.pool)
 }

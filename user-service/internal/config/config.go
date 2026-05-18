@@ -4,24 +4,24 @@ import (
 	"flag"
 	"os"
 
+	pkggrpc "carsharing/shared/pkg/grpc"
+	pkgminio "carsharing/shared/pkg/minio"
+	pkgnats "carsharing/shared/pkg/nats"
+	pkgpostgres "carsharing/shared/pkg/postgres"
+	pkgredis "carsharing/shared/pkg/redis"
 	brevocfg "carsharing/user-service/internal/pkg/brevo"
-	grpccfg "carsharing/user-service/internal/pkg/grpc"
-	miniocfg "carsharing/user-service/internal/pkg/minio"
-	natscfg "carsharing/user-service/internal/pkg/nats"
-	"carsharing/user-service/internal/pkg/postgres"
-	"carsharing/user-service/internal/pkg/redis"
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
 type Config struct {
-	Env              string                         `yaml:"env"               env:"ENV"               env-default:"local"`
-	GRPC             grpccfg.ServerConfig           `yaml:"grpc_server"`
-	Postgres         postgres.Config                `yaml:"postgres"`
-	Redis            redis.Config                   `yaml:"redis"`
-	NATS             natscfg.Config                 `yaml:"nats"`
-	Minio            miniocfg.Config                `yaml:"minio"`
-	Brevo            brevocfg.Config                `yaml:"brevo"`
-	DocumentAnalyzer grpccfg.DocumentAnalyzerConfig `yaml:"document_analyzer"`
+	Env              string                  `yaml:"env"               env:"ENV"               env-default:"local"`
+	GRPC             pkggrpc.ServerConfig    `yaml:"grpc_server"`
+	Postgres         pkgpostgres.Config      `yaml:"postgres"`
+	Redis            pkgredis.Config         `yaml:"redis"`
+	NATS             pkgnats.PublisherConfig `yaml:"nats"`
+	Minio            pkgminio.Config         `yaml:"minio"`
+	Brevo            brevocfg.Config         `yaml:"brevo"`
+	DocumentAnalyzer pkggrpc.ClientConfig    `yaml:"document_analyzer"`
 }
 
 func MustLoad() Config {

@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -12,18 +11,20 @@ import (
 	"carsharing/user-service/internal/model"
 	pkglog "carsharing/user-service/internal/pkg/log"
 	"carsharing/user-service/internal/pkg/utils"
-	"github.com/lib/pq"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type UserRepository struct {
-	log *slog.Logger
-	db  *sql.DB
+	log  *slog.Logger
+	pool *pgxpool.Pool
 }
 
-func NewUserRepository(log *slog.Logger, db *sql.DB) *UserRepository {
+func NewUserRepository(log *slog.Logger, pool *pgxpool.Pool) *UserRepository {
 	return &UserRepository{
-		log: pkglog.WithComponent(log, "repo.UserRepository"),
-		db:  db,
+		log:  pkglog.WithComponent(log, "repo.UserRepository"),
+		pool: pool,
 	}
 }
 
@@ -31,8 +32,6 @@ type rowScanner interface {
 	Scan(dest ...any) error
 }
 
-// Roles are fetched via a correlated subquery so every SELECT path
-// returns them without extra round-trips.
 const userSelect = `
     SELECT u.id, u.email, u.phone_number, u.first_name, u.last_name, u.birth_date,
            u.password_hash, u.profile_image_key,
@@ -43,9 +42,9 @@ const userSelect = `
 
 func scanUser(rs rowScanner) (model.User, error) {
 	var u model.User
-	var phoneNumber sql.NullString
-	var profileImageKey sql.NullString
-	var roleStrings pq.StringArray
+	var phoneNumber *string
+	var profileImageKey *string
+	var roleStrings []string
 
 	if err := rs.Scan(
 		&u.ID, &u.Email, &phoneNumber, &u.FirstName, &u.LastName, &u.BirthDate,
@@ -56,11 +55,9 @@ func scanUser(rs rowScanner) (model.User, error) {
 		return model.User{}, err
 	}
 
-	if phoneNumber.Valid {
-		u.PhoneNumber = &phoneNumber.String
-	}
-	if profileImageKey.Valid {
-		u.ProfileImage = &model.Image{Key: profileImageKey.String}
+	u.PhoneNumber = phoneNumber
+	if profileImageKey != nil {
+		u.ProfileImage = &model.Image{Key: *profileImageKey}
 	}
 
 	u.Roles = make([]model.Role, len(roleStrings))
@@ -71,31 +68,29 @@ func scanUser(rs rowScanner) (model.User, error) {
 	return u, nil
 }
 
-// handlePQErr maps known constraint violations to domain errors. Any other
-// failure is logged and returned as ErrSql.
-func (r *UserRepository) handlePQErr(logger *slog.Logger, err error) error {
-	var pqErr *pq.Error
-	if errors.As(err, &pqErr) {
-		switch pqErr.Constraint {
+func (r *UserRepository) handlePGErr(logger *slog.Logger, err error) error {
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) {
+		switch pgErr.ConstraintName {
 		case "users_email_key":
 			return model.ErrDuplicateEmail
 		case "users_phone_number_key":
 			return model.ErrDuplicatePhone
 		}
 	}
-	logger.Error("unexpected sql error", pkglog.Err(err))
+	logger.Error("unexpected postgres error", pkglog.Err(err))
 	return model.ErrSql
 }
 
 func (r *UserRepository) Insert(ctx context.Context, user model.User) (string, error) {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Insert"), utils.MetadataFromCtx(ctx))
 
-	tx, err := r.db.BeginTx(ctx, nil)
+	tx, err := r.pool.Begin(ctx)
 	if err != nil {
 		logger.Error("beginning transaction", pkglog.Err(err))
 		return "", model.ErrSqlTransaction
 	}
-	defer tx.Rollback()
+	defer tx.Rollback(ctx)
 
 	var profileImageKey *string
 	if user.ProfileImage != nil {
@@ -103,7 +98,7 @@ func (r *UserRepository) Insert(ctx context.Context, user model.User) (string, e
 	}
 
 	var id string
-	err = tx.QueryRowContext(ctx, `
+	err = tx.QueryRow(ctx, `
         INSERT INTO users
             (email, phone_number, first_name, last_name, birth_date, password_hash,
              profile_image_key, is_document_verified, is_email_verified, is_suspended,
@@ -124,11 +119,11 @@ func (r *UserRepository) Insert(ctx context.Context, user model.User) (string, e
 		user.UpdatedAt,
 	).Scan(&id)
 	if err != nil {
-		return "", r.handlePQErr(logger, err)
+		return "", r.handlePGErr(logger, err)
 	}
 
 	for _, role := range user.Roles {
-		if _, err = tx.ExecContext(ctx,
+		if _, err = tx.Exec(ctx,
 			`INSERT INTO user_roles (user_id, role_name) VALUES ($1, $2)`,
 			id, role.String(),
 		); err != nil {
@@ -137,7 +132,7 @@ func (r *UserRepository) Insert(ctx context.Context, user model.User) (string, e
 		}
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := tx.Commit(ctx); err != nil {
 		logger.Error("committing transaction", pkglog.Err(err))
 		return "", model.ErrSqlTransaction
 	}
@@ -148,9 +143,9 @@ func (r *UserRepository) Insert(ctx context.Context, user model.User) (string, e
 func (r *UserRepository) FindByID(ctx context.Context, id string) (model.User, error) {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindByID"), utils.MetadataFromCtx(ctx))
 
-	user, err := scanUser(r.db.QueryRowContext(ctx, userSelect+" WHERE u.id = $1", id))
+	user, err := scanUser(r.pool.QueryRow(ctx, userSelect+" WHERE u.id = $1", id))
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return model.User{}, model.ErrNotFound
 		}
 		logger.Error("scanning user", pkglog.Err(err))
@@ -168,9 +163,9 @@ func (r *UserRepository) FindOne(ctx context.Context, filter model.UserFilter) (
 		query += " WHERE " + strings.Join(clauses, " AND ")
 	}
 
-	user, err := scanUser(r.db.QueryRowContext(ctx, query, args...))
+	user, err := scanUser(r.pool.QueryRow(ctx, query, args...))
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return model.User{}, model.ErrNotFound
 		}
 		logger.Error("scanning user", pkglog.Err(err))
@@ -193,7 +188,7 @@ func (r *UserRepository) Find(ctx context.Context, filter model.UserFilter) ([]m
 		args = append(args, filter.Pagination.Limit, filter.Pagination.Offset)
 	}
 
-	rows, err := r.db.QueryContext(ctx, query, args...)
+	rows, err := r.pool.Query(ctx, query, args...)
 	if err != nil {
 		logger.Error("querying users", pkglog.Err(err))
 		return nil, model.ErrSql
@@ -229,27 +224,27 @@ func (r *UserRepository) Update(ctx context.Context, id string, update model.Use
 	userArgs := append(args, id)
 
 	if hasRoles {
-		tx, err := r.db.BeginTx(ctx, nil)
+		tx, err := r.pool.Begin(ctx)
 		if err != nil {
 			logger.Error("beginning transaction", pkglog.Err(err))
 			return model.ErrSqlTransaction
 		}
-		defer tx.Rollback()
+		defer tx.Rollback(ctx)
 
-		res, err := tx.ExecContext(ctx, userQuery, userArgs...)
+		tag, err := tx.Exec(ctx, userQuery, userArgs...)
 		if err != nil {
-			return r.handlePQErr(logger, err)
+			return r.handlePGErr(logger, err)
 		}
-		if rowsAffected, _ := res.RowsAffected(); rowsAffected == 0 {
+		if tag.RowsAffected() == 0 {
 			return model.ErrNotFound
 		}
 
-		if _, err = tx.ExecContext(ctx, `DELETE FROM user_roles WHERE user_id = $1`, id); err != nil {
+		if _, err = tx.Exec(ctx, `DELETE FROM user_roles WHERE user_id = $1`, id); err != nil {
 			logger.Error("deleting user roles", pkglog.Err(err))
 			return model.ErrSql
 		}
 		for _, role := range update.Roles {
-			if _, err = tx.ExecContext(ctx,
+			if _, err = tx.Exec(ctx,
 				`INSERT INTO user_roles (user_id, role_name) VALUES ($1, $2)`,
 				id, role.String(),
 			); err != nil {
@@ -258,18 +253,18 @@ func (r *UserRepository) Update(ctx context.Context, id string, update model.Use
 			}
 		}
 
-		if err := tx.Commit(); err != nil {
+		if err := tx.Commit(ctx); err != nil {
 			logger.Error("committing transaction", pkglog.Err(err))
 			return model.ErrSqlTransaction
 		}
 		return nil
 	}
 
-	res, err := r.db.ExecContext(ctx, userQuery, userArgs...)
+	tag, err := r.pool.Exec(ctx, userQuery, userArgs...)
 	if err != nil {
-		return r.handlePQErr(logger, err)
+		return r.handlePGErr(logger, err)
 	}
-	if rowsAffected, _ := res.RowsAffected(); rowsAffected == 0 {
+	if tag.RowsAffected() == 0 {
 		return model.ErrNotFound
 	}
 	return nil
@@ -278,18 +273,13 @@ func (r *UserRepository) Update(ctx context.Context, id string, update model.Use
 func (r *UserRepository) Delete(ctx context.Context, id string) error {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Delete"), utils.MetadataFromCtx(ctx))
 
-	res, err := r.db.ExecContext(ctx, `DELETE FROM users WHERE id = $1`, id)
+	tag, err := r.pool.Exec(ctx, `DELETE FROM users WHERE id = $1`, id)
 	if err != nil {
 		logger.Error("deleting user", pkglog.Err(err))
 		return model.ErrSql
 	}
 
-	rowsAffected, err := res.RowsAffected()
-	if err != nil {
-		logger.Error("reading rows affected", pkglog.Err(err))
-		return model.ErrSql
-	}
-	if rowsAffected == 0 {
+	if tag.RowsAffected() == 0 {
 		return model.ErrNotFound
 	}
 	return nil

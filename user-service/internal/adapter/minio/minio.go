@@ -9,9 +9,9 @@ import (
 	"net/url"
 	"time"
 
+	pkgminio "carsharing/shared/pkg/minio"
 	"carsharing/user-service/internal/model"
 	pkglog "carsharing/user-service/internal/pkg/log"
-	miniocfg "carsharing/user-service/internal/pkg/minio"
 	"carsharing/user-service/internal/pkg/utils"
 	"github.com/minio/minio-go/v7"
 )
@@ -19,10 +19,10 @@ import (
 type MinioObjectStorage struct {
 	log    *slog.Logger
 	client *minio.Client
-	cfg    miniocfg.Config
+	cfg    pkgminio.Config
 }
 
-func NewMinioObjectStorage(log *slog.Logger, client *minio.Client, cfg miniocfg.Config) *MinioObjectStorage {
+func NewMinioObjectStorage(log *slog.Logger, client *minio.Client, cfg pkgminio.Config) *MinioObjectStorage {
 	return &MinioObjectStorage{
 		log:    pkglog.WithComponent(log, "MinioObjectStorage"),
 		client: client,
@@ -35,7 +35,7 @@ func (s *MinioObjectStorage) GetDocumentImageUploadData(ctx context.Context, ima
 
 	objectKey := newObjectKey("documents/" + imageType)
 
-	presignedURL, err := s.client.PresignedPutObject(ctx, s.cfg.BucketName, objectKey, s.cfg.PresignedPutExpiry)
+	presignedURL, err := s.client.PresignedPutObject(ctx, s.cfg.Bucket, objectKey, s.cfg.PresignedPutExpiry)
 	if err != nil {
 		log.Error("generating presigned put url", pkglog.Err(err))
 		return model.ImageUploadData{}, model.ErrObjectStorage
@@ -52,7 +52,7 @@ func (s *MinioObjectStorage) GetUserProfileImageUploadData(ctx context.Context) 
 
 	objectKey := newObjectKey("users")
 
-	presignedURL, err := s.client.PresignedPutObject(ctx, s.cfg.BucketName, objectKey, s.cfg.PresignedPutExpiry)
+	presignedURL, err := s.client.PresignedPutObject(ctx, s.cfg.Bucket, objectKey, s.cfg.PresignedPutExpiry)
 	if err != nil {
 		log.Error("generating presigned put url", pkglog.Err(err))
 		return model.ImageUploadData{}, model.ErrObjectStorage
@@ -67,7 +67,7 @@ func (s *MinioObjectStorage) GetUserProfileImageUploadData(ctx context.Context) 
 func (s *MinioObjectStorage) GetImageURL(ctx context.Context, objectKey string) (string, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetImageURL"), utils.MetadataFromCtx(ctx))
 
-	presignedURL, err := s.client.PresignedGetObject(ctx, s.cfg.BucketName, objectKey, s.cfg.PresignedGetExpiry, url.Values{})
+	presignedURL, err := s.client.PresignedGetObject(ctx, s.cfg.Bucket, objectKey, s.cfg.PresignedGetExpiry, url.Values{})
 	if err != nil {
 		log.Error("generating presigned get url", pkglog.Err(err))
 		return "", model.ErrObjectStorage

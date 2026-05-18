@@ -3,32 +3,39 @@ package grpc
 import (
 	"log/slog"
 
+	pkggrpc "carsharing/shared/pkg/grpc"
 	"carsharing/user-service/internal/adapter/grpc/handler"
 	"carsharing/user-service/internal/adapter/grpc/interceptor"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 )
 
 func NewServer(
 	log *slog.Logger,
+	cfg pkggrpc.ServerConfig,
 	userService handler.UserService,
 	healthHandler *handler.HealthHandler,
-) *grpc.Server {
+) (*grpc.Server, error) {
 	baseInterceptor := interceptor.NewBaseInterceptor()
 	loggerInterceptor := interceptor.NewLoggerInterceptor(log)
 	authInterceptor := interceptor.NewAuthInterceptor(log)
 
-	s := grpc.NewServer(grpc.ChainUnaryInterceptor(
-		baseInterceptor.Unary,
-		loggerInterceptor.Unary,
-		authInterceptor.Unary,
-	))
+	s, err := pkggrpc.NewServer(
+		log,
+		cfg,
+		grpc.ChainUnaryInterceptor(
+			baseInterceptor.Unary,
+			loggerInterceptor.Unary,
+			authInterceptor.Unary,
+		),
+		grpc.ChainStreamInterceptor(),
+	)
+	if err != nil {
+		return nil, err
+	}
 
 	usersvc.RegisterUserServiceServer(s, handler.NewUserHandler(log, userService))
 	usersvc.RegisterHealthServiceServer(s, healthHandler)
 
-	reflection.Register(s)
-
-	return s
+	return s, nil
 }

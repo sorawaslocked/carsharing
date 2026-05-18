@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -12,17 +11,19 @@ import (
 	"carsharing/user-service/internal/model"
 	pkglog "carsharing/user-service/internal/pkg/log"
 	"carsharing/user-service/internal/pkg/utils"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type DocumentRepository struct {
-	log *slog.Logger
-	db  *sql.DB
+	log  *slog.Logger
+	pool *pgxpool.Pool
 }
 
-func NewDocumentRepository(log *slog.Logger, db *sql.DB) *DocumentRepository {
+func NewDocumentRepository(log *slog.Logger, pool *pgxpool.Pool) *DocumentRepository {
 	return &DocumentRepository{
-		log: pkglog.WithComponent(log, "repo.DocumentRepository"),
-		db:  db,
+		log:  pkglog.WithComponent(log, "repo.DocumentRepository"),
+		pool: pool,
 	}
 }
 
@@ -40,7 +41,7 @@ func scanDocument(rs rowScanner) (model.Document, error) {
 	var d model.Document
 	var imageType string
 	var status string
-	var errMsg sql.NullString
+	var errMsg *string
 	var imageKey string
 
 	if err := rs.Scan(
@@ -52,10 +53,7 @@ func scanDocument(rs rowScanner) (model.Document, error) {
 
 	d.ImageType = model.ImageType(imageType)
 	d.Status = model.DocumentStatus(status)
-
-	if errMsg.Valid {
-		d.Error = &errMsg.String
-	}
+	d.Error = errMsg
 	if imageKey != "" {
 		d.Image = &model.Image{Key: imageKey}
 	}
@@ -72,7 +70,7 @@ func (r *DocumentRepository) Insert(ctx context.Context, doc model.Document) (st
 	}
 
 	var id string
-	err := r.db.QueryRowContext(ctx, `
+	err := r.pool.QueryRow(ctx, `
         INSERT INTO documents (user_id, image_type, status, error, image_key, created_at, updated_at)
         VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING id`,
@@ -85,7 +83,7 @@ func (r *DocumentRepository) Insert(ctx context.Context, doc model.Document) (st
 		doc.UpdatedAt,
 	).Scan(&id)
 	if err != nil {
-		logger.Error("unexpected sql error", pkglog.Err(err))
+		logger.Error("unexpected postgres error", pkglog.Err(err))
 		return "", model.ErrSql
 	}
 
@@ -95,9 +93,9 @@ func (r *DocumentRepository) Insert(ctx context.Context, doc model.Document) (st
 func (r *DocumentRepository) FindByID(ctx context.Context, id string) (model.Document, error) {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindByID"), utils.MetadataFromCtx(ctx))
 
-	doc, err := scanDocument(r.db.QueryRowContext(ctx, documentSelect+" WHERE id = $1", id))
+	doc, err := scanDocument(r.pool.QueryRow(ctx, documentSelect+" WHERE id = $1", id))
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return model.Document{}, model.ErrNotFound
 		}
 		logger.Error("scanning document", pkglog.Err(err))
@@ -124,7 +122,7 @@ func (r *DocumentRepository) Find(ctx context.Context, filter model.DocumentFilt
 		query += " ORDER BY image_type, created_at DESC"
 	}
 
-	rows, err := r.db.QueryContext(ctx, query, args...)
+	rows, err := r.pool.Query(ctx, query, args...)
 	if err != nil {
 		logger.Error("querying documents", pkglog.Err(err))
 		return nil, model.ErrSql
@@ -158,12 +156,12 @@ func (r *DocumentRepository) Update(ctx context.Context, id string, update model
 		fmt.Sprintf(" WHERE id = $%d", nextArg)
 	args = append(args, id)
 
-	res, err := r.db.ExecContext(ctx, query, args...)
+	tag, err := r.pool.Exec(ctx, query, args...)
 	if err != nil {
-		logger.Error("unexpected sql error", pkglog.Err(err))
+		logger.Error("unexpected postgres error", pkglog.Err(err))
 		return model.ErrSql
 	}
-	if rowsAffected, _ := res.RowsAffected(); rowsAffected == 0 {
+	if tag.RowsAffected() == 0 {
 		return model.ErrNotFound
 	}
 

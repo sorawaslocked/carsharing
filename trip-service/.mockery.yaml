@@ -1,0 +1,23 @@
+with-expecter: true
+resolve-type-alias: false
+disable-version-string: true
+issue-845-fix: true
+packages:
+  github.com/sorawaslocked/car-rental-trip-service/internal/service:
+    config:
+      dir: "internal/service/mocks"
+      outpkg: "svcmocks"
+    interfaces:
+      TripRepository:
+      TripSummaryRepository:
+      TripStatusReadingRepository:
+      BookingClient:
+      TelematicsClient:
+      EventPublisher:
+  github.com/sorawaslocked/car-rental-trip-service/internal/adapter/grpc/handler:
+    config:
+      dir: "internal/adapter/grpc/handler/mocks"
+      outpkg: "handlermocks"
+    interfaces:
+      TripService:
+      TripStreamService:

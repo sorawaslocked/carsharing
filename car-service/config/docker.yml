@@ -1,7 +1,8 @@
 env: "dev"
 
 grpc_server:
-  addr: "0.0.0.0:9998"
+  host: "0.0.0.0"
+  port: 9998
 
 postgres:
   host: "postgres"
@@ -10,9 +11,20 @@ postgres:
   password: "car_rental"
   database: "car_rental"
   ssl_mode: "disable"
-  max_open_connections: 25
-  max_idle_connections: 25
-  max_idle_time: "15m"
+
+nats_publisher:
+  urls:
+    - "nats://nats:4222"
+  name: "car-service-publisher"
+  username: ""
+  password: ""
+
+nats_subscriber:
+  urls:
+    - "nats://nats:4222"
+  name: "car-service-subscriber"
+  username: ""
+  password: ""
 
 minio:
   endpoint: "minio:9000"
@@ -21,8 +33,6 @@ minio:
   bucket: "car-rental"
   use_ssl: false
 
-nats:
-  url: "nats://nats:4222"
-
 telematics_stream:
-  addr: "telematics:50051"
+  host: "telematics"
+  port: 50051

@@ -8,6 +8,7 @@ postgres:
   host: postgres
   port: 5432
   user: car_rental
+  password: car_rental
   database: car_rental
   ssl_mode: disable
 

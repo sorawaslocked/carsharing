@@ -11,7 +11,7 @@ require (
 	github.com/jackc/pgx/v5 v5.9.2
 	github.com/minio/minio-go/v7 v7.1.0
 	github.com/nats-io/nats.go v1.52.0
-	github.com/sorawaslocked/car-rental-protos v0.0.32
+	github.com/sorawaslocked/car-rental-protos v0.0.33
 	github.com/stretchr/testify v1.11.1
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260226221140-a57be14db171
 	google.golang.org/grpc v1.81.1

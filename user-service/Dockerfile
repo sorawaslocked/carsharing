@@ -1,11 +1,16 @@
-FROM golang:1.25-alpine AS builder
+FROM golang:1.26-alpine AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY shared/go.mod shared/go.sum ./shared/
+COPY user-service/go.mod user-service/go.sum ./user-service/
+
+WORKDIR /app/user-service
 RUN go mod download
 
-COPY . .
+COPY shared/ /app/shared/
+COPY user-service/ .
+
 RUN CGO_ENABLED=0 GOOS=linux go build -o /user-service ./cmd/user-service/
 
 FROM alpine:3.21
@@ -15,7 +20,7 @@ RUN apk add --no-cache ca-certificates
 WORKDIR /app
 
 COPY --from=builder /user-service .
-COPY config/docker.yml config/docker.yml
+COPY --from=builder /app/user-service/config/docker.yml config/docker.yml
 
 ENV CONFIG_PATH=/app/config/docker.yml
 

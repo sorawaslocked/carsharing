@@ -1,7 +1,8 @@
 env: "dev"
 
 grpc_server:
-  addr: "0.0.0.0:9997"
+  host: "0.0.0.0"
+  port: 9997
 
 postgres:
   host: "postgres"
@@ -10,9 +11,17 @@ postgres:
   password: "car_rental"
   database: "car_rental"
   ssl_mode: "disable"
-  max_open_connections: 25
-  max_idle_connections: 25
-  max_idle_time: "15m"
 
-nats:
-  url: "nats://nats:4222"
+nats_publisher:
+  urls:
+    - "nats://nats:4222"
+  name: "booking-service-publisher"
+  username: ""
+  password: ""
+
+nats_subscriber:
+  urls:
+    - "nats://nats:4222"
+  name: "booking-service-subscriber"
+  username: ""
+  password: ""

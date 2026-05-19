@@ -2,10 +2,14 @@ FROM golang:1.26-alpine AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY shared/go.mod shared/go.sum ./shared/
+COPY car-service/go.mod car-service/go.sum ./car-service/
+
+WORKDIR /app/car-service
 RUN go mod download
 
-COPY . .
+COPY shared/ /app/shared/
+COPY car-service/ .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o /car-service ./cmd/car-service/main.go
 
@@ -16,7 +20,7 @@ RUN apk --no-cache add ca-certificates
 WORKDIR /app
 
 COPY --from=builder /car-service .
-COPY --from=builder /app/config ./config
+COPY --from=builder /app/car-service/config ./config
 
 EXPOSE 9998
 

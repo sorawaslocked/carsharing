@@ -1,7 +1,8 @@
 env: "dev"
 
 grpc_server:
-  addr: "0.0.0.0:9996"
+  host: "0.0.0.0"
+  port: 9996
 
 postgres:
   host: "postgres"
@@ -10,18 +11,22 @@ postgres:
   password: "car_rental"
   database: "car_rental"
   ssl_mode: "disable"
-  max_open_connections: 25
-  max_idle_connections: 25
-  max_idle_time: "15m"
 
 nats:
-  url: "nats://nats:4222"
+  urls:
+    - "nats://nats:4222"
+  name: "trip-service"
+  username: ""
+  password: ""
 
 car_service:
-  addr: "car-service:9001"
+  host: "car-service"
+  port: 9998
 
 car_stream_service:
-  addr: "car-service:9001"
+  host: "car-service"
+  port: 9998
 
 booking_service:
-  addr: "booking-service:9002"
+  host: "booking-service"
+  port: 9997

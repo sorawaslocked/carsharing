@@ -2,9 +2,11 @@ services:
   redis:
     image: redis:7-alpine
     container_name: user-service-redis
-    command: redis-server --requirepass secret
+    command: "redis-server --requirepass ${REDIS_PASSWORD}"
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli -a secret ping"]
+      test: ["CMD-SHELL", "redis-cli -a $REDIS_PASSWORD ping"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -18,21 +20,28 @@ services:
       - ./migrations:/migrations
     command:
       - "-path=/migrations"
-      - "-database=postgres://car_rental:car_rental@car-service-postgres:5432/car_rental?sslmode=disable&x-migrations-table=user_service_migrations"
+      - "-database=postgres://car_rental:${POSTGRES_PASSWORD}@postgres:5432/car_rental?sslmode=disable&x-migrations-table=user_service_migrations"
       - "up"
     networks:
       - car-rental-net
 
   user-service:
-    build: .
+    container_name: user-service
+    build:
+      context: ..
+      dockerfile: user-service/Dockerfile
     ports:
       - "9999:9999"
     environment:
-      POSTGRES_PASSWORD: car_rental
-      REDIS_PASSWORD: secret
-      MINIO_ACCESS_KEY_ID: minioadmin
-      MINIO_SECRET_ACCESS_KEY: minioadmin
-      MAILTRAP_TOKEN: ${MAILTRAP_TOKEN}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_USERNAME: ""
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      MINIO_ACCESS_KEY_ID: ${MINIO_ACCESS_KEY_ID}
+      MINIO_SECRET_ACCESS_KEY: ${MINIO_SECRET_ACCESS_KEY}
+      NATS_PUBLISHER_USERNAME: ""
+      NATS_PUBLISHER_PASSWORD: ""
+      BREVO_API_KEY: ${BREVO_API_KEY}
+      BREVO_FROM: ${BREVO_FROM}
     depends_on:
       migrate:
         condition: service_completed_successfully

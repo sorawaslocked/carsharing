@@ -5,7 +5,14 @@ WORKDIR /app
 COPY pyproject.toml ./
 COPY src ./src
 
-RUN pip install --no-cache-dir --prefix=/install .
+# Install CPU-only PyTorch first to avoid downloading ~1 GB of CUDA packages.
+# PYTHONPATH lets the second pip invocation see torch as already satisfied.
+RUN PYVER=$(python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')") \
+    && pip install --no-cache-dir --prefix=/install \
+        --index-url https://download.pytorch.org/whl/cpu \
+        torch torchvision \
+    && PYTHONPATH=/install/lib/python${PYVER}/site-packages \
+       pip install --no-cache-dir --prefix=/install .
 
 
 FROM python:3.12-slim

@@ -7,14 +7,28 @@ http_server:
     secure: false
 
 grpc_server:
-  client:
-    user_service_url: "user-service:9999"
-    car_service_url: "car-service:9998"
-    booking_service_url: "booking-service:9997"
-    trip_service_url: "trip-service:9996"
+  user_service:
+    host: "user-service"
+    port: 9999
+  car_service:
+    host: "car-service"
+    port: 9998
+  booking_service:
+    host: "booking-service"
+    port: 9997
+  trip_service:
+    host: "trip-service"
+    port: 9996
 
 nats:
-  url: "nats:4222"
+  urls:
+    - "nats://nats:4222"
+  name: "api-gateway"
+  username: ""
+  password: ""
 
 redis:
-  address: "redis:6379"
+  host: "redis"
+  port: 6379
+  username: ""
+  password: ""

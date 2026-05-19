@@ -147,11 +147,11 @@ func fallbackCircleWalker(lat, lng float64) *routeWalker {
 // latitude/longitude coordinates.
 func haversineMeters(lat1, lng1, lat2, lng2 float64) float64 {
 	const R = 6_371_000.0
-	φ1 := lat1 * math.Pi / 180
-	φ2 := lat2 * math.Pi / 180
-	Δφ := (lat2 - lat1) * math.Pi / 180
-	Δλ := (lng2 - lng1) * math.Pi / 180
-	a := math.Sin(Δφ/2)*math.Sin(Δφ/2) +
-		math.Cos(φ1)*math.Cos(φ2)*math.Sin(Δλ/2)*math.Sin(Δλ/2)
+	lat1Rad := lat1 * math.Pi / 180
+	lat2Rad := lat2 * math.Pi / 180
+	dLat := (lat2 - lat1) * math.Pi / 180
+	dLng := (lng2 - lng1) * math.Pi / 180
+	a := math.Sin(dLat/2)*math.Sin(dLat/2) +
+		math.Cos(lat1Rad)*math.Cos(lat2Rad)*math.Sin(dLng/2)*math.Sin(dLng/2)
 	return R * 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
 }

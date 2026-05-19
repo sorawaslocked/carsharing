@@ -77,7 +77,7 @@ func TestTripHandler_StartTrip_ServiceError(t *testing.T) {
 	svc := handlermocks.NewMockTripService(t)
 	h := handler.NewTripHandler(discardLogger(), svc)
 
-	svc.EXPECT().StartTrip(mock.Anything, "booking-1").Return("", model.ErrBookingNotReserved)
+	svc.EXPECT().StartTrip(mock.Anything, "booking-1").Return("", model.ErrBookingNotCreated)
 
 	_, err := h.StartTrip(context.Background(), &tripsvc.StartTripRequest{BookingId: "booking-1"})
 

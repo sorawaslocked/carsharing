@@ -192,7 +192,7 @@ func TestTripService_StartTrip_BookingNotReserved(t *testing.T) {
 
 	_, err := d.svc.StartTrip(ctx, testBookingID)
 
-	assert.ErrorIs(t, err, model.ErrBookingNotReserved)
+	assert.ErrorIs(t, err, model.ErrBookingNotCreated)
 }
 
 func TestTripService_StartTrip_TelemetryFails(t *testing.T) {

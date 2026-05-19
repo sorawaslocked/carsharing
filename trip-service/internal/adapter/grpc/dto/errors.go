@@ -23,7 +23,7 @@ func ToStatusError(err error) error {
 		return status.Error(codes.Unauthenticated, err.Error())
 	case errors.Is(err, model.ErrInsufficientPermissions):
 		return status.Error(codes.PermissionDenied, err.Error())
-	case errors.Is(err, model.ErrBookingNotReserved),
+	case errors.Is(err, model.ErrBookingNotCreated),
 		errors.Is(err, model.ErrInvalidStatusTransition),
 		errors.Is(err, model.ErrTripNotActive):
 		return status.Error(codes.FailedPrecondition, err.Error())

@@ -9,6 +9,7 @@ import (
 	pkglog "carsharing/shared/pkg/log"
 	pkgutils "carsharing/shared/pkg/utils"
 	"carsharing/trip-service/internal/model"
+
 	"github.com/google/uuid"
 )
 
@@ -56,8 +57,8 @@ func (s *TripService) StartTrip(ctx context.Context, bookingID string) (string, 
 		return "", model.ErrInsufficientPermissions
 	}
 
-	if booking.Status != "reserved" {
-		return "", model.ErrBookingNotReserved
+	if booking.Status != "created" {
+		return "", model.ErrBookingNotCreated
 	}
 
 	telemetry, err := s.telematics.GetLatestTelemetry(ctx, booking.CarID)

@@ -5,10 +5,13 @@ import (
 	"log/slog"
 	"math"
 	"math/rand/v2"
+	"time"
 
 	osrm "github.com/gojuno/go.osrm"
 	geo "github.com/paulmach/go.geo"
 )
+
+const osrmRouteTimeout = 5 * time.Second
 
 const (
 	fallbackCircleRadiusDeg = 0.003 // ~330 m radius
@@ -78,7 +81,10 @@ func (s *SimulationService) fetchRoute(ctx context.Context, lat, lng float64) *r
 		{destLng, destLat},
 	})
 
-	resp, err := s.osrmClient.Route(ctx, osrm.RouteRequest{
+	osrmCtx, cancel := context.WithTimeout(ctx, osrmRouteTimeout)
+	defer cancel()
+
+	resp, err := s.osrmClient.Route(osrmCtx, osrm.RouteRequest{
 		Profile:     s.osrmProfile,
 		Coordinates: coords,
 		Steps:       osrm.StepsTrue,

@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log/slog"
 	"net"
@@ -16,14 +15,15 @@ import (
 	natsadapter "carsharing/car-service/internal/adapter/nats"
 	"carsharing/car-service/internal/adapter/postgres"
 	"carsharing/car-service/internal/config"
-	pkggrpc "carsharing/car-service/internal/pkg/grpc"
-	pkglog "carsharing/car-service/internal/pkg/log"
-	pkgminio "carsharing/car-service/internal/pkg/minio"
-	pkgnats "carsharing/car-service/internal/pkg/nats"
-	pkgpostgres "carsharing/car-service/internal/pkg/postgres"
 	"carsharing/car-service/internal/service"
 	"carsharing/car-service/internal/validation"
+	pkggrpc "carsharing/shared/pkg/grpc"
+	pkglog "carsharing/shared/pkg/log"
+	pkgminio "carsharing/shared/pkg/minio"
+	pkgnats "carsharing/shared/pkg/nats"
+	pkgpostgres "carsharing/shared/pkg/postgres"
 	"github.com/go-playground/validator/v10"
+	"github.com/jackc/pgx/v5/pgxpool"
 	natsio "github.com/nats-io/nats.go"
 	"google.golang.org/grpc"
 )
@@ -32,57 +32,72 @@ type App struct {
 	log               *slog.Logger
 	grpcServer        *grpc.Server
 	grpcAddr          string
-	db                *sql.DB
-	natsConn          *natsio.Conn
+	pool              *pgxpool.Pool
+	natsPubConn       *natsio.Conn
+	natsSubConn       *natsio.Conn
 	telematicsConn    *grpc.ClientConn
 	telematicsService *service.TelematicsService
 }
 
 func New(log *slog.Logger, cfg config.Config) (*App, error) {
-	db, err := pkgpostgres.NewDB(cfg.PG)
+	pool, err := pkgpostgres.NewPool(log, cfg.PG)
 	if err != nil {
 		return nil, fmt.Errorf("postgres: %w", err)
 	}
 
-	minioClient, err := pkgminio.NewClient(cfg.MinIO)
+	minioClient, err := pkgminio.NewClient(log, cfg.MinIO)
 	if err != nil {
-		_ = db.Close()
+		pool.Close()
 		return nil, fmt.Errorf("minio: %w", err)
 	}
 	objectStorage := minioadapter.NewObjectStorage(minioClient, cfg.MinIO.Bucket)
 
-	nc, err := pkgnats.NewConn(cfg.NATS)
+	ncPub, err := pkgnats.NewPublisher(log, cfg.NATSPublisher)
 	if err != nil {
-		_ = db.Close()
-		return nil, fmt.Errorf("nats: %w", err)
+		pool.Close()
+		return nil, fmt.Errorf("nats publisher: %w", err)
 	}
 
-	telematicsConn, err := pkggrpc.NewClientConn(cfg.TelematicsStream.Addr)
+	ncSub, err := pkgnats.NewSubscriber(log, cfg.NATSSubscriber)
 	if err != nil {
-		nc.Close()
-		_ = db.Close()
+		ncPub.Close()
+		pool.Close()
+		return nil, fmt.Errorf("nats subscriber: %w", err)
+	}
+
+	telematicsConn, err := pkggrpc.NewClientConn(
+		log,
+		cfg.TelematicsStream,
+		grpc.WithChainUnaryInterceptor(),
+		grpc.WithChainStreamInterceptor(),
+	)
+	if err != nil {
+		ncSub.Close()
+		ncPub.Close()
+		pool.Close()
 		return nil, fmt.Errorf("telematics stream client: %w", err)
 	}
 
 	validate := validator.New()
 	if err = validation.RegisterCustomValidators(validate); err != nil {
 		_ = telematicsConn.Close()
-		nc.Close()
-		_ = db.Close()
+		ncSub.Close()
+		ncPub.Close()
+		pool.Close()
 		return nil, fmt.Errorf("register validators: %w", err)
 	}
 
-	carModelRepo := postgres.NewCarModelRepository(db, log)
-	carRepo := postgres.NewCarRepository(db, log)
-	carInsuranceRepo := postgres.NewCarInsuranceRepository(db, log)
-	templateRepo := postgres.NewCarMaintenanceTemplateRepository(db, log)
-	recordRepo := postgres.NewCarMaintenanceRecordRepository(db, log)
-	serviceStateRepo := postgres.NewCarServiceStateRepository(db, log)
-	statusLogRepo := postgres.NewCarStatusLogRepository(db, log)
-	telematicsRepo := postgres.NewTelematicsRepository(db, log)
-	zoneRepo := postgres.NewZoneRepository(db, log)
+	carModelRepo := postgres.NewCarModelRepository(pool, log)
+	carRepo := postgres.NewCarRepository(pool, log)
+	carInsuranceRepo := postgres.NewCarInsuranceRepository(pool, log)
+	templateRepo := postgres.NewCarMaintenanceTemplateRepository(pool, log)
+	recordRepo := postgres.NewCarMaintenanceRecordRepository(pool, log)
+	serviceStateRepo := postgres.NewCarServiceStateRepository(pool, log)
+	statusLogRepo := postgres.NewCarStatusLogRepository(pool, log)
+	telematicsRepo := postgres.NewTelematicsRepository(pool, log)
+	zoneRepo := postgres.NewZoneRepository(pool, log)
 
-	natsPublisher := natsadapter.NewPublisher(nc)
+	natsPublisher := natsadapter.NewPublisher(ncPub)
 
 	telematicsStreamClient := grpcserver.NewTelematicsStreamClient(telematicsConn, log)
 	telematicsService := service.NewTelematicsService(telematicsStreamClient, telematicsRepo, carRepo, log)
@@ -95,11 +110,12 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	carMaintenanceService := service.NewCarMaintenanceService(templateRepo, recordRepo, serviceStateRepo, carRepo, carService, objectStorage, validate, log)
 	zoneService := service.NewZoneService(zoneRepo, validate, log)
 
-	natsSubscriber := natsadapter.NewSubscriber(nc, carService, log)
+	natsSubscriber := natsadapter.NewSubscriber(ncSub, carService, log)
 	if err = natsSubscriber.Subscribe(); err != nil {
 		_ = telematicsConn.Close()
-		nc.Close()
-		_ = db.Close()
+		ncSub.Close()
+		ncPub.Close()
+		pool.Close()
 		return nil, fmt.Errorf("nats subscribe: %w", err)
 	}
 
@@ -107,15 +123,16 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 		log,
 		carModelService, carService, carInsuranceService, carMaintenanceService, zoneService,
 		telematicsService,
-		db, nc,
+		pool, ncPub,
 	)
 
 	return &App{
 		log:               pkglog.WithComponent(log, "app"),
 		grpcServer:        grpcSrv.GRPCServer(),
-		grpcAddr:          cfg.GRPC.Addr,
-		db:                db,
-		natsConn:          nc,
+		grpcAddr:          fmt.Sprintf("%s:%d", cfg.GRPC.Host, cfg.GRPC.Port),
+		pool:              pool,
+		natsPubConn:       ncPub,
+		natsSubConn:       ncSub,
 		telematicsConn:    telematicsConn,
 		telematicsService: telematicsService,
 	}, nil
@@ -175,7 +192,8 @@ func (a *App) stop() {
 	}
 
 	a.telematicsService.Stop()
-	_ = a.db.Close()
-	a.natsConn.Close()
+	a.pool.Close()
+	a.natsPubConn.Close()
+	a.natsSubConn.Close()
 	_ = a.telematicsConn.Close()
 }

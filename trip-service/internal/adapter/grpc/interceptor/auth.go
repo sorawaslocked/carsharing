@@ -6,10 +6,10 @@ import (
 
 	"google.golang.org/grpc"
 
+	pkglog "carsharing/shared/pkg/log"
+	pkgutils "carsharing/shared/pkg/utils"
 	"carsharing/trip-service/internal/adapter/grpc/dto"
 	"carsharing/trip-service/internal/model"
-	pkglog "carsharing/trip-service/internal/pkg/log"
-	"carsharing/trip-service/internal/pkg/utils"
 )
 
 type methodPolicy struct {
@@ -32,7 +32,7 @@ func NewAuthInterceptor(log *slog.Logger) *AuthInterceptor {
 func (i *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		ctx = extractMetadata(ctx)
-		md := utils.MetadataFromCtx(ctx)
+		md := pkgutils.MetadataFromCtx(ctx)
 		log := pkglog.WithMetadata(pkglog.WithMethod(i.log, info.FullMethod), md)
 
 		policy, known := i.policies[info.FullMethod]
@@ -54,7 +54,7 @@ func (i *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 
 		for _, allowed := range policy.allowedRoles {
 			for _, callerRole := range md.UserRoles {
-				if callerRole == allowed {
+				if model.Role(callerRole) == allowed {
 					return handler(ctx, req)
 				}
 			}
@@ -69,7 +69,7 @@ func (i *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 func (i *AuthInterceptor) Stream() grpc.StreamServerInterceptor {
 	return func(srv any, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		ctx := extractMetadata(ss.Context())
-		md := utils.MetadataFromCtx(ctx)
+		md := pkgutils.MetadataFromCtx(ctx)
 		log := pkglog.WithMetadata(pkglog.WithMethod(i.log, info.FullMethod), md)
 
 		policy, known := i.policies[info.FullMethod]
@@ -91,7 +91,7 @@ func (i *AuthInterceptor) Stream() grpc.StreamServerInterceptor {
 
 		for _, allowed := range policy.allowedRoles {
 			for _, callerRole := range md.UserRoles {
-				if callerRole == allowed {
+				if model.Role(callerRole) == allowed {
 					return handler(srv, ss)
 				}
 			}

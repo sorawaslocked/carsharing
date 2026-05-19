@@ -9,9 +9,9 @@ import (
 	basetripmb "github.com/sorawaslocked/car-rental-protos/gen/base/trip"
 	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
 
+	pkglog "carsharing/shared/pkg/log"
 	"carsharing/trip-service/internal/adapter/grpc/dto"
 	"carsharing/trip-service/internal/model"
-	pkglog "carsharing/trip-service/internal/pkg/log"
 )
 
 type TripService interface {

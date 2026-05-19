@@ -1,7 +1,6 @@
 package dto
 
 import (
-	"database/sql"
 	"fmt"
 	"time"
 
@@ -14,8 +13,8 @@ type statusReadingRow struct {
 	FromStatus string
 	ToStatus   string
 	ActorType  string
-	ActorID    sql.NullString
-	Reason     sql.NullString
+	ActorID    *string
+	Reason     *string
 	ChangedAt  time.Time
 }
 
@@ -29,21 +28,16 @@ func ScanTripStatusReading(s scanner) (model.TripStatusReading, error) {
 		return model.TripStatusReading{}, err
 	}
 
-	reading := model.TripStatusReading{
+	return model.TripStatusReading{
 		ID:         r.ID,
 		TripID:     r.TripID,
 		FromStatus: model.TripStatus(r.FromStatus),
 		ToStatus:   model.TripStatus(r.ToStatus),
 		ActorType:  model.ActorType(r.ActorType),
+		ActorID:    r.ActorID,
+		Reason:     r.Reason,
 		ChangedAt:  r.ChangedAt,
-	}
-	if r.ActorID.Valid {
-		reading.ActorID = &r.ActorID.String
-	}
-	if r.Reason.Valid {
-		reading.Reason = &r.Reason.String
-	}
-	return reading, nil
+	}, nil
 }
 
 func BuildStatusReadingWhereClauses(f model.TripStatusReadingFilter, b *ArgsBuilder) []string {

@@ -2,10 +2,10 @@ package handler
 
 import (
 	"context"
-	"database/sql"
 	"log/slog"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	natsio "github.com/nats-io/nats.go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
@@ -15,7 +15,7 @@ import (
 	protosvc "github.com/sorawaslocked/car-rental-protos/gen/service"
 	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
 
-	pkglog "carsharing/trip-service/internal/pkg/log"
+	pkglog "carsharing/shared/pkg/log"
 )
 
 const depCheckTimeout = 3 * time.Second
@@ -24,7 +24,7 @@ type HealthHandler struct {
 	tripsvc.UnimplementedHealthServiceServer
 	log         *slog.Logger
 	startTime   time.Time
-	db          *sql.DB
+	pool        *pgxpool.Pool
 	natsConn    *natsio.Conn
 	carConn     *grpc.ClientConn
 	streamConn  *grpc.ClientConn
@@ -33,7 +33,7 @@ type HealthHandler struct {
 
 func NewHealthHandler(
 	log *slog.Logger,
-	db *sql.DB,
+	pool *pgxpool.Pool,
 	natsConn *natsio.Conn,
 	carConn *grpc.ClientConn,
 	streamConn *grpc.ClientConn,
@@ -42,7 +42,7 @@ func NewHealthHandler(
 	return &HealthHandler{
 		log:         pkglog.WithComponent(log, "handler.HealthHandler"),
 		startTime:   time.Now(),
-		db:          db,
+		pool:        pool,
 		natsConn:    natsConn,
 		carConn:     carConn,
 		streamConn:  streamConn,
@@ -82,7 +82,7 @@ func (h *HealthHandler) pingPostgres(ctx context.Context) *protosvc.DependencyHe
 	defer cancel()
 
 	start := time.Now()
-	err := h.db.PingContext(ctx)
+	err := h.pool.Ping(ctx)
 	ms := uint32(time.Since(start).Milliseconds())
 
 	dep := &protosvc.DependencyHealth{Name: "postgres", LatencyMs: &ms}

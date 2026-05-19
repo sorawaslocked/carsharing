@@ -2,33 +2,34 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
+	"log/slog"
 	"strings"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+
+	pkglog "carsharing/shared/pkg/log"
+	pkgutils "carsharing/shared/pkg/utils"
 	"carsharing/trip-service/internal/adapter/postgres/dto"
 	"carsharing/trip-service/internal/model"
-	pkglog "carsharing/trip-service/internal/pkg/log"
-	"carsharing/trip-service/internal/pkg/utils"
-	"log/slog"
 )
 
 type TripRepo struct {
-	log *slog.Logger
-	db  *sql.DB
+	log  *slog.Logger
+	pool *pgxpool.Pool
 }
 
-func NewTripRepo(log *slog.Logger, db *sql.DB) *TripRepo {
+func NewTripRepo(log *slog.Logger, pool *pgxpool.Pool) *TripRepo {
 	return &TripRepo{
-		log: pkglog.WithComponent(log, "repo.TripRepo"),
-		db:  db,
+		log:  pkglog.WithComponent(log, "repo.TripRepo"),
+		pool: pool,
 	}
 }
 
 func (r *TripRepo) Create(ctx context.Context, trip model.TripCreate) (model.Trip, error) {
 	log := pkglog.WithMethod(r.log, "Create")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+	log = pkglog.WithMetadata(log, pkgutils.MetadataFromCtx(ctx))
 
 	now := time.Now()
 
@@ -40,11 +41,11 @@ func (r *TripRepo) Create(ctx context.Context, trip model.TripCreate) (model.Tri
 		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 		RETURNING %s`, dto.TripColumns)
 
-	t, err := dto.ScanTrip(r.db.QueryRowContext(ctx, q,
+	t, err := dto.ScanTrip(r.pool.QueryRow(ctx, q,
 		trip.ID, trip.BookingID, trip.UserID, trip.CarID, trip.Status.String(),
 		trip.StartedAt,
 		trip.StartLocation.Latitude, trip.StartLocation.Longitude,
-		trip.StartMileageKM, dto.NullableFloat32(trip.StartFuelLevel),
+		trip.StartMileageKM, trip.StartFuelLevel,
 		now, now,
 	))
 	if err != nil {
@@ -55,11 +56,11 @@ func (r *TripRepo) Create(ctx context.Context, trip model.TripCreate) (model.Tri
 
 func (r *TripRepo) GetByID(ctx context.Context, id string) (model.Trip, error) {
 	log := pkglog.WithMethod(r.log, "GetByID")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+	log = pkglog.WithMetadata(log, pkgutils.MetadataFromCtx(ctx))
 
 	q := fmt.Sprintf(`SELECT %s FROM trips WHERE id = $1`, dto.TripColumns)
 
-	t, err := dto.ScanTrip(r.db.QueryRowContext(ctx, q, id))
+	t, err := dto.ScanTrip(r.pool.QueryRow(ctx, q, id))
 	if err != nil {
 		return model.Trip{}, mapSQLError(log, err, "failed to get trip by id")
 	}
@@ -68,7 +69,7 @@ func (r *TripRepo) GetByID(ctx context.Context, id string) (model.Trip, error) {
 
 func (r *TripRepo) List(ctx context.Context, filter model.TripFilter) ([]model.Trip, error) {
 	log := pkglog.WithMethod(r.log, "List")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+	log = pkglog.WithMetadata(log, pkgutils.MetadataFromCtx(ctx))
 
 	b := &dto.ArgsBuilder{}
 	where := dto.BuildTripWhereClause(dto.BuildTripWhereClauses(filter, b))
@@ -79,7 +80,7 @@ func (r *TripRepo) List(ctx context.Context, filter model.TripFilter) ([]model.T
 		dto.TripColumns, where, pagination,
 	)
 
-	rows, err := r.db.QueryContext(ctx, q, b.Args...)
+	rows, err := r.pool.Query(ctx, q, b.Args...)
 	if err != nil {
 		log.Error("failed to list trips", pkglog.Err(err))
 		return nil, model.ErrSQL
@@ -105,7 +106,7 @@ func (r *TripRepo) List(ctx context.Context, filter model.TripFilter) ([]model.T
 
 func (r *TripRepo) Update(ctx context.Context, id string, update model.TripUpdate) (model.Trip, error) {
 	log := pkglog.WithMethod(r.log, "Update")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+	log = pkglog.WithMetadata(log, pkgutils.MetadataFromCtx(ctx))
 
 	b := &dto.ArgsBuilder{}
 	setClauses := dto.BuildTripSetClauses(update, b)
@@ -117,7 +118,7 @@ func (r *TripRepo) Update(ctx context.Context, id string, update model.TripUpdat
 		dto.TripColumns,
 	)
 
-	t, err := dto.ScanTrip(r.db.QueryRowContext(ctx, q, b.Args...))
+	t, err := dto.ScanTrip(r.pool.QueryRow(ctx, q, b.Args...))
 	if err != nil {
 		return model.Trip{}, mapSQLError(log, err, "failed to update trip")
 	}

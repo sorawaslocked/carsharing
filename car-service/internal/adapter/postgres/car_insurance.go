@@ -2,27 +2,27 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"log/slog"
 	"strings"
 
 	"carsharing/car-service/internal/adapter/postgres/dto"
 	"carsharing/car-service/internal/model"
-	pkglog "carsharing/car-service/internal/pkg/log"
-	"carsharing/car-service/internal/pkg/utils"
-	"github.com/lib/pq"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type CarInsuranceRepository struct {
-	db  *sql.DB
-	log *slog.Logger
+	pool *pgxpool.Pool
+	log  *slog.Logger
 }
 
-func NewCarInsuranceRepository(db *sql.DB, log *slog.Logger) *CarInsuranceRepository {
+func NewCarInsuranceRepository(pool *pgxpool.Pool, log *slog.Logger) *CarInsuranceRepository {
 	return &CarInsuranceRepository{
-		db:  db,
-		log: pkglog.WithComponent(log, "repo.CarInsuranceRepo"),
+		pool: pool,
+		log:  pkglog.WithComponent(log, "repo.CarInsuranceRepo"),
 	}
 }
 
@@ -46,14 +46,14 @@ func (r *CarInsuranceRepository) Insert(ctx context.Context, ins model.CarInsura
 		b.Add(ins.CostTenge),
 		b.Add(string(ins.Status)),
 		b.Add(ins.Notes),
-		b.Add(pq.StringArray(dto.ImagesToKeys(ins.Images))),
+		b.Add(dto.ImagesToKeys(ins.Images)),
 		b.Add(ins.CreatedAt),
 		b.Add(ins.UpdatedAt),
 	}, ", ") + `) RETURNING id`
 
 	var id string
 
-	err := r.db.QueryRowContext(ctx, q, b.Args...).Scan(&id)
+	err := r.pool.QueryRow(ctx, q, b.Args...).Scan(&id)
 	if err != nil {
 		logger.Error("failed to insert car insurance", pkglog.Err(err))
 		return "", ErrSql
@@ -72,11 +72,11 @@ func (r *CarInsuranceRepository) FindByID(ctx context.Context, id string) (model
 		cost_tenge, status, notes, image_keys, created_at, updated_at
 		FROM car_insurances WHERE id = ` + b.Add(id) + ` LIMIT 1`
 
-	row := r.db.QueryRowContext(ctx, q, b.Args...)
+	row := r.pool.QueryRow(ctx, q, b.Args...)
 
 	ins, err := dto.ScanCarInsuranceRow(row)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return model.CarInsurance{}, ErrNotFound
 		}
 		logger.Error("failed to find car insurance by id", pkglog.Err(err))
@@ -102,7 +102,7 @@ func (r *CarInsuranceRepository) Find(ctx context.Context, filter model.CarInsur
 		cost_tenge, status, notes, image_keys, created_at, updated_at
 		FROM car_insurances` + where + dto.BuildPagination(b, filter.Pagination)
 
-	rows, err := r.db.QueryContext(ctx, q, b.Args...)
+	rows, err := r.pool.Query(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to query car insurances", pkglog.Err(err))
 		return nil, ErrSql
@@ -140,13 +140,13 @@ func (r *CarInsuranceRepository) Update(ctx context.Context, id string, update m
 
 	q := `UPDATE car_insurances SET ` + strings.Join(setClauses, ", ") + ` WHERE id = ` + b.Add(id)
 
-	res, err := r.db.ExecContext(ctx, q, b.Args...)
+	tag, err := r.pool.Exec(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to update car insurance", pkglog.Err(err))
 		return ErrSql
 	}
 
-	if n, _ := res.RowsAffected(); n == 0 {
+	if tag.RowsAffected() == 0 {
 		return ErrNotFound
 	}
 
@@ -161,13 +161,13 @@ func (r *CarInsuranceRepository) Delete(ctx context.Context, id string) error {
 
 	q := `DELETE FROM car_insurances WHERE id = ` + b.Add(id)
 
-	res, err := r.db.ExecContext(ctx, q, b.Args...)
+	tag, err := r.pool.Exec(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to delete car insurance", pkglog.Err(err))
 		return ErrSql
 	}
 
-	if n, _ := res.RowsAffected(); n == 0 {
+	if tag.RowsAffected() == 0 {
 		return ErrNotFound
 	}
 

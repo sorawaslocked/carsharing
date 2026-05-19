@@ -2,29 +2,30 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"log/slog"
 	"strings"
+	"time"
 
 	"carsharing/car-service/internal/adapter/postgres/dto"
 	"carsharing/car-service/internal/model"
-	pkglog "carsharing/car-service/internal/pkg/log"
-	"carsharing/car-service/internal/pkg/utils"
-	"github.com/lib/pq"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // --- CarMaintenanceTemplateRepository ---
 
 type CarMaintenanceTemplateRepository struct {
-	db  *sql.DB
-	log *slog.Logger
+	pool *pgxpool.Pool
+	log  *slog.Logger
 }
 
-func NewCarMaintenanceTemplateRepository(db *sql.DB, log *slog.Logger) *CarMaintenanceTemplateRepository {
+func NewCarMaintenanceTemplateRepository(pool *pgxpool.Pool, log *slog.Logger) *CarMaintenanceTemplateRepository {
 	return &CarMaintenanceTemplateRepository{
-		db:  db,
-		log: pkglog.WithComponent(log, "repo.CarMaintenanceTemplateRepo"),
+		pool: pool,
+		log:  pkglog.WithComponent(log, "repo.CarMaintenanceTemplateRepo"),
 	}
 }
 
@@ -50,7 +51,7 @@ func (r *CarMaintenanceTemplateRepository) Insert(ctx context.Context, t model.C
 
 	var id string
 
-	err := r.db.QueryRowContext(ctx, q, b.Args...).Scan(&id)
+	err := r.pool.QueryRow(ctx, q, b.Args...).Scan(&id)
 	if err != nil {
 		logger.Error("failed to insert maintenance template", pkglog.Err(err))
 		return "", ErrSql
@@ -68,11 +69,11 @@ func (r *CarMaintenanceTemplateRepository) FindByID(ctx context.Context, id stri
 	q := `SELECT id, name, km_interval, day_interval, is_mandatory, warn_pct, pull_pct, created_at, updated_at
 		FROM car_maintenance_templates WHERE id = ` + b.Add(id) + ` LIMIT 1`
 
-	row := r.db.QueryRowContext(ctx, q, b.Args...)
+	row := r.pool.QueryRow(ctx, q, b.Args...)
 
 	tmpl, err := dto.ScanMaintenanceTemplateRow(row)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return model.CarMaintenanceTemplate{}, ErrNotFound
 		}
 		logger.Error("failed to find maintenance template by id", pkglog.Err(err))
@@ -97,7 +98,7 @@ func (r *CarMaintenanceTemplateRepository) Find(ctx context.Context, filter mode
 	q := `SELECT id, name, km_interval, day_interval, is_mandatory, warn_pct, pull_pct, created_at, updated_at
 		FROM car_maintenance_templates` + where + dto.BuildPagination(b, filter.Pagination)
 
-	rows, err := r.db.QueryContext(ctx, q, b.Args...)
+	rows, err := r.pool.Query(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to query maintenance templates", pkglog.Err(err))
 		return nil, ErrSql
@@ -135,13 +136,13 @@ func (r *CarMaintenanceTemplateRepository) Update(ctx context.Context, id string
 
 	q := `UPDATE car_maintenance_templates SET ` + strings.Join(setClauses, ", ") + ` WHERE id = ` + b.Add(id)
 
-	res, err := r.db.ExecContext(ctx, q, b.Args...)
+	tag, err := r.pool.Exec(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to update maintenance template", pkglog.Err(err))
 		return ErrSql
 	}
 
-	if n, _ := res.RowsAffected(); n == 0 {
+	if tag.RowsAffected() == 0 {
 		return ErrNotFound
 	}
 
@@ -156,13 +157,13 @@ func (r *CarMaintenanceTemplateRepository) Delete(ctx context.Context, id string
 
 	q := `DELETE FROM car_maintenance_templates WHERE id = ` + b.Add(id)
 
-	res, err := r.db.ExecContext(ctx, q, b.Args...)
+	tag, err := r.pool.Exec(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to delete maintenance template", pkglog.Err(err))
 		return ErrSql
 	}
 
-	if n, _ := res.RowsAffected(); n == 0 {
+	if tag.RowsAffected() == 0 {
 		return ErrNotFound
 	}
 
@@ -172,14 +173,14 @@ func (r *CarMaintenanceTemplateRepository) Delete(ctx context.Context, id string
 // --- CarMaintenanceRecordRepository ---
 
 type CarMaintenanceRecordRepository struct {
-	db  *sql.DB
-	log *slog.Logger
+	pool *pgxpool.Pool
+	log  *slog.Logger
 }
 
-func NewCarMaintenanceRecordRepository(db *sql.DB, log *slog.Logger) *CarMaintenanceRecordRepository {
+func NewCarMaintenanceRecordRepository(pool *pgxpool.Pool, log *slog.Logger) *CarMaintenanceRecordRepository {
 	return &CarMaintenanceRecordRepository{
-		db:  db,
-		log: pkglog.WithComponent(log, "repo.CarMaintenanceRecordRepo"),
+		pool: pool,
+		log:  pkglog.WithComponent(log, "repo.CarMaintenanceRecordRepo"),
 	}
 }
 
@@ -204,14 +205,14 @@ func (r *CarMaintenanceRecordRepository) Insert(ctx context.Context, rec model.C
 		b.Add(rec.DueBy),
 		b.Add(rec.CompletedAt),
 		b.Add(rec.Notes),
-		b.Add(pq.StringArray(dto.ImagesToKeys(rec.ReceiptImages))),
+		b.Add(dto.ImagesToKeys(rec.ReceiptImages)),
 		b.Add(rec.CreatedAt),
 		b.Add(rec.UpdatedAt),
 	}, ", ") + `) RETURNING id`
 
 	var id string
 
-	err := r.db.QueryRowContext(ctx, q, b.Args...).Scan(&id)
+	err := r.pool.QueryRow(ctx, q, b.Args...).Scan(&id)
 	if err != nil {
 		logger.Error("failed to insert maintenance record", pkglog.Err(err))
 		return "", ErrSql
@@ -230,11 +231,11 @@ func (r *CarMaintenanceRecordRepository) FindByID(ctx context.Context, id string
 		assigned_to, due_by, completed_at, notes, receipt_image_keys, created_at, updated_at
 		FROM car_maintenance_records WHERE id = ` + b.Add(id) + ` LIMIT 1`
 
-	row := r.db.QueryRowContext(ctx, q, b.Args...)
+	row := r.pool.QueryRow(ctx, q, b.Args...)
 
 	rec, err := dto.ScanMaintenanceRecordRow(row)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return model.CarMaintenanceRecord{}, ErrNotFound
 		}
 		logger.Error("failed to find maintenance record by id", pkglog.Err(err))
@@ -260,7 +261,7 @@ func (r *CarMaintenanceRecordRepository) Find(ctx context.Context, filter model.
 		assigned_to, due_by, completed_at, notes, receipt_image_keys, created_at, updated_at
 		FROM car_maintenance_records` + where + dto.BuildPagination(b, filter.Pagination)
 
-	rows, err := r.db.QueryContext(ctx, q, b.Args...)
+	rows, err := r.pool.Query(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to query maintenance records", pkglog.Err(err))
 		return nil, ErrSql
@@ -298,13 +299,13 @@ func (r *CarMaintenanceRecordRepository) Update(ctx context.Context, id string, 
 
 	q := `UPDATE car_maintenance_records SET ` + strings.Join(setClauses, ", ") + ` WHERE id = ` + b.Add(id)
 
-	res, err := r.db.ExecContext(ctx, q, b.Args...)
+	tag, err := r.pool.Exec(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to update maintenance record", pkglog.Err(err))
 		return ErrSql
 	}
 
-	if n, _ := res.RowsAffected(); n == 0 {
+	if tag.RowsAffected() == 0 {
 		return ErrNotFound
 	}
 
@@ -314,14 +315,14 @@ func (r *CarMaintenanceRecordRepository) Update(ctx context.Context, id string, 
 // --- CarServiceStateRepository ---
 
 type CarServiceStateRepository struct {
-	db  *sql.DB
-	log *slog.Logger
+	pool *pgxpool.Pool
+	log  *slog.Logger
 }
 
-func NewCarServiceStateRepository(db *sql.DB, log *slog.Logger) *CarServiceStateRepository {
+func NewCarServiceStateRepository(pool *pgxpool.Pool, log *slog.Logger) *CarServiceStateRepository {
 	return &CarServiceStateRepository{
-		db:  db,
-		log: pkglog.WithComponent(log, "repo.CarServiceStateRepo"),
+		pool: pool,
+		log:  pkglog.WithComponent(log, "repo.CarServiceStateRepo"),
 	}
 }
 
@@ -347,7 +348,7 @@ func (r *CarServiceStateRepository) Upsert(ctx context.Context, state model.CarS
 			next_due_km  = EXCLUDED.next_due_km,
 			next_due_date = EXCLUDED.next_due_date`
 
-	_, err := r.db.ExecContext(ctx, q, b.Args...)
+	_, err := r.pool.Exec(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to upsert car service state", pkglog.Err(err))
 		return ErrSql
@@ -378,7 +379,7 @@ func (r *CarServiceStateRepository) FindAll(ctx context.Context, filter model.Ca
 	q := `SELECT car_id, template_id, last_km, last_date, next_due_km, next_due_date
 		FROM car_service_states` + where
 
-	rows, err := r.db.QueryContext(ctx, q, b.Args...)
+	rows, err := r.pool.Query(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to query car service states", pkglog.Err(err))
 		return nil, ErrSql
@@ -388,9 +389,9 @@ func (r *CarServiceStateRepository) FindAll(ctx context.Context, filter model.Ca
 	var result []model.CarServiceState
 	for rows.Next() {
 		var s model.CarServiceState
-		var lastDate sql.NullTime
-		var nextDueKM sql.NullInt32
-		var nextDueDate sql.NullTime
+		var lastDate *time.Time
+		var nextDueKM *int32
+		var nextDueDate *time.Time
 
 		if err = rows.Scan(
 			&s.CarID, &s.TemplateID, &s.LastKM,
@@ -400,16 +401,9 @@ func (r *CarServiceStateRepository) FindAll(ctx context.Context, filter model.Ca
 			return nil, ErrSql
 		}
 
-		if lastDate.Valid {
-			s.LastDate = &lastDate.Time
-		}
-		if nextDueKM.Valid {
-			v := nextDueKM.Int32
-			s.NextDueKM = &v
-		}
-		if nextDueDate.Valid {
-			s.NextDueDate = &nextDueDate.Time
-		}
+		s.LastDate = lastDate
+		s.NextDueKM = nextDueKM
+		s.NextDueDate = nextDueDate
 
 		result = append(result, s)
 	}

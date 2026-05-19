@@ -4,17 +4,18 @@ import (
 	"flag"
 	"os"
 
-	pkggrpc "carsharing/booking-service/internal/pkg/grpc"
-	pkgnats "carsharing/booking-service/internal/pkg/nats"
-	pkgpostgres "carsharing/booking-service/internal/pkg/postgres"
+	pkggrpc "carsharing/shared/pkg/grpc"
+	pkgnats "carsharing/shared/pkg/nats"
+	pkgpostgres "carsharing/shared/pkg/postgres"
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
 type Config struct {
-	Env  string               `yaml:"env"         env:"ENV"  env-default:"local"`
-	GRPC pkggrpc.ServerConfig `yaml:"grpc_server"`
-	PG   pkgpostgres.Config   `yaml:"postgres"`
-	NATS pkgnats.Config       `yaml:"nats"`
+	Env            string                   `yaml:"env"             env:"ENV"  env-default:"local"`
+	GRPC           pkggrpc.ServerConfig     `yaml:"grpc_server"`
+	PG             pkgpostgres.Config       `yaml:"postgres"`
+	NATSPublisher  pkgnats.PublisherConfig  `yaml:"nats_publisher"`
+	NATSSubscriber pkgnats.SubscriberConfig `yaml:"nats_subscriber"`
 }
 
 func MustLoad() Config {

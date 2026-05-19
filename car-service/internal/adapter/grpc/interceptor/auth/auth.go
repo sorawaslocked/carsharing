@@ -6,8 +6,8 @@ import (
 
 	"carsharing/car-service/internal/adapter/grpc/dto"
 	"carsharing/car-service/internal/model"
-	pkglog "carsharing/car-service/internal/pkg/log"
-	"carsharing/car-service/internal/pkg/utils"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 
 	"google.golang.org/grpc"
 )
@@ -54,7 +54,7 @@ func (i *AuthInterceptor) Unary(ctx context.Context, req any, info *grpc.UnarySe
 	// Role check: any matching role grants access.
 	for _, allowed := range policy.allowedRoles {
 		for _, callerRole := range md.UserRoles {
-			if callerRole == allowed {
+			if callerRole == string(allowed) {
 				return handler(ctx, req)
 			}
 		}

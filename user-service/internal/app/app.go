@@ -11,6 +11,7 @@ import (
 	"time"
 
 	pkggrpc "carsharing/shared/pkg/grpc"
+	pkglog "carsharing/shared/pkg/log"
 	pkgminio "carsharing/shared/pkg/minio"
 	pkgnats "carsharing/shared/pkg/nats"
 	pkgpostgres "carsharing/shared/pkg/postgres"
@@ -26,7 +27,6 @@ import (
 	"carsharing/user-service/internal/adapter/postgres"
 	redisadapter "carsharing/user-service/internal/adapter/redis"
 	"carsharing/user-service/internal/config"
-	pkglog "carsharing/user-service/internal/pkg/log"
 	validatecfg "carsharing/user-service/internal/pkg/validate"
 	"carsharing/user-service/internal/service"
 	"github.com/go-playground/validator/v10"

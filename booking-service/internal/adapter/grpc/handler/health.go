@@ -2,10 +2,10 @@ package handler
 
 import (
 	"context"
-	"database/sql"
 	"log/slog"
 
-	pkglog "carsharing/booking-service/internal/pkg/log"
+	pkglog "carsharing/shared/pkg/log"
+	"github.com/jackc/pgx/v5/pgxpool"
 	natsgo "github.com/nats-io/nats.go"
 	servicepb "github.com/sorawaslocked/car-rental-protos/gen/service"
 	servicebookingpb "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
@@ -15,16 +15,16 @@ import (
 
 type HealthHandler struct {
 	servicebookingpb.UnimplementedHealthServiceServer
-	log *slog.Logger
-	db  *sql.DB
-	nc  *natsgo.Conn
+	log  *slog.Logger
+	pool *pgxpool.Pool
+	nc   *natsgo.Conn
 }
 
-func NewHealthHandler(log *slog.Logger, db *sql.DB, nc *natsgo.Conn) *HealthHandler {
+func NewHealthHandler(log *slog.Logger, pool *pgxpool.Pool, nc *natsgo.Conn) *HealthHandler {
 	return &HealthHandler{
-		log: pkglog.WithComponent(log, "grpc.HealthHandler"),
-		db:  db,
-		nc:  nc,
+		log:  pkglog.WithComponent(log, "grpc.HealthHandler"),
+		pool: pool,
+		nc:   nc,
 	}
 }
 
@@ -34,7 +34,7 @@ func (h *HealthHandler) Health(ctx context.Context, _ *emptypb.Empty) (*servicep
 	deps := make([]*servicepb.DependencyHealth, 0, 2)
 
 	pgStatus := "healthy"
-	if err := h.db.PingContext(ctx); err != nil {
+	if err := h.pool.Ping(ctx); err != nil {
 		log.Error("postgres health check failed", pkglog.Err(err))
 		pgStatus = "unhealthy"
 	}

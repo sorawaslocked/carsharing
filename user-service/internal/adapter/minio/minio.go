@@ -9,10 +9,10 @@ import (
 	"net/url"
 	"time"
 
+	pkglog "carsharing/shared/pkg/log"
 	pkgminio "carsharing/shared/pkg/minio"
+	"carsharing/shared/pkg/utils"
 	"carsharing/user-service/internal/model"
-	pkglog "carsharing/user-service/internal/pkg/log"
-	"carsharing/user-service/internal/pkg/utils"
 	"github.com/minio/minio-go/v7"
 )
 

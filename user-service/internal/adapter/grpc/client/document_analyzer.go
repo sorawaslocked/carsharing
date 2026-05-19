@@ -4,8 +4,8 @@ import (
 	"context"
 	"log/slog"
 
-	pkglog "carsharing/user-service/internal/pkg/log"
-	"carsharing/user-service/internal/pkg/utils"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"google.golang.org/grpc"
 )

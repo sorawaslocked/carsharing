@@ -6,8 +6,8 @@ import (
 
 	"carsharing/booking-service/internal/adapter/grpc/dto"
 	"carsharing/booking-service/internal/model"
-	pkglog "carsharing/booking-service/internal/pkg/log"
-	"carsharing/booking-service/internal/pkg/utils"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	"google.golang.org/grpc"
 )
 
@@ -52,7 +52,7 @@ func (i *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 
 		for _, allowed := range policy.allowedRoles {
 			for _, callerRole := range md.UserRoles {
-				if callerRole == allowed {
+				if model.Role(callerRole) == allowed {
 					return handler(ctx, req)
 				}
 			}

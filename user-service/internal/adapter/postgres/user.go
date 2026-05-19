@@ -7,10 +7,10 @@ import (
 	"log/slog"
 	"strings"
 
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	pgdto "carsharing/user-service/internal/adapter/postgres/dto"
 	"carsharing/user-service/internal/model"
-	pkglog "carsharing/user-service/internal/pkg/log"
-	"carsharing/user-service/internal/pkg/utils"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"

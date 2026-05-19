@@ -1,12 +1,9 @@
 package dto
 
 import (
-	"database/sql"
+	"carsharing/car-service/internal/model"
 	"fmt"
 	"time"
-
-	"carsharing/car-service/internal/model"
-	"github.com/lib/pq"
 )
 
 // --- CarMaintenanceTemplate ---
@@ -14,8 +11,8 @@ import (
 type carMaintenanceTemplateRow struct {
 	ID          string
 	Name        string
-	KmInterval  sql.NullInt32
-	DayInterval sql.NullInt32
+	KmInterval  *int32
+	DayInterval *int32
 	IsMandatory bool
 	WarnPct     float64
 	PullPct     float64
@@ -24,26 +21,17 @@ type carMaintenanceTemplateRow struct {
 }
 
 func (r carMaintenanceTemplateRow) toDomain() model.CarMaintenanceTemplate {
-	t := model.CarMaintenanceTemplate{
+	return model.CarMaintenanceTemplate{
 		ID:          r.ID,
 		Name:        r.Name,
+		KmInterval:  r.KmInterval,
+		DayInterval: r.DayInterval,
 		IsMandatory: r.IsMandatory,
 		WarnPct:     r.WarnPct,
 		PullPct:     r.PullPct,
 		CreatedAt:   r.CreatedAt,
 		UpdatedAt:   r.UpdatedAt,
 	}
-
-	if r.KmInterval.Valid {
-		v := r.KmInterval.Int32
-		t.KmInterval = &v
-	}
-	if r.DayInterval.Valid {
-		v := r.DayInterval.Int32
-		t.DayInterval = &v
-	}
-
-	return t
 }
 
 func ScanMaintenanceTemplateRow(s scanner) (model.CarMaintenanceTemplate, error) {
@@ -105,51 +93,34 @@ type carMaintenanceRecordRow struct {
 	TemplateID  string
 	Status      string
 	OdometerAt  int32
-	CompletedKM sql.NullInt32
-	CostTenge   sql.NullInt32
-	AssignedTo  sql.NullString
-	DueBy       sql.NullTime
-	CompletedAt sql.NullTime
-	Notes       sql.NullString
-	ReceiptKeys pq.StringArray
+	CompletedKM *int32
+	CostTenge   *int32
+	AssignedTo  *string
+	DueBy       *time.Time
+	CompletedAt *time.Time
+	Notes       *string
+	ReceiptKeys []string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
 
 func (r carMaintenanceRecordRow) toDomain() model.CarMaintenanceRecord {
-	rec := model.CarMaintenanceRecord{
+	return model.CarMaintenanceRecord{
 		ID:            r.ID,
 		CarID:         r.CarID,
 		TemplateID:    r.TemplateID,
 		Status:        model.MaintenanceRecordStatus(r.Status),
 		OdometerAt:    r.OdometerAt,
-		ReceiptImages: ImageKeysToImages([]string(r.ReceiptKeys)),
+		CompletedKM:   r.CompletedKM,
+		CostTenge:     r.CostTenge,
+		AssignedTo:    r.AssignedTo,
+		DueBy:         r.DueBy,
+		CompletedAt:   r.CompletedAt,
+		Notes:         r.Notes,
+		ReceiptImages: ImageKeysToImages(r.ReceiptKeys),
 		CreatedAt:     r.CreatedAt,
 		UpdatedAt:     r.UpdatedAt,
 	}
-
-	if r.CompletedKM.Valid {
-		v := r.CompletedKM.Int32
-		rec.CompletedKM = &v
-	}
-	if r.CostTenge.Valid {
-		v := r.CostTenge.Int32
-		rec.CostTenge = &v
-	}
-	if r.AssignedTo.Valid {
-		rec.AssignedTo = &r.AssignedTo.String
-	}
-	if r.DueBy.Valid {
-		rec.DueBy = &r.DueBy.Time
-	}
-	if r.CompletedAt.Valid {
-		rec.CompletedAt = &r.CompletedAt.Time
-	}
-	if r.Notes.Valid {
-		rec.Notes = &r.Notes.String
-	}
-
-	return rec
 }
 
 func ScanMaintenanceRecordRow(s scanner) (model.CarMaintenanceRecord, error) {
@@ -209,7 +180,7 @@ func BuildMaintenanceRecordSetClauses(u model.CarMaintenanceRecordUpdate, b *Arg
 		clauses = append(clauses, fmt.Sprintf("notes = %s", b.Add(*u.Notes)))
 	}
 	if u.ReceiptImageKeys != nil {
-		clauses = append(clauses, fmt.Sprintf("receipt_image_keys = %s", b.Add(pq.StringArray(u.ReceiptImageKeys))))
+		clauses = append(clauses, fmt.Sprintf("receipt_image_keys = %s", b.Add(u.ReceiptImageKeys)))
 	}
 
 	clauses = append(clauses, fmt.Sprintf("updated_at = %s", b.Add(u.UpdatedAt)))

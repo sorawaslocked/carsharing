@@ -10,9 +10,9 @@ import (
 
 	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
 
+	pkglog "carsharing/shared/pkg/log"
 	"carsharing/trip-service/internal/adapter/grpc/dto"
 	"carsharing/trip-service/internal/model"
-	pkglog "carsharing/trip-service/internal/pkg/log"
 )
 
 type TripStreamService interface {

@@ -19,7 +19,7 @@ func TestHealthHandlerHealth(t *testing.T) {
 		nats := mocks.NewMockNATSChecker(t)
 		h := NewHealthHandler(db, nats, discardLogger())
 
-		db.EXPECT().PingContext(mock.Anything).Return(nil)
+		db.EXPECT().Ping(mock.Anything).Return(nil)
 		nats.EXPECT().IsConnected().Return(true)
 
 		resp, err := h.Health(ctx, &emptypb.Empty{})
@@ -33,7 +33,7 @@ func TestHealthHandlerHealth(t *testing.T) {
 		nats := mocks.NewMockNATSChecker(t)
 		h := NewHealthHandler(db, nats, discardLogger())
 
-		db.EXPECT().PingContext(mock.Anything).Return(errors.New("connection refused"))
+		db.EXPECT().Ping(mock.Anything).Return(errors.New("connection refused"))
 		nats.EXPECT().IsConnected().Return(true)
 
 		resp, err := h.Health(ctx, &emptypb.Empty{})
@@ -46,7 +46,7 @@ func TestHealthHandlerHealth(t *testing.T) {
 		nats := mocks.NewMockNATSChecker(t)
 		h := NewHealthHandler(db, nats, discardLogger())
 
-		db.EXPECT().PingContext(mock.Anything).Return(nil)
+		db.EXPECT().Ping(mock.Anything).Return(nil)
 		nats.EXPECT().IsConnected().Return(false)
 
 		resp, err := h.Health(ctx, &emptypb.Empty{})
@@ -59,7 +59,7 @@ func TestHealthHandlerHealth(t *testing.T) {
 		nats := mocks.NewMockNATSChecker(t)
 		h := NewHealthHandler(db, nats, discardLogger())
 
-		db.EXPECT().PingContext(mock.Anything).Return(errors.New("connection refused"))
+		db.EXPECT().Ping(mock.Anything).Return(errors.New("connection refused"))
 		nats.EXPECT().IsConnected().Return(false)
 
 		resp, err := h.Health(ctx, &emptypb.Empty{})
@@ -72,7 +72,7 @@ func TestHealthHandlerHealth(t *testing.T) {
 		nats := mocks.NewMockNATSChecker(t)
 		h := NewHealthHandler(db, nats, discardLogger())
 
-		db.EXPECT().PingContext(mock.Anything).Return(nil).Maybe()
+		db.EXPECT().Ping(mock.Anything).Return(nil).Maybe()
 		nats.EXPECT().IsConnected().Return(true).Maybe()
 
 		resp, err := h.Health(ctx, &emptypb.Empty{})

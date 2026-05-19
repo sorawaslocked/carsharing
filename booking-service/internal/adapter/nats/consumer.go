@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	pkglog "carsharing/booking-service/internal/pkg/log"
+	pkglog "carsharing/shared/pkg/log"
 
 	natsgo "github.com/nats-io/nats.go"
 	eventtripb "github.com/sorawaslocked/car-rental-protos/gen/event/trip"

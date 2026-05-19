@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"carsharing/booking-service/internal/model"
-	pkglog "carsharing/booking-service/internal/pkg/log"
-	"carsharing/booking-service/internal/pkg/utils"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 )
 
 const (
@@ -235,9 +235,9 @@ func (s *BookingService) StartExpiryWatcher(ctx context.Context) {
 	}
 }
 
-func isPrivileged(roles []model.Role) bool {
+func isPrivileged(roles []string) bool {
 	for _, r := range roles {
-		if r == model.RoleAdmin || r == model.RoleBookingManager {
+		if r == string(model.RoleAdmin) || r == string(model.RoleBookingManager) {
 			return true
 		}
 	}

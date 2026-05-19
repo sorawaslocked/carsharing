@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"carsharing/car-service/internal/model"
-	pkglog "carsharing/car-service/internal/pkg/log"
+	pkglog "carsharing/shared/pkg/log"
 	telematicspb "github.com/sorawaslocked/car-rental-protos/gen/service/telematics"
 	"google.golang.org/grpc"
 )

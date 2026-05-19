@@ -1,7 +1,6 @@
 package app
 
 import (
-	"database/sql"
 	"fmt"
 	"log/slog"
 	"net"
@@ -10,19 +9,21 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	natsio "github.com/nats-io/nats.go"
 	"google.golang.org/grpc"
 
+	pkggrpc "carsharing/shared/pkg/grpc"
+	pkglog "carsharing/shared/pkg/log"
+	pkgnats "carsharing/shared/pkg/nats"
+	pkgpostgres "carsharing/shared/pkg/postgres"
 	grpcserver "carsharing/trip-service/internal/adapter/grpc"
 	"carsharing/trip-service/internal/adapter/grpc/client"
 	"carsharing/trip-service/internal/adapter/grpc/handler"
+	"carsharing/trip-service/internal/adapter/grpc/interceptor"
 	natspub "carsharing/trip-service/internal/adapter/nats"
 	"carsharing/trip-service/internal/adapter/postgres"
 	"carsharing/trip-service/internal/config"
-	pkggrpc "carsharing/trip-service/internal/pkg/grpc"
-	pkglog "carsharing/trip-service/internal/pkg/log"
-	pkgnats "carsharing/trip-service/internal/pkg/nats"
-	pkgpostgres "carsharing/trip-service/internal/pkg/postgres"
 	"carsharing/trip-service/internal/service"
 )
 
@@ -30,7 +31,7 @@ type App struct {
 	log         *slog.Logger
 	grpcServer  *grpc.Server
 	grpcAddr    string
-	db          *sql.DB
+	pool        *pgxpool.Pool
 	natsConn    *natsio.Conn
 	carConn     *grpc.ClientConn
 	streamConn  *grpc.ClientConn
@@ -38,44 +39,47 @@ type App struct {
 }
 
 func New(log *slog.Logger, cfg config.Config) (*App, error) {
-	db, err := pkgpostgres.NewDB(cfg.PG)
+	pool, err := pkgpostgres.NewPool(log, cfg.PG)
 	if err != nil {
 		return nil, fmt.Errorf("postgres: %w", err)
 	}
 
-	nc, err := pkgnats.NewConn(cfg.NATS)
+	nc, err := pkgnats.NewPublisher(log, cfg.NATS)
 	if err != nil {
-		_ = db.Close()
+		pool.Close()
 		return nil, fmt.Errorf("nats: %w", err)
 	}
 
-	carConn, err := pkggrpc.NewClientConn(cfg.CarService.Addr)
+	unaryInterceptors := grpc.WithChainUnaryInterceptor(interceptor.MetadataForwardingUnaryInterceptor)
+	streamInterceptors := grpc.WithChainStreamInterceptor(interceptor.MetadataForwardingStreamInterceptor)
+
+	carConn, err := pkggrpc.NewClientConn(log, cfg.CarService, unaryInterceptors, streamInterceptors)
 	if err != nil {
-		_ = db.Close()
+		pool.Close()
 		nc.Close()
 		return nil, fmt.Errorf("car service client: %w", err)
 	}
 
-	streamConn, err := pkggrpc.NewClientConn(cfg.CarStreamService.Addr)
+	streamConn, err := pkggrpc.NewClientConn(log, cfg.CarStreamService, unaryInterceptors, streamInterceptors)
 	if err != nil {
-		_ = db.Close()
+		pool.Close()
 		nc.Close()
 		_ = carConn.Close()
 		return nil, fmt.Errorf("car stream service client: %w", err)
 	}
 
-	bookingConn, err := pkggrpc.NewClientConn(cfg.BookingService.Addr)
+	bookingConn, err := pkggrpc.NewClientConn(log, cfg.BookingService, unaryInterceptors, streamInterceptors)
 	if err != nil {
-		_ = db.Close()
+		pool.Close()
 		nc.Close()
 		_ = carConn.Close()
 		_ = streamConn.Close()
 		return nil, fmt.Errorf("booking service client: %w", err)
 	}
 
-	tripRepo := postgres.NewTripRepo(log, db)
-	summaryRepo := postgres.NewTripSummaryRepo(log, db)
-	statusRepo := postgres.NewTripStatusReadingRepo(log, db)
+	tripRepo := postgres.NewTripRepo(log, pool)
+	summaryRepo := postgres.NewTripSummaryRepo(log, pool)
+	statusRepo := postgres.NewTripStatusReadingRepo(log, pool)
 
 	bookingClient := client.NewBookingClient(log, bookingConn)
 	telematicsClient := client.NewTelematicsClient(log, carConn, streamConn)
@@ -85,15 +89,15 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 
 	tripHandler := handler.NewTripHandler(log, tripSvc)
 	streamHandler := handler.NewTripStreamHandler(log, tripSvc)
-	healthHandler := handler.NewHealthHandler(log, db, nc, carConn, streamConn, bookingConn)
+	healthHandler := handler.NewHealthHandler(log, pool, nc, carConn, streamConn, bookingConn)
 
 	srv := grpcserver.NewServer(log, tripHandler, streamHandler, healthHandler)
 
 	return &App{
 		log:         pkglog.WithComponent(log, "app"),
 		grpcServer:  srv,
-		grpcAddr:    cfg.GRPC.Addr,
-		db:          db,
+		grpcAddr:    fmt.Sprintf("%s:%d", cfg.GRPC.Host, cfg.GRPC.Port),
+		pool:        pool,
 		natsConn:    nc,
 		carConn:     carConn,
 		streamConn:  streamConn,
@@ -145,7 +149,7 @@ func (a *App) stop() {
 		a.grpcServer.Stop()
 	}
 
-	_ = a.db.Close()
+	a.pool.Close()
 	a.natsConn.Close()
 	_ = a.carConn.Close()
 	_ = a.streamConn.Close()

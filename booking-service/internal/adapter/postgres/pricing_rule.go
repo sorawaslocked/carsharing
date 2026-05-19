@@ -2,23 +2,25 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"log/slog"
 	"strings"
 
 	"carsharing/booking-service/internal/model"
-	pkglog "carsharing/booking-service/internal/pkg/log"
-	"carsharing/booking-service/internal/pkg/utils"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type PricingRuleRepo struct {
 	log *slog.Logger
-	db  *sql.DB
+	db  *pgxpool.Pool
 }
 
-func NewPricingRuleRepo(log *slog.Logger, db *sql.DB) *PricingRuleRepo {
+func NewPricingRuleRepo(log *slog.Logger, db *pgxpool.Pool) *PricingRuleRepo {
 	return &PricingRuleRepo{
 		log: pkglog.WithComponent(log, "repo.PricingRuleRepo"),
 		db:  db,
@@ -30,7 +32,7 @@ func (r *PricingRuleRepo) Create(ctx context.Context, data model.PricingRuleCrea
 	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
 	var id string
-	err := r.db.QueryRowContext(ctx, `
+	err := r.db.QueryRow(ctx, `
 		INSERT INTO pricing_rules
 			(model_id, zone_id, class, type, rate_tenge, rate_per_km_tenge, free_minutes, min_charge_tenge, overtime_policy, overtime_rate_tenge)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
@@ -53,10 +55,10 @@ func (r *PricingRuleRepo) GetByID(ctx context.Context, id string) (model.Pricing
 	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
 	var rule model.PricingRule
-	var modelID, zoneID, class, overtimePolicy sql.NullString
-	var ratePerKM, freeMinutes, minCharge, overtimeRate sql.NullInt32
+	var modelID, zoneID, class, overtimePolicy *string
+	var ratePerKM, freeMinutes, minCharge, overtimeRate *int32
 
-	err := r.db.QueryRowContext(ctx, `
+	err := r.db.QueryRow(ctx, `
 		SELECT id, model_id, zone_id, class, type, rate_tenge, rate_per_km_tenge,
 		       free_minutes, min_charge_tenge, overtime_policy, overtime_rate_tenge,
 		       is_active, created_at, updated_at
@@ -66,7 +68,7 @@ func (r *PricingRuleRepo) GetByID(ctx context.Context, id string) (model.Pricing
 		&ratePerKM, &freeMinutes, &minCharge, &overtimePolicy, &overtimeRate,
 		&rule.IsActive, &rule.CreatedAt, &rule.UpdatedAt,
 	)
-	if errors.Is(err, sql.ErrNoRows) {
+	if errors.Is(err, pgx.ErrNoRows) {
 		return model.PricingRule{}, model.ErrNotFound
 	}
 	if err != nil {
@@ -74,30 +76,14 @@ func (r *PricingRuleRepo) GetByID(ctx context.Context, id string) (model.Pricing
 		return model.PricingRule{}, model.ErrInternalServerError
 	}
 
-	if modelID.Valid {
-		rule.ModelID = &modelID.String
-	}
-	if zoneID.Valid {
-		rule.ZoneID = &zoneID.String
-	}
-	if class.Valid {
-		rule.Class = &class.String
-	}
-	if overtimePolicy.Valid {
-		rule.OvertimePolicy = &overtimePolicy.String
-	}
-	if ratePerKM.Valid {
-		rule.RatePerKMTenge = &ratePerKM.Int32
-	}
-	if freeMinutes.Valid {
-		rule.FreeMinutes = &freeMinutes.Int32
-	}
-	if minCharge.Valid {
-		rule.MinChargeTenge = &minCharge.Int32
-	}
-	if overtimeRate.Valid {
-		rule.OvertimeRateTenge = &overtimeRate.Int32
-	}
+	rule.ModelID = modelID
+	rule.ZoneID = zoneID
+	rule.Class = class
+	rule.OvertimePolicy = overtimePolicy
+	rule.RatePerKMTenge = ratePerKM
+	rule.FreeMinutes = freeMinutes
+	rule.MinChargeTenge = minCharge
+	rule.OvertimeRateTenge = overtimeRate
 
 	return rule, nil
 }
@@ -145,7 +131,7 @@ func (r *PricingRuleRepo) List(ctx context.Context, filter model.PricingRuleList
 
 	args = append(args, filter.Pagination.Limit, filter.Pagination.Offset)
 
-	rows, err := r.db.QueryContext(ctx, query, args...)
+	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
 		log.Error("failed to list pricing rules", pkglog.Err(err))
 		return nil, model.ErrInternalServerError
@@ -155,8 +141,8 @@ func (r *PricingRuleRepo) List(ctx context.Context, filter model.PricingRuleList
 	var rules []model.PricingRule
 	for rows.Next() {
 		var rule model.PricingRule
-		var modelID, zoneID, class, overtimePolicy sql.NullString
-		var ratePerKM, freeMinutes, minCharge, overtimeRate sql.NullInt32
+		var modelID, zoneID, class, overtimePolicy *string
+		var ratePerKM, freeMinutes, minCharge, overtimeRate *int32
 
 		if err := rows.Scan(
 			&rule.ID, &modelID, &zoneID, &class, &rule.Type, &rule.RateTenge,
@@ -167,30 +153,14 @@ func (r *PricingRuleRepo) List(ctx context.Context, filter model.PricingRuleList
 			return nil, model.ErrInternalServerError
 		}
 
-		if modelID.Valid {
-			rule.ModelID = &modelID.String
-		}
-		if zoneID.Valid {
-			rule.ZoneID = &zoneID.String
-		}
-		if class.Valid {
-			rule.Class = &class.String
-		}
-		if overtimePolicy.Valid {
-			rule.OvertimePolicy = &overtimePolicy.String
-		}
-		if ratePerKM.Valid {
-			rule.RatePerKMTenge = &ratePerKM.Int32
-		}
-		if freeMinutes.Valid {
-			rule.FreeMinutes = &freeMinutes.Int32
-		}
-		if minCharge.Valid {
-			rule.MinChargeTenge = &minCharge.Int32
-		}
-		if overtimeRate.Valid {
-			rule.OvertimeRateTenge = &overtimeRate.Int32
-		}
+		rule.ModelID = modelID
+		rule.ZoneID = zoneID
+		rule.Class = class
+		rule.OvertimePolicy = overtimePolicy
+		rule.RatePerKMTenge = ratePerKM
+		rule.FreeMinutes = freeMinutes
+		rule.MinChargeTenge = minCharge
+		rule.OvertimeRateTenge = overtimeRate
 
 		rules = append(rules, rule)
 	}
@@ -269,18 +239,12 @@ func (r *PricingRuleRepo) Update(ctx context.Context, id string, data model.Pric
 	args = append(args, id)
 	query := fmt.Sprintf(`UPDATE pricing_rules SET %s WHERE id = $%d`, strings.Join(sets, ", "), idx)
 
-	res, err := r.db.ExecContext(ctx, query, args...)
+	tag, err := r.db.Exec(ctx, query, args...)
 	if err != nil {
 		log.Error("failed to update pricing rule", pkglog.Err(err))
 		return model.ErrInternalServerError
 	}
-
-	n, err := res.RowsAffected()
-	if err != nil {
-		log.Error("failed to check rows affected", pkglog.Err(err))
-		return model.ErrInternalServerError
-	}
-	if n == 0 {
+	if tag.RowsAffected() == 0 {
 		return model.ErrNotFound
 	}
 
@@ -291,18 +255,12 @@ func (r *PricingRuleRepo) Delete(ctx context.Context, id string) error {
 	log := pkglog.WithMethod(r.log, "Delete")
 	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
-	res, err := r.db.ExecContext(ctx, `DELETE FROM pricing_rules WHERE id = $1`, id)
+	tag, err := r.db.Exec(ctx, `DELETE FROM pricing_rules WHERE id = $1`, id)
 	if err != nil {
 		log.Error("failed to delete pricing rule", pkglog.Err(err))
 		return model.ErrInternalServerError
 	}
-
-	n, err := res.RowsAffected()
-	if err != nil {
-		log.Error("failed to check rows affected", pkglog.Err(err))
-		return model.ErrInternalServerError
-	}
-	if n == 0 {
+	if tag.RowsAffected() == 0 {
 		return model.ErrNotFound
 	}
 

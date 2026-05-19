@@ -1,7 +1,6 @@
 package dto
 
 import (
-	"database/sql"
 	"fmt"
 	"strings"
 	"time"
@@ -30,16 +29,16 @@ type tripRow struct {
 	StartLatitude  float64
 	StartLongitude float64
 	StartMileageKM int64
-	StartFuelLevel sql.NullFloat64
-	EndedAt        sql.NullTime
-	EndLatitude    sql.NullFloat64
-	EndLongitude   sql.NullFloat64
-	EndMileageKM   sql.NullInt64
-	EndFuelLevel   sql.NullFloat64
-	DistanceKM     sql.NullFloat64
-	DurationSecs   sql.NullInt64
-	FinalCost      sql.NullInt32
-	CancelReason   sql.NullString
+	StartFuelLevel *float32
+	EndedAt        *time.Time
+	EndLatitude    *float64
+	EndLongitude   *float64
+	EndMileageKM   *int64
+	EndFuelLevel   *float32
+	DistanceKM     *float64
+	DurationSecs   *int64
+	FinalCost      *int32
+	CancelReason   *string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 }
@@ -57,41 +56,21 @@ func (r tripRow) toDomain() model.Trip {
 			Longitude: r.StartLongitude,
 		},
 		StartMileageKM: r.StartMileageKM,
+		StartFuelLevel: r.StartFuelLevel,
 		CreatedAt:      r.CreatedAt,
 		UpdatedAt:      r.UpdatedAt,
 	}
-	if r.StartFuelLevel.Valid {
-		f := float32(r.StartFuelLevel.Float64)
-		t.StartFuelLevel = &f
-	}
-	if r.EndedAt.Valid {
-		t.EndedAt = &r.EndedAt.Time
-	}
-	if r.EndLatitude.Valid && r.EndLongitude.Valid {
-		loc := model.Location{Latitude: r.EndLatitude.Float64, Longitude: r.EndLongitude.Float64}
+	t.EndedAt = r.EndedAt
+	if r.EndLatitude != nil && r.EndLongitude != nil {
+		loc := model.Location{Latitude: *r.EndLatitude, Longitude: *r.EndLongitude}
 		t.EndLocation = &loc
 	}
-	if r.EndMileageKM.Valid {
-		m := r.EndMileageKM.Int64
-		t.EndMileageKM = &m
-	}
-	if r.EndFuelLevel.Valid {
-		f := float32(r.EndFuelLevel.Float64)
-		t.EndFuelLevel = &f
-	}
-	if r.DistanceKM.Valid {
-		t.DistanceTraveledKM = &r.DistanceKM.Float64
-	}
-	if r.DurationSecs.Valid {
-		t.DurationSeconds = &r.DurationSecs.Int64
-	}
-	if r.FinalCost.Valid {
-		c := r.FinalCost.Int32
-		t.FinalCostTenge = &c
-	}
-	if r.CancelReason.Valid {
-		t.CancelReason = &r.CancelReason.String
-	}
+	t.EndMileageKM = r.EndMileageKM
+	t.EndFuelLevel = r.EndFuelLevel
+	t.DistanceTraveledKM = r.DistanceKM
+	t.DurationSeconds = r.DurationSecs
+	t.FinalCostTenge = r.FinalCost
+	t.CancelReason = r.CancelReason
 	return t
 }
 
@@ -126,7 +105,7 @@ func BuildTripSetClauses(u model.TripUpdate, b *ArgsBuilder) []string {
 		clauses = append(clauses, fmt.Sprintf("end_mileage_km = %s", b.Add(*u.EndMileageKM)))
 	}
 	if u.EndFuelLevel != nil {
-		clauses = append(clauses, fmt.Sprintf("end_fuel_level = %s", b.Add(float64(*u.EndFuelLevel))))
+		clauses = append(clauses, fmt.Sprintf("end_fuel_level = %s", b.Add(*u.EndFuelLevel)))
 	}
 	if u.DistanceTraveledKM != nil {
 		clauses = append(clauses, fmt.Sprintf("distance_traveled_km = %s", b.Add(*u.DistanceTraveledKM)))

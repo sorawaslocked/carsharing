@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log/slog"
 	"net"
@@ -15,53 +14,63 @@ import (
 	"carsharing/booking-service/internal/adapter/grpc/handler"
 	"carsharing/booking-service/internal/adapter/grpc/interceptor"
 	natsadapter "carsharing/booking-service/internal/adapter/nats"
-	"carsharing/booking-service/internal/adapter/postgres"
+	postgresadapter "carsharing/booking-service/internal/adapter/postgres"
 	"carsharing/booking-service/internal/config"
-	pkglog "carsharing/booking-service/internal/pkg/log"
-	pkgnats "carsharing/booking-service/internal/pkg/nats"
-	pkgpostgres "carsharing/booking-service/internal/pkg/postgres"
 	"carsharing/booking-service/internal/service"
+	pkglog "carsharing/shared/pkg/log"
+	pkgnats "carsharing/shared/pkg/nats"
+	pkgpostgres "carsharing/shared/pkg/postgres"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	natsgo "github.com/nats-io/nats.go"
 	"google.golang.org/grpc"
 )
 
 type App struct {
-	log        *slog.Logger
-	grpcServer *grpc.Server
-	grpcAddr   string
-	db         *sql.DB
-	natsConn   *natsgo.Conn
-	cancel     context.CancelFunc
+	log            *slog.Logger
+	grpcServer     *grpc.Server
+	grpcAddr       string
+	pool           *pgxpool.Pool
+	publisherConn  *natsgo.Conn
+	subscriberConn *natsgo.Conn
+	cancel         context.CancelFunc
 }
 
 func New(log *slog.Logger, cfg config.Config) (*App, error) {
-	db, err := pkgpostgres.NewDB(cfg.PG)
+	pool, err := pkgpostgres.NewPool(log, cfg.PG)
 	if err != nil {
 		return nil, fmt.Errorf("postgres: %w", err)
 	}
 
-	nc, err := pkgnats.NewConn(cfg.NATS)
+	publisherConn, err := pkgnats.NewPublisher(log, cfg.NATSPublisher)
 	if err != nil {
-		_ = db.Close()
-		return nil, fmt.Errorf("nats: %w", err)
+		pool.Close()
+		return nil, fmt.Errorf("nats publisher: %w", err)
 	}
 
-	bookingRepo := postgres.NewBookingRepo(log, db)
-	ruleRepo := postgres.NewPricingRuleRepo(log, db)
+	subscriberConn, err := pkgnats.NewSubscriber(log, cfg.NATSSubscriber)
+	if err != nil {
+		pool.Close()
+		publisherConn.Close()
+		return nil, fmt.Errorf("nats subscriber: %w", err)
+	}
 
-	publisher := natsadapter.NewPublisher(log, nc)
+	bookingRepo := postgresadapter.NewBookingRepo(log, pool)
+	ruleRepo := postgresadapter.NewPricingRuleRepo(log, pool)
+
+	publisher := natsadapter.NewPublisher(log, publisherConn)
 
 	bookingSvc := service.NewBookingService(log, bookingRepo, ruleRepo, publisher)
 	ruleSvc := service.NewPricingRuleService(log, ruleRepo)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	consumer := natsadapter.NewConsumer(log, nc, bookingSvc)
+	consumer := natsadapter.NewConsumer(log, subscriberConn, bookingSvc)
 	if err := consumer.Subscribe(ctx); err != nil {
 		cancel()
-		nc.Close()
-		_ = db.Close()
+		subscriberConn.Close()
+		publisherConn.Close()
+		pool.Close()
 		return nil, fmt.Errorf("nats consumer: %w", err)
 	}
 
@@ -69,7 +78,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 
 	bookingHandler := handler.NewBookingHandler(log, bookingSvc)
 	ruleHandler := handler.NewPricingRuleHandler(log, ruleSvc)
-	healthHandler := handler.NewHealthHandler(log, db, nc)
+	healthHandler := handler.NewHealthHandler(log, pool, publisherConn)
 
 	baseInterceptor := interceptor.NewBaseInterceptor()
 	loggerInterceptor := interceptor.NewLoggerInterceptor(log)
@@ -81,12 +90,13 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	)
 
 	return &App{
-		log:        pkglog.WithComponent(log, "app"),
-		grpcServer: grpcSrv,
-		grpcAddr:   cfg.GRPC.Addr,
-		db:         db,
-		natsConn:   nc,
-		cancel:     cancel,
+		log:            pkglog.WithComponent(log, "app"),
+		grpcServer:     grpcSrv,
+		grpcAddr:       fmt.Sprintf("%s:%d", cfg.GRPC.Host, cfg.GRPC.Port),
+		pool:           pool,
+		publisherConn:  publisherConn,
+		subscriberConn: subscriberConn,
+		cancel:         cancel,
 	}, nil
 }
 
@@ -135,6 +145,7 @@ func (a *App) stop() {
 	}
 
 	a.cancel()
-	_ = a.db.Close()
-	a.natsConn.Close()
+	a.pool.Close()
+	a.publisherConn.Close()
+	a.subscriberConn.Close()
 }

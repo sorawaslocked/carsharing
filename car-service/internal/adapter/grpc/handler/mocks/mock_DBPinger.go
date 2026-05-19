@@ -21,12 +21,12 @@ func (_m *MockDBPinger) EXPECT() *MockDBPinger_Expecter {
 	return &MockDBPinger_Expecter{mock: &_m.Mock}
 }
 
-// PingContext provides a mock function with given fields: ctx
-func (_m *MockDBPinger) PingContext(ctx context.Context) error {
+// Ping provides a mock function with given fields: ctx
+func (_m *MockDBPinger) Ping(ctx context.Context) error {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
-		panic("no return value specified for PingContext")
+		panic("no return value specified for Ping")
 	}
 
 	var r0 error
@@ -39,30 +39,30 @@ func (_m *MockDBPinger) PingContext(ctx context.Context) error {
 	return r0
 }
 
-// MockDBPinger_PingContext_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PingContext'
-type MockDBPinger_PingContext_Call struct {
+// MockDBPinger_Ping_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Ping'
+type MockDBPinger_Ping_Call struct {
 	*mock.Call
 }
 
-// PingContext is a helper method to define mock.On call
+// Ping is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *MockDBPinger_Expecter) PingContext(ctx interface{}) *MockDBPinger_PingContext_Call {
-	return &MockDBPinger_PingContext_Call{Call: _e.mock.On("PingContext", ctx)}
+func (_e *MockDBPinger_Expecter) Ping(ctx interface{}) *MockDBPinger_Ping_Call {
+	return &MockDBPinger_Ping_Call{Call: _e.mock.On("Ping", ctx)}
 }
 
-func (_c *MockDBPinger_PingContext_Call) Run(run func(ctx context.Context)) *MockDBPinger_PingContext_Call {
+func (_c *MockDBPinger_Ping_Call) Run(run func(ctx context.Context)) *MockDBPinger_Ping_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context))
 	})
 	return _c
 }
 
-func (_c *MockDBPinger_PingContext_Call) Return(_a0 error) *MockDBPinger_PingContext_Call {
+func (_c *MockDBPinger_Ping_Call) Return(_a0 error) *MockDBPinger_Ping_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *MockDBPinger_PingContext_Call) RunAndReturn(run func(context.Context) error) *MockDBPinger_PingContext_Call {
+func (_c *MockDBPinger_Ping_Call) RunAndReturn(run func(context.Context) error) *MockDBPinger_Ping_Call {
 	_c.Call.Return(run)
 	return _c
 }

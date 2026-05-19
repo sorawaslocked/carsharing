@@ -1,34 +1,31 @@
 package dto
 
 import (
-	"database/sql"
+	"carsharing/car-service/internal/model"
 	"fmt"
 	"time"
-
-	"carsharing/car-service/internal/model"
-	"github.com/lib/pq"
 )
 
 type carModelRow struct {
-	ID           string          `db:"id"`
-	Brand        string          `db:"brand"`
-	Model        string          `db:"model"`
-	Year         int16           `db:"year"`
-	FuelType     string          `db:"fuel_type"`
-	Transmission string          `db:"transmission"`
-	BodyType     string          `db:"body_type"`
-	Class        string          `db:"class"`
-	Seats        int8            `db:"seats"`
-	EngineVolume sql.NullFloat64 `db:"engine_volume"`
-	RangeKM      int32           `db:"range_km"`
-	Features     pq.StringArray  `db:"features"`
-	ImageKeys    pq.StringArray  `db:"image_keys"`
-	CreatedAt    time.Time       `db:"created_at"`
-	UpdatedAt    time.Time       `db:"updated_at"`
+	ID           string
+	Brand        string
+	Model        string
+	Year         int16
+	FuelType     string
+	Transmission string
+	BodyType     string
+	Class        string
+	Seats        int8
+	EngineVolume *float32
+	RangeKM      int32
+	Features     []string
+	ImageKeys    []string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
 func (r carModelRow) toDomain() model.CarModel {
-	cm := model.CarModel{
+	return model.CarModel{
 		ID:           r.ID,
 		Brand:        r.Brand,
 		Model:        r.Model,
@@ -38,19 +35,13 @@ func (r carModelRow) toDomain() model.CarModel {
 		BodyType:     model.CarBodyType(r.BodyType),
 		Class:        model.CarClass(r.Class),
 		Seats:        r.Seats,
+		EngineVolume: r.EngineVolume,
 		RangeKM:      r.RangeKM,
-		Features:     []string(r.Features),
-		Images:       ImageKeysToImages([]string(r.ImageKeys)),
+		Features:     r.Features,
+		Images:       ImageKeysToImages(r.ImageKeys),
 		CreatedAt:    r.CreatedAt,
 		UpdatedAt:    r.UpdatedAt,
 	}
-
-	if r.EngineVolume.Valid {
-		v := float32(r.EngineVolume.Float64)
-		cm.EngineVolume = &v
-	}
-
-	return cm
 }
 
 func ScanCarModelRow(s scanner) (model.CarModel, error) {
@@ -62,7 +53,6 @@ func ScanCarModelRow(s scanner) (model.CarModel, error) {
 		&r.Seats, &r.EngineVolume, &r.RangeKM, &r.Features, &r.ImageKeys,
 		&r.CreatedAt, &r.UpdatedAt,
 	)
-
 	if err != nil {
 		return model.CarModel{}, err
 	}
@@ -135,10 +125,10 @@ func BuildCarModelSetClauses(u model.CarModelUpdate, b *ArgsBuilder) []string {
 		clauses = append(clauses, fmt.Sprintf("range_km = %s", b.Add(*u.RangeKM)))
 	}
 	if u.Features != nil {
-		clauses = append(clauses, fmt.Sprintf("features = %s", b.Add(pq.StringArray(u.Features))))
+		clauses = append(clauses, fmt.Sprintf("features = %s", b.Add(u.Features)))
 	}
 	if u.ImageKeys != nil {
-		clauses = append(clauses, fmt.Sprintf("image_keys = %s", b.Add(pq.StringArray(u.ImageKeys))))
+		clauses = append(clauses, fmt.Sprintf("image_keys = %s", b.Add(u.ImageKeys)))
 	}
 
 	clauses = append(clauses, fmt.Sprintf("updated_at = %s", b.Add(u.UpdatedAt)))

@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"carsharing/car-service/internal/model"
-	pkglog "carsharing/car-service/internal/pkg/log"
-	"carsharing/car-service/internal/pkg/utils"
 	"carsharing/car-service/internal/validation"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 
 	"github.com/go-playground/validator/v10"
 )

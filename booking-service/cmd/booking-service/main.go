@@ -3,7 +3,7 @@ package main
 import (
 	"carsharing/booking-service/internal/app"
 	"carsharing/booking-service/internal/config"
-	pkglog "carsharing/booking-service/internal/pkg/log"
+	pkglog "carsharing/shared/pkg/log"
 )
 
 func main() {

@@ -1,17 +1,18 @@
 package postgres
 
 import (
-	"database/sql"
 	"errors"
 	"log/slog"
 
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
+
+	pkglog "carsharing/shared/pkg/log"
 	"carsharing/trip-service/internal/model"
-	pkglog "carsharing/trip-service/internal/pkg/log"
-	"github.com/lib/pq"
 )
 
 func mapSQLError(log *slog.Logger, err error, msg string) error {
-	if errors.Is(err, sql.ErrNoRows) {
+	if errors.Is(err, pgx.ErrNoRows) {
 		return model.ErrNotFound
 	}
 	if isUniqueViolation(err) {
@@ -22,6 +23,6 @@ func mapSQLError(log *slog.Logger, err error, msg string) error {
 }
 
 func isUniqueViolation(err error) bool {
-	var pqErr *pq.Error
-	return errors.As(err, &pqErr) && pqErr.Code == "23505"
+	var pgErr *pgconn.PgError
+	return errors.As(err, &pgErr) && pgErr.Code == "23505"
 }

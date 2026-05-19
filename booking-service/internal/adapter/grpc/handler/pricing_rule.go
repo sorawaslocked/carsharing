@@ -5,8 +5,8 @@ import (
 	"log/slog"
 
 	"carsharing/booking-service/internal/adapter/grpc/dto"
-	pkglog "carsharing/booking-service/internal/pkg/log"
-	"carsharing/booking-service/internal/pkg/utils"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	basebookingpb "github.com/sorawaslocked/car-rental-protos/gen/base/booking"
 	servicebookingpb "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 	"google.golang.org/protobuf/types/known/emptypb"

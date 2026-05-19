@@ -4,10 +4,10 @@ import (
 	"context"
 	"log/slog"
 
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	"carsharing/user-service/internal/adapter/grpc/dto"
 	"carsharing/user-service/internal/model"
-	pkglog "carsharing/user-service/internal/pkg/log"
-	"carsharing/user-service/internal/pkg/utils"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"google.golang.org/grpc"
 )
@@ -113,7 +113,7 @@ func (i *AuthInterceptor) Unary(ctx context.Context, req any, info *grpc.UnarySe
 	// Role check: any matching privileged role grants access.
 	for _, allowed := range policy.allowedRoles {
 		for _, callerRole := range md.UserRoles {
-			if callerRole == allowed {
+			if model.Role(callerRole) == allowed {
 				return handler(ctx, req)
 			}
 		}

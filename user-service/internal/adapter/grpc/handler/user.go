@@ -6,9 +6,9 @@ import (
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	"carsharing/user-service/internal/adapter/grpc/dto"
-	pkglog "carsharing/user-service/internal/pkg/log"
-	"carsharing/user-service/internal/pkg/utils"
 	baseuserpb "github.com/sorawaslocked/car-rental-protos/gen/base/user"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 )

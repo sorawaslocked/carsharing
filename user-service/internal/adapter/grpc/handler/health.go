@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"time"
 
-	pkglog "carsharing/user-service/internal/pkg/log"
+	pkglog "carsharing/shared/pkg/log"
 	servicepb "github.com/sorawaslocked/car-rental-protos/gen/service"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"google.golang.org/protobuf/types/known/emptypb"

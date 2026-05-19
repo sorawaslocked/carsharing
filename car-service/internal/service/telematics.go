@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"carsharing/car-service/internal/model"
-	pkglog "carsharing/car-service/internal/pkg/log"
+	pkglog "carsharing/shared/pkg/log"
 )
 
 const telematicsReconnectDelay = 5 * time.Second

@@ -10,9 +10,9 @@ import (
 
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 
+	pkglog "carsharing/shared/pkg/log"
+	pkgutils "carsharing/shared/pkg/utils"
 	"carsharing/trip-service/internal/model"
-	pkglog "carsharing/trip-service/internal/pkg/log"
-	"carsharing/trip-service/internal/pkg/utils"
 )
 
 type TelematicsClient struct {
@@ -31,7 +31,7 @@ func NewTelematicsClient(log *slog.Logger, carConn, streamConn *grpc.ClientConn)
 
 func (c *TelematicsClient) GetLatestTelemetry(ctx context.Context, carID string) (model.CarTelemetry, error) {
 	log := pkglog.WithMethod(c.log, "GetLatestTelemetry")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+	log = pkglog.WithMetadata(log, pkgutils.MetadataFromCtx(ctx))
 
 	resp, err := c.carClient.GetCar(ctx, &carsvc.GetCarRequest{Id: carID})
 	if err != nil {
@@ -60,7 +60,7 @@ func (c *TelematicsClient) GetLatestTelemetry(ctx context.Context, carID string)
 
 func (c *TelematicsClient) StreamTelemetry(ctx context.Context, carID string, fn func(model.CarTelemetry) error) error {
 	log := pkglog.WithMethod(c.log, "StreamTelemetry")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+	log = pkglog.WithMetadata(log, pkgutils.MetadataFromCtx(ctx))
 
 	stream, err := c.streamClient.StreamCarTelemetry(ctx, &carsvc.StreamCarTelemetryRequest{CarId: carID})
 	if err != nil {

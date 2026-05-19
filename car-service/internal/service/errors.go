@@ -5,8 +5,8 @@ import (
 	"log/slog"
 
 	"carsharing/car-service/internal/model"
-	"carsharing/car-service/internal/pkg/log"
 	"carsharing/car-service/internal/validation"
+	"carsharing/shared/pkg/log"
 )
 
 type ErrInvalidStatusTransition struct {

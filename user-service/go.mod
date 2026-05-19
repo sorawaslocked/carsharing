@@ -3,6 +3,7 @@ module carsharing/user-service
 go 1.25.0
 
 require (
+	carsharing/shared v0.0.0
 	github.com/fatih/color v1.18.0
 	github.com/go-playground/validator/v10 v10.28.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0

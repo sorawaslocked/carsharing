@@ -2,31 +2,32 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log/slog"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+
+	pkglog "carsharing/shared/pkg/log"
+	pkgutils "carsharing/shared/pkg/utils"
 	"carsharing/trip-service/internal/adapter/postgres/dto"
 	"carsharing/trip-service/internal/model"
-	pkglog "carsharing/trip-service/internal/pkg/log"
-	"carsharing/trip-service/internal/pkg/utils"
 )
 
 type TripSummaryRepo struct {
-	log *slog.Logger
-	db  *sql.DB
+	log  *slog.Logger
+	pool *pgxpool.Pool
 }
 
-func NewTripSummaryRepo(log *slog.Logger, db *sql.DB) *TripSummaryRepo {
+func NewTripSummaryRepo(log *slog.Logger, pool *pgxpool.Pool) *TripSummaryRepo {
 	return &TripSummaryRepo{
-		log: pkglog.WithComponent(log, "repo.TripSummaryRepo"),
-		db:  db,
+		log:  pkglog.WithComponent(log, "repo.TripSummaryRepo"),
+		pool: pool,
 	}
 }
 
 func (r *TripSummaryRepo) Create(ctx context.Context, s model.TripSummaryCreate) (model.TripSummary, error) {
 	log := pkglog.WithMethod(r.log, "Create")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+	log = pkglog.WithMetadata(log, pkgutils.MetadataFromCtx(ctx))
 
 	snapJSON, err := dto.MarshalPricingSnapshot(s.PricingSnapshot)
 	if err != nil {
@@ -42,7 +43,7 @@ func (r *TripSummaryRepo) Create(ctx context.Context, s model.TripSummaryCreate)
 		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 		RETURNING %s`, dto.TripSummaryColumns)
 
-	summary, err := dto.ScanTripSummary(r.db.QueryRowContext(ctx, q,
+	summary, err := dto.ScanTripSummary(r.pool.QueryRow(ctx, q,
 		s.TripID, s.BookingID, s.StartedAt, s.EndedAt,
 		s.DurationSeconds, s.DistanceTraveledKM, snapJSON,
 		s.BaseCostTenge, s.DistanceCostTenge, s.OvertimeCostTenge, s.TotalCostTenge,
@@ -55,11 +56,11 @@ func (r *TripSummaryRepo) Create(ctx context.Context, s model.TripSummaryCreate)
 
 func (r *TripSummaryRepo) GetByTripID(ctx context.Context, tripID string) (model.TripSummary, error) {
 	log := pkglog.WithMethod(r.log, "GetByTripID")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+	log = pkglog.WithMetadata(log, pkgutils.MetadataFromCtx(ctx))
 
 	q := fmt.Sprintf(`SELECT %s FROM trip_summaries WHERE trip_id = $1`, dto.TripSummaryColumns)
 
-	summary, err := dto.ScanTripSummary(r.db.QueryRowContext(ctx, q, tripID))
+	summary, err := dto.ScanTripSummary(r.pool.QueryRow(ctx, q, tripID))
 	if err != nil {
 		return model.TripSummary{}, mapSQLError(log, err, "failed to get trip summary")
 	}

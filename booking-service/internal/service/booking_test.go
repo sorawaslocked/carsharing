@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"carsharing/booking-service/internal/model"
-	"carsharing/booking-service/internal/pkg/utils"
 	"carsharing/booking-service/internal/service"
 	"carsharing/booking-service/internal/service/mocks"
 	"github.com/stretchr/testify/assert"
@@ -23,11 +22,13 @@ func discardLogger() *slog.Logger {
 func ptr[T any](v T) *T { return &v }
 
 func ctxAsBookingManager() context.Context {
-	return utils.SetMetadata(context.Background(), "", "", "manager-1", "booking_manager")
+	ctx := context.WithValue(context.Background(), "x-user-id", "manager-1")
+	return context.WithValue(ctx, "x-user-roles", []string{"booking_manager"})
 }
 
 func ctxAsUser(userID string) context.Context {
-	return utils.SetMetadata(context.Background(), "", "", userID, "user")
+	ctx := context.WithValue(context.Background(), "x-user-id", userID)
+	return context.WithValue(ctx, "x-user-roles", []string{"user"})
 }
 
 func newBookingSvc(repo *mocks.MockBookingRepository, rules *mocks.MockPricingRuleRepository, pub *mocks.MockEventPublisher) *service.BookingService {

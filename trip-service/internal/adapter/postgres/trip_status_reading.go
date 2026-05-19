@@ -2,33 +2,34 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log/slog"
 	"strings"
 
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgxpool"
+
+	pkglog "carsharing/shared/pkg/log"
+	pkgutils "carsharing/shared/pkg/utils"
 	"carsharing/trip-service/internal/adapter/postgres/dto"
 	"carsharing/trip-service/internal/model"
-	pkglog "carsharing/trip-service/internal/pkg/log"
-	"carsharing/trip-service/internal/pkg/utils"
-	"github.com/google/uuid"
 )
 
 type TripStatusReadingRepo struct {
-	log *slog.Logger
-	db  *sql.DB
+	log  *slog.Logger
+	pool *pgxpool.Pool
 }
 
-func NewTripStatusReadingRepo(log *slog.Logger, db *sql.DB) *TripStatusReadingRepo {
+func NewTripStatusReadingRepo(log *slog.Logger, pool *pgxpool.Pool) *TripStatusReadingRepo {
 	return &TripStatusReadingRepo{
-		log: pkglog.WithComponent(log, "repo.TripStatusReadingRepo"),
-		db:  db,
+		log:  pkglog.WithComponent(log, "repo.TripStatusReadingRepo"),
+		pool: pool,
 	}
 }
 
 func (r *TripStatusReadingRepo) Create(ctx context.Context, reading model.TripStatusReadingCreate) (model.TripStatusReading, error) {
 	log := pkglog.WithMethod(r.log, "Create")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+	log = pkglog.WithMetadata(log, pkgutils.MetadataFromCtx(ctx))
 
 	q := `
 		INSERT INTO trip_status_readings (
@@ -36,13 +37,13 @@ func (r *TripStatusReadingRepo) Create(ctx context.Context, reading model.TripSt
 		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		RETURNING id, trip_id, from_status, to_status, actor_type, actor_id, reason, changed_at`
 
-	result, err := dto.ScanTripStatusReading(r.db.QueryRowContext(ctx, q,
+	result, err := dto.ScanTripStatusReading(r.pool.QueryRow(ctx, q,
 		uuid.New().String(),
 		reading.TripID,
 		reading.FromStatus.String(), reading.ToStatus.String(),
 		reading.ActorType.String(),
-		dto.NullableString(reading.ActorID),
-		dto.NullableString(reading.Reason),
+		reading.ActorID,
+		reading.Reason,
 		reading.ChangedAt,
 	))
 	if err != nil {
@@ -53,7 +54,7 @@ func (r *TripStatusReadingRepo) Create(ctx context.Context, reading model.TripSt
 
 func (r *TripStatusReadingRepo) List(ctx context.Context, filter model.TripStatusReadingFilter) ([]model.TripStatusReading, error) {
 	log := pkglog.WithMethod(r.log, "List")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+	log = pkglog.WithMetadata(log, pkgutils.MetadataFromCtx(ctx))
 
 	b := &dto.ArgsBuilder{}
 	whereClauses := dto.BuildStatusReadingWhereClauses(filter, b)
@@ -68,7 +69,7 @@ func (r *TripStatusReadingRepo) List(ctx context.Context, filter model.TripStatu
 		pagination,
 	)
 
-	rows, err := r.db.QueryContext(ctx, q, b.Args...)
+	rows, err := r.pool.Query(ctx, q, b.Args...)
 	if err != nil {
 		log.Error("failed to list status readings", pkglog.Err(err))
 		return nil, model.ErrSQL

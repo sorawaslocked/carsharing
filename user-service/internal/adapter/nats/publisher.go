@@ -4,9 +4,9 @@ import (
 	"context"
 	"log/slog"
 
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	"carsharing/user-service/internal/model"
-	pkglog "carsharing/user-service/internal/pkg/log"
-	"carsharing/user-service/internal/pkg/utils"
 	"github.com/nats-io/nats.go"
 	eventuserpb "github.com/sorawaslocked/car-rental-protos/gen/event/user"
 	"google.golang.org/protobuf/proto"

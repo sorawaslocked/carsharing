@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -10,20 +9,21 @@ import (
 
 	"carsharing/car-service/internal/adapter/postgres/dto"
 	"carsharing/car-service/internal/model"
-	pkglog "carsharing/car-service/internal/pkg/log"
-	"carsharing/car-service/internal/pkg/utils"
-	"github.com/lib/pq"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type CarModelRepository struct {
-	db  *sql.DB
-	log *slog.Logger
+	pool *pgxpool.Pool
+	log  *slog.Logger
 }
 
-func NewCarModelRepository(db *sql.DB, log *slog.Logger) *CarModelRepository {
+func NewCarModelRepository(pool *pgxpool.Pool, log *slog.Logger) *CarModelRepository {
 	return &CarModelRepository{
-		db:  db,
-		log: pkglog.WithComponent(log, "repo.CarModelRepo"),
+		pool: pool,
+		log:  pkglog.WithComponent(log, "repo.CarModelRepo"),
 	}
 }
 
@@ -47,10 +47,10 @@ func (r *CarModelRepository) Insert(ctx context.Context, cm model.CarModel) (str
 		b.Add(string(cm.BodyType)),
 		b.Add(string(cm.Class)),
 		b.Add(cm.Seats),
-		b.Add(dto.NullableFloat32(cm.EngineVolume)),
+		b.Add(cm.EngineVolume),
 		b.Add(cm.RangeKM),
-		b.Add(pq.StringArray(cm.Features)),
-		b.Add(pq.StringArray(dto.ImagesToKeys(cm.Images))),
+		b.Add(cm.Features),
+		b.Add(dto.ImagesToKeys(cm.Images)),
 		b.Add(cm.CreatedAt),
 		b.Add(cm.UpdatedAt),
 	}, ", ") + `)
@@ -58,7 +58,7 @@ func (r *CarModelRepository) Insert(ctx context.Context, cm model.CarModel) (str
 
 	var id string
 
-	err := r.db.QueryRowContext(ctx, q, b.Args...).Scan(&id)
+	err := r.pool.QueryRow(ctx, q, b.Args...).Scan(&id)
 	if err != nil {
 		logger.Error("failed to insert car model", pkglog.Err(err))
 		return "", ErrSql
@@ -77,11 +77,11 @@ func (r *CarModelRepository) FindByID(ctx context.Context, id string) (model.Car
 		seats, engine_volume, range_km, features, image_keys, created_at, updated_at
 		FROM car_models WHERE id = ` + b.Add(id) + ` LIMIT 1`
 
-	row := r.db.QueryRowContext(ctx, q, b.Args...)
+	row := r.pool.QueryRow(ctx, q, b.Args...)
 
 	cm, err := dto.ScanCarModelRow(row)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return model.CarModel{}, ErrNotFound
 		}
 		logger.Error("failed to find car model by id", pkglog.Err(err))
@@ -107,7 +107,7 @@ func (r *CarModelRepository) Find(ctx context.Context, filter model.CarModelFilt
 		seats, engine_volume, range_km, features, image_keys, created_at, updated_at
 		FROM car_models` + where + dto.BuildPagination(b, filter.Pagination)
 
-	rows, err := r.db.QueryContext(ctx, q, b.Args...)
+	rows, err := r.pool.Query(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to query car models", pkglog.Err(err))
 		return nil, ErrSql
@@ -145,13 +145,13 @@ func (r *CarModelRepository) Update(ctx context.Context, id string, update model
 
 	q := `UPDATE car_models SET ` + strings.Join(setClauses, ", ") + ` WHERE id = ` + b.Add(id)
 
-	res, err := r.db.ExecContext(ctx, q, b.Args...)
+	tag, err := r.pool.Exec(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to update car model", pkglog.Err(err))
 		return ErrSql
 	}
 
-	if n, _ := res.RowsAffected(); n == 0 {
+	if tag.RowsAffected() == 0 {
 		return ErrNotFound
 	}
 
@@ -166,13 +166,13 @@ func (r *CarModelRepository) Delete(ctx context.Context, id string) error {
 
 	q := `DELETE FROM car_models WHERE id = ` + b.Add(id)
 
-	res, err := r.db.ExecContext(ctx, q, b.Args...)
+	tag, err := r.pool.Exec(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to delete car model", pkglog.Err(err))
 		return ErrSql
 	}
 
-	if n, _ := res.RowsAffected(); n == 0 {
+	if tag.RowsAffected() == 0 {
 		return ErrNotFound
 	}
 

@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"carsharing/booking-service/internal/model"
-	pkglog "carsharing/booking-service/internal/pkg/log"
-	"carsharing/booking-service/internal/pkg/utils"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	natsgo "github.com/nats-io/nats.go"
 	eventbookingpb "github.com/sorawaslocked/car-rental-protos/gen/event/booking"
 	"google.golang.org/protobuf/proto"

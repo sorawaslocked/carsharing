@@ -2,26 +2,26 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"log/slog"
 	"strings"
 
 	"carsharing/car-service/internal/adapter/postgres/dto"
 	"carsharing/car-service/internal/model"
-	pkglog "carsharing/car-service/internal/pkg/log"
-	"carsharing/car-service/internal/pkg/utils"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type TelematicsRepository struct {
-	db  *sql.DB
-	log *slog.Logger
+	pool *pgxpool.Pool
+	log  *slog.Logger
 }
 
-func NewTelematicsRepository(db *sql.DB, log *slog.Logger) *TelematicsRepository {
+func NewTelematicsRepository(pool *pgxpool.Pool, log *slog.Logger) *TelematicsRepository {
 	return &TelematicsRepository{
-		db:  db,
-		log: pkglog.WithComponent(log, "repo.TelematicsRepo"),
+		pool: pool,
+		log:  pkglog.WithComponent(log, "repo.TelematicsRepo"),
 	}
 }
 
@@ -49,8 +49,8 @@ func (r *TelematicsRepository) InsertEvent(ctx context.Context, event model.CarT
 		b.Add(event.CarID),
 		b.Add(event.Latitude),
 		b.Add(event.Longitude),
-		b.Add(dto.NullableFloat32(event.FuelLevel)),
-		b.Add(dto.NullableFloat32(event.BatteryLevel)),
+		b.Add(event.FuelLevel),
+		b.Add(event.BatteryLevel),
 		b.Add(event.OdometerKM),
 		b.Add(event.ActorID),
 		b.Add(event.ActorType),
@@ -59,7 +59,7 @@ func (r *TelematicsRepository) InsertEvent(ctx context.Context, event model.CarT
 		b.Add(event.ReceivedAt),
 	}, ", ") + `)`
 
-	_, err := r.db.ExecContext(ctx, q, b.Args...)
+	_, err := r.pool.Exec(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to insert telematics event", pkglog.Err(err))
 		return ErrSql
@@ -94,7 +94,7 @@ func (r *TelematicsRepository) FindEvents(ctx context.Context, filter model.Tele
 		odometer_km, actor_id, actor_type, metadata, recorded_at, received_at
 		FROM car_telematics_events` + where + ` ORDER BY recorded_at DESC` + dto.BuildPagination(b, filter.Pagination)
 
-	rows, err := r.db.QueryContext(ctx, q, b.Args...)
+	rows, err := r.pool.Query(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to query telematics events", pkglog.Err(err))
 		return nil, ErrSql
@@ -104,8 +104,8 @@ func (r *TelematicsRepository) FindEvents(ctx context.Context, filter model.Tele
 	var result []model.CarTelematicsEvent
 	for rows.Next() {
 		var e model.CarTelematicsEvent
-		var fuelLevel, batteryLevel sql.NullFloat64
-		var actorID sql.NullString
+		var fuelLevel, batteryLevel *float32
+		var actorID *string
 		var metadataRaw []byte
 
 		if err = rows.Scan(
@@ -118,17 +118,10 @@ func (r *TelematicsRepository) FindEvents(ctx context.Context, filter model.Tele
 			return nil, ErrSql
 		}
 
-		if fuelLevel.Valid {
-			f := float32(fuelLevel.Float64)
-			e.FuelLevel = &f
-		}
-		if batteryLevel.Valid {
-			bv := float32(batteryLevel.Float64)
-			e.BatteryLevel = &bv
-		}
-		if actorID.Valid {
-			e.ActorID = &actorID.String
-		}
+		e.FuelLevel = fuelLevel
+		e.BatteryLevel = batteryLevel
+		e.ActorID = actorID
+
 		if len(metadataRaw) > 0 {
 			if err = json.Unmarshal(metadataRaw, &e.Metadata); err != nil {
 				logger.Error("failed to unmarshal telematics event metadata", pkglog.Err(err))

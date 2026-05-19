@@ -9,10 +9,10 @@ import (
 	basebookingpb "github.com/sorawaslocked/car-rental-protos/gen/base/booking"
 	bookingsvc "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 
+	pkglog "carsharing/shared/pkg/log"
+	pkgutils "carsharing/shared/pkg/utils"
 	"carsharing/trip-service/internal/adapter/grpc/dto"
 	"carsharing/trip-service/internal/model"
-	pkglog "carsharing/trip-service/internal/pkg/log"
-	"carsharing/trip-service/internal/pkg/utils"
 )
 
 type BookingClient struct {
@@ -29,7 +29,7 @@ func NewBookingClient(log *slog.Logger, conn *grpc.ClientConn) *BookingClient {
 
 func (c *BookingClient) GetBooking(ctx context.Context, id string) (model.Booking, error) {
 	log := pkglog.WithMethod(c.log, "GetBooking")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+	log = pkglog.WithMetadata(log, pkgutils.MetadataFromCtx(ctx))
 
 	resp, err := c.client.GetBooking(ctx, &bookingsvc.GetBookingRequest{Id: id})
 	if err != nil {

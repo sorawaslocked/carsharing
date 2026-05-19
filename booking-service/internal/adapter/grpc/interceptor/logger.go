@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"time"
 
-	pkglog "carsharing/booking-service/internal/pkg/log"
-	"carsharing/booking-service/internal/pkg/utils"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 )

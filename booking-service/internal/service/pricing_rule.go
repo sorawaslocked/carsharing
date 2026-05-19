@@ -5,8 +5,8 @@ import (
 	"log/slog"
 
 	"carsharing/booking-service/internal/model"
-	pkglog "carsharing/booking-service/internal/pkg/log"
-	"carsharing/booking-service/internal/pkg/utils"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 )
 
 type PricingRuleService struct {

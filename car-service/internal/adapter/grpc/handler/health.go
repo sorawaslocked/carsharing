@@ -40,7 +40,7 @@ func (h *HealthHandler) Health(ctx context.Context, _ *emptypb.Empty) (*svcpb.Se
 	pingCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
 
-	if err := h.db.PingContext(pingCtx); err != nil {
+	if err := h.db.Ping(pingCtx); err != nil {
 		h.log.Error("postgres health check failed", slog.String("error", err.Error()))
 		status = "degraded"
 	}

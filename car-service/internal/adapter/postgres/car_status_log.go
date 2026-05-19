@@ -2,26 +2,26 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"log/slog"
 	"strings"
 
 	"carsharing/car-service/internal/adapter/postgres/dto"
 	"carsharing/car-service/internal/model"
-	pkglog "carsharing/car-service/internal/pkg/log"
-	"carsharing/car-service/internal/pkg/utils"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type CarStatusLogRepository struct {
-	db  *sql.DB
-	log *slog.Logger
+	pool *pgxpool.Pool
+	log  *slog.Logger
 }
 
-func NewCarStatusLogRepository(db *sql.DB, log *slog.Logger) *CarStatusLogRepository {
+func NewCarStatusLogRepository(pool *pgxpool.Pool, log *slog.Logger) *CarStatusLogRepository {
 	return &CarStatusLogRepository{
-		db:  db,
-		log: pkglog.WithComponent(log, "repo.CarStatusLogRepo"),
+		pool: pool,
+		log:  pkglog.WithComponent(log, "repo.CarStatusLogRepo"),
 	}
 }
 
@@ -55,7 +55,7 @@ func (r *CarStatusLogRepository) Insert(ctx context.Context, entry model.CarStat
 		b.Add(entry.ChangedAt),
 	}, ", ") + `)`
 
-	_, err := r.db.ExecContext(ctx, q, b.Args...)
+	_, err := r.pool.Exec(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to insert car status log entry", pkglog.Err(err))
 		return ErrSql
@@ -83,7 +83,7 @@ func (r *CarStatusLogRepository) Find(ctx context.Context, filter model.CarStatu
 	q := `SELECT id, car_id, from_status, to_status, actor_type, actor_id, reason, metadata, changed_at
 		FROM car_status_logs` + where + ` ORDER BY changed_at DESC` + dto.BuildPagination(b, filter.Pagination)
 
-	rows, err := r.db.QueryContext(ctx, q, b.Args...)
+	rows, err := r.pool.Query(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to query car status logs", pkglog.Err(err))
 		return nil, ErrSql
@@ -94,7 +94,7 @@ func (r *CarStatusLogRepository) Find(ctx context.Context, filter model.CarStatu
 	for rows.Next() {
 		var e model.CarStatusLogEntry
 		var fromStatus, toStatus, actorType string
-		var actorID, reason sql.NullString
+		var actorID, reason *string
 		var metadataRaw []byte
 
 		if err = rows.Scan(
@@ -108,12 +108,9 @@ func (r *CarStatusLogRepository) Find(ctx context.Context, filter model.CarStatu
 		e.FromStatus = model.CarStatus(fromStatus)
 		e.ToStatus = model.CarStatus(toStatus)
 		e.ActorType = model.CarStatusActor(actorType)
-		if actorID.Valid {
-			e.ActorID = &actorID.String
-		}
-		if reason.Valid {
-			e.Reason = &reason.String
-		}
+		e.ActorID = actorID
+		e.Reason = reason
+
 		if len(metadataRaw) > 0 {
 			if err = json.Unmarshal(metadataRaw, &e.Metadata); err != nil {
 				logger.Error("failed to unmarshal status log metadata", pkglog.Err(err))

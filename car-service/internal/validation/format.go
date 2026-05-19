@@ -1,7 +1,7 @@
 package validation
 
 import (
-	"carsharing/car-service/internal/pkg/utils"
+	"carsharing/shared/pkg/utils"
 	"errors"
 	"fmt"
 

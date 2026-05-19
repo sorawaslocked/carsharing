@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -10,20 +9,21 @@ import (
 
 	"carsharing/car-service/internal/adapter/postgres/dto"
 	"carsharing/car-service/internal/model"
-	pkglog "carsharing/car-service/internal/pkg/log"
-	"carsharing/car-service/internal/pkg/utils"
-	"github.com/lib/pq"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type CarRepository struct {
-	db  *sql.DB
-	log *slog.Logger
+	pool *pgxpool.Pool
+	log  *slog.Logger
 }
 
-func NewCarRepository(db *sql.DB, log *slog.Logger) *CarRepository {
+func NewCarRepository(pool *pgxpool.Pool, log *slog.Logger) *CarRepository {
 	return &CarRepository{
-		db:  db,
-		log: pkglog.WithComponent(log, "repo.CarRepo"),
+		pool: pool,
+		log:  pkglog.WithComponent(log, "repo.CarRepo"),
 	}
 }
 
@@ -47,12 +47,12 @@ func (r *CarRepository) Insert(ctx context.Context, car model.Car) (string, erro
 		b.Add(car.YearManufactured),
 		b.Add(string(car.Status)),
 		b.Add(car.MileageKM),
-		b.Add(dto.NullableFloat32(car.FuelLevel)),
-		b.Add(dto.NullableFloat32(car.BatteryLevel)),
+		b.Add(car.FuelLevel),
+		b.Add(car.BatteryLevel),
 		b.Add(car.Location.Latitude),
 		b.Add(car.Location.Longitude),
-		b.Add(pq.StringArray(car.Notes)),
-		b.Add(pq.StringArray(dto.ImagesToKeys(car.Images))),
+		b.Add(car.Notes),
+		b.Add(dto.ImagesToKeys(car.Images)),
 		b.Add(car.LastSeenAt),
 		b.Add(car.CreatedAt),
 		b.Add(car.UpdatedAt),
@@ -61,7 +61,7 @@ func (r *CarRepository) Insert(ctx context.Context, car model.Car) (string, erro
 
 	var id string
 
-	err := r.db.QueryRowContext(ctx, q, b.Args...).Scan(&id)
+	err := r.pool.QueryRow(ctx, q, b.Args...).Scan(&id)
 	if err != nil {
 		if isUniqueViolation(err) {
 			return "", ErrAlreadyExists
@@ -83,11 +83,11 @@ func (r *CarRepository) FindByID(ctx context.Context, id string) (model.Car, err
 		mileage_km, fuel_level, battery_level, latitude, longitude, notes, image_keys,
 		last_seen_at, created_at, updated_at FROM cars WHERE id = ` + b.Add(id) + ` LIMIT 1`
 
-	row := r.db.QueryRowContext(ctx, q, b.Args...)
+	row := r.pool.QueryRow(ctx, q, b.Args...)
 
 	car, err := dto.ScanCarRow(row)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return model.Car{}, ErrNotFound
 		}
 		logger.Error("failed to find car by id", pkglog.Err(err))
@@ -109,7 +109,7 @@ func (r *CarRepository) Find(ctx context.Context, filter model.CarFilter) ([]mod
 		c.mileage_km, c.fuel_level, c.battery_level, c.latitude, c.longitude, c.notes, c.image_keys,
 		c.last_seen_at, c.created_at, c.updated_at FROM cars c` + join + where + dto.BuildPagination(b, filter.Pagination)
 
-	rows, err := r.db.QueryContext(ctx, q, b.Args...)
+	rows, err := r.pool.Query(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to query cars", pkglog.Err(err))
 		return nil, ErrSql
@@ -147,7 +147,7 @@ func (r *CarRepository) Update(ctx context.Context, id string, update model.CarU
 
 	q := `UPDATE cars SET ` + strings.Join(setClauses, ", ") + ` WHERE id = ` + b.Add(id)
 
-	res, err := r.db.ExecContext(ctx, q, b.Args...)
+	tag, err := r.pool.Exec(ctx, q, b.Args...)
 	if err != nil {
 		if isUniqueViolation(err) {
 			return ErrAlreadyExists
@@ -156,7 +156,7 @@ func (r *CarRepository) Update(ctx context.Context, id string, update model.CarU
 		return ErrSql
 	}
 
-	if n, _ := res.RowsAffected(); n == 0 {
+	if tag.RowsAffected() == 0 {
 		return ErrNotFound
 	}
 
@@ -171,13 +171,13 @@ func (r *CarRepository) Delete(ctx context.Context, id string) error {
 
 	q := `DELETE FROM cars WHERE id = ` + b.Add(id)
 
-	res, err := r.db.ExecContext(ctx, q, b.Args...)
+	tag, err := r.pool.Exec(ctx, q, b.Args...)
 	if err != nil {
 		logger.Error("failed to delete car", pkglog.Err(err))
 		return ErrSql
 	}
 
-	if n, _ := res.RowsAffected(); n == 0 {
+	if tag.RowsAffected() == 0 {
 		return ErrNotFound
 	}
 

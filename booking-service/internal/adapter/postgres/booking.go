@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,8 +10,11 @@ import (
 	"time"
 
 	"carsharing/booking-service/internal/model"
-	pkglog "carsharing/booking-service/internal/pkg/log"
-	"carsharing/booking-service/internal/pkg/utils"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type pricingSnapshotJSON struct {
@@ -26,10 +28,10 @@ type pricingSnapshotJSON struct {
 
 type BookingRepo struct {
 	log *slog.Logger
-	db  *sql.DB
+	db  *pgxpool.Pool
 }
 
-func NewBookingRepo(log *slog.Logger, db *sql.DB) *BookingRepo {
+func NewBookingRepo(log *slog.Logger, db *pgxpool.Pool) *BookingRepo {
 	return &BookingRepo{
 		log: pkglog.WithComponent(log, "repo.BookingRepo"),
 		db:  db,
@@ -40,21 +42,33 @@ func (r *BookingRepo) Create(ctx context.Context, data model.BookingCreate, expi
 	log := pkglog.WithMethod(r.log, "Create")
 	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
-	var snap pricingSnapshotJSON
-	err := r.db.QueryRowContext(ctx, `
+	var (
+		ratePerKM      *int32
+		freeMinutes    *int32
+		minCharge      *int32
+		overtimePolicy *string
+		overtimeRate   *int32
+		snap           pricingSnapshotJSON
+	)
+	err := r.db.QueryRow(ctx, `
 		SELECT rate_tenge, rate_per_km_tenge, free_minutes, min_charge_tenge, overtime_policy, overtime_rate_tenge
 		FROM pricing_rules WHERE id = $1 AND is_active = TRUE
 	`, data.PricingRuleID).Scan(
-		&snap.RateTenge, &snap.RatePerKMTenge, &snap.FreeMinutes,
-		&snap.MinChargeTenge, &snap.OvertimePolicy, &snap.OvertimeRateTenge,
+		&snap.RateTenge, &ratePerKM, &freeMinutes,
+		&minCharge, &overtimePolicy, &overtimeRate,
 	)
-	if errors.Is(err, sql.ErrNoRows) {
+	if errors.Is(err, pgx.ErrNoRows) {
 		return "", model.ErrNotFound
 	}
 	if err != nil {
 		log.Error("failed to fetch pricing rule for snapshot", pkglog.Err(err))
 		return "", model.ErrInternalServerError
 	}
+	snap.RatePerKMTenge = ratePerKM
+	snap.FreeMinutes = freeMinutes
+	snap.MinChargeTenge = minCharge
+	snap.OvertimePolicy = overtimePolicy
+	snap.OvertimeRateTenge = overtimeRate
 
 	snapJSON, err := json.Marshal(snap)
 	if err != nil {
@@ -62,15 +76,15 @@ func (r *BookingRepo) Create(ctx context.Context, data model.BookingCreate, expi
 		return "", model.ErrInternalServerError
 	}
 
-	tx, err := r.db.BeginTx(ctx, nil)
+	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		log.Error("failed to begin transaction", pkglog.Err(err))
 		return "", model.ErrInternalServerError
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback(ctx) }()
 
 	var id string
-	err = tx.QueryRowContext(ctx, `
+	err = tx.QueryRow(ctx, `
 		INSERT INTO bookings (user_id, car_id, committed_periods, pricing_rule_id, pricing_snapshot, expires_at)
 		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id
@@ -80,7 +94,7 @@ func (r *BookingRepo) Create(ctx context.Context, data model.BookingCreate, expi
 		return "", model.ErrInternalServerError
 	}
 
-	_, err = tx.ExecContext(ctx, `
+	_, err = tx.Exec(ctx, `
 		INSERT INTO booking_status_history (booking_id, from_status, to_status, actor_type)
 		VALUES ($1, '', 'created', 'system')
 	`, id)
@@ -89,7 +103,7 @@ func (r *BookingRepo) Create(ctx context.Context, data model.BookingCreate, expi
 		return "", model.ErrInternalServerError
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := tx.Commit(ctx); err != nil {
 		log.Error("failed to commit transaction", pkglog.Err(err))
 		return "", model.ErrInternalServerError
 	}
@@ -104,16 +118,16 @@ func (r *BookingRepo) GetByID(ctx context.Context, id string) (model.Booking, er
 	var b model.Booking
 	var statusStr string
 	var snapJSON []byte
-	var cp sql.NullInt32
+	var cp *int32
 
-	err := r.db.QueryRowContext(ctx, `
+	err := r.db.QueryRow(ctx, `
 		SELECT id, user_id, car_id, committed_periods, status, pricing_rule_id, pricing_snapshot, expires_at, created_at, updated_at
 		FROM bookings WHERE id = $1
 	`, id).Scan(
 		&b.ID, &b.UserID, &b.CarID, &cp,
 		&statusStr, &b.PricingRuleID, &snapJSON, &b.ExpiresAt, &b.CreatedAt, &b.UpdatedAt,
 	)
-	if errors.Is(err, sql.ErrNoRows) {
+	if errors.Is(err, pgx.ErrNoRows) {
 		return model.Booking{}, model.ErrNotFound
 	}
 	if err != nil {
@@ -122,10 +136,7 @@ func (r *BookingRepo) GetByID(ctx context.Context, id string) (model.Booking, er
 	}
 
 	b.Status = model.BookingStatus(statusStr)
-	if cp.Valid {
-		v := cp.Int32
-		b.CommittedPeriods = &v
-	}
+	b.CommittedPeriods = cp
 
 	var snap pricingSnapshotJSON
 	if err := json.Unmarshal(snapJSON, &snap); err != nil {
@@ -180,7 +191,7 @@ func (r *BookingRepo) List(ctx context.Context, filter model.BookingListFilter) 
 
 	args = append(args, filter.Pagination.Limit, filter.Pagination.Offset)
 
-	rows, err := r.db.QueryContext(ctx, query, args...)
+	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
 		log.Error("failed to list bookings", pkglog.Err(err))
 		return nil, model.ErrInternalServerError
@@ -192,7 +203,7 @@ func (r *BookingRepo) List(ctx context.Context, filter model.BookingListFilter) 
 		var b model.Booking
 		var statusStr string
 		var snapJSON []byte
-		var cp sql.NullInt32
+		var cp *int32
 
 		if err := rows.Scan(
 			&b.ID, &b.UserID, &b.CarID, &cp,
@@ -203,10 +214,7 @@ func (r *BookingRepo) List(ctx context.Context, filter model.BookingListFilter) 
 		}
 
 		b.Status = model.BookingStatus(statusStr)
-		if cp.Valid {
-			v := cp.Int32
-			b.CommittedPeriods = &v
-		}
+		b.CommittedPeriods = cp
 
 		var snap pricingSnapshotJSON
 		if err := json.Unmarshal(snapJSON, &snap); err != nil {
@@ -235,7 +243,7 @@ func (r *BookingRepo) ListCreatedExpired(ctx context.Context, now time.Time) ([]
 	log := pkglog.WithMethod(r.log, "ListCreatedExpired")
 	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
-	rows, err := r.db.QueryContext(ctx, `
+	rows, err := r.db.Query(ctx, `
 		SELECT id, user_id, car_id, committed_periods, status, pricing_rule_id, pricing_snapshot, expires_at, created_at, updated_at
 		FROM bookings WHERE status = 'created' AND expires_at <= $1
 	`, now)
@@ -250,7 +258,7 @@ func (r *BookingRepo) ListCreatedExpired(ctx context.Context, now time.Time) ([]
 		var b model.Booking
 		var statusStr string
 		var snapJSON []byte
-		var cp sql.NullInt32
+		var cp *int32
 
 		if err := rows.Scan(
 			&b.ID, &b.UserID, &b.CarID, &cp,
@@ -261,10 +269,7 @@ func (r *BookingRepo) ListCreatedExpired(ctx context.Context, now time.Time) ([]
 		}
 
 		b.Status = model.BookingStatus(statusStr)
-		if cp.Valid {
-			v := cp.Int32
-			b.CommittedPeriods = &v
-		}
+		b.CommittedPeriods = cp
 
 		var snap pricingSnapshotJSON
 		if err := json.Unmarshal(snapJSON, &snap); err != nil {
@@ -293,16 +298,16 @@ func (r *BookingRepo) UpdateStatus(ctx context.Context, id, toStatus, actorType 
 	log := pkglog.WithMethod(r.log, "UpdateStatus")
 	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
-	tx, err := r.db.BeginTx(ctx, nil)
+	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		log.Error("failed to begin transaction", pkglog.Err(err))
 		return model.ErrInternalServerError
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback(ctx) }()
 
 	var fromStatus string
-	err = tx.QueryRowContext(ctx, `SELECT status FROM bookings WHERE id = $1 FOR UPDATE`, id).Scan(&fromStatus)
-	if errors.Is(err, sql.ErrNoRows) {
+	err = tx.QueryRow(ctx, `SELECT status FROM bookings WHERE id = $1 FOR UPDATE`, id).Scan(&fromStatus)
+	if errors.Is(err, pgx.ErrNoRows) {
 		return model.ErrNotFound
 	}
 	if err != nil {
@@ -310,12 +315,12 @@ func (r *BookingRepo) UpdateStatus(ctx context.Context, id, toStatus, actorType 
 		return model.ErrInternalServerError
 	}
 
-	if _, err = tx.ExecContext(ctx, `UPDATE bookings SET status = $1, updated_at = NOW() WHERE id = $2`, toStatus, id); err != nil {
+	if _, err = tx.Exec(ctx, `UPDATE bookings SET status = $1, updated_at = NOW() WHERE id = $2`, toStatus, id); err != nil {
 		log.Error("failed to update booking status", pkglog.Err(err))
 		return model.ErrInternalServerError
 	}
 
-	if _, err = tx.ExecContext(ctx, `
+	if _, err = tx.Exec(ctx, `
 		INSERT INTO booking_status_history (booking_id, from_status, to_status, actor_type, actor_id, reason)
 		VALUES ($1, $2, $3, $4, $5, $6)
 	`, id, fromStatus, toStatus, actorType, actorID, reason); err != nil {
@@ -323,7 +328,7 @@ func (r *BookingRepo) UpdateStatus(ctx context.Context, id, toStatus, actorType 
 		return model.ErrInternalServerError
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err := tx.Commit(ctx); err != nil {
 		log.Error("failed to commit transaction", pkglog.Err(err))
 		return model.ErrInternalServerError
 	}
@@ -357,7 +362,7 @@ func (r *BookingRepo) GetStatusHistory(ctx context.Context, filter model.Booking
 
 	args = append(args, filter.Pagination.Limit, filter.Pagination.Offset)
 
-	rows, err := r.db.QueryContext(ctx, query, args...)
+	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
 		log.Error("failed to query status history", pkglog.Err(err))
 		return nil, model.ErrInternalServerError
@@ -367,7 +372,7 @@ func (r *BookingRepo) GetStatusHistory(ctx context.Context, filter model.Booking
 	var history []model.BookingStatusReading
 	for rows.Next() {
 		var reading model.BookingStatusReading
-		var actorID, reason sql.NullString
+		var actorID, reason *string
 
 		if err := rows.Scan(
 			&reading.ID, &reading.BookingID, &reading.FromStatus, &reading.ToStatus,
@@ -377,12 +382,8 @@ func (r *BookingRepo) GetStatusHistory(ctx context.Context, filter model.Booking
 			return nil, model.ErrInternalServerError
 		}
 
-		if actorID.Valid {
-			reading.ActorID = &actorID.String
-		}
-		if reason.Valid {
-			reading.Reason = &reason.String
-		}
+		reading.ActorID = actorID
+		reading.Reason = reason
 
 		history = append(history, reading)
 	}

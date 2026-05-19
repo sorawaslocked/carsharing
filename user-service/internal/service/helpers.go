@@ -3,8 +3,8 @@ package service
 import (
 	"strings"
 
+	"carsharing/shared/pkg/utils"
 	"carsharing/user-service/internal/model"
-	"carsharing/user-service/internal/pkg/utils"
 	"context"
 )
 

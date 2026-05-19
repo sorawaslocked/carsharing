@@ -10,3 +10,5 @@ use (
 	./trip-service
 	./user-service
 )
+
+replace carsharing/shared v0.0.0 => ./shared

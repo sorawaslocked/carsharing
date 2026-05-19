@@ -5,10 +5,10 @@ import (
 	"errors"
 	"time"
 
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	"carsharing/user-service/internal/model"
-	pkglog "carsharing/user-service/internal/pkg/log"
 	"carsharing/user-service/internal/pkg/security"
-	"carsharing/user-service/internal/pkg/utils"
 )
 
 func (s *UserService) SendActivationCode(ctx context.Context) error {

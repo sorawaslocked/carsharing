@@ -4,20 +4,21 @@ import (
 	"flag"
 	"os"
 
-	pkggrpc "carsharing/car-service/internal/pkg/grpc"
-	pkgminio "carsharing/car-service/internal/pkg/minio"
-	pkgnats "carsharing/car-service/internal/pkg/nats"
-	pkgpostgres "carsharing/car-service/internal/pkg/postgres"
+	pkggrpc "carsharing/shared/pkg/grpc"
+	pkgminio "carsharing/shared/pkg/minio"
+	pkgnats "carsharing/shared/pkg/nats"
+	pkgpostgres "carsharing/shared/pkg/postgres"
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
 type Config struct {
-	Env              string                                `yaml:"env"                env:"ENV"                      env-default:"local"`
-	GRPC             pkggrpc.ServerConfig                  `yaml:"grpc_server"`
-	PG               pkgpostgres.Config                    `yaml:"postgres"`
-	NATS             pkgnats.Config                        `yaml:"nats"`
-	MinIO            pkgminio.Config                       `yaml:"minio"`
-	TelematicsStream pkggrpc.TelematicsStreamServiceConfig `yaml:"telematics_stream"`
+	Env              string                   `yaml:"env"              env:"ENV"             env-default:"local"`
+	GRPC             pkggrpc.ServerConfig     `yaml:"grpc_server"`
+	PG               pkgpostgres.Config       `yaml:"postgres"`
+	NATSPublisher    pkgnats.PublisherConfig  `yaml:"nats_publisher"`
+	NATSSubscriber   pkgnats.SubscriberConfig `yaml:"nats_subscriber"`
+	MinIO            pkgminio.Config          `yaml:"minio"`
+	TelematicsStream pkggrpc.ClientConfig     `yaml:"telematics_stream"`
 }
 
 func MustLoad() Config {

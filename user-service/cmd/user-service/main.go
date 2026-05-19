@@ -1,9 +1,9 @@
 package main
 
 import (
+	pkglog "carsharing/shared/pkg/log"
 	"carsharing/user-service/internal/app"
 	"carsharing/user-service/internal/config"
-	pkglog "carsharing/user-service/internal/pkg/log"
 )
 
 func main() {

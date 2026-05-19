@@ -14,7 +14,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"carsharing/trip-service/internal/model"
-	"carsharing/trip-service/internal/pkg/utils"
 	"carsharing/trip-service/internal/service"
 	svcmocks "carsharing/trip-service/internal/service/mocks"
 )
@@ -61,15 +60,28 @@ func newDeps(t *testing.T) deps {
 }
 
 func ctxOwner(userID string) context.Context {
-	return utils.SetMetadata(context.Background(), "req-test", "127.0.0.1", userID, "")
+	return testCtx("req-test", "127.0.0.1", userID, nil)
 }
 
 func ctxAdmin() context.Context {
-	return utils.SetMetadata(context.Background(), "req-test", "127.0.0.1", "admin-user", string(model.RoleAdmin))
+	return testCtx("req-test", "127.0.0.1", "admin-user", []string{string(model.RoleAdmin)})
 }
 
 func ctxManager() context.Context {
-	return utils.SetMetadata(context.Background(), "req-test", "127.0.0.1", "manager-user", string(model.RoleBookingManager))
+	return testCtx("req-test", "127.0.0.1", "manager-user", []string{string(model.RoleBookingManager)})
+}
+
+func testCtx(requestID, clientIP, userID string, roles []string) context.Context {
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "x-request-id", requestID)
+	ctx = context.WithValue(ctx, "x-client-ip", clientIP)
+	if userID != "" {
+		ctx = context.WithValue(ctx, "x-user-id", userID)
+	}
+	if len(roles) > 0 {
+		ctx = context.WithValue(ctx, "x-user-roles", roles)
+	}
+	return ctx
 }
 
 func sampleActiveTrip() model.Trip {

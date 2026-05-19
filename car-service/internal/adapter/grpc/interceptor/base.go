@@ -2,10 +2,10 @@ package interceptor
 
 import (
 	"context"
+	"strings"
 
 	"carsharing/car-service/internal/adapter/grpc/dto"
 	"carsharing/car-service/internal/model"
-	"carsharing/car-service/internal/pkg/utils"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -30,13 +30,10 @@ func (i *BaseInterceptor) Unary(ctx context.Context, req any, _ *grpc.UnaryServe
 		return nil, dto.FromErrorToStatusCode(model.ErrMissingMetadata)
 	}
 
-	ctx = utils.SetMetadata(
-		ctx,
-		firstVal(md.Get(mdKeyRequestID)),
-		firstVal(md.Get(mdKeyClientIP)),
-		firstVal(md.Get(mdKeyUserID)),
-		firstVal(md.Get(mdKeyUserRoles)),
-	)
+	ctx = context.WithValue(ctx, mdKeyRequestID, firstVal(md.Get(mdKeyRequestID)))
+	ctx = context.WithValue(ctx, mdKeyClientIP, firstVal(md.Get(mdKeyClientIP)))
+	ctx = context.WithValue(ctx, mdKeyUserID, firstVal(md.Get(mdKeyUserID)))
+	ctx = context.WithValue(ctx, mdKeyUserRoles, parseRoles(firstVal(md.Get(mdKeyUserRoles))))
 
 	return handler(ctx, req)
 }
@@ -46,4 +43,17 @@ func firstVal(vals []string) string {
 		return vals[0]
 	}
 	return ""
+}
+
+func parseRoles(s string) []string {
+	if s == "" {
+		return nil
+	}
+	var roles []string
+	for _, r := range strings.Split(s, ",") {
+		if r = strings.TrimSpace(r); r != "" {
+			roles = append(roles, r)
+		}
+	}
+	return roles
 }

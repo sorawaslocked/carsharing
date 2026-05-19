@@ -1,12 +1,9 @@
 package dto
 
 import (
-	"database/sql"
+	"carsharing/car-service/internal/model"
 	"fmt"
 	"time"
-
-	"carsharing/car-service/internal/model"
-	"github.com/lib/pq"
 )
 
 type carInsuranceRow struct {
@@ -19,14 +16,14 @@ type carInsuranceRow struct {
 	ExpiresAt time.Time
 	CostTenge int32
 	Status    string
-	Notes     sql.NullString
-	ImageKeys pq.StringArray
+	Notes     *string
+	ImageKeys []string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
 func (r carInsuranceRow) toDomain() model.CarInsurance {
-	ins := model.CarInsurance{
+	return model.CarInsurance{
 		ID:        r.ID,
 		CarID:     r.CarID,
 		Type:      model.InsuranceType(r.Type),
@@ -36,16 +33,11 @@ func (r carInsuranceRow) toDomain() model.CarInsurance {
 		ExpiresAt: r.ExpiresAt,
 		CostTenge: r.CostTenge,
 		Status:    model.InsuranceStatus(r.Status),
-		Images:    ImageKeysToImages([]string(r.ImageKeys)),
+		Notes:     r.Notes,
+		Images:    ImageKeysToImages(r.ImageKeys),
 		CreatedAt: r.CreatedAt,
 		UpdatedAt: r.UpdatedAt,
 	}
-
-	if r.Notes.Valid {
-		ins.Notes = &r.Notes.String
-	}
-
-	return ins
 }
 
 func ScanCarInsuranceRow(s scanner) (model.CarInsurance, error) {
@@ -109,7 +101,7 @@ func BuildCarInsuranceSetClauses(u model.CarInsuranceUpdate, b *ArgsBuilder) []s
 		clauses = append(clauses, fmt.Sprintf("notes = %s", b.Add(*u.Notes)))
 	}
 	if u.ImageKeys != nil {
-		clauses = append(clauses, fmt.Sprintf("image_keys = %s", b.Add(pq.StringArray(u.ImageKeys))))
+		clauses = append(clauses, fmt.Sprintf("image_keys = %s", b.Add(u.ImageKeys)))
 	}
 
 	clauses = append(clauses, fmt.Sprintf("updated_at = %s", b.Add(u.UpdatedAt)))

@@ -5,7 +5,7 @@ import (
 	"log/slog"
 
 	"carsharing/car-service/internal/model"
-	pkglog "carsharing/car-service/internal/pkg/log"
+	pkglog "carsharing/shared/pkg/log"
 	"github.com/nats-io/nats.go"
 	eventbooking "github.com/sorawaslocked/car-rental-protos/gen/event/booking"
 	eventtrip "github.com/sorawaslocked/car-rental-protos/gen/event/trip"

@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	"carsharing/user-service/internal/model"
-	pkglog "carsharing/user-service/internal/pkg/log"
-	"carsharing/user-service/internal/pkg/utils"
 )
 
 func (s *UserService) CreateDocument(ctx context.Context, objectKey string, imageType model.ImageType) (string, error) {

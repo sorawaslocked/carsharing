@@ -115,11 +115,16 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 
 func authHeader(c *gin.Context) (string, error) {
 	header := c.GetHeader("Authorization")
-	if header == "" {
-		return "", model.ErrUnauthorized
+	if header != "" {
+		return header, nil
 	}
 
-	return header, nil
+	// WebSocket clients cannot set custom headers, so accept the token as a query param.
+	if token := c.Query("token"); token != "" {
+		return "Bearer " + token, nil
+	}
+
+	return "", model.ErrUnauthorized
 }
 
 func (a *Authentication) parseClaims(c *gin.Context, authHeader string) (userID string, exp time.Time, err error) {

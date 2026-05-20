@@ -30,8 +30,6 @@ services:
     build:
       context: ..
       dockerfile: user-service/Dockerfile
-    ports:
-      - "9999:9999"
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       REDIS_USERNAME: ""

@@ -16,8 +16,6 @@ services:
     build:
       context: ..
       dockerfile: car-service/Dockerfile
-    ports:
-      - "9998:9998"
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       MINIO_ACCESS_KEY_ID: ${MINIO_ACCESS_KEY_ID}

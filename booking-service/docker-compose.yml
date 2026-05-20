@@ -16,8 +16,6 @@ services:
     build:
       context: ..
       dockerfile: booking-service/Dockerfile
-    ports:
-      - "9997:9997"
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       NATS_PUBLISHER_USERNAME: ""

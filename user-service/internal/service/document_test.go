@@ -187,11 +187,8 @@ func TestHandleDocumentAnalyzed_Passed(t *testing.T) {
 
 	d.docRepo.EXPECT().FindByID(ctx, testDocID).Return(doc, nil)
 	d.docRepo.EXPECT().Update(ctx, testDocID, mock.MatchedBy(func(u model.DocumentUpdate) bool {
-		return u.Status != nil && *u.Status == model.DocumentStatusApproved && u.Error == nil
+		return u.Status != nil && *u.Status == model.DocumentStatusProcessed && u.Error == nil
 	})).Return(nil)
-	// Only one doc type — won't trigger verification.
-	d.docRepo.EXPECT().Find(ctx, model.DocumentFilter{UserID: ptr(testUserID), LatestPerType: true}).
-		Return([]model.Document{doc}, nil)
 
 	err := svc.HandleDocumentAnalyzed(ctx, event)
 

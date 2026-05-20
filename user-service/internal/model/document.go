@@ -5,15 +5,17 @@ import "time"
 type DocumentStatus string
 
 const (
-	DocumentStatusPending  DocumentStatus = "pending"
-	DocumentStatusApproved DocumentStatus = "approved"
-	DocumentStatusRejected DocumentStatus = "rejected"
+	DocumentStatusPending   DocumentStatus = "pending"
+	DocumentStatusProcessed DocumentStatus = "processed"
+	DocumentStatusApproved  DocumentStatus = "approved"
+	DocumentStatusRejected  DocumentStatus = "rejected"
 )
 
 var validDocumentStatuses = map[DocumentStatus]struct{}{
-	DocumentStatusPending:  {},
-	DocumentStatusApproved: {},
-	DocumentStatusRejected: {},
+	DocumentStatusPending:   {},
+	DocumentStatusProcessed: {},
+	DocumentStatusApproved:  {},
+	DocumentStatusRejected:  {},
 }
 
 func DocumentStatusFromString(s string) (DocumentStatus, error) {

@@ -128,7 +128,7 @@ func (s *UserService) HandleDocumentAnalyzed(ctx context.Context, event model.Do
 		return err
 	}
 
-	status := model.DocumentStatusApproved
+	status := model.DocumentStatusProcessed
 	var docError *string
 	if !event.Passed {
 		status = model.DocumentStatusRejected
@@ -145,12 +145,6 @@ func (s *UserService) HandleDocumentAnalyzed(ctx context.Context, event model.Do
 	}); err != nil {
 		logger.Error("repo: updating document status", pkglog.Err(err))
 		return err
-	}
-
-	if status == model.DocumentStatusApproved {
-		if err := s.checkAndFlagDocumentVerified(ctx, logger, doc.UserID); err != nil {
-			return err
-		}
 	}
 
 	return nil

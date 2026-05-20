@@ -1,0 +1,7 @@
+*
+!shared/go.mod
+!shared/go.sum
+!shared/**/*.go
+!car-service/
+car-service/config/local.yml
+car-service/.env

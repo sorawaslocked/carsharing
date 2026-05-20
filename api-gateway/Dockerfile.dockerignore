@@ -1,0 +1,7 @@
+*
+!shared/go.mod
+!shared/go.sum
+!shared/**/*.go
+!api-gateway/
+api-gateway/config/local.yml
+api-gateway/.env

@@ -1,0 +1,7 @@
+*
+!shared/go.mod
+!shared/go.sum
+!shared/**/*.go
+!user-service/
+user-service/config/local.yml
+user-service/.env

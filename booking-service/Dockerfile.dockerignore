@@ -1,0 +1,7 @@
+*
+!shared/go.mod
+!shared/go.sum
+!shared/**/*.go
+!booking-service/
+booking-service/config/local.yml
+booking-service/.env

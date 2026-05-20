@@ -1,0 +1,7 @@
+*
+!shared/go.mod
+!shared/go.sum
+!shared/**/*.go
+!trip-service/
+trip-service/config/local.yml
+trip-service/.env

@@ -6,12 +6,15 @@ COPY shared/go.mod shared/go.sum ./shared/
 COPY car-service/go.mod car-service/go.sum ./car-service/
 
 WORKDIR /app/car-service
-RUN go mod download
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download
 
 COPY shared/ /app/shared/
 COPY car-service/ .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /car-service ./cmd/car-service/main.go
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg/mod \
+    CGO_ENABLED=0 GOOS=linux go build -o /car-service ./cmd/car-service/main.go
 
 FROM alpine:3.21
 

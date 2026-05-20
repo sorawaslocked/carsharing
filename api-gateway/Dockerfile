@@ -6,12 +6,15 @@ COPY shared/go.mod shared/go.sum ./shared/
 COPY api-gateway/go.mod api-gateway/go.sum ./api-gateway/
 
 WORKDIR /app/api-gateway
-RUN go mod download
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download
 
 COPY shared/ /app/shared/
 COPY api-gateway/ .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /api-gateway ./cmd/api-gateway
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg/mod \
+    CGO_ENABLED=0 GOOS=linux go build -o /api-gateway ./cmd/api-gateway
 
 FROM alpine:3.21
 

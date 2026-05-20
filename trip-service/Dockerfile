@@ -6,12 +6,15 @@ COPY shared/go.mod shared/go.sum ./shared/
 COPY trip-service/go.mod trip-service/go.sum ./trip-service/
 
 WORKDIR /app/trip-service
-RUN go mod download
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download
 
 COPY shared/ /app/shared/
 COPY trip-service/ .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /trip-service ./cmd/trip-service/main.go
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg/mod \
+    CGO_ENABLED=0 GOOS=linux go build -o /trip-service ./cmd/trip-service/main.go
 
 FROM alpine:3.21
 

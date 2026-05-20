@@ -3,6 +3,7 @@ package service_test
 import (
 	"testing"
 
+	sharedmodel "carsharing/shared/model"
 	"carsharing/user-service/internal/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -275,11 +276,11 @@ func TestUpdate_IsSecurityUpdate_WhenRolesChanged(t *testing.T) {
 
 	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(baseUser(), nil)
 	d.userRepo.EXPECT().Update(ctx, testUserID, mock.MatchedBy(func(u model.UserRepoUpdate) bool {
-		return len(u.Roles) == 1 && u.Roles[0] == model.RoleAdmin
+		return len(u.Roles) == 1 && u.Roles[0] == sharedmodel.RoleAdmin
 	})).Return(nil)
 	d.publisher.EXPECT().PublishUserUpdated(ctx, testUserID, true).Return(nil)
 
-	err := svc.Update(ctx, testUserID, model.UserUpdate{Roles: []model.Role{model.RoleAdmin}})
+	err := svc.Update(ctx, testUserID, model.UserUpdate{Roles: []sharedmodel.Role{sharedmodel.RoleAdmin}})
 
 	require.NoError(t, err)
 }

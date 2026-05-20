@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	sharedmodel "carsharing/shared/model"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -31,7 +32,11 @@ func (i *BaseInterceptor) Unary(ctx context.Context, req any, _ *grpc.UnaryServe
 	if userID := stringFromMD(md, "x-user-id"); userID != "" {
 		ctx = context.WithValue(ctx, CtxUserIDKey, userID)
 	}
-	if roles := stringsFromMD(md, "x-user-roles"); len(roles) > 0 {
+	if roleStrs := stringsFromMD(md, "x-user-roles"); len(roleStrs) > 0 {
+		roles := make([]sharedmodel.Role, len(roleStrs))
+		for i, s := range roleStrs {
+			roles[i] = sharedmodel.Role(s)
+		}
 		ctx = context.WithValue(ctx, CtxUserRolesKey, roles)
 	}
 

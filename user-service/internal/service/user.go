@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"time"
 
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 	"carsharing/user-service/internal/model"
@@ -93,7 +94,7 @@ func (s *UserService) insertUser(ctx context.Context, logger *slog.Logger, data 
 		LastName:     data.LastName,
 		BirthDate:    data.BirthDate,
 		PasswordHash: hash,
-		Roles:        []model.Role{model.RoleUser},
+		Roles:        []sharedmodel.Role{sharedmodel.RoleUser},
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}

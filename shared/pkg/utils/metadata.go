@@ -2,6 +2,8 @@ package utils
 
 import (
 	"context"
+
+	sharedmodel "carsharing/shared/model"
 )
 
 const (
@@ -15,7 +17,7 @@ type Metadata struct {
 	ClientIP  string
 	RequestID string
 	UserID    *string
-	UserRoles []string
+	UserRoles []sharedmodel.Role
 }
 
 func MetadataFromCtx(ctx context.Context) Metadata {
@@ -30,7 +32,7 @@ func MetadataFromCtx(ctx context.Context) Metadata {
 	if userID, ok := ctx.Value(ctxRequestUserIDKey).(string); ok {
 		md.UserID = &userID
 	}
-	if userRoles, ok := ctx.Value(ctxRequestUserRolesKey).([]string); ok {
+	if userRoles, ok := ctx.Value(ctxRequestUserRolesKey).([]sharedmodel.Role); ok {
 		md.UserRoles = userRoles
 	}
 

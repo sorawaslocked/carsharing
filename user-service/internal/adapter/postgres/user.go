@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"strings"
 
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 	pgdto "carsharing/user-service/internal/adapter/postgres/dto"
@@ -60,9 +61,9 @@ func scanUser(rs rowScanner) (model.User, error) {
 		u.ProfileImage = &model.Image{Key: *profileImageKey}
 	}
 
-	u.Roles = make([]model.Role, len(roleStrings))
+	u.Roles = make([]sharedmodel.Role, len(roleStrings))
 	for i, s := range roleStrings {
-		u.Roles[i] = model.Role(s)
+		u.Roles[i] = sharedmodel.Role(s)
 	}
 
 	return u, nil

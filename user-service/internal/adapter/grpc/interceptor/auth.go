@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 	"carsharing/user-service/internal/adapter/grpc/dto"
@@ -18,7 +19,7 @@ type ownerExtractFn func(req any) (userID string, ok bool)
 
 type methodPolicy struct {
 	public       bool
-	allowedRoles []model.Role
+	allowedRoles []sharedmodel.Role
 	ownerExtract ownerExtractFn
 }
 
@@ -44,7 +45,7 @@ func extractByUserID(req any) (string, bool) {
 	return id, id != ""
 }
 
-var privilegedRoles = []model.Role{model.RoleAdmin, model.RoleUserManager}
+var privilegedRoles = []sharedmodel.Role{sharedmodel.RoleAdmin, sharedmodel.RoleUserManager}
 
 func buildPolicies() map[string]methodPolicy {
 	return map[string]methodPolicy{
@@ -113,7 +114,7 @@ func (i *AuthInterceptor) Unary(ctx context.Context, req any, info *grpc.UnarySe
 	// Role check: any matching privileged role grants access.
 	for _, allowed := range policy.allowedRoles {
 		for _, callerRole := range md.UserRoles {
-			if model.Role(callerRole) == allowed {
+			if callerRole == allowed {
 				return handler(ctx, req)
 			}
 		}

@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	sharedmodel "carsharing/shared/model"
+)
 
 type User struct {
 	ID           string
@@ -12,7 +16,7 @@ type User struct {
 	PasswordHash []byte
 	ProfileImage *Image
 
-	Roles              []Role
+	Roles              []sharedmodel.Role
 	IsDocumentVerified bool
 	IsEmailVerified    bool
 	IsSuspended        bool
@@ -44,7 +48,7 @@ type UserUpdate struct {
 	PasswordConfirmation *string    `validate:"omitempty,min=8,max=20,complex_password"`
 	ProfileImageKey      *string
 
-	Roles              []Role
+	Roles              []sharedmodel.Role
 	IsDocumentVerified *bool
 	IsEmailVerified    *bool
 	IsSuspended        *bool
@@ -61,7 +65,7 @@ type UserRepoUpdate struct {
 	PasswordHash    *[]byte
 	ProfileImageKey *string
 
-	Roles              []Role
+	Roles              []sharedmodel.Role
 	IsDocumentVerified *bool
 	IsEmailVerified    *bool
 	IsSuspended        *bool

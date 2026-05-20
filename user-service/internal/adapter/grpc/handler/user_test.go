@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
+	sharedmodel "carsharing/shared/model"
 	"carsharing/user-service/internal/adapter/grpc/handler"
 	"carsharing/user-service/internal/adapter/grpc/handler/mocks"
 	"carsharing/user-service/internal/model"
@@ -46,7 +47,7 @@ func ctxWithUser(userID string) context.Context {
 	ctx = context.WithValue(ctx, ctxKeyRequestID, "test-req-id")
 	ctx = context.WithValue(ctx, ctxKeyClientIP, "127.0.0.1")
 	ctx = context.WithValue(ctx, ctxKeyUserID, userID)
-	ctx = context.WithValue(ctx, ctxKeyUserRoles, []string{model.RoleUser.String()})
+	ctx = context.WithValue(ctx, ctxKeyUserRoles, []sharedmodel.Role{sharedmodel.RoleUser})
 	return ctx
 }
 
@@ -73,7 +74,7 @@ func baseUser() model.User {
 		FirstName: testFName,
 		LastName:  testLName,
 		BirthDate: testBirthDate,
-		Roles:     []model.Role{model.RoleUser},
+		Roles:     []sharedmodel.Role{sharedmodel.RoleUser},
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}

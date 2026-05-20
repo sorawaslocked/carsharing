@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	sharedmodel "carsharing/shared/model"
 	"carsharing/user-service/internal/model"
 	"carsharing/user-service/internal/pkg/security"
 	validatecfg "carsharing/user-service/internal/pkg/validate"
@@ -46,7 +47,7 @@ func ctxWithUser(userID string) context.Context {
 	ctx = context.WithValue(ctx, ctxKeyRequestID, "test-req-id")
 	ctx = context.WithValue(ctx, ctxKeyClientIP, "127.0.0.1")
 	ctx = context.WithValue(ctx, ctxKeyUserID, userID)
-	ctx = context.WithValue(ctx, ctxKeyUserRoles, []string{model.RoleUser.String()})
+	ctx = context.WithValue(ctx, ctxKeyUserRoles, []sharedmodel.Role{sharedmodel.RoleUser})
 	return ctx
 }
 
@@ -102,7 +103,7 @@ func baseUser() model.User {
 		FirstName: testFName,
 		LastName:  testLName,
 		BirthDate: testBirthDate,
-		Roles:     []model.Role{model.RoleUser},
+		Roles:     []sharedmodel.Role{sharedmodel.RoleUser},
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}

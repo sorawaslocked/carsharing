@@ -5,6 +5,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	sharedmodel "carsharing/shared/model"
 	"carsharing/user-service/internal/model"
 	baseuserpb "github.com/sorawaslocked/car-rental-protos/gen/base/user"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
@@ -94,9 +95,9 @@ func FromUpdateUserRequest(req *usersvc.UpdateUserRequest) (model.UserUpdate, er
 	}
 
 	if len(req.Roles) > 0 {
-		roles := make([]model.Role, len(req.Roles))
+		roles := make([]sharedmodel.Role, len(req.Roles))
 		for i, r := range req.Roles {
-			role, err := model.RoleFromString(r)
+			role, err := sharedmodel.RoleFromString(r)
 			if err != nil {
 				return model.UserUpdate{}, model.ValidationErrors{
 					"roles": model.ErrInvalidRole,

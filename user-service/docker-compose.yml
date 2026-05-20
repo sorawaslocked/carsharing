@@ -26,6 +26,7 @@ services:
       - car-rental-net
 
   user-service:
+    image: ghcr.io/sorawaslocked/carsharing/user-service:latest
     container_name: user-service
     build:
       context: ..

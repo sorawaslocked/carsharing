@@ -1,5 +1,6 @@
 services:
   api-gateway:
+    image: ghcr.io/sorawaslocked/carsharing/api-gateway:latest
     build:
       context: ..
       dockerfile: api-gateway/Dockerfile

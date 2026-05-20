@@ -1,5 +1,6 @@
 services:
   document-analyzer:
+    image: ghcr.io/sorawaslocked/carsharing/document-analyzer:latest
     container_name: document-analyzer
     build: .
     networks:

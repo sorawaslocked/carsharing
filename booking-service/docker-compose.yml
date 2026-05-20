@@ -12,6 +12,7 @@ services:
       - car-rental-net
 
   booking-service:
+    image: ghcr.io/sorawaslocked/carsharing/booking-service:latest
     container_name: booking-service
     build:
       context: ..

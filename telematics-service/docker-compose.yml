@@ -1,5 +1,6 @@
 services:
   telematics:
+    image: ghcr.io/sorawaslocked/carsharing/telematics-service:latest
     container_name: telematics
     build: .
     environment:

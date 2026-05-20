@@ -6,6 +6,7 @@ import (
 
 	"carsharing/car-service/internal/adapter/grpc/dto"
 	"carsharing/car-service/internal/model"
+	sharedmodel "carsharing/shared/model"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -45,14 +46,14 @@ func firstVal(vals []string) string {
 	return ""
 }
 
-func parseRoles(s string) []string {
+func parseRoles(s string) []sharedmodel.Role {
 	if s == "" {
 		return nil
 	}
-	var roles []string
+	var roles []sharedmodel.Role
 	for _, r := range strings.Split(s, ",") {
 		if r = strings.TrimSpace(r); r != "" {
-			roles = append(roles, r)
+			roles = append(roles, sharedmodel.Role(r))
 		}
 	}
 	return roles

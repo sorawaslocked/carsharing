@@ -31,7 +31,11 @@ func attachOutgoingMetadata(ctx context.Context) context.Context {
 		kv = append(kv, "x-user-id", *md.UserID)
 	}
 	if len(md.UserRoles) > 0 {
-		kv = append(kv, "x-user-roles", strings.Join(md.UserRoles, ","))
+		roleStrs := make([]string, len(md.UserRoles))
+		for i, r := range md.UserRoles {
+			roleStrs[i] = string(r)
+		}
+		kv = append(kv, "x-user-roles", strings.Join(roleStrs, ","))
 	}
 	if len(kv) == 0 {
 		return ctx

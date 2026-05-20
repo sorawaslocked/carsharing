@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"carsharing/booking-service/internal/model"
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 )
@@ -235,9 +236,9 @@ func (s *BookingService) StartExpiryWatcher(ctx context.Context) {
 	}
 }
 
-func isPrivileged(roles []string) bool {
+func isPrivileged(roles []sharedmodel.Role) bool {
 	for _, r := range roles {
-		if r == string(model.RoleAdmin) || r == string(model.RoleBookingManager) {
+		if r == sharedmodel.RoleAdmin || r == sharedmodel.RoleBookingManager {
 			return true
 		}
 	}

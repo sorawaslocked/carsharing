@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"time"
 
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	pkgutils "carsharing/shared/pkg/utils"
 	"carsharing/trip-service/internal/model"
@@ -124,7 +125,7 @@ func (s *TripService) GetTrip(ctx context.Context, id string) (model.Trip, error
 func (s *TripService) ListTrips(ctx context.Context, filter model.TripFilter) ([]model.Trip, error) {
 	md := pkgutils.MetadataFromCtx(ctx)
 	for _, r := range md.UserRoles {
-		if model.Role(r) == model.RoleAdmin || model.Role(r) == model.RoleBookingManager {
+		if r == sharedmodel.RoleAdmin || r == sharedmodel.RoleBookingManager {
 			return s.tripRepo.List(ctx, filter)
 		}
 	}
@@ -353,7 +354,7 @@ func canAccess(md pkgutils.Metadata, ownerID string) bool {
 		return true
 	}
 	for _, r := range md.UserRoles {
-		if model.Role(r) == model.RoleAdmin || model.Role(r) == model.RoleBookingManager {
+		if r == sharedmodel.RoleAdmin || r == sharedmodel.RoleBookingManager {
 			return true
 		}
 	}

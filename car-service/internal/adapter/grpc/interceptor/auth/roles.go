@@ -1,11 +1,11 @@
 package auth
 
 import (
-	"carsharing/car-service/internal/model"
+	sharedmodel "carsharing/shared/model"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 )
 
-var fleetRoles = []model.Role{model.RoleAdmin, model.RoleFleetManager}
+var fleetRoles = []sharedmodel.Role{sharedmodel.RoleAdmin, sharedmodel.RoleFleetManager}
 
 func buildPolicies() map[string]methodPolicy {
 	return map[string]methodPolicy{

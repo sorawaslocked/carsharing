@@ -1,12 +1,12 @@
 package interceptor
 
 import (
-	"carsharing/trip-service/internal/model"
+	sharedmodel "carsharing/shared/model"
 	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
 )
 
 // tripManagerRoles — roles that may view status history for any trip.
-var tripManagerRoles = []model.Role{model.RoleAdmin, model.RoleBookingManager}
+var tripManagerRoles = []sharedmodel.Role{sharedmodel.RoleAdmin, sharedmodel.RoleBookingManager}
 
 func buildPolicies() map[string]methodPolicy {
 	return map[string]methodPolicy{

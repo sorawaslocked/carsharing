@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	sharedmodel "carsharing/shared/model"
 	"carsharing/trip-service/internal/model"
 	"carsharing/trip-service/internal/service"
 	svcmocks "carsharing/trip-service/internal/service/mocks"
@@ -64,14 +65,14 @@ func ctxOwner(userID string) context.Context {
 }
 
 func ctxAdmin() context.Context {
-	return testCtx("req-test", "127.0.0.1", "admin-user", []string{string(model.RoleAdmin)})
+	return testCtx("req-test", "127.0.0.1", "admin-user", []sharedmodel.Role{sharedmodel.RoleAdmin})
 }
 
 func ctxManager() context.Context {
-	return testCtx("req-test", "127.0.0.1", "manager-user", []string{string(model.RoleBookingManager)})
+	return testCtx("req-test", "127.0.0.1", "manager-user", []sharedmodel.Role{sharedmodel.RoleBookingManager})
 }
 
-func testCtx(requestID, clientIP, userID string, roles []string) context.Context {
+func testCtx(requestID, clientIP, userID string, roles []sharedmodel.Role) context.Context {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "x-request-id", requestID)
 	ctx = context.WithValue(ctx, "x-client-ip", clientIP)

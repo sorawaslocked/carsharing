@@ -6,6 +6,7 @@ import (
 
 	"carsharing/car-service/internal/adapter/grpc/dto"
 	"carsharing/car-service/internal/model"
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 
@@ -14,7 +15,7 @@ import (
 
 type methodPolicy struct {
 	public       bool
-	allowedRoles []model.Role
+	allowedRoles []sharedmodel.Role
 }
 
 type AuthInterceptor struct {
@@ -54,7 +55,7 @@ func (i *AuthInterceptor) Unary(ctx context.Context, req any, info *grpc.UnarySe
 	// Role check: any matching role grants access.
 	for _, allowed := range policy.allowedRoles {
 		for _, callerRole := range md.UserRoles {
-			if callerRole == string(allowed) {
+			if callerRole == allowed {
 				return handler(ctx, req)
 			}
 		}

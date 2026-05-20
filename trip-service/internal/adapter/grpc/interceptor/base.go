@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	sharedmodel "carsharing/shared/model"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -22,10 +23,10 @@ func extractMetadata(ctx context.Context) context.Context {
 		ctx = context.WithValue(ctx, "x-user-id", userID)
 	}
 	if rolesStr := firstMD(md, "x-user-roles"); rolesStr != "" {
-		var roles []string
+		var roles []sharedmodel.Role
 		for _, r := range strings.Split(rolesStr, ",") {
 			if r = strings.TrimSpace(r); r != "" {
-				roles = append(roles, r)
+				roles = append(roles, sharedmodel.Role(r))
 			}
 		}
 		if len(roles) > 0 {

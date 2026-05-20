@@ -1,11 +1,11 @@
 package interceptor
 
 import (
-	"carsharing/booking-service/internal/model"
+	sharedmodel "carsharing/shared/model"
 	bookingpb "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 )
 
-var bookingManagerRoles = []model.Role{model.RoleAdmin, model.RoleBookingManager}
+var bookingManagerRoles = []sharedmodel.Role{sharedmodel.RoleAdmin, sharedmodel.RoleBookingManager}
 
 func buildPolicies() map[string]methodPolicy {
 	return map[string]methodPolicy{

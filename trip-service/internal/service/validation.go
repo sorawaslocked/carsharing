@@ -1,6 +1,9 @@
 package service
 
-import "carsharing/trip-service/internal/model"
+import (
+	sharedmodel "carsharing/shared/model"
+	"carsharing/trip-service/internal/model"
+)
 
 func validateID(id string) error {
 	if id == "" {
@@ -16,7 +19,7 @@ func validateBookingID(bookingID string) error {
 	return nil
 }
 
-func hasRole(roles []model.Role, role model.Role) bool {
+func hasRole(roles []sharedmodel.Role, role sharedmodel.Role) bool {
 	for _, r := range roles {
 		if r == role {
 			return true
@@ -25,6 +28,6 @@ func hasRole(roles []model.Role, role model.Role) bool {
 	return false
 }
 
-func isPrivileged(roles []model.Role) bool {
-	return hasRole(roles, model.RoleAdmin) || hasRole(roles, model.RoleBookingManager)
+func isPrivileged(roles []sharedmodel.Role) bool {
+	return hasRole(roles, sharedmodel.RoleAdmin) || hasRole(roles, sharedmodel.RoleBookingManager)
 }

@@ -22,8 +22,9 @@ func (s *UserService) SendActivationCode(ctx context.Context) error {
 
 	user, err := s.userRepo.FindByID(ctx, *md.UserID)
 	if err != nil {
-		log.Error("repo: finding user", pkglog.Err(err))
-
+		if !errors.Is(err, model.ErrNotFound) {
+			log.Error("repo: finding user", pkglog.Err(err))
+		}
 		return err
 	}
 
@@ -53,8 +54,9 @@ func (s *UserService) CheckActivationCode(ctx context.Context, code string) erro
 
 	user, err := s.userRepo.FindByID(ctx, *md.UserID)
 	if err != nil {
-		log.Error("repo: finding user", pkglog.Err(err))
-
+		if !errors.Is(err, model.ErrNotFound) {
+			log.Error("repo: finding user", pkglog.Err(err))
+		}
 		return err
 	}
 

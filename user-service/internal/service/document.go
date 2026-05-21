@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"strings"
 	"time"
@@ -70,8 +71,9 @@ func (s *UserService) GetProcessedDocumentsForUser(ctx context.Context, userID s
 	}
 
 	if _, err := s.userRepo.FindByID(ctx, userID); err != nil {
-		log.Error("repo: finding user", pkglog.Err(err))
-
+		if !errors.Is(err, model.ErrNotFound) {
+			log.Error("repo: finding user", pkglog.Err(err))
+		}
 		return nil, err
 	}
 
@@ -118,8 +120,9 @@ func (s *UserService) CheckDocument(ctx context.Context, docID string, data vali
 
 	doc, err := s.docRepo.FindByID(ctx, docID)
 	if err != nil {
-		log.Error("repo: finding document", pkglog.Err(err))
-
+		if !errors.Is(err, model.ErrNotFound) {
+			log.Error("repo: finding document", pkglog.Err(err))
+		}
 		return err
 	}
 

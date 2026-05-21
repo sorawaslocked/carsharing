@@ -2,15 +2,19 @@ package redis
 
 import (
 	"bytes"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	"context"
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"log/slog"
 
 	"carsharing/user-service/internal/model"
 	"carsharing/user-service/internal/pkg/security"
-	"github.com/redis/go-redis/v9"
 	"time"
+
+	"github.com/redis/go-redis/v9"
 )
 
 const (
@@ -20,21 +24,25 @@ const (
 	activationCodeLength    = 6
 )
 
-type ActivationCodeRedisCache struct {
+type ActivationCodeCache struct {
+	log *slog.Logger
 	rdb *redis.Client
 }
 
-func NewActivationCodeRedisCache(client *redis.Client) *ActivationCodeRedisCache {
-	return &ActivationCodeRedisCache{
+func NewActivationCodeCache(log *slog.Logger, client *redis.Client) *ActivationCodeCache {
+	return &ActivationCodeCache{
+		log: pkglog.WithComponent(log, "adapter.redis.ActivationCodeCache"),
 		rdb: client,
 	}
 }
 
-func (rc *ActivationCodeRedisCache) key(userID string) string {
+func (rc *ActivationCodeCache) key(userID string) string {
 	return fmt.Sprintf("%s:%s", activationCodeKeyPrefix, userID)
 }
 
-func (rc *ActivationCodeRedisCache) Save(ctx context.Context, userID string) (string, error) {
+func (rc *ActivationCodeCache) Save(ctx context.Context, userID string) (string, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(rc.log, "Save"), utils.MetadataFromCtx(ctx))
+
 	code := createCode()
 
 	codeHash, err := security.HashString(code)
@@ -43,18 +51,24 @@ func (rc *ActivationCodeRedisCache) Save(ctx context.Context, userID string) (st
 	}
 
 	if err := rc.rdb.Set(ctx, rc.key(userID), codeHash, codeExpiration).Err(); err != nil {
+		log.Error("setting activation code", pkglog.Err(err))
+
 		return "", model.ErrRedis
 	}
 
 	return code, nil
 }
 
-func (rc *ActivationCodeRedisCache) Get(ctx context.Context, userID string) ([]byte, error) {
+func (rc *ActivationCodeCache) Get(ctx context.Context, userID string) ([]byte, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(rc.log, "Get"), utils.MetadataFromCtx(ctx))
+
 	codeHash, err := rc.rdb.Get(ctx, rc.key(userID)).Bytes()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
 			return nil, model.ErrNotFound
 		}
+		log.Error("getting activation code", pkglog.Err(err))
+
 		return nil, model.ErrRedis
 	}
 

@@ -12,6 +12,7 @@ import (
 	"carsharing/shared/pkg/utils"
 	pgdto "carsharing/user-service/internal/adapter/postgres/dto"
 	"carsharing/user-service/internal/model"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -69,7 +70,7 @@ func scanUser(rs rowScanner) (model.User, error) {
 	return u, nil
 }
 
-func (r *UserRepository) handlePGErr(logger *slog.Logger, err error) error {
+func (r *UserRepository) handlePGErr(log *slog.Logger, err error) error {
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) {
 		switch pgErr.ConstraintName {
@@ -79,16 +80,16 @@ func (r *UserRepository) handlePGErr(logger *slog.Logger, err error) error {
 			return model.ErrDuplicatePhone
 		}
 	}
-	logger.Error("unexpected postgres error", pkglog.Err(err))
+	log.Error("unexpected postgres error", pkglog.Err(err))
 	return model.ErrSql
 }
 
 func (r *UserRepository) Insert(ctx context.Context, user model.User) (string, error) {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Insert"), utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Insert"), utils.MetadataFromCtx(ctx))
 
 	tx, err := r.pool.Begin(ctx)
 	if err != nil {
-		logger.Error("beginning transaction", pkglog.Err(err))
+		log.Error("beginning transaction", pkglog.Err(err))
 		return "", model.ErrSqlTransaction
 	}
 	defer tx.Rollback(ctx)
@@ -120,7 +121,7 @@ func (r *UserRepository) Insert(ctx context.Context, user model.User) (string, e
 		user.UpdatedAt,
 	).Scan(&id)
 	if err != nil {
-		return "", r.handlePGErr(logger, err)
+		return "", r.handlePGErr(log, err)
 	}
 
 	for _, role := range user.Roles {
@@ -128,13 +129,13 @@ func (r *UserRepository) Insert(ctx context.Context, user model.User) (string, e
 			`INSERT INTO user_roles (user_id, role_name) VALUES ($1, $2)`,
 			id, role.String(),
 		); err != nil {
-			logger.Error("inserting user role", slog.String("role", role.String()), pkglog.Err(err))
+			log.Error("inserting user role", slog.String("role", role.String()), pkglog.Err(err))
 			return "", model.ErrSql
 		}
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		logger.Error("committing transaction", pkglog.Err(err))
+		log.Error("committing transaction", pkglog.Err(err))
 		return "", model.ErrSqlTransaction
 	}
 
@@ -142,21 +143,21 @@ func (r *UserRepository) Insert(ctx context.Context, user model.User) (string, e
 }
 
 func (r *UserRepository) FindByID(ctx context.Context, id string) (model.User, error) {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindByID"), utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindByID"), utils.MetadataFromCtx(ctx))
 
 	user, err := scanUser(r.pool.QueryRow(ctx, userSelect+" WHERE u.id = $1", id))
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return model.User{}, model.ErrNotFound
 		}
-		logger.Error("scanning user", pkglog.Err(err))
+		log.Error("scanning user", pkglog.Err(err))
 		return model.User{}, model.ErrSql
 	}
 	return user, nil
 }
 
 func (r *UserRepository) FindOne(ctx context.Context, filter model.UserFilter) (model.User, error) {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindOne"), utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindOne"), utils.MetadataFromCtx(ctx))
 
 	query := userSelect
 	clauses, args, _ := pgdto.WhereClausesFromFilter(filter, nil, 1)
@@ -169,14 +170,14 @@ func (r *UserRepository) FindOne(ctx context.Context, filter model.UserFilter) (
 		if errors.Is(err, pgx.ErrNoRows) {
 			return model.User{}, model.ErrNotFound
 		}
-		logger.Error("scanning user", pkglog.Err(err))
+		log.Error("scanning user", pkglog.Err(err))
 		return model.User{}, model.ErrSql
 	}
 	return user, nil
 }
 
 func (r *UserRepository) Find(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Find"), utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Find"), utils.MetadataFromCtx(ctx))
 
 	query := userSelect
 	clauses, args, nextArg := pgdto.WhereClausesFromFilter(filter, nil, 1)
@@ -191,7 +192,7 @@ func (r *UserRepository) Find(ctx context.Context, filter model.UserFilter) ([]m
 
 	rows, err := r.pool.Query(ctx, query, args...)
 	if err != nil {
-		logger.Error("querying users", pkglog.Err(err))
+		log.Error("querying users", pkglog.Err(err))
 		return nil, model.ErrSql
 	}
 	defer rows.Close()
@@ -200,14 +201,14 @@ func (r *UserRepository) Find(ctx context.Context, filter model.UserFilter) ([]m
 	for rows.Next() {
 		user, err := scanUser(rows)
 		if err != nil {
-			logger.Error("scanning user row", pkglog.Err(err))
+			log.Error("scanning user row", pkglog.Err(err))
 			return nil, model.ErrSql
 		}
 		users = append(users, user)
 	}
 
 	if err := rows.Err(); err != nil {
-		logger.Error("iterating user rows", pkglog.Err(err))
+		log.Error("iterating user rows", pkglog.Err(err))
 		return nil, model.ErrSql
 	}
 
@@ -215,7 +216,7 @@ func (r *UserRepository) Find(ctx context.Context, filter model.UserFilter) ([]m
 }
 
 func (r *UserRepository) Update(ctx context.Context, id string, update model.UserUpdate) error {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Update"), utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Update"), utils.MetadataFromCtx(ctx))
 
 	setClauses, args, nextArg := pgdto.SetClausesFromUpdate(update)
 	hasRoles := len(update.Roles) > 0
@@ -227,21 +228,21 @@ func (r *UserRepository) Update(ctx context.Context, id string, update model.Use
 	if hasRoles {
 		tx, err := r.pool.Begin(ctx)
 		if err != nil {
-			logger.Error("beginning transaction", pkglog.Err(err))
+			log.Error("beginning transaction", pkglog.Err(err))
 			return model.ErrSqlTransaction
 		}
 		defer tx.Rollback(ctx)
 
 		tag, err := tx.Exec(ctx, userQuery, userArgs...)
 		if err != nil {
-			return r.handlePGErr(logger, err)
+			return r.handlePGErr(log, err)
 		}
 		if tag.RowsAffected() == 0 {
 			return model.ErrNotFound
 		}
 
 		if _, err = tx.Exec(ctx, `DELETE FROM user_roles WHERE user_id = $1`, id); err != nil {
-			logger.Error("deleting user roles", pkglog.Err(err))
+			log.Error("deleting user roles", pkglog.Err(err))
 			return model.ErrSql
 		}
 		for _, role := range update.Roles {
@@ -249,13 +250,13 @@ func (r *UserRepository) Update(ctx context.Context, id string, update model.Use
 				`INSERT INTO user_roles (user_id, role_name) VALUES ($1, $2)`,
 				id, role.String(),
 			); err != nil {
-				logger.Error("inserting user role", slog.String("role", role.String()), pkglog.Err(err))
+				log.Error("inserting user role", slog.String("role", role.String()), pkglog.Err(err))
 				return model.ErrSql
 			}
 		}
 
 		if err := tx.Commit(ctx); err != nil {
-			logger.Error("committing transaction", pkglog.Err(err))
+			log.Error("committing transaction", pkglog.Err(err))
 			return model.ErrSqlTransaction
 		}
 		return nil
@@ -263,7 +264,7 @@ func (r *UserRepository) Update(ctx context.Context, id string, update model.Use
 
 	tag, err := r.pool.Exec(ctx, userQuery, userArgs...)
 	if err != nil {
-		return r.handlePGErr(logger, err)
+		return r.handlePGErr(log, err)
 	}
 	if tag.RowsAffected() == 0 {
 		return model.ErrNotFound
@@ -272,11 +273,11 @@ func (r *UserRepository) Update(ctx context.Context, id string, update model.Use
 }
 
 func (r *UserRepository) Delete(ctx context.Context, id string) error {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Delete"), utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Delete"), utils.MetadataFromCtx(ctx))
 
 	tag, err := r.pool.Exec(ctx, `DELETE FROM users WHERE id = $1`, id)
 	if err != nil {
-		logger.Error("deleting user", pkglog.Err(err))
+		log.Error("deleting user", pkglog.Err(err))
 		return model.ErrSql
 	}
 

@@ -26,7 +26,7 @@ type HealthHandler struct {
 
 func NewHealthHandler(log *slog.Logger, deps map[string]Pinger) *HealthHandler {
 	return &HealthHandler{
-		log:       pkglog.WithComponent(log, "grpc.HealthHandler"),
+		log:       pkglog.WithComponent(log, "grpc.handler.HealthHandler"),
 		deps:      deps,
 		startTime: time.Now(),
 	}

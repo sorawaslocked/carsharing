@@ -66,13 +66,15 @@ func (m *Brevo) send(ctx context.Context, to, subject, text, html string) error 
 	body, err := json.Marshal(payload)
 	if err != nil {
 		log.Error("marshalling request", pkglog.Err(err))
-		return model.ErrMailer
+
+		return model.ErrBrevo
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, sendURL, bytes.NewReader(body))
 	if err != nil {
 		log.Error("building request", pkglog.Err(err))
-		return model.ErrMailer
+
+		return model.ErrBrevo
 	}
 	req.Header.Set("api-key", m.apiKey)
 	req.Header.Set("Content-Type", "application/json")
@@ -80,13 +82,15 @@ func (m *Brevo) send(ctx context.Context, to, subject, text, html string) error 
 	resp, err := m.client.Do(req)
 	if err != nil {
 		log.Error("sending request", pkglog.Err(err))
-		return model.ErrMailer
+
+		return model.ErrBrevo
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= 300 {
 		log.Error("unexpected response", slog.String("to", to), slog.Int("status", resp.StatusCode))
-		return model.ErrMailer
+
+		return model.ErrBrevo
 	}
 
 	return nil

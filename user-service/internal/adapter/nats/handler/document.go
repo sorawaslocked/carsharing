@@ -5,8 +5,8 @@ import (
 	"log/slog"
 
 	pkglog "carsharing/shared/pkg/log"
-	"carsharing/shared/pkg/utils"
 	natsdto "carsharing/user-service/internal/adapter/nats/dto"
+
 	"github.com/nats-io/nats.go"
 	eventuserpb "github.com/sorawaslocked/car-rental-protos/gen/event/user"
 	"google.golang.org/protobuf/proto"
@@ -30,21 +30,23 @@ func NewDocumentHandler(log *slog.Logger, conn *nats.Conn, service DocumentServi
 
 func (h *DocumentHandler) Subscribe() error {
 	_, err := h.conn.Subscribe(subjectDocumentAnalyzed, h.handleDocumentAnalyzed)
+
 	return err
 }
 
 func (h *DocumentHandler) handleDocumentAnalyzed(msg *nats.Msg) {
 	ctx := context.Background()
-	logger := pkglog.WithMetadata(pkglog.WithMethod(h.log, "handleDocumentAnalyzed"), utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMethod(h.log, "handleDocumentAnalyzed")
 
 	var event eventuserpb.DocumentAnalyzedEvent
 	if err := proto.Unmarshal(msg.Data, &event); err != nil {
-		logger.Error("unmarshalling document analyzed event", pkglog.Err(err))
+		log.Error("unmarshalling document analyzed event", pkglog.Err(err))
+
 		return
 	}
 
 	if err := h.service.HandleDocumentAnalyzed(ctx, natsdto.DocumentAnalyzedEventFromProto(&event)); err != nil {
-		logger.Error("handling document analyzed event",
+		log.Error("handling document analyzed event",
 			slog.String("documentID", event.GetDocumentId()),
 			pkglog.Err(err),
 		)

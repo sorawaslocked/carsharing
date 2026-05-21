@@ -1,10 +1,13 @@
 package interceptor
 
 import (
+	"carsharing/user-service/internal/adapter/grpc/dto"
+	"carsharing/user-service/internal/model"
 	"context"
 	"strings"
 
 	sharedmodel "carsharing/shared/model"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -35,7 +38,11 @@ func (i *BaseInterceptor) Unary(ctx context.Context, req any, _ *grpc.UnaryServe
 	if roleStrs := stringsFromMD(md, "x-user-roles"); len(roleStrs) > 0 {
 		roles := make([]sharedmodel.Role, len(roleStrs))
 		for i, s := range roleStrs {
-			roles[i] = sharedmodel.Role(s)
+			role, ok := sharedmodel.RoleFromString(s)
+			if !ok {
+				return nil, dto.ToStatusError(model.ErrInvalidMetadata)
+			}
+			roles[i] = role
 		}
 		ctx = context.WithValue(ctx, CtxUserRolesKey, roles)
 	}

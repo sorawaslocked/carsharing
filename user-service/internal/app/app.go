@@ -88,7 +88,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 		return nil, fmt.Errorf("minio: %w", err)
 	}
 
-	activationCodeCache := redisadapter.NewActivationCodeRedisCache(redisClient)
+	activationCodeCache := redisadapter.NewActivationCodeCache(log, redisClient)
 	msMailer := brevo.New(log, cfg.Brevo)
 	userRepo := postgres.NewUserRepository(log, pool)
 	docRepo := postgres.NewDocumentRepository(log, pool)

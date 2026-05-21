@@ -3,7 +3,7 @@ package model
 import "errors"
 
 var (
-	ErrMailer         = errors.New("brevo error")
+	ErrBrevo          = errors.New("brevo error")
 	ErrNats           = errors.New("nats error")
 	ErrRedis          = errors.New("redis error")
 	ErrSqlTransaction = errors.New("sql transaction error")

@@ -12,6 +12,7 @@ import (
 	"carsharing/shared/pkg/utils"
 	pgdto "carsharing/user-service/internal/adapter/postgres/dto"
 	"carsharing/user-service/internal/model"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -63,7 +64,7 @@ func scanDocument(rs rowScanner) (model.Document, error) {
 }
 
 func (r *DocumentRepository) Insert(ctx context.Context, doc model.Document) (string, error) {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Insert"), utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Insert"), utils.MetadataFromCtx(ctx))
 
 	var imageKey *string
 	if doc.Image.Key != "" {
@@ -84,7 +85,7 @@ func (r *DocumentRepository) Insert(ctx context.Context, doc model.Document) (st
 		doc.UpdatedAt,
 	).Scan(&id)
 	if err != nil {
-		logger.Error("unexpected postgres error", pkglog.Err(err))
+		log.Error("unexpected postgres error", pkglog.Err(err))
 		return "", model.ErrSql
 	}
 
@@ -92,14 +93,14 @@ func (r *DocumentRepository) Insert(ctx context.Context, doc model.Document) (st
 }
 
 func (r *DocumentRepository) FindByID(ctx context.Context, id string) (model.Document, error) {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindByID"), utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindByID"), utils.MetadataFromCtx(ctx))
 
 	doc, err := scanDocument(r.pool.QueryRow(ctx, documentSelect+" WHERE id = $1", id))
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return model.Document{}, model.ErrNotFound
 		}
-		logger.Error("scanning document", pkglog.Err(err))
+		log.Error("scanning document", pkglog.Err(err))
 		return model.Document{}, model.ErrSql
 	}
 
@@ -107,7 +108,7 @@ func (r *DocumentRepository) FindByID(ctx context.Context, id string) (model.Doc
 }
 
 func (r *DocumentRepository) Find(ctx context.Context, filter model.DocumentFilter) ([]model.Document, error) {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Find"), utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Find"), utils.MetadataFromCtx(ctx))
 
 	base := documentSelect
 	if filter.LatestPerType {
@@ -125,7 +126,7 @@ func (r *DocumentRepository) Find(ctx context.Context, filter model.DocumentFilt
 
 	rows, err := r.pool.Query(ctx, query, args...)
 	if err != nil {
-		logger.Error("querying documents", pkglog.Err(err))
+		log.Error("querying documents", pkglog.Err(err))
 		return nil, model.ErrSql
 	}
 	defer rows.Close()
@@ -134,14 +135,14 @@ func (r *DocumentRepository) Find(ctx context.Context, filter model.DocumentFilt
 	for rows.Next() {
 		doc, err := scanDocument(rows)
 		if err != nil {
-			logger.Error("scanning document row", pkglog.Err(err))
+			log.Error("scanning document row", pkglog.Err(err))
 			return nil, model.ErrSql
 		}
 		docs = append(docs, doc)
 	}
 
 	if err := rows.Err(); err != nil {
-		logger.Error("iterating document rows", pkglog.Err(err))
+		log.Error("iterating document rows", pkglog.Err(err))
 		return nil, model.ErrSql
 	}
 
@@ -149,7 +150,7 @@ func (r *DocumentRepository) Find(ctx context.Context, filter model.DocumentFilt
 }
 
 func (r *DocumentRepository) Update(ctx context.Context, id string, update model.DocumentUpdate) error {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Update"), utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Update"), utils.MetadataFromCtx(ctx))
 
 	setClauses, args, nextArg := pgdto.SetClausesFromDocumentUpdate(update)
 
@@ -159,7 +160,7 @@ func (r *DocumentRepository) Update(ctx context.Context, id string, update model
 
 	tag, err := r.pool.Exec(ctx, query, args...)
 	if err != nil {
-		logger.Error("unexpected postgres error", pkglog.Err(err))
+		log.Error("unexpected postgres error", pkglog.Err(err))
 		return model.ErrSql
 	}
 	if tag.RowsAffected() == 0 {

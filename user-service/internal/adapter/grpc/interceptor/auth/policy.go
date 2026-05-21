@@ -1,16 +1,9 @@
-package interceptor
+package auth
 
 import (
-	"context"
-	"log/slog"
-
 	sharedmodel "carsharing/shared/model"
-	pkglog "carsharing/shared/pkg/log"
-	"carsharing/shared/pkg/utils"
-	"carsharing/user-service/internal/adapter/grpc/dto"
-	"carsharing/user-service/internal/model"
+
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
-	"google.golang.org/grpc"
 )
 
 // ownerExtractFn extracts the target user ID from the request so the interceptor
@@ -75,59 +68,4 @@ func buildPolicies() map[string]methodPolicy {
 		usersvc.UserService_CreateDocument_FullMethodName:            {},
 		usersvc.UserService_GetUploadDocumentData_FullMethodName:     {},
 	}
-}
-
-type AuthInterceptor struct {
-	log      *slog.Logger
-	policies map[string]methodPolicy
-}
-
-func NewAuthInterceptor(log *slog.Logger) *AuthInterceptor {
-	return &AuthInterceptor{
-		log:      pkglog.WithComponent(log, "grpc.AuthInterceptor"),
-		policies: buildPolicies(),
-	}
-}
-
-func (i *AuthInterceptor) Unary(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
-	md := utils.MetadataFromCtx(ctx)
-	log := pkglog.WithMetadata(pkglog.WithMethod(i.log, info.FullMethod), md)
-
-	policy, known := i.policies[info.FullMethod]
-	if !known {
-		return nil, dto.ToStatusError(model.ErrInsufficientPermissions)
-	}
-
-	if policy.public {
-		return handler(ctx, req)
-	}
-
-	if md.UserID == nil {
-		return nil, dto.ToStatusError(model.ErrUnauthenticated)
-	}
-
-	// No role or owner restrictions — any authenticated caller may proceed.
-	if len(policy.allowedRoles) == 0 && policy.ownerExtract == nil {
-		return handler(ctx, req)
-	}
-
-	// Role check: any matching privileged role grants access.
-	for _, allowed := range policy.allowedRoles {
-		for _, callerRole := range md.UserRoles {
-			if callerRole == allowed {
-				return handler(ctx, req)
-			}
-		}
-	}
-
-	// Owner check: caller operates on their own resource.
-	if policy.ownerExtract != nil {
-		if targetID, ok := policy.ownerExtract(req); ok && targetID == *md.UserID {
-			return handler(ctx, req)
-		}
-	}
-
-	log.Warn("permission denied", slog.Any("userRoles", md.UserRoles))
-
-	return nil, dto.ToStatusError(model.ErrInsufficientPermissions)
 }

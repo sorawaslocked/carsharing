@@ -1,11 +1,13 @@
 package grpc
 
 import (
+	"carsharing/user-service/internal/adapter/grpc/interceptor/auth"
 	"log/slog"
 
 	pkggrpc "carsharing/shared/pkg/grpc"
 	"carsharing/user-service/internal/adapter/grpc/handler"
 	"carsharing/user-service/internal/adapter/grpc/interceptor"
+
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"google.golang.org/grpc"
 )
@@ -18,7 +20,7 @@ func NewServer(
 ) (*grpc.Server, error) {
 	baseInterceptor := interceptor.NewBaseInterceptor()
 	loggerInterceptor := interceptor.NewLoggerInterceptor(log)
-	authInterceptor := interceptor.NewAuthInterceptor(log)
+	authInterceptor := auth.NewInterceptor(log)
 
 	s, err := pkggrpc.NewServer(
 		log,

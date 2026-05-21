@@ -3,6 +3,7 @@ package model
 import "errors"
 
 var (
+	ErrInvalidMetadata         = errors.New("invalid metadata")
 	ErrUnauthenticated         = errors.New("invalid credentials")
 	ErrInsufficientPermissions = errors.New("insufficient permissions")
 	ErrNotFound                = errors.New("resource not found")

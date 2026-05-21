@@ -1,6 +1,7 @@
 package interceptor
 
 import (
+	"carsharing/shared/pkg/utils"
 	"context"
 	"log/slog"
 
@@ -18,15 +19,14 @@ func NewLoggerInterceptor(log *slog.Logger) *LoggerInterceptor {
 }
 
 func (i *LoggerInterceptor) Unary(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
-	requestID, _ := ctx.Value(CtxRequestIDKey).(string)
-	clientIP, _ := ctx.Value(CtxClientIPKey).(string)
+	md := utils.MetadataFromCtx(ctx)
 
-	logger := i.log.With(
-		slog.String("requestId", requestID),
-		slog.String("clientIP", clientIP),
+	log := i.log.With(
+		slog.String("requestID", md.RequestID),
+		slog.String("clientIP", md.ClientIP),
 		slog.String("method", info.FullMethod),
 	)
-	logger.Info("grpc request")
+	log.Info("grpc request")
 
 	m, err := handler(ctx, req)
 
@@ -39,7 +39,7 @@ func (i *LoggerInterceptor) Unary(ctx context.Context, req any, info *grpc.Unary
 		statusCode = codes.OK.String()
 	}
 
-	logger.Info("grpc response", slog.String("status", statusCode))
+	log.Info("grpc response", slog.String("status", statusCode))
 
 	return m, err
 }

@@ -13,6 +13,7 @@ var (
 	ErrForbidden           = errors.New("forbidden")
 	ErrNotFound            = errors.New("resource not found")
 	ErrAlreadyExists       = errors.New("resource already exists")
+	ErrConflict            = errors.New("conflict")
 	ErrInternalServerError = errors.New("something went wrong")
 
 	ErrInvalidQueryParam = errors.New("invalid query param")

@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"carsharing/api-gateway/internal/model"
+
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -29,6 +30,8 @@ func FromGrpcErr(err error) error {
 		return model.ErrNotFound
 	case codes.AlreadyExists:
 		return model.ErrAlreadyExists
+	case codes.FailedPrecondition:
+		return model.ErrConflict
 	case codes.PermissionDenied:
 		return model.ErrForbidden
 	case codes.Internal:

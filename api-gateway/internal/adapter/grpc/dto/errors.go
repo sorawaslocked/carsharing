@@ -34,6 +34,8 @@ func FromGrpcErr(err error) error {
 		return model.ErrConflict
 	case codes.PermissionDenied:
 		return model.ErrForbidden
+	case codes.ResourceExhausted:
+		return model.ErrTooManyRequests
 	case codes.Internal:
 		return model.ErrInternalServerError
 	case codes.Unauthenticated:

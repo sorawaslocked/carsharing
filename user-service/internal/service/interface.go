@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	sharedmodel "carsharing/shared/model"
 	"carsharing/user-service/internal/model"
@@ -42,6 +43,9 @@ type Publisher interface {
 type ActivationCodeStorage interface {
 	Save(ctx context.Context, userID string) (string, error)
 	Get(ctx context.Context, userID string) ([]byte, error)
+	// ResendAllowedIn returns the duration the caller must wait before requesting
+	// a new activation code. Returns 0 if a resend is immediately allowed.
+	ResendAllowedIn(ctx context.Context, userID string) (time.Duration, error)
 }
 
 type Mailer interface {

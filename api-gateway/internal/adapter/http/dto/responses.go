@@ -91,6 +91,12 @@ func conflict(ctx *gin.Context) {
 	ctx.JSON(http.StatusConflict, body)
 }
 
+func tooManyRequests(ctx *gin.Context) {
+	body := errorBody("too many requests", nil)
+
+	ctx.JSON(http.StatusTooManyRequests, body)
+}
+
 func internalServerError(ctx *gin.Context) {
 	body := errorBody("something went wrong", nil)
 

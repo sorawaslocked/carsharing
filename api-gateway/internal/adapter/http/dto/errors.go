@@ -53,6 +53,9 @@ func FromError(ctx *gin.Context, err error) {
 	case errors.Is(err, model.ErrConflict):
 		conflict(ctx)
 
+	case errors.Is(err, model.ErrTooManyRequests):
+		tooManyRequests(ctx)
+
 	case errors.Is(err, model.ErrInternalServerError):
 		internalServerError(ctx)
 

@@ -20,6 +20,15 @@ func (s *UserService) SendActivationCode(ctx context.Context) error {
 		return model.ErrUnauthenticated
 	}
 
+	wait, err := s.activationCodeStorage.ResendAllowedIn(ctx, *md.UserID)
+	if err != nil {
+		log.Error("cache: checking resend cooldown", pkglog.Err(err))
+		return err
+	}
+	if wait > 0 {
+		return model.ErrActivationCodeResendTooSoon
+	}
+
 	user, err := s.userRepo.FindByID(ctx, *md.UserID)
 	if err != nil {
 		if !errors.Is(err, model.ErrNotFound) {

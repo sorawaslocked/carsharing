@@ -4,6 +4,7 @@ package mocks
 
 import (
 	context "context"
+	time "time"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -133,6 +134,63 @@ func (_c *MockActivationCodeStorage_Save_Call) Return(_a0 string, _a1 error) *Mo
 }
 
 func (_c *MockActivationCodeStorage_Save_Call) RunAndReturn(run func(context.Context, string) (string, error)) *MockActivationCodeStorage_Save_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ResendAllowedIn provides a mock function with given fields: ctx, userID
+func (_m *MockActivationCodeStorage) ResendAllowedIn(ctx context.Context, userID string) (time.Duration, error) {
+	ret := _m.Called(ctx, userID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ResendAllowedIn")
+	}
+
+	var r0 time.Duration
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (time.Duration, error)); ok {
+		return rf(ctx, userID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) time.Duration); ok {
+		r0 = rf(ctx, userID)
+	} else {
+		r0 = ret.Get(0).(time.Duration)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, userID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockActivationCodeStorage_ResendAllowedIn_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ResendAllowedIn'
+type MockActivationCodeStorage_ResendAllowedIn_Call struct {
+	*mock.Call
+}
+
+// ResendAllowedIn is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID string
+func (_e *MockActivationCodeStorage_Expecter) ResendAllowedIn(ctx interface{}, userID interface{}) *MockActivationCodeStorage_ResendAllowedIn_Call {
+	return &MockActivationCodeStorage_ResendAllowedIn_Call{Call: _e.mock.On("ResendAllowedIn", ctx, userID)}
+}
+
+func (_c *MockActivationCodeStorage_ResendAllowedIn_Call) Run(run func(ctx context.Context, userID string)) *MockActivationCodeStorage_ResendAllowedIn_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *MockActivationCodeStorage_ResendAllowedIn_Call) Return(_a0 time.Duration, _a1 error) *MockActivationCodeStorage_ResendAllowedIn_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockActivationCodeStorage_ResendAllowedIn_Call) RunAndReturn(run func(context.Context, string) (time.Duration, error)) *MockActivationCodeStorage_ResendAllowedIn_Call {
 	_c.Call.Return(run)
 	return _c
 }

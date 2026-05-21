@@ -14,6 +14,7 @@ var (
 	ErrNotFound            = errors.New("resource not found")
 	ErrAlreadyExists       = errors.New("resource already exists")
 	ErrConflict            = errors.New("conflict")
+	ErrTooManyRequests     = errors.New("too many requests")
 	ErrInternalServerError = errors.New("something went wrong")
 
 	ErrInvalidQueryParam = errors.New("invalid query param")

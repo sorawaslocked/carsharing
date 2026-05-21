@@ -2,6 +2,7 @@ package service_test
 
 import (
 	"testing"
+	"time"
 
 	"carsharing/user-service/internal/model"
 	"carsharing/user-service/internal/validation"
@@ -18,6 +19,7 @@ func TestSendActivationCode_Success(t *testing.T) {
 	ctx := ctxWithUser(testUserID)
 	user := baseUser()
 
+	d.codeStorage.EXPECT().ResendAllowedIn(ctx, testUserID).Return(time.Duration(0), nil)
 	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(user, nil)
 	d.codeStorage.EXPECT().Save(ctx, testUserID).Return(testCode, nil)
 	d.mailer.EXPECT().SendActivationCode(ctx, user.Email, testCode).Return(nil)
@@ -36,11 +38,36 @@ func TestSendActivationCode_NoUserIDInCtx(t *testing.T) {
 	assert.ErrorIs(t, err, model.ErrUnauthenticated)
 }
 
+func TestSendActivationCode_Throttled(t *testing.T) {
+	d := newDeps(t)
+	svc := newService(t, d)
+	ctx := ctxWithUser(testUserID)
+
+	d.codeStorage.EXPECT().ResendAllowedIn(ctx, testUserID).Return(30*time.Second, nil)
+
+	err := svc.SendActivationCode(ctx)
+
+	assert.ErrorIs(t, err, model.ErrActivationCodeResendTooSoon)
+}
+
+func TestSendActivationCode_ThrottleCheckError(t *testing.T) {
+	d := newDeps(t)
+	svc := newService(t, d)
+	ctx := ctxWithUser(testUserID)
+
+	d.codeStorage.EXPECT().ResendAllowedIn(ctx, testUserID).Return(time.Duration(0), model.ErrRedis)
+
+	err := svc.SendActivationCode(ctx)
+
+	assert.ErrorIs(t, err, model.ErrRedis)
+}
+
 func TestSendActivationCode_UserNotFound(t *testing.T) {
 	d := newDeps(t)
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
+	d.codeStorage.EXPECT().ResendAllowedIn(ctx, testUserID).Return(time.Duration(0), nil)
 	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(model.User{}, model.ErrNotFound)
 
 	err := svc.SendActivationCode(ctx)
@@ -89,7 +116,7 @@ func TestCheckActivationCode_AlreadyVerified(t *testing.T) {
 
 	err := svc.CheckActivationCode(ctx, testCode)
 
-	assert.ErrorIs(t, err, model.ErrAlreadyExists)
+	assert.ErrorIs(t, err, model.ErrEmailVerified)
 }
 
 func TestCheckActivationCode_InvalidFormat(t *testing.T) {

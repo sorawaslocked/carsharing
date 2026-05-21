@@ -37,6 +37,10 @@ func NewClient(log *slog.Logger, cfg Config) (*minio.Client, error) {
 		return nil, ErrFailedConnection
 	}
 
+	if err := EnsureBucket(context.Background(), log, client, cfg); err != nil {
+		return nil, err
+	}
+
 	return client, nil
 }
 

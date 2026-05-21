@@ -2,22 +2,21 @@ package nats
 
 import (
 	"context"
-	"errors"
+	"log/slog"
 
+	pkgnats "carsharing/shared/pkg/nats"
 	"github.com/nats-io/nats.go"
 )
 
-type Checker struct {
+type Pinger struct {
+	log  *slog.Logger
 	conn *nats.Conn
 }
 
-func NewChecker(conn *nats.Conn) *Checker {
-	return &Checker{conn: conn}
+func NewPinger(log *slog.Logger, conn *nats.Conn) *Pinger {
+	return &Pinger{log: log, conn: conn}
 }
 
-func (c *Checker) Ping(_ context.Context) error {
-	if !c.conn.IsConnected() {
-		return errors.New("not connected")
-	}
-	return nil
+func (p *Pinger) Ping(ctx context.Context) error {
+	return pkgnats.Ping(ctx, p.log, p.conn)
 }

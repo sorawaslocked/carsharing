@@ -2,24 +2,22 @@ package client
 
 import (
 	"context"
-	"fmt"
+	"log/slog"
 
+	pkggrpc "carsharing/shared/pkg/grpc"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/connectivity"
 )
 
-type Checker struct {
+type Pinger struct {
+	log  *slog.Logger
 	conn *grpc.ClientConn
 }
 
-func NewChecker(conn *grpc.ClientConn) *Checker {
-	return &Checker{conn: conn}
+func NewPinger(log *slog.Logger, conn *grpc.ClientConn) *Pinger {
+	return &Pinger{log: log, conn: conn}
 }
 
-func (c *Checker) Ping(_ context.Context) error {
-	state := c.conn.GetState()
-	if state == connectivity.TransientFailure || state == connectivity.Shutdown {
-		return fmt.Errorf("connection state: %s", state)
-	}
-	return nil
+func (p *Pinger) Ping(ctx context.Context) error {
+	_, err := pkggrpc.PingClient(ctx, p.log, p.conn)
+	return err
 }

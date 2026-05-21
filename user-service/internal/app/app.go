@@ -1,7 +1,6 @@
 package app
 
 import (
-	"context"
 	"fmt"
 	"log/slog"
 	"net"
@@ -29,40 +28,39 @@ import (
 	"carsharing/user-service/internal/config"
 	"carsharing/user-service/internal/service"
 	"carsharing/user-service/internal/validation"
+
 	"github.com/go-playground/validator/v10"
-	"github.com/jackc/pgx/v5/pgxpool"
-	natsio "github.com/nats-io/nats.go"
-	goredis "github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
 )
 
 type App struct {
-	log          *slog.Logger
-	grpcServer   *grpc.Server
-	grpcAddr     string
-	pool         *pgxpool.Pool
-	natsConn     *natsio.Conn
-	analyzerConn *grpc.ClientConn
-	redisClient  *goredis.Client
+	log        *slog.Logger
+	grpcServer *grpc.Server
+	grpcAddr   string
+	closer     closer
 }
 
 func New(log *slog.Logger, cfg config.Config) (*App, error) {
+	var cl closer
+
 	pool, err := pkgpostgres.NewPool(log, cfg.Postgres)
 	if err != nil {
 		return nil, fmt.Errorf("postgres: %w", err)
 	}
+	cl.add(pool.Close)
 
 	validate := validator.New()
 	if err := validation.RegisterCustomValidators(validate, log); err != nil {
-		pool.Close()
+		cl.closeAll()
 		return nil, fmt.Errorf("validator: %w", err)
 	}
 
 	natsConn, err := pkgnats.NewPublisher(log, cfg.NATS)
 	if err != nil {
-		pool.Close()
+		cl.closeAll()
 		return nil, fmt.Errorf("nats: %w", err)
 	}
+	cl.add(natsConn.Close)
 
 	baseClientInterceptor := interceptor.NewClientBaseInterceptor()
 	analyzerConn, err := pkggrpc.NewClientConn(
@@ -72,33 +70,22 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 		grpc.WithChainStreamInterceptor(),
 	)
 	if err != nil {
-		pool.Close()
-		natsConn.Close()
+		cl.closeAll()
 		return nil, fmt.Errorf("document analyzer client: %w", err)
 	}
+	cl.add(func() { _ = analyzerConn.Close() })
 
 	redisClient, err := pkgredis.NewClient(log, cfg.Redis)
 	if err != nil {
-		pool.Close()
-		natsConn.Close()
-		_ = analyzerConn.Close()
+		cl.closeAll()
 		return nil, fmt.Errorf("redis: %w", err)
 	}
+	cl.add(func() { _ = redisClient.Close() })
 
 	minioClient, err := pkgminio.NewClient(log, cfg.Minio)
 	if err != nil {
-		pool.Close()
-		natsConn.Close()
-		_ = analyzerConn.Close()
-		_ = redisClient.Close()
+		cl.closeAll()
 		return nil, fmt.Errorf("minio: %w", err)
-	}
-	if err := pkgminio.EnsureBucket(context.Background(), log, minioClient, cfg.Minio); err != nil {
-		pool.Close()
-		natsConn.Close()
-		_ = analyzerConn.Close()
-		_ = redisClient.Close()
-		return nil, fmt.Errorf("minio bucket: %w", err)
 	}
 
 	activationCodeCache := redisadapter.NewActivationCodeRedisCache(redisClient)
@@ -113,38 +100,29 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 
 	docHandler := natshandler.NewDocumentHandler(log, natsConn, userService)
 	if err := docHandler.Subscribe(); err != nil {
-		pool.Close()
-		natsConn.Close()
-		_ = analyzerConn.Close()
-		_ = redisClient.Close()
+		cl.closeAll()
 		return nil, fmt.Errorf("nats subscribe: %w", err)
 	}
 
 	healthHandler := handler.NewHealthHandler(log, map[string]handler.Pinger{
-		"postgres":          postgres.NewChecker(log, pool),
-		"redis":             redisadapter.NewChecker(redisClient),
-		"nats":              natsadapter.NewChecker(natsConn),
-		"minio":             minioadapter.NewChecker(minioClient, cfg.Minio.Bucket),
-		"document-analyzer": grpcdocanalyzer.NewChecker(analyzerConn),
+		"postgres":          postgres.NewPinger(log, pool),
+		"redis":             redisadapter.NewPinger(log, redisClient),
+		"nats":              natsadapter.NewPinger(log, natsConn),
+		"minio":             minioadapter.NewPinger(log, minioClient),
+		"document-analyzer": grpcdocanalyzer.NewPinger(log, analyzerConn),
 	})
 
 	grpcSrv, err := grpcserver.NewServer(log, cfg.GRPC, userService, healthHandler)
 	if err != nil {
-		pool.Close()
-		natsConn.Close()
-		_ = analyzerConn.Close()
-		_ = redisClient.Close()
+		cl.closeAll()
 		return nil, fmt.Errorf("grpc server: %w", err)
 	}
 
 	return &App{
-		log:          pkglog.WithComponent(log, "app"),
-		grpcServer:   grpcSrv,
-		grpcAddr:     fmt.Sprintf("%s:%d", cfg.GRPC.Host, cfg.GRPC.Port),
-		pool:         pool,
-		natsConn:     natsConn,
-		analyzerConn: analyzerConn,
-		redisClient:  redisClient,
+		log:        pkglog.WithComponent(log, "app"),
+		grpcServer: grpcSrv,
+		grpcAddr:   fmt.Sprintf("%s:%d", cfg.GRPC.Host, cfg.GRPC.Port),
+		closer:     cl,
 	}, nil
 }
 
@@ -192,8 +170,5 @@ func (a *App) stop() {
 		a.grpcServer.Stop()
 	}
 
-	a.pool.Close()
-	a.natsConn.Close()
-	_ = a.analyzerConn.Close()
-	_ = a.redisClient.Close()
+	a.closer.closeAll()
 }

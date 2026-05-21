@@ -8,15 +8,15 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type Checker struct {
+type Pinger struct {
 	log  *slog.Logger
 	pool *pgxpool.Pool
 }
 
-func NewChecker(log *slog.Logger, pool *pgxpool.Pool) *Checker {
-	return &Checker{log: log, pool: pool}
+func NewPinger(log *slog.Logger, pool *pgxpool.Pool) *Pinger {
+	return &Pinger{log: log, pool: pool}
 }
 
-func (c *Checker) Ping(ctx context.Context) error {
-	return pkgpostgres.Ping(ctx, c.log, c.pool)
+func (p *Pinger) Ping(ctx context.Context) error {
+	return pkgpostgres.Ping(ctx, p.log, p.pool)
 }

@@ -2,18 +2,21 @@ package redis
 
 import (
 	"context"
+	"log/slog"
 
+	pkgredis "carsharing/shared/pkg/redis"
 	"github.com/redis/go-redis/v9"
 )
 
-type Checker struct {
+type Pinger struct {
+	log    *slog.Logger
 	client *redis.Client
 }
 
-func NewChecker(client *redis.Client) *Checker {
-	return &Checker{client: client}
+func NewPinger(log *slog.Logger, client *redis.Client) *Pinger {
+	return &Pinger{log: log, client: client}
 }
 
-func (c *Checker) Ping(ctx context.Context) error {
-	return c.client.Ping(ctx).Err()
+func (p *Pinger) Ping(ctx context.Context) error {
+	return pkgredis.PingClient(ctx, p.log, p.client)
 }

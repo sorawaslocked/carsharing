@@ -25,7 +25,7 @@ type UserUpdate struct {
 	PasswordConfirmation *string    `validate:"omitempty,required_with=Password,min=8,max=20,complex_password,eqfield=Password"`
 	ProfileImageKey      *string    `validate:"omitempty,min=1"`
 
-	Roles              []string `validate:"omitempty,dive,role"`
+	Roles              []string `validate:"omitempty,min=1,dive,role"`
 	IsDocumentVerified *bool
 	IsEmailVerified    *bool
 	IsSuspended        *bool

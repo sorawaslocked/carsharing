@@ -11,4 +11,5 @@ var (
 	ErrAlreadyExists           = errors.New("resource already exists")
 	ErrDuplicateEmail          = errors.New("user with this email already exists")
 	ErrDuplicatePhone          = errors.New("user with this phone number already exists")
+	ErrEmailVerified           = errors.New("user with this email already verified")
 )

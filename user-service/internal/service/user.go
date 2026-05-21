@@ -204,11 +204,6 @@ func (s *UserService) Update(ctx context.Context, id string, data validation.Use
 		return err
 	}
 
-	roles := make([]sharedmodel.Role, len(data.Roles))
-	for i, r := range data.Roles {
-		roles[i] = sharedmodel.Role(r)
-	}
-
 	repoUpdate := model.UserUpdate{
 		Email:              data.Email,
 		PhoneNumber:        data.PhoneNumber,
@@ -216,11 +211,17 @@ func (s *UserService) Update(ctx context.Context, id string, data validation.Use
 		LastName:           data.LastName,
 		BirthDate:          data.BirthDate,
 		ProfileImageKey:    data.ProfileImageKey,
-		Roles:              roles,
 		IsDocumentVerified: data.IsDocumentVerified,
 		IsEmailVerified:    data.IsEmailVerified,
 		IsSuspended:        data.IsSuspended,
 		UpdatedAt:          time.Now(),
+	}
+	if data.Roles != nil {
+		roles := make([]sharedmodel.Role, len(data.Roles))
+		for i, r := range data.Roles {
+			roles[i] = sharedmodel.Role(r)
+		}
+		repoUpdate.Roles = roles
 	}
 
 	if data.Password != nil {

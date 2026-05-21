@@ -66,11 +66,6 @@ func scanDocument(rs rowScanner) (model.Document, error) {
 func (r *DocumentRepository) Insert(ctx context.Context, doc model.Document) (string, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Insert"), utils.MetadataFromCtx(ctx))
 
-	var imageKey *string
-	if doc.Image.Key != "" {
-		imageKey = &doc.Image.Key
-	}
-
 	var id string
 	err := r.pool.QueryRow(ctx, `
         INSERT INTO documents (user_id, image_type, status, error, image_key, created_at, updated_at)
@@ -80,7 +75,7 @@ func (r *DocumentRepository) Insert(ctx context.Context, doc model.Document) (st
 		doc.ImageType.String(),
 		doc.Status.String(),
 		doc.Error,
-		imageKey,
+		doc.Image.Key,
 		doc.CreatedAt,
 		doc.UpdatedAt,
 	).Scan(&id)

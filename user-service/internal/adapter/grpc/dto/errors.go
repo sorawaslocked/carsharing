@@ -45,8 +45,8 @@ func ToStatusError(err error) error {
 		return status.Error(codes.AlreadyExists, err.Error())
 	case errors.Is(err, model.ErrNoUpdateFields):
 		return status.Error(codes.InvalidArgument, err.Error())
-	case errors.Is(err, validation.ErrInvalidActivationCode):
-		return status.Error(codes.InvalidArgument, err.Error())
+	case errors.Is(err, validation.ErrInvalidEmail):
+		return status.Error(codes.FailedPrecondition, err.Error())
 	case errors.As(err, &ve):
 		return validationError(ve)
 	default:

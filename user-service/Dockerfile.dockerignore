@@ -2,6 +2,9 @@
 !shared/go.mod
 !shared/go.sum
 !shared/**/*.go
+!protos/go.mod
+!protos/go.sum
+!protos/**/*.go
 !user-service/
 user-service/config/local.yml
 user-service/.env

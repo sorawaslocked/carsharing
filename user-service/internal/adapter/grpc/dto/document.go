@@ -7,9 +7,9 @@ import (
 	"carsharing/user-service/internal/model"
 	"carsharing/user-service/internal/validation"
 
-	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
-	baseuserpb "github.com/sorawaslocked/car-rental-protos/gen/base/user"
-	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
+	basepb "carsharing/protos/gen/base"
+	baseuserpb "carsharing/protos/gen/base/user"
+	usersvc "carsharing/protos/gen/service/user"
 )
 
 func FromCreateDocumentRequest(req *usersvc.CreateDocumentRequest) validation.DocumentCreate {

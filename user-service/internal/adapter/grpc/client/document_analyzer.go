@@ -7,7 +7,8 @@ import (
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 
-	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
+	usersvc "carsharing/protos/gen/service/user"
+
 	"google.golang.org/grpc"
 )
 

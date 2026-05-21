@@ -8,8 +8,8 @@ import (
 	"carsharing/shared/pkg/utils"
 	"carsharing/user-service/internal/model"
 
+	eventuserpb "carsharing/protos/gen/event/user"
 	"github.com/nats-io/nats.go"
-	eventuserpb "github.com/sorawaslocked/car-rental-protos/gen/event/user"
 	"google.golang.org/protobuf/proto"
 )
 

@@ -5,11 +5,11 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	baseuserpb "carsharing/protos/gen/base/user"
+	usersvc "carsharing/protos/gen/service/user"
 	sharedmodel "carsharing/shared/model"
 	"carsharing/user-service/internal/model"
 	"carsharing/user-service/internal/validation"
-	baseuserpb "github.com/sorawaslocked/car-rental-protos/gen/base/user"
-	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 )
 
 func FromCreateUserRequest(req *usersvc.CreateUserRequest) (validation.UserCreate, error) {

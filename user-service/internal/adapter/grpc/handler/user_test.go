@@ -11,12 +11,13 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
+	usersvc "carsharing/protos/gen/service/user"
 	sharedmodel "carsharing/shared/model"
 	"carsharing/user-service/internal/adapter/grpc/handler"
 	"carsharing/user-service/internal/adapter/grpc/handler/mocks"
 	"carsharing/user-service/internal/model"
 	"carsharing/user-service/internal/validation"
-	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

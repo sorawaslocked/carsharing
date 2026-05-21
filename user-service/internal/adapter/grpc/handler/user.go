@@ -10,8 +10,8 @@ import (
 	"carsharing/shared/pkg/utils"
 	"carsharing/user-service/internal/adapter/grpc/dto"
 
-	baseuserpb "github.com/sorawaslocked/car-rental-protos/gen/base/user"
-	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
+	baseuserpb "carsharing/protos/gen/base/user"
+	usersvc "carsharing/protos/gen/service/user"
 )
 
 type UserHandler struct {

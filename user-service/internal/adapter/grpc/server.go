@@ -8,7 +8,7 @@ import (
 	"carsharing/user-service/internal/adapter/grpc/handler"
 	"carsharing/user-service/internal/adapter/grpc/interceptor"
 
-	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
+	usersvc "carsharing/protos/gen/service/user"
 	"google.golang.org/grpc"
 )
 

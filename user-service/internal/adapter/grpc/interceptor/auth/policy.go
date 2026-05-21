@@ -3,7 +3,7 @@ package auth
 import (
 	sharedmodel "carsharing/shared/model"
 
-	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
+	usersvc "carsharing/protos/gen/service/user"
 )
 
 // ownerExtractFn extracts the target user ID from the request so the interceptor

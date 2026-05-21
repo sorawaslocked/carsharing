@@ -1,8 +1,8 @@
 package dto
 
 import (
+	eventuserpb "carsharing/protos/gen/event/user"
 	"carsharing/user-service/internal/model"
-	eventuserpb "github.com/sorawaslocked/car-rental-protos/gen/event/user"
 )
 
 func DocumentAnalyzedEventFromProto(e *eventuserpb.DocumentAnalyzedEvent) model.DocumentAnalyzedEvent {

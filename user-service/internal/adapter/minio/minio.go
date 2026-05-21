@@ -9,10 +9,12 @@ import (
 	"net/url"
 	"time"
 
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	pkgminio "carsharing/shared/pkg/minio"
 	"carsharing/shared/pkg/utils"
 	"carsharing/user-service/internal/model"
+
 	"github.com/minio/minio-go/v7"
 )
 
@@ -30,7 +32,7 @@ func NewMinioObjectStorage(log *slog.Logger, client *minio.Client, cfg pkgminio.
 	}
 }
 
-func (s *MinioObjectStorage) GetDocumentImageUploadData(ctx context.Context, imageType string) (model.ImageUploadData, error) {
+func (s *MinioObjectStorage) GetDocumentImageUploadData(ctx context.Context, imageType string) (sharedmodel.ImageUploadData, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetDocumentImageUploadData"), utils.MetadataFromCtx(ctx))
 
 	objectKey := newObjectKey("documents/" + imageType)
@@ -38,16 +40,17 @@ func (s *MinioObjectStorage) GetDocumentImageUploadData(ctx context.Context, ima
 	presignedURL, err := s.client.PresignedPutObject(ctx, s.cfg.Bucket, objectKey, s.cfg.PresignedPutExpiry)
 	if err != nil {
 		log.Error("generating presigned put url", pkglog.Err(err))
-		return model.ImageUploadData{}, model.ErrObjectStorage
+
+		return sharedmodel.ImageUploadData{}, model.ErrObjectStorage
 	}
 
-	return model.ImageUploadData{
+	return sharedmodel.ImageUploadData{
 		PresignedPutURL: presignedURL.String(),
 		ObjectKey:       objectKey,
 	}, nil
 }
 
-func (s *MinioObjectStorage) GetUserProfileImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (s *MinioObjectStorage) GetUserProfileImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetUserProfileImageUploadData"), utils.MetadataFromCtx(ctx))
 
 	objectKey := newObjectKey("users")
@@ -55,10 +58,11 @@ func (s *MinioObjectStorage) GetUserProfileImageUploadData(ctx context.Context) 
 	presignedURL, err := s.client.PresignedPutObject(ctx, s.cfg.Bucket, objectKey, s.cfg.PresignedPutExpiry)
 	if err != nil {
 		log.Error("generating presigned put url", pkglog.Err(err))
-		return model.ImageUploadData{}, model.ErrObjectStorage
+
+		return sharedmodel.ImageUploadData{}, model.ErrObjectStorage
 	}
 
-	return model.ImageUploadData{
+	return sharedmodel.ImageUploadData{
 		PresignedPutURL: presignedURL.String(),
 		ObjectKey:       objectKey,
 	}, nil
@@ -70,6 +74,7 @@ func (s *MinioObjectStorage) GetImageURL(ctx context.Context, objectKey string) 
 	presignedURL, err := s.client.PresignedGetObject(ctx, s.cfg.Bucket, objectKey, s.cfg.PresignedGetExpiry, url.Values{})
 	if err != nil {
 		log.Error("generating presigned get url", pkglog.Err(err))
+
 		return "", model.ErrObjectStorage
 	}
 
@@ -82,5 +87,6 @@ func newObjectKey(prefix string) string {
 	if _, err := rand.Read(b); err != nil {
 		b = []byte{0, 0, 0, 0, 0, 0, 0, 0}
 	}
+
 	return fmt.Sprintf("%s/%d_%s", prefix, time.Now().UnixNano(), hex.EncodeToString(b))
 }

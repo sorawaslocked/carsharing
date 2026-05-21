@@ -5,6 +5,7 @@ package mocks
 import (
 	context "context"
 
+	sharedmodel "carsharing/shared/model"
 	mock "github.com/stretchr/testify/mock"
 
 	model "carsharing/user-service/internal/model"
@@ -338,22 +339,22 @@ func (_c *MockUserService_Get_Call) RunAndReturn(run func(context.Context, strin
 }
 
 // GetDocumentImageUploadData provides a mock function with given fields: ctx, imageType
-func (_m *MockUserService) GetDocumentImageUploadData(ctx context.Context, imageType string) (model.ImageUploadData, error) {
+func (_m *MockUserService) GetDocumentImageUploadData(ctx context.Context, imageType string) (sharedmodel.ImageUploadData, error) {
 	ret := _m.Called(ctx, imageType)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetDocumentImageUploadData")
 	}
 
-	var r0 model.ImageUploadData
+	var r0 sharedmodel.ImageUploadData
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (model.ImageUploadData, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) (sharedmodel.ImageUploadData, error)); ok {
 		return rf(ctx, imageType)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) model.ImageUploadData); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) sharedmodel.ImageUploadData); ok {
 		r0 = rf(ctx, imageType)
 	} else {
-		r0 = ret.Get(0).(model.ImageUploadData)
+		r0 = ret.Get(0).(sharedmodel.ImageUploadData)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
@@ -384,12 +385,12 @@ func (_c *MockUserService_GetDocumentImageUploadData_Call) Run(run func(ctx cont
 	return _c
 }
 
-func (_c *MockUserService_GetDocumentImageUploadData_Call) Return(_a0 model.ImageUploadData, _a1 error) *MockUserService_GetDocumentImageUploadData_Call {
+func (_c *MockUserService_GetDocumentImageUploadData_Call) Return(_a0 sharedmodel.ImageUploadData, _a1 error) *MockUserService_GetDocumentImageUploadData_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockUserService_GetDocumentImageUploadData_Call) RunAndReturn(run func(context.Context, string) (model.ImageUploadData, error)) *MockUserService_GetDocumentImageUploadData_Call {
+func (_c *MockUserService_GetDocumentImageUploadData_Call) RunAndReturn(run func(context.Context, string) (sharedmodel.ImageUploadData, error)) *MockUserService_GetDocumentImageUploadData_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -454,22 +455,22 @@ func (_c *MockUserService_GetProcessedDocumentsForUser_Call) RunAndReturn(run fu
 }
 
 // GetUserProfileImageUploadData provides a mock function with given fields: ctx
-func (_m *MockUserService) GetUserProfileImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (_m *MockUserService) GetUserProfileImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetUserProfileImageUploadData")
 	}
 
-	var r0 model.ImageUploadData
+	var r0 sharedmodel.ImageUploadData
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) (model.ImageUploadData, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) (sharedmodel.ImageUploadData, error)); ok {
 		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) model.ImageUploadData); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) sharedmodel.ImageUploadData); ok {
 		r0 = rf(ctx)
 	} else {
-		r0 = ret.Get(0).(model.ImageUploadData)
+		r0 = ret.Get(0).(sharedmodel.ImageUploadData)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
@@ -499,18 +500,18 @@ func (_c *MockUserService_GetUserProfileImageUploadData_Call) Run(run func(ctx c
 	return _c
 }
 
-func (_c *MockUserService_GetUserProfileImageUploadData_Call) Return(_a0 model.ImageUploadData, _a1 error) *MockUserService_GetUserProfileImageUploadData_Call {
+func (_c *MockUserService_GetUserProfileImageUploadData_Call) Return(_a0 sharedmodel.ImageUploadData, _a1 error) *MockUserService_GetUserProfileImageUploadData_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockUserService_GetUserProfileImageUploadData_Call) RunAndReturn(run func(context.Context) (model.ImageUploadData, error)) *MockUserService_GetUserProfileImageUploadData_Call {
+func (_c *MockUserService_GetUserProfileImageUploadData_Call) RunAndReturn(run func(context.Context) (sharedmodel.ImageUploadData, error)) *MockUserService_GetUserProfileImageUploadData_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // List provides a mock function with given fields: ctx, filter
-func (_m *MockUserService) List(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
+func (_m *MockUserService) List(ctx context.Context, filter validation.UserFilter) ([]model.User, error) {
 	ret := _m.Called(ctx, filter)
 
 	if len(ret) == 0 {
@@ -519,10 +520,10 @@ func (_m *MockUserService) List(ctx context.Context, filter model.UserFilter) ([
 
 	var r0 []model.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.UserFilter) ([]model.User, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, validation.UserFilter) ([]model.User, error)); ok {
 		return rf(ctx, filter)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, model.UserFilter) []model.User); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, validation.UserFilter) []model.User); ok {
 		r0 = rf(ctx, filter)
 	} else {
 		if ret.Get(0) != nil {
@@ -530,7 +531,7 @@ func (_m *MockUserService) List(ctx context.Context, filter model.UserFilter) ([
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, model.UserFilter) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, validation.UserFilter) error); ok {
 		r1 = rf(ctx, filter)
 	} else {
 		r1 = ret.Error(1)
@@ -546,14 +547,14 @@ type MockUserService_List_Call struct {
 
 // List is a helper method to define mock.On call
 //   - ctx context.Context
-//   - filter model.UserFilter
+//   - filter validation.UserFilter
 func (_e *MockUserService_Expecter) List(ctx interface{}, filter interface{}) *MockUserService_List_Call {
 	return &MockUserService_List_Call{Call: _e.mock.On("List", ctx, filter)}
 }
 
-func (_c *MockUserService_List_Call) Run(run func(ctx context.Context, filter model.UserFilter)) *MockUserService_List_Call {
+func (_c *MockUserService_List_Call) Run(run func(ctx context.Context, filter validation.UserFilter)) *MockUserService_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.UserFilter))
+		run(args[0].(context.Context), args[1].(validation.UserFilter))
 	})
 	return _c
 }
@@ -563,7 +564,7 @@ func (_c *MockUserService_List_Call) Return(_a0 []model.User, _a1 error) *MockUs
 	return _c
 }
 
-func (_c *MockUserService_List_Call) RunAndReturn(run func(context.Context, model.UserFilter) ([]model.User, error)) *MockUserService_List_Call {
+func (_c *MockUserService_List_Call) RunAndReturn(run func(context.Context, validation.UserFilter) ([]model.User, error)) *MockUserService_List_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -672,7 +673,7 @@ func (_c *MockUserService_SendActivationCode_Call) RunAndReturn(run func(context
 }
 
 // SignIn provides a mock function with given fields: ctx, creds
-func (_m *MockUserService) SignIn(ctx context.Context, creds model.Credentials) (string, error) {
+func (_m *MockUserService) SignIn(ctx context.Context, creds validation.Credentials) (string, error) {
 	ret := _m.Called(ctx, creds)
 
 	if len(ret) == 0 {
@@ -681,16 +682,16 @@ func (_m *MockUserService) SignIn(ctx context.Context, creds model.Credentials) 
 
 	var r0 string
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.Credentials) (string, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, validation.Credentials) (string, error)); ok {
 		return rf(ctx, creds)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, model.Credentials) string); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, validation.Credentials) string); ok {
 		r0 = rf(ctx, creds)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, model.Credentials) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, validation.Credentials) error); ok {
 		r1 = rf(ctx, creds)
 	} else {
 		r1 = ret.Error(1)
@@ -706,14 +707,14 @@ type MockUserService_SignIn_Call struct {
 
 // SignIn is a helper method to define mock.On call
 //   - ctx context.Context
-//   - creds model.Credentials
+//   - creds validation.Credentials
 func (_e *MockUserService_Expecter) SignIn(ctx interface{}, creds interface{}) *MockUserService_SignIn_Call {
 	return &MockUserService_SignIn_Call{Call: _e.mock.On("SignIn", ctx, creds)}
 }
 
-func (_c *MockUserService_SignIn_Call) Run(run func(ctx context.Context, creds model.Credentials)) *MockUserService_SignIn_Call {
+func (_c *MockUserService_SignIn_Call) Run(run func(ctx context.Context, creds validation.Credentials)) *MockUserService_SignIn_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.Credentials))
+		run(args[0].(context.Context), args[1].(validation.Credentials))
 	})
 	return _c
 }
@@ -723,7 +724,7 @@ func (_c *MockUserService_SignIn_Call) Return(_a0 string, _a1 error) *MockUserSe
 	return _c
 }
 
-func (_c *MockUserService_SignIn_Call) RunAndReturn(run func(context.Context, model.Credentials) (string, error)) *MockUserService_SignIn_Call {
+func (_c *MockUserService_SignIn_Call) RunAndReturn(run func(context.Context, validation.Credentials) (string, error)) *MockUserService_SignIn_Call {
 	_c.Call.Return(run)
 	return _c
 }

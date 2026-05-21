@@ -9,6 +9,7 @@ import (
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 	"carsharing/user-service/internal/adapter/grpc/dto"
+
 	baseuserpb "github.com/sorawaslocked/car-rental-protos/gen/base/user"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 )
@@ -26,12 +27,8 @@ func NewUserHandler(log *slog.Logger, userService UserService) *UserHandler {
 	}
 }
 
-func (h *UserHandler) logger(ctx context.Context, method string) *slog.Logger {
-	return pkglog.WithMetadata(pkglog.WithMethod(h.log, method), utils.MetadataFromCtx(ctx))
-}
-
 func (h *UserHandler) CreateUser(ctx context.Context, req *usersvc.CreateUserRequest) (*usersvc.CreateUserResponse, error) {
-	logger := h.logger(ctx, "CreateUser")
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CreateUser"), utils.MetadataFromCtx(ctx))
 
 	data, err := dto.FromCreateUserRequest(req)
 	if err != nil {
@@ -40,7 +37,8 @@ func (h *UserHandler) CreateUser(ctx context.Context, req *usersvc.CreateUserReq
 
 	id, err := h.userService.Create(ctx, data)
 	if err != nil {
-		logger.Error("creating user", pkglog.Err(err))
+		log.Error("creating user", pkglog.Err(err))
+
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -48,11 +46,12 @@ func (h *UserHandler) CreateUser(ctx context.Context, req *usersvc.CreateUserReq
 }
 
 func (h *UserHandler) GetUser(ctx context.Context, req *usersvc.GetUserRequest) (*usersvc.GetUserResponse, error) {
-	logger := h.logger(ctx, "GetUser")
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetUser"), utils.MetadataFromCtx(ctx))
 
 	user, err := h.userService.Get(ctx, req.GetId())
 	if err != nil {
-		logger.Error("getting user", pkglog.Err(err))
+		log.Error("getting user", pkglog.Err(err))
+
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -60,13 +59,14 @@ func (h *UserHandler) GetUser(ctx context.Context, req *usersvc.GetUserRequest) 
 }
 
 func (h *UserHandler) ListUsers(ctx context.Context, req *usersvc.ListUsersRequest) (*usersvc.ListUsersResponse, error) {
-	logger := h.logger(ctx, "ListUsers")
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "ListUsers"), utils.MetadataFromCtx(ctx))
 
 	filter := dto.FromListUsersRequest(req)
 
 	users, err := h.userService.List(ctx, filter)
 	if err != nil {
-		logger.Error("listing users", pkglog.Err(err))
+		log.Error("listing users", pkglog.Err(err))
+
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -79,7 +79,7 @@ func (h *UserHandler) ListUsers(ctx context.Context, req *usersvc.ListUsersReque
 }
 
 func (h *UserHandler) UpdateUser(ctx context.Context, req *usersvc.UpdateUserRequest) (*emptypb.Empty, error) {
-	logger := h.logger(ctx, "UpdateUser")
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "UpdateUser"), utils.MetadataFromCtx(ctx))
 
 	data, err := dto.FromUpdateUserRequest(req)
 	if err != nil {
@@ -87,7 +87,8 @@ func (h *UserHandler) UpdateUser(ctx context.Context, req *usersvc.UpdateUserReq
 	}
 
 	if err := h.userService.Update(ctx, req.GetId(), data); err != nil {
-		logger.Error("updating user", pkglog.Err(err))
+		log.Error("updating user", pkglog.Err(err))
+
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -95,10 +96,11 @@ func (h *UserHandler) UpdateUser(ctx context.Context, req *usersvc.UpdateUserReq
 }
 
 func (h *UserHandler) DeleteUser(ctx context.Context, req *usersvc.DeleteUserRequest) (*emptypb.Empty, error) {
-	logger := h.logger(ctx, "DeleteUser")
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "DeleteUser"), utils.MetadataFromCtx(ctx))
 
 	if err := h.userService.Delete(ctx, req.GetId()); err != nil {
-		logger.Error("deleting user", pkglog.Err(err))
+		log.Error("deleting user", pkglog.Err(err))
+
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -106,7 +108,7 @@ func (h *UserHandler) DeleteUser(ctx context.Context, req *usersvc.DeleteUserReq
 }
 
 func (h *UserHandler) Register(ctx context.Context, req *usersvc.RegisterRequest) (*usersvc.RegisterResponse, error) {
-	logger := h.logger(ctx, "Register")
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Register"), utils.MetadataFromCtx(ctx))
 
 	data, err := dto.FromRegisterRequest(req)
 	if err != nil {
@@ -115,7 +117,8 @@ func (h *UserHandler) Register(ctx context.Context, req *usersvc.RegisterRequest
 
 	id, err := h.userService.Register(ctx, data)
 	if err != nil {
-		logger.Error("registering user", pkglog.Err(err))
+		log.Error("registering user", pkglog.Err(err))
+
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -123,13 +126,14 @@ func (h *UserHandler) Register(ctx context.Context, req *usersvc.RegisterRequest
 }
 
 func (h *UserHandler) SignIn(ctx context.Context, req *usersvc.SignInRequest) (*usersvc.SignInResponse, error) {
-	logger := h.logger(ctx, "SignIn")
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "SignIn"), utils.MetadataFromCtx(ctx))
 
 	creds := dto.FromSignInRequest(req)
 
 	id, err := h.userService.SignIn(ctx, creds)
 	if err != nil {
-		logger.Error("signing in", pkglog.Err(err))
+		log.Error("signing in", pkglog.Err(err))
+
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -137,10 +141,11 @@ func (h *UserHandler) SignIn(ctx context.Context, req *usersvc.SignInRequest) (*
 }
 
 func (h *UserHandler) SendActivationCode(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
-	logger := h.logger(ctx, "SendActivationCode")
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "SendActivationCode"), utils.MetadataFromCtx(ctx))
 
 	if err := h.userService.SendActivationCode(ctx); err != nil {
-		logger.Error("sending activation code", pkglog.Err(err))
+		log.Error("sending activation code", pkglog.Err(err))
+
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -148,10 +153,11 @@ func (h *UserHandler) SendActivationCode(ctx context.Context, _ *emptypb.Empty) 
 }
 
 func (h *UserHandler) CheckActivationCode(ctx context.Context, req *usersvc.CheckActivationCodeRequest) (*emptypb.Empty, error) {
-	logger := h.logger(ctx, "CheckActivationCode")
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CheckActivationCode"), utils.MetadataFromCtx(ctx))
 
 	if err := h.userService.CheckActivationCode(ctx, req.GetCode()); err != nil {
-		logger.Error("checking activation code", pkglog.Err(err))
+		log.Error("checking activation code", pkglog.Err(err))
+
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -159,11 +165,12 @@ func (h *UserHandler) CheckActivationCode(ctx context.Context, req *usersvc.Chec
 }
 
 func (h *UserHandler) GetProfileImageUploadData(ctx context.Context, _ *emptypb.Empty) (*usersvc.GetProfileImageUploadDataResponse, error) {
-	logger := h.logger(ctx, "GetProfileImageUploadData")
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetProfileImageUploadData"), utils.MetadataFromCtx(ctx))
 
 	data, err := h.userService.GetUserProfileImageUploadData(ctx)
 	if err != nil {
-		logger.Error("getting profile image upload data", pkglog.Err(err))
+		log.Error("getting profile image upload data", pkglog.Err(err))
+
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -173,16 +180,12 @@ func (h *UserHandler) GetProfileImageUploadData(ctx context.Context, _ *emptypb.
 }
 
 func (h *UserHandler) CreateDocument(ctx context.Context, req *usersvc.CreateDocumentRequest) (*usersvc.CreateDocumentResponse, error) {
-	logger := h.logger(ctx, "CreateDocument")
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CreateDocument"), utils.MetadataFromCtx(ctx))
 
-	data, err := dto.FromCreateDocumentRequest(req)
+	id, err := h.userService.CreateDocument(ctx, dto.FromCreateDocumentRequest(req))
 	if err != nil {
-		return nil, dto.ToStatusError(err)
-	}
+		log.Error("creating document", pkglog.Err(err))
 
-	id, err := h.userService.CreateDocument(ctx, data)
-	if err != nil {
-		logger.Error("creating document", pkglog.Err(err))
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -190,16 +193,12 @@ func (h *UserHandler) CreateDocument(ctx context.Context, req *usersvc.CreateDoc
 }
 
 func (h *UserHandler) GetUploadDocumentData(ctx context.Context, req *usersvc.GetUploadDocumentDataRequest) (*usersvc.GetUploadDocumentDataResponse, error) {
-	logger := h.logger(ctx, "GetUploadDocumentData")
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetUploadDocumentData"), utils.MetadataFromCtx(ctx))
 
-	imageType, err := dto.FromGetUploadDocumentDataRequest(req)
+	data, err := h.userService.GetDocumentImageUploadData(ctx, dto.FromGetUploadDocumentDataRequest(req))
 	if err != nil {
-		return nil, dto.ToStatusError(err)
-	}
+		log.Error("getting document upload data", pkglog.Err(err))
 
-	data, err := h.userService.GetDocumentImageUploadData(ctx, imageType.String())
-	if err != nil {
-		logger.Error("getting document upload data", pkglog.Err(err))
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -209,11 +208,12 @@ func (h *UserHandler) GetUploadDocumentData(ctx context.Context, req *usersvc.Ge
 }
 
 func (h *UserHandler) GetProcessedDocumentsForUser(ctx context.Context, req *usersvc.GetProcessedDocumentsForUserRequest) (*usersvc.GetProcessedDocumentsForUserResponse, error) {
-	logger := h.logger(ctx, "GetProcessedDocumentsForUser")
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetProcessedDocumentsForUser"), utils.MetadataFromCtx(ctx))
 
 	docs, err := h.userService.GetProcessedDocumentsForUser(ctx, req.GetUserId())
 	if err != nil {
-		logger.Error("getting processed documents for user", pkglog.Err(err))
+		log.Error("getting processed documents for user", pkglog.Err(err))
+
 		return nil, dto.ToStatusError(err)
 	}
 
@@ -226,15 +226,13 @@ func (h *UserHandler) GetProcessedDocumentsForUser(ctx context.Context, req *use
 }
 
 func (h *UserHandler) CheckDocument(ctx context.Context, req *usersvc.CheckDocumentRequest) (*emptypb.Empty, error) {
-	logger := h.logger(ctx, "CheckDocument")
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CheckDocument"), utils.MetadataFromCtx(ctx))
 
-	docID, data, err := dto.FromCheckDocumentRequest(req)
-	if err != nil {
-		return nil, dto.ToStatusError(err)
-	}
+	docID, data := dto.FromCheckDocumentRequest(req)
 
 	if err := h.userService.CheckDocument(ctx, docID, data); err != nil {
-		logger.Error("checking document", pkglog.Err(err))
+		log.Error("checking document", pkglog.Err(err))
+
 		return nil, dto.ToStatusError(err)
 	}
 

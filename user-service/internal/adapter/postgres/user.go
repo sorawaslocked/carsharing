@@ -58,7 +58,7 @@ func scanUser(rs rowScanner) (model.User, error) {
 
 	u.PhoneNumber = phoneNumber
 	if profileImageKey != nil {
-		u.ProfileImage = &model.Image{Key: *profileImageKey}
+		u.ProfileImage = sharedmodel.Image{Key: *profileImageKey}
 	}
 
 	u.Roles = make([]sharedmodel.Role, len(roleStrings))
@@ -94,7 +94,7 @@ func (r *UserRepository) Insert(ctx context.Context, user model.User) (string, e
 	defer tx.Rollback(ctx)
 
 	var profileImageKey *string
-	if user.ProfileImage != nil {
+	if user.ProfileImage.Key != "" {
 		profileImageKey = &user.ProfileImage.Key
 	}
 

@@ -3,51 +3,33 @@ package dto
 import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	sharedmodel "carsharing/shared/model"
 	"carsharing/user-service/internal/model"
 	"carsharing/user-service/internal/validation"
+
 	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
 	baseuserpb "github.com/sorawaslocked/car-rental-protos/gen/base/user"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 )
 
-func FromCreateDocumentRequest(req *usersvc.CreateDocumentRequest) (validation.DocumentCreate, error) {
-	objectKey := req.GetObjectKey()
-	if objectKey == "" {
-		return validation.DocumentCreate{}, validation.Errors{"object_key": validation.ErrRequiredField}
-	}
-
-	imageType := req.GetImageType()
-	if _, err := model.ImageTypeFromString(imageType); err != nil {
-		return validation.DocumentCreate{}, validation.Errors{"image_type": model.ErrInvalidImageType}
-	}
-
+func FromCreateDocumentRequest(req *usersvc.CreateDocumentRequest) validation.DocumentCreate {
 	return validation.DocumentCreate{
-		ObjectKey: objectKey,
-		ImageType: imageType,
-	}, nil
+		ObjectKey: req.GetObjectKey(),
+		ImageType: req.GetImageType(),
+	}
 }
 
-func FromGetUploadDocumentDataRequest(req *usersvc.GetUploadDocumentDataRequest) (model.ImageType, error) {
-	imageType, err := model.ImageTypeFromString(req.GetImageType())
-	if err != nil {
-		return "", validation.Errors{"image_type": model.ErrInvalidImageType}
-	}
-	return imageType, nil
+func FromGetUploadDocumentDataRequest(req *usersvc.GetUploadDocumentDataRequest) string {
+	return req.GetImageType()
 }
 
-func FromCheckDocumentRequest(req *usersvc.CheckDocumentRequest) (docID string, data validation.DocumentUpdate, err error) {
-	docID = req.GetDocId()
-
-	statusStr := req.GetStatus()
-	if _, err = model.DocumentStatusFromString(statusStr); err != nil {
-		return "", validation.DocumentUpdate{}, validation.Errors{"status": model.ErrInvalidDocumentStatus}
+func FromCheckDocumentRequest(req *usersvc.CheckDocumentRequest) (string, validation.DocumentUpdate) {
+	data := validation.DocumentUpdate{
+		Status: req.GetStatus(),
+		Error:  req.Error,
 	}
 
-	data = validation.DocumentUpdate{Status: statusStr}
-	if e := req.GetError(); e != "" {
-		data.Error = &e
-	}
-	return docID, data, nil
+	return req.GetDocId(), data
 }
 
 func DocumentToProto(doc model.Document) *baseuserpb.Document {
@@ -63,14 +45,14 @@ func DocumentToProto(doc model.Document) *baseuserpb.Document {
 	if doc.Error != nil {
 		d.Error = doc.Error
 	}
-	if doc.Image != nil && doc.Image.URL != "" {
+	if doc.Image.URL != "" {
 		d.ImageUrl = doc.Image.URL
 	}
 
 	return d
 }
 
-func ImageUploadDataToProto(data model.ImageUploadData) *basepb.ImageUploadData {
+func ImageUploadDataToProto(data sharedmodel.ImageUploadData) *basepb.ImageUploadData {
 	return &basepb.ImageUploadData{
 		PresignedPutUrl: data.PresignedPutURL,
 		ObjectKey:       data.ObjectKey,

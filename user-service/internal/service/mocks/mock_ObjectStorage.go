@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	model "carsharing/user-service/internal/model"
+	sharedmodel "carsharing/shared/model"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -23,22 +23,22 @@ func (_m *MockObjectStorage) EXPECT() *MockObjectStorage_Expecter {
 }
 
 // GetDocumentImageUploadData provides a mock function with given fields: ctx, imageType
-func (_m *MockObjectStorage) GetDocumentImageUploadData(ctx context.Context, imageType string) (model.ImageUploadData, error) {
+func (_m *MockObjectStorage) GetDocumentImageUploadData(ctx context.Context, imageType string) (sharedmodel.ImageUploadData, error) {
 	ret := _m.Called(ctx, imageType)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetDocumentImageUploadData")
 	}
 
-	var r0 model.ImageUploadData
+	var r0 sharedmodel.ImageUploadData
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (model.ImageUploadData, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) (sharedmodel.ImageUploadData, error)); ok {
 		return rf(ctx, imageType)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) model.ImageUploadData); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) sharedmodel.ImageUploadData); ok {
 		r0 = rf(ctx, imageType)
 	} else {
-		r0 = ret.Get(0).(model.ImageUploadData)
+		r0 = ret.Get(0).(sharedmodel.ImageUploadData)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
@@ -69,12 +69,12 @@ func (_c *MockObjectStorage_GetDocumentImageUploadData_Call) Run(run func(ctx co
 	return _c
 }
 
-func (_c *MockObjectStorage_GetDocumentImageUploadData_Call) Return(_a0 model.ImageUploadData, _a1 error) *MockObjectStorage_GetDocumentImageUploadData_Call {
+func (_c *MockObjectStorage_GetDocumentImageUploadData_Call) Return(_a0 sharedmodel.ImageUploadData, _a1 error) *MockObjectStorage_GetDocumentImageUploadData_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockObjectStorage_GetDocumentImageUploadData_Call) RunAndReturn(run func(context.Context, string) (model.ImageUploadData, error)) *MockObjectStorage_GetDocumentImageUploadData_Call {
+func (_c *MockObjectStorage_GetDocumentImageUploadData_Call) RunAndReturn(run func(context.Context, string) (sharedmodel.ImageUploadData, error)) *MockObjectStorage_GetDocumentImageUploadData_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -137,22 +137,22 @@ func (_c *MockObjectStorage_GetImageURL_Call) RunAndReturn(run func(context.Cont
 }
 
 // GetUserProfileImageUploadData provides a mock function with given fields: ctx
-func (_m *MockObjectStorage) GetUserProfileImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (_m *MockObjectStorage) GetUserProfileImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetUserProfileImageUploadData")
 	}
 
-	var r0 model.ImageUploadData
+	var r0 sharedmodel.ImageUploadData
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) (model.ImageUploadData, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) (sharedmodel.ImageUploadData, error)); ok {
 		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) model.ImageUploadData); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) sharedmodel.ImageUploadData); ok {
 		r0 = rf(ctx)
 	} else {
-		r0 = ret.Get(0).(model.ImageUploadData)
+		r0 = ret.Get(0).(sharedmodel.ImageUploadData)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
@@ -182,12 +182,12 @@ func (_c *MockObjectStorage_GetUserProfileImageUploadData_Call) Run(run func(ctx
 	return _c
 }
 
-func (_c *MockObjectStorage_GetUserProfileImageUploadData_Call) Return(_a0 model.ImageUploadData, _a1 error) *MockObjectStorage_GetUserProfileImageUploadData_Call {
+func (_c *MockObjectStorage_GetUserProfileImageUploadData_Call) Return(_a0 sharedmodel.ImageUploadData, _a1 error) *MockObjectStorage_GetUserProfileImageUploadData_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockObjectStorage_GetUserProfileImageUploadData_Call) RunAndReturn(run func(context.Context) (model.ImageUploadData, error)) *MockObjectStorage_GetUserProfileImageUploadData_Call {
+func (_c *MockObjectStorage_GetUserProfileImageUploadData_Call) RunAndReturn(run func(context.Context) (sharedmodel.ImageUploadData, error)) *MockObjectStorage_GetUserProfileImageUploadData_Call {
 	_c.Call.Return(run)
 	return _c
 }

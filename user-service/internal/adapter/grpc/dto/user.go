@@ -50,8 +50,8 @@ func FromRegisterRequest(req *usersvc.RegisterRequest) (validation.UserCreate, e
 	}, nil
 }
 
-func FromListUsersRequest(req *usersvc.ListUsersRequest) model.UserFilter {
-	filter := model.UserFilter{
+func FromListUsersRequest(req *usersvc.ListUsersRequest) validation.UserFilter {
+	filter := validation.UserFilter{
 		Email:              req.Email,
 		PhoneNumber:        req.PhoneNumber,
 		FirstName:          req.FirstName,
@@ -62,7 +62,7 @@ func FromListUsersRequest(req *usersvc.ListUsersRequest) model.UserFilter {
 	}
 
 	if req.Pagination != nil {
-		filter.Pagination = &model.Pagination{
+		filter.Pagination = &sharedmodel.Pagination{
 			Limit:  req.Pagination.Limit,
 			Offset: req.Pagination.Offset,
 		}
@@ -80,6 +80,7 @@ func FromUpdateUserRequest(req *usersvc.UpdateUserRequest) (validation.UserUpdat
 		Password:             req.Password,
 		PasswordConfirmation: req.PasswordConfirmation,
 		ProfileImageKey:      req.ProfileImageKey,
+		Roles:                req.Roles,
 		IsDocumentVerified:   req.IsDocumentVerified,
 		IsEmailVerified:      req.IsEmailVerified,
 		IsSuspended:          req.IsSuspended,
@@ -95,25 +96,11 @@ func FromUpdateUserRequest(req *usersvc.UpdateUserRequest) (validation.UserUpdat
 		update.BirthDate = &birthDate
 	}
 
-	if len(req.Roles) > 0 {
-		roles := make([]sharedmodel.Role, len(req.Roles))
-		for i, r := range req.Roles {
-			role, err := sharedmodel.RoleFromString(r)
-			if err != nil {
-				return validation.UserUpdate{}, validation.Errors{
-					"roles": validation.ErrInvalidRole,
-				}
-			}
-			roles[i] = role
-		}
-		update.Roles = roles
-	}
-
 	return update, nil
 }
 
-func FromSignInRequest(req *usersvc.SignInRequest) model.Credentials {
-	return model.Credentials{
+func FromSignInRequest(req *usersvc.SignInRequest) validation.Credentials {
+	return validation.Credentials{
 		Email:       req.Email,
 		PhoneNumber: req.PhoneNumber,
 		Password:    req.GetPassword(),
@@ -144,7 +131,7 @@ func UserToProto(user model.User) *baseuserpb.User {
 	if user.PhoneNumber != nil {
 		u.PhoneNumber = user.PhoneNumber
 	}
-	if user.ProfileImage != nil && user.ProfileImage.URL != "" {
+	if user.ProfileImage.URL != "" {
 		u.ProfileImageUrl = &user.ProfileImage.URL
 	}
 

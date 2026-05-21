@@ -15,11 +15,11 @@ import (
 	pkgnats "carsharing/shared/pkg/nats"
 	pkgpostgres "carsharing/shared/pkg/postgres"
 	pkgredis "carsharing/shared/pkg/redis"
+	"carsharing/user-service/internal/adapter/brevo"
 	grpcserver "carsharing/user-service/internal/adapter/grpc"
 	grpcdocanalyzer "carsharing/user-service/internal/adapter/grpc/client"
 	"carsharing/user-service/internal/adapter/grpc/handler"
 	"carsharing/user-service/internal/adapter/grpc/interceptor"
-	"carsharing/user-service/internal/adapter/mailer"
 	minioadapter "carsharing/user-service/internal/adapter/minio"
 	natsadapter "carsharing/user-service/internal/adapter/nats"
 	natshandler "carsharing/user-service/internal/adapter/nats/handler"
@@ -89,7 +89,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	}
 
 	activationCodeCache := redisadapter.NewActivationCodeRedisCache(redisClient)
-	msMailer := mailer.New(log, cfg.Brevo)
+	msMailer := brevo.New(log, cfg.Brevo)
 	userRepo := postgres.NewUserRepository(log, pool)
 	docRepo := postgres.NewDocumentRepository(log, pool)
 	publisher := natsadapter.NewPublisher(log, natsConn)

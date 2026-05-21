@@ -185,7 +185,7 @@ func TestGetUser_WithProfileImageURL(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxWithUser(testUserID)
 	user := baseUser()
-	user.ProfileImage = &model.Image{Key: testObjKey, URL: "https://minio/signed"}
+	user.ProfileImage = sharedmodel.Image{Key: testObjKey, URL: "https://minio/signed"}
 
 	svc.EXPECT().Get(ctx, testUserID).Return(user, nil)
 
@@ -202,7 +202,7 @@ func TestListUsers_Success(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxWithUser(testUserID)
 
-	svc.EXPECT().List(ctx, model.UserFilter{}).Return([]model.User{baseUser()}, nil)
+	svc.EXPECT().List(ctx, validation.UserFilter{}).Return([]model.User{baseUser()}, nil)
 
 	resp, err := h.ListUsers(ctx, &usersvc.ListUsersRequest{})
 
@@ -215,7 +215,7 @@ func TestListUsers_Empty(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxWithUser(testUserID)
 
-	svc.EXPECT().List(ctx, model.UserFilter{}).Return(nil, nil)
+	svc.EXPECT().List(ctx, validation.UserFilter{}).Return(nil, nil)
 
 	resp, err := h.ListUsers(ctx, &usersvc.ListUsersRequest{})
 
@@ -227,7 +227,7 @@ func TestListUsers_WithFilter(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxWithUser(testUserID)
 
-	svc.EXPECT().List(ctx, model.UserFilter{Email: ptr(testEmail)}).Return([]model.User{baseUser()}, nil)
+	svc.EXPECT().List(ctx, validation.UserFilter{Email: ptr(testEmail)}).Return([]model.User{baseUser()}, nil)
 
 	resp, err := h.ListUsers(ctx, &usersvc.ListUsersRequest{Email: ptr(testEmail)})
 
@@ -329,7 +329,7 @@ func TestSignIn_Success(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxAnon()
 
-	svc.EXPECT().SignIn(ctx, model.Credentials{Email: ptr(testEmail), Password: testPasswd}).
+	svc.EXPECT().SignIn(ctx, validation.Credentials{Email: ptr(testEmail), Password: testPasswd}).
 		Return(testUserID, nil)
 
 	resp, err := h.SignIn(ctx, &usersvc.SignInRequest{Email: ptr(testEmail), Password: testPasswd})
@@ -342,7 +342,7 @@ func TestSignIn_Unauthenticated(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxAnon()
 
-	svc.EXPECT().SignIn(ctx, model.Credentials{Email: ptr(testEmail), Password: testPasswd}).
+	svc.EXPECT().SignIn(ctx, validation.Credentials{Email: ptr(testEmail), Password: testPasswd}).
 		Return("", model.ErrUnauthenticated)
 
 	_, err := h.SignIn(ctx, &usersvc.SignInRequest{Email: ptr(testEmail), Password: testPasswd})
@@ -404,7 +404,7 @@ func TestCheckActivationCode_InvalidCode(t *testing.T) {
 func TestGetProfileImageUploadData_Success(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxWithUser(testUserID)
-	data := model.ImageUploadData{PresignedPutURL: "https://minio/put", ObjectKey: testObjKey}
+	data := sharedmodel.ImageUploadData{PresignedPutURL: "https://minio/put", ObjectKey: testObjKey}
 
 	svc.EXPECT().GetUserProfileImageUploadData(ctx).Return(data, nil)
 
@@ -434,8 +434,11 @@ func TestCreateDocument_Success(t *testing.T) {
 }
 
 func TestCreateDocument_InvalidImageType(t *testing.T) {
-	h, _ := newHandler(t)
+	h, svc := newHandler(t)
 	ctx := ctxWithUser(testUserID)
+
+	svc.EXPECT().CreateDocument(ctx, validation.DocumentCreate{ObjectKey: testObjKey, ImageType: "invalid_type"}).
+		Return("", validation.Errors{"image_type": validation.ErrInvalidImageType})
 
 	_, err := h.CreateDocument(ctx, &usersvc.CreateDocumentRequest{
 		ObjectKey: testObjKey,
@@ -450,7 +453,7 @@ func TestCreateDocument_InvalidImageType(t *testing.T) {
 func TestGetUploadDocumentData_Success(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxWithUser(testUserID)
-	data := model.ImageUploadData{PresignedPutURL: "https://minio/put", ObjectKey: "documents/id_front/key"}
+	data := sharedmodel.ImageUploadData{PresignedPutURL: "https://minio/put", ObjectKey: "documents/id_front/key"}
 
 	svc.EXPECT().GetDocumentImageUploadData(ctx, testImgType).Return(data, nil)
 
@@ -470,9 +473,9 @@ func TestGetProcessedDocumentsForUser_Success(t *testing.T) {
 		{
 			ID:        testDocID,
 			UserID:    testUserID,
-			ImageType: model.ImageTypeIDFront,
+			ImageType: model.DocumentImageTypeIDFront,
 			Status:    model.DocumentStatusApproved,
-			Image:     &model.Image{Key: testObjKey, URL: "https://minio/signed"},
+			Image:     sharedmodel.Image{Key: testObjKey, URL: "https://minio/signed"},
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},
@@ -532,8 +535,11 @@ func TestCheckDocument_WithError(t *testing.T) {
 }
 
 func TestCheckDocument_InvalidStatus(t *testing.T) {
-	h, _ := newHandler(t)
+	h, svc := newHandler(t)
 	ctx := ctxWithUser(testUserID)
+
+	svc.EXPECT().CheckDocument(ctx, testDocID, validation.DocumentUpdate{Status: "unknown_status"}).
+		Return(validation.Errors{"status": validation.ErrInvalidDocumentStatus})
 
 	_, err := h.CheckDocument(ctx, &usersvc.CheckDocumentRequest{
 		DocId:  testDocID,

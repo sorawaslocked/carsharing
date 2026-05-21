@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	sharedmodel "carsharing/shared/model"
 	"carsharing/user-service/internal/model"
 	"carsharing/user-service/internal/validation"
 	"github.com/stretchr/testify/assert"
@@ -20,9 +21,9 @@ func TestCreateDocument_Success(t *testing.T) {
 
 	d.docRepo.EXPECT().Insert(ctx, mock.MatchedBy(func(doc model.Document) bool {
 		return doc.UserID == testUserID &&
-			doc.ImageType == model.ImageTypeIDFront &&
+			doc.ImageType == model.DocumentImageTypeIDFront &&
 			doc.Status == model.DocumentStatusPending &&
-			doc.Image != nil && doc.Image.Key == testObjKey
+			doc.Image.Key == testObjKey
 	})).Return(testDocID, nil)
 	d.analyzer.EXPECT().Analyze(ctx, testDocID, testObjKey)
 
@@ -47,7 +48,7 @@ func TestGetDocumentImageUploadData_Success(t *testing.T) {
 	d := newDeps(t)
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
-	expected := model.ImageUploadData{PresignedPutURL: "https://minio/put", ObjectKey: "documents/id_front/key"}
+	expected := sharedmodel.ImageUploadData{PresignedPutURL: "https://minio/put", ObjectKey: "documents/id_front/key"}
 
 	d.storage.EXPECT().GetDocumentImageUploadData(ctx, testImgType).Return(expected, nil)
 
@@ -65,7 +66,7 @@ func TestGetProcessedDocumentsForUser_Success(t *testing.T) {
 	ctx := ctxWithUser(testUserID)
 	pending := model.DocumentStatusPending
 	docs := []model.Document{
-		{ID: testDocID, UserID: testUserID, Status: model.DocumentStatusApproved, ImageType: model.ImageTypeIDFront},
+		{ID: testDocID, UserID: testUserID, Status: model.DocumentStatusApproved, ImageType: model.DocumentImageTypeIDFront},
 	}
 
 	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(baseUser(), nil)
@@ -102,7 +103,7 @@ func TestCheckDocument_Rejected(t *testing.T) {
 	ctx := ctxWithUser(testUserID)
 	rejected := model.DocumentStatusRejected
 	errMsg := "blurry image"
-	doc := model.Document{ID: testDocID, UserID: testUserID, Status: model.DocumentStatusPending, ImageType: model.ImageTypeIDFront}
+	doc := model.Document{ID: testDocID, UserID: testUserID, Status: model.DocumentStatusPending, ImageType: model.DocumentImageTypeIDFront}
 
 	d.docRepo.EXPECT().FindByID(ctx, testDocID).Return(doc, nil)
 	d.docRepo.EXPECT().Update(ctx, testDocID, mock.MatchedBy(func(u model.DocumentUpdate) bool {
@@ -119,7 +120,7 @@ func TestCheckDocument_Approved_NotAllTypesPresent(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 	approved := model.DocumentStatusApproved
-	doc := model.Document{ID: testDocID, UserID: testUserID, Status: model.DocumentStatusPending, ImageType: model.ImageTypeIDFront}
+	doc := model.Document{ID: testDocID, UserID: testUserID, Status: model.DocumentStatusPending, ImageType: model.DocumentImageTypeIDFront}
 
 	d.docRepo.EXPECT().FindByID(ctx, testDocID).Return(doc, nil)
 	d.docRepo.EXPECT().Update(ctx, testDocID, mock.MatchedBy(func(u model.DocumentUpdate) bool {
@@ -139,11 +140,11 @@ func TestCheckDocument_Approved_AllTypesApproved_SetsVerified(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
-	doc := model.Document{ID: testDocID, UserID: testUserID, Status: model.DocumentStatusPending, ImageType: model.ImageTypeIDFront}
+	doc := model.Document{ID: testDocID, UserID: testUserID, Status: model.DocumentStatusPending, ImageType: model.DocumentImageTypeIDFront}
 
 	// All four document types present and approved.
-	allApproved := make([]model.Document, len(model.AllImageTypes()))
-	for i, it := range model.AllImageTypes() {
+	allApproved := make([]model.Document, len(model.AllDocumentImageTypes()))
+	for i, it := range model.AllDocumentImageTypes() {
 		allApproved[i] = model.Document{UserID: testUserID, ImageType: it, Status: model.DocumentStatusApproved}
 	}
 
@@ -182,7 +183,7 @@ func TestHandleDocumentAnalyzed_Passed(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
-	doc := model.Document{ID: testDocID, UserID: testUserID, ImageType: model.ImageTypeIDFront, Status: model.DocumentStatusPending}
+	doc := model.Document{ID: testDocID, UserID: testUserID, ImageType: model.DocumentImageTypeIDFront, Status: model.DocumentStatusPending}
 	event := model.DocumentAnalyzedEvent{DocumentID: testDocID, Passed: true}
 
 	d.docRepo.EXPECT().FindByID(ctx, testDocID).Return(doc, nil)
@@ -200,7 +201,7 @@ func TestHandleDocumentAnalyzed_Failed_WithDefects(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
-	doc := model.Document{ID: testDocID, UserID: testUserID, ImageType: model.ImageTypeIDFront, Status: model.DocumentStatusPending}
+	doc := model.Document{ID: testDocID, UserID: testUserID, ImageType: model.DocumentImageTypeIDFront, Status: model.DocumentStatusPending}
 	event := model.DocumentAnalyzedEvent{
 		DocumentID: testDocID,
 		Passed:     false,
@@ -235,7 +236,7 @@ func TestCheckDocument_UpdateTimestampSet(t *testing.T) {
 	d := newDeps(t)
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
-	doc := model.Document{ID: testDocID, UserID: testUserID, Status: model.DocumentStatusPending, ImageType: model.ImageTypeIDFront}
+	doc := model.Document{ID: testDocID, UserID: testUserID, Status: model.DocumentStatusPending, ImageType: model.DocumentImageTypeIDFront}
 
 	d.docRepo.EXPECT().FindByID(ctx, testDocID).Return(doc, nil)
 	d.docRepo.EXPECT().Update(ctx, testDocID, mock.MatchedBy(func(u model.DocumentUpdate) bool {

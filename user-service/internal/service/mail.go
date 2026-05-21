@@ -13,12 +13,13 @@ import (
 )
 
 func (s *UserService) SendActivationCode(ctx context.Context) error {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "SendActivationCode"), utils.MetadataFromCtx(ctx))
+	md := utils.MetadataFromCtx(ctx)
+	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "SendActivationCode"), md)
 
-	userID, err := userIDFromCtx(ctx)
-	if err != nil {
-		return err
+	if md.UserID == nil {
+		return model.ErrUnauthenticated
 	}
+	userID := *md.UserID
 
 	user, err := s.userRepo.FindByID(ctx, userID)
 	if err != nil {
@@ -35,7 +36,7 @@ func (s *UserService) SendActivationCode(ctx context.Context) error {
 	}
 
 	if err := s.mailer.SendActivationCode(ctx, user.Email, code); err != nil {
-		logger.Error("mailer: sending activation code", pkglog.Err(err))
+		logger.Error("brevo: sending activation code", pkglog.Err(err))
 		return err
 	}
 
@@ -43,12 +44,13 @@ func (s *UserService) SendActivationCode(ctx context.Context) error {
 }
 
 func (s *UserService) CheckActivationCode(ctx context.Context, code string) error {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "CheckActivationCode"), utils.MetadataFromCtx(ctx))
+	md := utils.MetadataFromCtx(ctx)
+	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "CheckActivationCode"), md)
 
-	userID, err := userIDFromCtx(ctx)
-	if err != nil {
-		return err
+	if md.UserID == nil {
+		return model.ErrUnauthenticated
 	}
+	userID := *md.UserID
 
 	user, err := s.userRepo.FindByID(ctx, userID)
 	if err != nil {

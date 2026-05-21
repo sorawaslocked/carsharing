@@ -1,9 +1,5 @@
 package model
 
-import "errors"
-
-var ErrInvalidRole = errors.New("invalid role")
-
 type Role string
 
 const (
@@ -22,12 +18,12 @@ var validRoles = map[Role]struct{}{
 	RoleBookingManager: {},
 }
 
-func RoleFromString(s string) (Role, error) {
+func RoleFromString(s string) (Role, bool) {
 	r := Role(s)
 	if _, ok := validRoles[r]; !ok {
-		return "", ErrInvalidRole
+		return "", false
 	}
-	return r, nil
+	return r, true
 }
 
 func (r Role) String() string {

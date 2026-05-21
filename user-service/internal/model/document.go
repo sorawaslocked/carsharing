@@ -1,11 +1,9 @@
 package model
 
 import (
-	"errors"
+	sharedmodel "carsharing/shared/model"
 	"time"
 )
-
-var ErrInvalidDocumentStatus = errors.New("must be \"approved\" or \"rejected\"")
 
 type DocumentStatus string
 
@@ -23,25 +21,62 @@ var validDocumentStatuses = map[DocumentStatus]struct{}{
 	DocumentStatusRejected:  {},
 }
 
-func DocumentStatusFromString(s string) (DocumentStatus, error) {
+func DocumentStatusFromString(s string) (DocumentStatus, bool) {
 	ds := DocumentStatus(s)
 	if _, ok := validDocumentStatuses[ds]; !ok {
-		return "", ErrInvalidDocumentStatus
+		return "", false
 	}
-	return ds, nil
+	return ds, true
 }
 
 func (s DocumentStatus) String() string {
 	return string(s)
 }
 
+type DocumentImageType string
+
+const (
+	DocumentImageTypeIDFront             DocumentImageType = "id_front"
+	DocumentImageTypeIDBack              DocumentImageType = "id_back"
+	DocumentImageTypeDrivingLicenseFront DocumentImageType = "driving_license_front"
+	DocumentImageTypeDrivingLicenseBack  DocumentImageType = "driving_license_back"
+)
+
+var validDocumentImageTypes = map[DocumentImageType]struct{}{
+	DocumentImageTypeIDFront:             {},
+	DocumentImageTypeIDBack:              {},
+	DocumentImageTypeDrivingLicenseFront: {},
+	DocumentImageTypeDrivingLicenseBack:  {},
+}
+
+func AllDocumentImageTypes() []DocumentImageType {
+	return []DocumentImageType{
+		DocumentImageTypeIDFront,
+		DocumentImageTypeIDBack,
+		DocumentImageTypeDrivingLicenseFront,
+		DocumentImageTypeDrivingLicenseBack,
+	}
+}
+
+func DocumentImageTypeFromString(s string) (DocumentImageType, bool) {
+	it := DocumentImageType(s)
+	if _, ok := validDocumentImageTypes[it]; ok {
+		return it, true
+	}
+	return "", false
+}
+
+func (t DocumentImageType) String() string {
+	return string(t)
+}
+
 type Document struct {
 	ID        string
 	UserID    string
-	ImageType ImageType
+	ImageType DocumentImageType
 	Status    DocumentStatus
 	Error     *string
-	Image     *Image
+	Image     sharedmodel.Image
 
 	CreatedAt time.Time
 	UpdatedAt time.Time

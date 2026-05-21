@@ -5,14 +5,9 @@ import (
 	"fmt"
 
 	"carsharing/shared/pkg/utils"
-	"carsharing/user-service/internal/model"
 
 	"github.com/go-playground/validator/v10"
 )
-
-type activationCodeValidation struct {
-	Code string `validate:"required,len=6,alphanum,uppercase"`
-}
 
 func ValidateInput(v *validator.Validate, input any) error {
 	err := v.Struct(input)
@@ -39,6 +34,10 @@ func ValidateInput(v *validator.Validate, input any) error {
 
 func ValidateActivationCode(v *validator.Validate, code string) error {
 	return ValidateInput(v, activationCodeValidation{Code: code})
+}
+
+func ValidateID(v *validator.Validate, id string) error {
+	return ValidateInput(v, idValidation{ID: id})
 }
 
 func validationError(fieldErr validator.FieldError) error {
@@ -76,10 +75,14 @@ func validationError(fieldErr validator.FieldError) error {
 		return ErrNotComplexPassword
 	case "min_age":
 		return fmt.Errorf("must be at least %s years old", fieldErr.Param())
-	case "imagetype":
-		return model.ErrInvalidImageType
-	case "documentstatus":
-		return model.ErrInvalidDocumentStatus
+	case "document_image_type":
+		return ErrInvalidImageType
+	case "document_status":
+		return ErrInvalidDocumentStatus
+	case "uuid4":
+		return ErrInvalidID
+	case "role":
+		return ErrInvalidRole
 	default:
 		return fmt.Errorf("invalid value")
 	}

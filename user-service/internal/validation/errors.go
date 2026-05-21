@@ -40,5 +40,12 @@ var (
 	ErrInvalidDateFormat     = errors.New("must be a valid date format (YYYY-MM-DD)")
 	ErrNotComplexPassword    = errors.New("must contain uppercase, lowercase, numbers, and special characters (!@#)")
 	ErrInvalidRole           = errors.New("must be a valid role")
+	ErrInvalidID             = errors.New("must be a valid UUID")
 	ErrInvalidActivationCode = errors.New("invalid or expired activation code")
+)
+
+// Document
+var (
+	ErrInvalidDocumentStatus = errors.New("must be a valid document status")
+	ErrInvalidImageType      = errors.New("must be a valid image type")
 )

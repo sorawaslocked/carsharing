@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"strings"
 
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 	pgdto "carsharing/user-service/internal/adapter/postgres/dto"
@@ -51,11 +52,11 @@ func scanDocument(rs rowScanner) (model.Document, error) {
 		return model.Document{}, err
 	}
 
-	d.ImageType = model.ImageType(imageType)
+	d.ImageType = model.DocumentImageType(imageType)
 	d.Status = model.DocumentStatus(status)
 	d.Error = errMsg
 	if imageKey != "" {
-		d.Image = &model.Image{Key: imageKey}
+		d.Image = sharedmodel.Image{Key: imageKey}
 	}
 
 	return d, nil
@@ -65,7 +66,7 @@ func (r *DocumentRepository) Insert(ctx context.Context, doc model.Document) (st
 	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Insert"), utils.MetadataFromCtx(ctx))
 
 	var imageKey *string
-	if doc.Image != nil {
+	if doc.Image.Key != "" {
 		imageKey = &doc.Image.Key
 	}
 

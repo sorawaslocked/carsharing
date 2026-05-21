@@ -18,7 +18,6 @@ func TestCreate_Success(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
-	d.userRepo.EXPECT().FindOne(ctx, model.UserFilter{Email: ptr(testEmail)}).Return(model.User{}, model.ErrNotFound)
 	d.userRepo.EXPECT().Insert(ctx, mock.MatchedBy(func(u model.User) bool {
 		return u.Email == testEmail && len(u.PasswordHash) > 0
 	})).Return(testUserID, nil)
@@ -35,7 +34,7 @@ func TestCreate_DuplicateEmail(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
-	d.userRepo.EXPECT().FindOne(ctx, model.UserFilter{Email: ptr(testEmail)}).Return(baseUser(), nil)
+	d.userRepo.EXPECT().Insert(ctx, mock.Anything).Return("", model.ErrDuplicateEmail)
 
 	_, err := svc.Create(ctx, validUserCreate())
 
@@ -49,8 +48,7 @@ func TestCreate_DuplicatePhone(t *testing.T) {
 	input := validUserCreate()
 	input.PhoneNumber = ptr(testPhone)
 
-	d.userRepo.EXPECT().FindOne(ctx, model.UserFilter{Email: ptr(testEmail)}).Return(model.User{}, model.ErrNotFound)
-	d.userRepo.EXPECT().FindOne(ctx, model.UserFilter{PhoneNumber: ptr(testPhone)}).Return(baseUser(), nil)
+	d.userRepo.EXPECT().Insert(ctx, mock.Anything).Return("", model.ErrDuplicatePhone)
 
 	_, err := svc.Create(ctx, input)
 
@@ -91,7 +89,6 @@ func TestRegister_Success(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxAnon()
 
-	d.userRepo.EXPECT().FindOne(ctx, model.UserFilter{Email: ptr(testEmail)}).Return(model.User{}, model.ErrNotFound)
 	d.userRepo.EXPECT().Insert(ctx, mock.MatchedBy(func(u model.User) bool {
 		return u.Email == testEmail
 	})).Return(testUserID, nil)
@@ -118,7 +115,7 @@ func TestGet_Success_NoProfileImage(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, testUserID, got.ID)
 	assert.Equal(t, testEmail, got.Email)
-	assert.Nil(t, got.ProfileImage)
+	assert.Empty(t, got.ProfileImage.Key)
 }
 
 func TestGet_Success_WithProfileImage(t *testing.T) {
@@ -126,7 +123,7 @@ func TestGet_Success_WithProfileImage(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 	user := baseUser()
-	user.ProfileImage = &model.Image{Key: testObjKey}
+	user.ProfileImage = sharedmodel.Image{Key: testObjKey}
 	signedURL := "https://minio.example.com/signed-url"
 
 	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(user, nil)
@@ -135,7 +132,6 @@ func TestGet_Success_WithProfileImage(t *testing.T) {
 	got, err := svc.Get(ctx, testUserID)
 
 	require.NoError(t, err)
-	require.NotNil(t, got.ProfileImage)
 	assert.Equal(t, testObjKey, got.ProfileImage.Key)
 	assert.Equal(t, signedURL, got.ProfileImage.URL)
 }
@@ -159,9 +155,11 @@ func TestList_Success_Empty(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
-	d.userRepo.EXPECT().Find(ctx, model.UserFilter{}).Return(nil, nil)
+	d.userRepo.EXPECT().Find(ctx, model.UserFilter{
+		Pagination: &sharedmodel.Pagination{Limit: sharedmodel.DefaultPaginationLimit, Offset: sharedmodel.DefaultPaginationOffset},
+	}).Return(nil, nil)
 
-	users, err := svc.List(ctx, model.UserFilter{})
+	users, err := svc.List(ctx, validation.UserFilter{})
 
 	require.NoError(t, err)
 	assert.Empty(t, users)
@@ -173,12 +171,14 @@ func TestList_Success_MultipleUsers(t *testing.T) {
 	ctx := ctxWithUser(testUserID)
 	u1 := baseUser()
 	u2 := baseUser()
-	u2.ID = "33333333-3333-3333-3333-333333333333"
+	u2.ID = "33333333-3333-4333-8333-333333333333"
 	u2.Email = "jane@example.com"
 
-	d.userRepo.EXPECT().Find(ctx, model.UserFilter{}).Return([]model.User{u1, u2}, nil)
+	d.userRepo.EXPECT().Find(ctx, model.UserFilter{
+		Pagination: &sharedmodel.Pagination{Limit: sharedmodel.DefaultPaginationLimit, Offset: sharedmodel.DefaultPaginationOffset},
+	}).Return([]model.User{u1, u2}, nil)
 
-	users, err := svc.List(ctx, model.UserFilter{})
+	users, err := svc.List(ctx, validation.UserFilter{})
 
 	require.NoError(t, err)
 	require.Len(t, users, 2)
@@ -189,17 +189,18 @@ func TestList_ResolvesProfileImageURLs(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 	u := baseUser()
-	u.ProfileImage = &model.Image{Key: testObjKey}
+	u.ProfileImage = sharedmodel.Image{Key: testObjKey}
 	signedURL := "https://minio.example.com/signed-url"
 
-	d.userRepo.EXPECT().Find(ctx, model.UserFilter{}).Return([]model.User{u}, nil)
+	d.userRepo.EXPECT().Find(ctx, model.UserFilter{
+		Pagination: &sharedmodel.Pagination{Limit: sharedmodel.DefaultPaginationLimit, Offset: sharedmodel.DefaultPaginationOffset},
+	}).Return([]model.User{u}, nil)
 	d.storage.EXPECT().GetImageURL(ctx, testObjKey).Return(signedURL, nil)
 
-	users, err := svc.List(ctx, model.UserFilter{})
+	users, err := svc.List(ctx, validation.UserFilter{})
 
 	require.NoError(t, err)
 	require.Len(t, users, 1)
-	require.NotNil(t, users[0].ProfileImage)
 	assert.Equal(t, signedURL, users[0].ProfileImage.URL)
 }
 
@@ -211,7 +212,6 @@ func TestUpdate_Success_NameChange(t *testing.T) {
 	ctx := ctxWithUser(testUserID)
 	newName := "Jane"
 
-	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(baseUser(), nil)
 	d.userRepo.EXPECT().Update(ctx, testUserID, mock.MatchedBy(func(u model.UserUpdate) bool {
 		return u.FirstName != nil && *u.FirstName == newName
 	})).Return(nil)
@@ -227,7 +227,7 @@ func TestUpdate_NotFound(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
-	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(model.User{}, model.ErrNotFound)
+	d.userRepo.EXPECT().Update(ctx, testUserID, mock.Anything).Return(model.ErrNotFound)
 
 	err := svc.Update(ctx, testUserID, validation.UserUpdate{FirstName: ptr("Jane")})
 
@@ -239,8 +239,6 @@ func TestUpdate_PasswordMismatch(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
-	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(baseUser(), nil)
-
 	err := svc.Update(ctx, testUserID, validation.UserUpdate{
 		Password:             ptr(testPasswd),
 		PasswordConfirmation: ptr("DifferentPass1!"),
@@ -248,7 +246,7 @@ func TestUpdate_PasswordMismatch(t *testing.T) {
 
 	var ve validation.Errors
 	require.ErrorAs(t, err, &ve)
-	assert.Contains(t, ve, "password_confirmation")
+	assert.Contains(t, ve, "passwordConfirmation")
 }
 
 func TestUpdate_IsSecurityUpdate_WhenPasswordChanged(t *testing.T) {
@@ -256,9 +254,8 @@ func TestUpdate_IsSecurityUpdate_WhenPasswordChanged(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
-	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(baseUser(), nil)
 	d.userRepo.EXPECT().Update(ctx, testUserID, mock.MatchedBy(func(u model.UserUpdate) bool {
-		return u.PasswordHash != nil && len(*u.PasswordHash) > 0
+		return len(u.PasswordHash) > 0
 	})).Return(nil)
 	d.publisher.EXPECT().PublishUserUpdated(ctx, testUserID, true).Return(nil)
 
@@ -275,13 +272,12 @@ func TestUpdate_IsSecurityUpdate_WhenRolesChanged(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
-	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(baseUser(), nil)
 	d.userRepo.EXPECT().Update(ctx, testUserID, mock.MatchedBy(func(u model.UserUpdate) bool {
 		return len(u.Roles) == 1 && u.Roles[0] == sharedmodel.RoleAdmin
 	})).Return(nil)
 	d.publisher.EXPECT().PublishUserUpdated(ctx, testUserID, true).Return(nil)
 
-	err := svc.Update(ctx, testUserID, validation.UserUpdate{Roles: []sharedmodel.Role{sharedmodel.RoleAdmin}})
+	err := svc.Update(ctx, testUserID, validation.UserUpdate{Roles: []string{"admin"}})
 
 	require.NoError(t, err)
 }
@@ -325,7 +321,7 @@ func TestSignIn_Success(t *testing.T) {
 
 	d.userRepo.EXPECT().FindOne(ctx, model.UserFilter{Email: ptr(testEmail)}).Return(user, nil)
 
-	id, err := svc.SignIn(ctx, model.Credentials{Email: ptr(testEmail), Password: testPasswd})
+	id, err := svc.SignIn(ctx, validation.Credentials{Email: ptr(testEmail), Password: testPasswd})
 
 	require.NoError(t, err)
 	assert.Equal(t, testUserID, id)
@@ -341,7 +337,7 @@ func TestSignIn_WrongPassword(t *testing.T) {
 
 	d.userRepo.EXPECT().FindOne(ctx, model.UserFilter{Email: ptr(testEmail)}).Return(user, nil)
 
-	_, err := svc.SignIn(ctx, model.Credentials{Email: ptr(testEmail), Password: "WrongPass1!"})
+	_, err := svc.SignIn(ctx, validation.Credentials{Email: ptr(testEmail), Password: "WrongPass1!"})
 
 	assert.ErrorIs(t, err, model.ErrUnauthenticated)
 }
@@ -353,9 +349,9 @@ func TestSignIn_UserNotFound(t *testing.T) {
 
 	d.userRepo.EXPECT().FindOne(ctx, model.UserFilter{Email: ptr(testEmail)}).Return(model.User{}, model.ErrNotFound)
 
-	_, err := svc.SignIn(ctx, model.Credentials{Email: ptr(testEmail), Password: testPasswd})
+	_, err := svc.SignIn(ctx, validation.Credentials{Email: ptr(testEmail), Password: testPasswd})
 
-	assert.ErrorIs(t, err, model.ErrUnauthenticated)
+	assert.ErrorIs(t, err, model.ErrNotFound)
 }
 
 func TestSignIn_ByPhone_Success(t *testing.T) {
@@ -369,7 +365,7 @@ func TestSignIn_ByPhone_Success(t *testing.T) {
 
 	d.userRepo.EXPECT().FindOne(ctx, model.UserFilter{PhoneNumber: ptr(testPhone)}).Return(user, nil)
 
-	id, err := svc.SignIn(ctx, model.Credentials{PhoneNumber: ptr(testPhone), Password: testPasswd})
+	id, err := svc.SignIn(ctx, validation.Credentials{PhoneNumber: ptr(testPhone), Password: testPasswd})
 
 	require.NoError(t, err)
 	assert.Equal(t, testUserID, id)
@@ -381,7 +377,7 @@ func TestGetUserProfileImageUploadData_Success(t *testing.T) {
 	d := newDeps(t)
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
-	expected := model.ImageUploadData{PresignedPutURL: "https://minio/put", ObjectKey: testObjKey}
+	expected := sharedmodel.ImageUploadData{PresignedPutURL: "https://minio/put", ObjectKey: testObjKey}
 
 	d.storage.EXPECT().GetUserProfileImageUploadData(ctx).Return(expected, nil)
 
@@ -396,7 +392,7 @@ func TestGetUserProfileImageUploadData_StorageError(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
-	d.storage.EXPECT().GetUserProfileImageUploadData(ctx).Return(model.ImageUploadData{}, model.ErrObjectStorage)
+	d.storage.EXPECT().GetUserProfileImageUploadData(ctx).Return(sharedmodel.ImageUploadData{}, model.ErrObjectStorage)
 
 	_, err := svc.GetUserProfileImageUploadData(ctx)
 

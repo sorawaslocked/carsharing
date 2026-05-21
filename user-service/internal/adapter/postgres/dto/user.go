@@ -85,9 +85,9 @@ func SetClausesFromUpdate(update model.UserUpdate) ([]string, []any, int) {
 		args = append(args, *update.BirthDate)
 		argNumber++
 	}
-	if update.PasswordHash != nil {
+	if len(update.PasswordHash) > 0 {
 		clauses = append(clauses, fmt.Sprintf("password_hash = $%d", argNumber))
-		args = append(args, *update.PasswordHash)
+		args = append(args, update.PasswordHash)
 		argNumber++
 	}
 	if update.ProfileImageKey != nil {

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	sharedmodel "carsharing/shared/model"
 	"carsharing/user-service/internal/model"
 )
 
@@ -23,8 +24,8 @@ type DocumentRepository interface {
 }
 
 type ObjectStorage interface {
-	GetDocumentImageUploadData(ctx context.Context, imageType string) (model.ImageUploadData, error)
-	GetUserProfileImageUploadData(ctx context.Context) (model.ImageUploadData, error)
+	GetDocumentImageUploadData(ctx context.Context, imageType string) (sharedmodel.ImageUploadData, error)
+	GetUserProfileImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error)
 	GetImageURL(ctx context.Context, objectKey string) (string, error)
 }
 

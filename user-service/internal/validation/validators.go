@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"time"
 
+	sharedmodel "carsharing/shared/model"
 	"carsharing/user-service/internal/model"
 
 	"github.com/go-playground/validator/v10"
@@ -33,8 +34,9 @@ func RegisterCustomValidators(v *validator.Validate, log *slog.Logger) error {
 	}{
 		{"min_age", minAge},
 		{"complex_password", complexPassword},
-		{"imagetype", imageTypeValidator},
-		{"documentstatus", documentStatusValidator},
+		{"document_image_type", imageTypeValidator},
+		{"document_status", documentStatusValidator},
+		{"role", roleValidator},
 	}
 
 	for _, vd := range validators {
@@ -76,11 +78,16 @@ func complexPassword(fl validator.FieldLevel) bool {
 }
 
 func imageTypeValidator(fl validator.FieldLevel) bool {
-	_, err := model.ImageTypeFromString(fl.Field().String())
-	return err == nil
+	_, ok := model.DocumentImageTypeFromString(fl.Field().String())
+	return ok
 }
 
 func documentStatusValidator(fl validator.FieldLevel) bool {
-	_, err := model.DocumentStatusFromString(fl.Field().String())
-	return err == nil
+	_, ok := model.DocumentStatusFromString(fl.Field().String())
+	return ok
+}
+
+func roleValidator(fl validator.FieldLevel) bool {
+	_, ok := sharedmodel.RoleFromString(fl.Field().String())
+	return ok
 }

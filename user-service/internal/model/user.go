@@ -14,7 +14,7 @@ type User struct {
 	LastName     string
 	BirthDate    time.Time
 	PasswordHash []byte
-	ProfileImage *Image
+	ProfileImage sharedmodel.Image
 
 	Roles              []sharedmodel.Role
 	IsDocumentVerified bool
@@ -25,15 +25,13 @@ type User struct {
 	UpdatedAt time.Time
 }
 
-// UserUpdate is the repo-layer struct with pre-processed fields (hashed
-// password, resolved image URL). Constructed by the service before calling the repo.
 type UserUpdate struct {
 	Email           *string
 	PhoneNumber     *string
 	FirstName       *string
 	LastName        *string
 	BirthDate       *time.Time
-	PasswordHash    *[]byte
+	PasswordHash    []byte
 	ProfileImageKey *string
 
 	Roles              []sharedmodel.Role
@@ -53,16 +51,5 @@ type UserFilter struct {
 	IsEmailVerified    *bool
 	IsSuspended        *bool
 
-	Pagination *Pagination
-}
-
-type Pagination struct {
-	Limit  int64
-	Offset int64
-}
-
-type Credentials struct {
-	Email       *string `validate:"required_without=PhoneNumber,omitempty,email"`
-	PhoneNumber *string `validate:"required_without=Email,omitempty,e164"`
-	Password    string  `validate:"required"`
+	Pagination *sharedmodel.Pagination
 }

@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 	"time"
 
@@ -12,6 +11,7 @@ import (
 	"carsharing/user-service/internal/model"
 	"carsharing/user-service/internal/pkg/security"
 	"carsharing/user-service/internal/validation"
+
 	"github.com/go-playground/validator/v10"
 )
 
@@ -51,40 +51,57 @@ func NewUserService(
 	}
 }
 
+func (s *UserService) SignIn(ctx context.Context, creds validation.Credentials) (string, error) {
+	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "SignIn"), utils.MetadataFromCtx(ctx))
+
+	if err := validation.ValidateInput(s.validate, creds); err != nil {
+		return "", err
+	}
+
+	filter := model.UserFilter{}
+	if creds.Email != nil {
+		filter.Email = creds.Email
+	} else {
+		filter.PhoneNumber = creds.PhoneNumber
+	}
+
+	user, err := s.userRepo.FindOne(ctx, filter)
+	if err != nil {
+		logger.Error("repo: finding user by id", pkglog.Err(err))
+
+		return "", err
+	}
+
+	if err := security.CheckStringHash(creds.Password, user.PasswordHash); err != nil {
+		logger.Warn("invalid user password hash", pkglog.Err(model.ErrBcrypt))
+
+		return "", model.ErrUnauthenticated
+	}
+
+	return user.ID, nil
+}
+
 func (s *UserService) Create(ctx context.Context, data validation.UserCreate) (string, error) {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Create"), utils.MetadataFromCtx(ctx))
-	return s.insertUser(ctx, logger, data)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Create"), utils.MetadataFromCtx(ctx))
+
+	return s.insertUser(ctx, log, data)
 }
 
 func (s *UserService) Register(ctx context.Context, data validation.UserCreate) (string, error) {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Register"), utils.MetadataFromCtx(ctx))
-	return s.insertUser(ctx, logger, data)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Register"), utils.MetadataFromCtx(ctx))
+
+	return s.insertUser(ctx, log, data)
 }
 
-func (s *UserService) insertUser(ctx context.Context, logger *slog.Logger, data validation.UserCreate) (string, error) {
+func (s *UserService) insertUser(ctx context.Context, log *slog.Logger, data validation.UserCreate) (string, error) {
 	if err := validation.ValidateInput(s.validate, data); err != nil {
 		return "", err
 	}
 
-	if _, err := s.userRepo.FindOne(ctx, model.UserFilter{Email: &data.Email}); err == nil {
-		return "", model.ErrDuplicateEmail
-	} else if !errors.Is(err, model.ErrNotFound) {
-		logger.Error("repo: finding user by email", pkglog.Err(err))
-		return "", err
-	}
-
-	if data.PhoneNumber != nil {
-		if _, err := s.userRepo.FindOne(ctx, model.UserFilter{PhoneNumber: data.PhoneNumber}); err == nil {
-			return "", model.ErrDuplicatePhone
-		} else if !errors.Is(err, model.ErrNotFound) {
-			logger.Error("repo: finding user by phone", pkglog.Err(err))
-			return "", err
-		}
-	}
-
 	hash, err := security.HashString(data.Password)
 	if err != nil {
-		logger.Error("bcrypt: hashing password", pkglog.Err(err))
+		log.Error("hashing password", pkglog.Err(err))
+
 		return "", model.ErrBcrypt
 	}
 
@@ -102,41 +119,68 @@ func (s *UserService) insertUser(ctx context.Context, logger *slog.Logger, data 
 
 	id, err := s.userRepo.Insert(ctx, user)
 	if err != nil {
-		logger.Error("repo: inserting user", pkglog.Err(err))
+		log.Error("repo: inserting user", pkglog.Err(err))
+
 		return "", err
 	}
 
 	if err := s.publisher.PublishUserCreated(ctx, id); err != nil {
-		logger.Error("nats: publishing user.created", pkglog.Err(err))
+		log.Error("event: publishing user created", pkglog.Err(err))
 	}
 
 	return id, nil
 }
 
 func (s *UserService) Get(ctx context.Context, id string) (model.User, error) {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Get"), utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Get"), utils.MetadataFromCtx(ctx))
 
-	user, err := s.userRepo.FindByID(ctx, id)
-	if err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
-			logger.Error("repo: finding user by id", pkglog.Err(err))
-		}
+	if err := validation.ValidateID(s.validate, id); err != nil {
 		return model.User{}, err
 	}
 
-	if err := s.resolveProfileImageURL(ctx, logger, &user); err != nil {
+	user, err := s.userRepo.FindByID(ctx, id)
+	if err != nil {
+		log.Error("repo: finding user by id", pkglog.Err(err))
+
+		return model.User{}, err
+	}
+
+	if err := s.resolveProfileImageURL(ctx, log, &user); err != nil {
 		return model.User{}, err
 	}
 
 	return user, nil
 }
 
-func (s *UserService) List(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
+func (s *UserService) List(ctx context.Context, filter validation.UserFilter) ([]model.User, error) {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "List"), utils.MetadataFromCtx(ctx))
 
-	users, err := s.userRepo.Find(ctx, filter)
+	if err := validation.ValidateInput(s.validate, filter); err != nil {
+		return nil, err
+	}
+
+	if filter.Pagination == nil {
+		filter.Pagination = &sharedmodel.Pagination{
+			Limit:  sharedmodel.DefaultPaginationLimit,
+			Offset: sharedmodel.DefaultPaginationOffset,
+		}
+	}
+
+	repoFilter := model.UserFilter{
+		Email:              filter.Email,
+		PhoneNumber:        filter.PhoneNumber,
+		FirstName:          filter.FirstName,
+		LastName:           filter.LastName,
+		IsDocumentVerified: filter.IsDocumentVerified,
+		IsEmailVerified:    filter.IsEmailVerified,
+		IsSuspended:        filter.IsSuspended,
+		Pagination:         filter.Pagination,
+	}
+
+	users, err := s.userRepo.Find(ctx, repoFilter)
 	if err != nil {
 		logger.Error("repo: listing users", pkglog.Err(err))
+
 		return nil, err
 	}
 
@@ -149,28 +193,10 @@ func (s *UserService) List(ctx context.Context, filter model.UserFilter) ([]mode
 	return users, nil
 }
 
-func (s *UserService) resolveProfileImageURL(ctx context.Context, logger *slog.Logger, user *model.User) error {
-	if user.ProfileImage == nil || user.ProfileImage.Key == "" {
-		return nil
-	}
-
-	imageURL, err := s.objectStorage.GetImageURL(ctx, user.ProfileImage.Key)
-	if err != nil {
-		logger.Error("object storage: resolving profile image url", pkglog.Err(err))
-		return err
-	}
-
-	user.ProfileImage.URL = imageURL
-	return nil
-}
-
 func (s *UserService) Update(ctx context.Context, id string, data validation.UserUpdate) error {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Update"), utils.MetadataFromCtx(ctx))
 
-	if _, err := s.userRepo.FindByID(ctx, id); err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
-			logger.Error("repo: finding user for update", pkglog.Err(err))
-		}
+	if err := validation.ValidateID(s.validate, id); err != nil {
 		return err
 	}
 
@@ -178,10 +204,9 @@ func (s *UserService) Update(ctx context.Context, id string, data validation.Use
 		return err
 	}
 
-	if data.Password != nil {
-		if data.PasswordConfirmation == nil || *data.Password != *data.PasswordConfirmation {
-			return validation.Errors{"password_confirmation": validation.ErrPasswordsDoNotMatch}
-		}
+	roles := make([]sharedmodel.Role, len(data.Roles))
+	for i, r := range data.Roles {
+		roles[i] = sharedmodel.Role(r)
 	}
 
 	repoUpdate := model.UserUpdate{
@@ -190,38 +215,33 @@ func (s *UserService) Update(ctx context.Context, id string, data validation.Use
 		FirstName:          data.FirstName,
 		LastName:           data.LastName,
 		BirthDate:          data.BirthDate,
-		Roles:              data.Roles,
+		ProfileImageKey:    data.ProfileImageKey,
+		Roles:              roles,
 		IsDocumentVerified: data.IsDocumentVerified,
 		IsEmailVerified:    data.IsEmailVerified,
 		IsSuspended:        data.IsSuspended,
 		UpdatedAt:          time.Now(),
 	}
 
-	if data.ProfileImageKey != nil {
-		repoUpdate.ProfileImageKey = data.ProfileImageKey
-	}
-
 	if data.Password != nil {
 		hash, err := security.HashString(*data.Password)
 		if err != nil {
-			logger.Error("bcrypt: hashing password", pkglog.Err(err))
+			logger.Error("hashing password", pkglog.Err(err))
+
 			return model.ErrBcrypt
 		}
-		repoUpdate.PasswordHash = &hash
+		repoUpdate.PasswordHash = hash
 	}
 
 	if err := s.userRepo.Update(ctx, id, repoUpdate); err != nil {
-		if !errors.Is(err, model.ErrNotFound) &&
-			!errors.Is(err, model.ErrDuplicateEmail) &&
-			!errors.Is(err, model.ErrDuplicatePhone) {
-			logger.Error("repo: updating user", pkglog.Err(err))
-		}
+		logger.Error("repo: updating user", pkglog.Err(err))
+
 		return err
 	}
 
 	isSecurityUpdate := data.Password != nil || len(data.Roles) > 0 || data.IsSuspended != nil
 	if err := s.publisher.PublishUserUpdated(ctx, id, isSecurityUpdate); err != nil {
-		logger.Error("nats: publishing user.updated", pkglog.Err(err))
+		logger.Error("event: publishing user updated", pkglog.Err(err))
 	}
 
 	return nil
@@ -230,58 +250,48 @@ func (s *UserService) Update(ctx context.Context, id string, data validation.Use
 func (s *UserService) Delete(ctx context.Context, id string) error {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Delete"), utils.MetadataFromCtx(ctx))
 
+	if err := validation.ValidateID(s.validate, id); err != nil {
+		return err
+	}
+
 	if err := s.userRepo.Delete(ctx, id); err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
-			logger.Error("repo: deleting user", pkglog.Err(err))
-		}
+		logger.Error("repo: deleting user", pkglog.Err(err))
+
 		return err
 	}
 
 	if err := s.publisher.PublishUserDeleted(ctx, id); err != nil {
-		logger.Error("nats: publishing user.deleted", pkglog.Err(err))
+		logger.Error("event: publishing user deleted", pkglog.Err(err))
 	}
 
 	return nil
 }
 
-func (s *UserService) GetUserProfileImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (s *UserService) GetUserProfileImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetUserProfileImageUploadData"), utils.MetadataFromCtx(ctx))
 
 	data, err := s.objectStorage.GetUserProfileImageUploadData(ctx)
 	if err != nil {
 		logger.Error("object storage: getting upload data", pkglog.Err(err))
-		return model.ImageUploadData{}, err
+
+		return sharedmodel.ImageUploadData{}, err
 	}
 
 	return data, nil
 }
 
-func (s *UserService) SignIn(ctx context.Context, creds model.Credentials) (string, error) {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "SignIn"), utils.MetadataFromCtx(ctx))
-
-	if err := validation.ValidateInput(s.validate, creds); err != nil {
-		return "", err
+func (s *UserService) resolveProfileImageURL(ctx context.Context, log *slog.Logger, user *model.User) error {
+	if user.ProfileImage.Key == "" {
+		return nil
 	}
 
-	filter := model.UserFilter{}
-	if creds.Email != nil {
-		filter.Email = creds.Email
-	} else {
-		filter.PhoneNumber = creds.PhoneNumber
-	}
-
-	user, err := s.userRepo.FindOne(ctx, filter)
+	imageURL, err := s.objectStorage.GetImageURL(ctx, user.ProfileImage.Key)
 	if err != nil {
-		if errors.Is(err, model.ErrNotFound) {
-			return "", model.ErrUnauthenticated
-		}
-		logger.Error("repo: finding user for sign in", pkglog.Err(err))
-		return "", err
-	}
+		log.Error("object storage: getting image url", pkglog.Err(err))
 
-	if err := security.CheckStringHash(creds.Password, user.PasswordHash); err != nil {
-		return "", model.ErrUnauthenticated
+		return err
 	}
+	user.ProfileImage.URL = imageURL
 
-	return user.ID, nil
+	return nil
 }

@@ -22,8 +22,7 @@ func (e Errors) Error() string {
 
 // General
 var (
-	ErrRequiredField       = errors.New("required")
-	ErrPasswordsDoNotMatch = errors.New("passwords do not match")
+	ErrRequiredField = errors.New("required")
 )
 
 // String format

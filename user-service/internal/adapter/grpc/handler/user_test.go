@@ -375,6 +375,17 @@ func TestSendActivationCode_Unauthenticated(t *testing.T) {
 	assert.Equal(t, codes.Unauthenticated, grpcCode(err))
 }
 
+func TestSendActivationCode_Throttled(t *testing.T) {
+	h, svc := newHandler(t)
+	ctx := ctxWithUser(testUserID)
+
+	svc.EXPECT().SendActivationCode(ctx).Return(model.ErrActivationCodeResendTooSoon)
+
+	_, err := h.SendActivationCode(ctx, &emptypb.Empty{})
+
+	assert.Equal(t, codes.ResourceExhausted, grpcCode(err))
+}
+
 // --- CheckActivationCode ---
 
 func TestCheckActivationCode_Success(t *testing.T) {

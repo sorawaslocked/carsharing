@@ -7,19 +7,20 @@ import (
 
 	sharedmodel "carsharing/shared/model"
 	"carsharing/user-service/internal/model"
+	"carsharing/user-service/internal/validation"
 	baseuserpb "github.com/sorawaslocked/car-rental-protos/gen/base/user"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 )
 
-func FromCreateUserRequest(req *usersvc.CreateUserRequest) (model.UserCreate, error) {
+func FromCreateUserRequest(req *usersvc.CreateUserRequest) (validation.UserCreate, error) {
 	birthDate, err := time.Parse("2006-01-02", req.GetBirthDate())
 	if err != nil {
-		return model.UserCreate{}, model.ValidationErrors{
-			"birth_date": model.ErrInvalidDateFormat,
+		return validation.UserCreate{}, validation.Errors{
+			"birth_date": validation.ErrInvalidDateFormat,
 		}
 	}
 
-	return model.UserCreate{
+	return validation.UserCreate{
 		Email:                req.GetEmail(),
 		PhoneNumber:          req.PhoneNumber,
 		FirstName:            req.GetFirstName(),
@@ -30,15 +31,15 @@ func FromCreateUserRequest(req *usersvc.CreateUserRequest) (model.UserCreate, er
 	}, nil
 }
 
-func FromRegisterRequest(req *usersvc.RegisterRequest) (model.UserCreate, error) {
+func FromRegisterRequest(req *usersvc.RegisterRequest) (validation.UserCreate, error) {
 	birthDate, err := time.Parse("2006-01-02", req.GetBirthDate())
 	if err != nil {
-		return model.UserCreate{}, model.ValidationErrors{
-			"birth_date": model.ErrInvalidDateFormat,
+		return validation.UserCreate{}, validation.Errors{
+			"birth_date": validation.ErrInvalidDateFormat,
 		}
 	}
 
-	return model.UserCreate{
+	return validation.UserCreate{
 		Email:                req.GetEmail(),
 		PhoneNumber:          req.PhoneNumber,
 		FirstName:            req.GetFirstName(),
@@ -70,8 +71,8 @@ func FromListUsersRequest(req *usersvc.ListUsersRequest) model.UserFilter {
 	return filter
 }
 
-func FromUpdateUserRequest(req *usersvc.UpdateUserRequest) (model.UserUpdate, error) {
-	update := model.UserUpdate{
+func FromUpdateUserRequest(req *usersvc.UpdateUserRequest) (validation.UserUpdate, error) {
+	update := validation.UserUpdate{
 		Email:                req.Email,
 		PhoneNumber:          req.PhoneNumber,
 		FirstName:            req.FirstName,
@@ -87,8 +88,8 @@ func FromUpdateUserRequest(req *usersvc.UpdateUserRequest) (model.UserUpdate, er
 	if req.BirthDate != nil {
 		birthDate, err := time.Parse("2006-01-02", *req.BirthDate)
 		if err != nil {
-			return model.UserUpdate{}, model.ValidationErrors{
-				"birth_date": model.ErrInvalidDateFormat,
+			return validation.UserUpdate{}, validation.Errors{
+				"birth_date": validation.ErrInvalidDateFormat,
 			}
 		}
 		update.BirthDate = &birthDate
@@ -99,8 +100,8 @@ func FromUpdateUserRequest(req *usersvc.UpdateUserRequest) (model.UserUpdate, er
 		for i, r := range req.Roles {
 			role, err := sharedmodel.RoleFromString(r)
 			if err != nil {
-				return model.UserUpdate{}, model.ValidationErrors{
-					"roles": model.ErrInvalidRole,
+				return validation.UserUpdate{}, validation.Errors{
+					"roles": validation.ErrInvalidRole,
 				}
 			}
 			roles[i] = role

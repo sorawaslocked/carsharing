@@ -1,5 +1,9 @@
 package model
 
+import "errors"
+
+var ErrInvalidImageType = errors.New("must be a valid image type")
+
 type ImageType string
 
 const (
@@ -27,10 +31,10 @@ func AllImageTypes() []ImageType {
 
 func ImageTypeFromString(s string) (ImageType, error) {
 	it := ImageType(s)
-	if _, ok := validImageTypes[it]; !ok {
-		return "", ErrInvalidImageType
+	if _, ok := validImageTypes[it]; ok {
+		return it, nil
 	}
-	return it, nil
+	return "", ErrInvalidImageType
 }
 
 func (t ImageType) String() string {

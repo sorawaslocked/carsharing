@@ -11,6 +11,7 @@ import (
 	"carsharing/shared/pkg/utils"
 	"carsharing/user-service/internal/model"
 	"carsharing/user-service/internal/pkg/security"
+	"carsharing/user-service/internal/validation"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -50,18 +51,18 @@ func NewUserService(
 	}
 }
 
-func (s *UserService) Create(ctx context.Context, data model.UserCreate) (string, error) {
+func (s *UserService) Create(ctx context.Context, data validation.UserCreate) (string, error) {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Create"), utils.MetadataFromCtx(ctx))
 	return s.insertUser(ctx, logger, data)
 }
 
-func (s *UserService) Register(ctx context.Context, data model.UserCreate) (string, error) {
+func (s *UserService) Register(ctx context.Context, data validation.UserCreate) (string, error) {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Register"), utils.MetadataFromCtx(ctx))
 	return s.insertUser(ctx, logger, data)
 }
 
-func (s *UserService) insertUser(ctx context.Context, logger *slog.Logger, data model.UserCreate) (string, error) {
-	if err := validateInput(s.validate, data); err != nil {
+func (s *UserService) insertUser(ctx context.Context, logger *slog.Logger, data validation.UserCreate) (string, error) {
+	if err := validation.ValidateInput(s.validate, data); err != nil {
 		return "", err
 	}
 
@@ -163,7 +164,7 @@ func (s *UserService) resolveProfileImageURL(ctx context.Context, logger *slog.L
 	return nil
 }
 
-func (s *UserService) Update(ctx context.Context, id string, data model.UserUpdate) error {
+func (s *UserService) Update(ctx context.Context, id string, data validation.UserUpdate) error {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Update"), utils.MetadataFromCtx(ctx))
 
 	if _, err := s.userRepo.FindByID(ctx, id); err != nil {
@@ -173,17 +174,17 @@ func (s *UserService) Update(ctx context.Context, id string, data model.UserUpda
 		return err
 	}
 
-	if err := validateInput(s.validate, data); err != nil {
+	if err := validation.ValidateInput(s.validate, data); err != nil {
 		return err
 	}
 
 	if data.Password != nil {
 		if data.PasswordConfirmation == nil || *data.Password != *data.PasswordConfirmation {
-			return model.ValidationErrors{"password_confirmation": model.ErrPasswordsDoNotMatch}
+			return validation.Errors{"password_confirmation": validation.ErrPasswordsDoNotMatch}
 		}
 	}
 
-	repoUpdate := model.UserRepoUpdate{
+	repoUpdate := model.UserUpdate{
 		Email:              data.Email,
 		PhoneNumber:        data.PhoneNumber,
 		FirstName:          data.FirstName,
@@ -258,7 +259,7 @@ func (s *UserService) GetUserProfileImageUploadData(ctx context.Context) (model.
 func (s *UserService) SignIn(ctx context.Context, creds model.Credentials) (string, error) {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "SignIn"), utils.MetadataFromCtx(ctx))
 
-	if err := validateInput(s.validate, creds); err != nil {
+	if err := validation.ValidateInput(s.validate, creds); err != nil {
 		return "", err
 	}
 

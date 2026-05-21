@@ -5,6 +5,7 @@ import (
 
 	sharedmodel "carsharing/shared/model"
 	"carsharing/user-service/internal/model"
+	"carsharing/user-service/internal/validation"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -65,7 +66,7 @@ func TestCreate_ValidationError_InvalidEmail(t *testing.T) {
 
 	_, err := svc.Create(ctx, input)
 
-	var ve model.ValidationErrors
+	var ve validation.Errors
 	require.ErrorAs(t, err, &ve)
 	assert.Contains(t, ve, "email")
 }
@@ -80,7 +81,7 @@ func TestCreate_ValidationError_WeakPassword(t *testing.T) {
 
 	_, err := svc.Create(ctx, input)
 
-	var ve model.ValidationErrors
+	var ve validation.Errors
 	require.ErrorAs(t, err, &ve)
 	assert.Contains(t, ve, "password")
 }
@@ -211,12 +212,12 @@ func TestUpdate_Success_NameChange(t *testing.T) {
 	newName := "Jane"
 
 	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(baseUser(), nil)
-	d.userRepo.EXPECT().Update(ctx, testUserID, mock.MatchedBy(func(u model.UserRepoUpdate) bool {
+	d.userRepo.EXPECT().Update(ctx, testUserID, mock.MatchedBy(func(u model.UserUpdate) bool {
 		return u.FirstName != nil && *u.FirstName == newName
 	})).Return(nil)
 	d.publisher.EXPECT().PublishUserUpdated(ctx, testUserID, false).Return(nil)
 
-	err := svc.Update(ctx, testUserID, model.UserUpdate{FirstName: &newName})
+	err := svc.Update(ctx, testUserID, validation.UserUpdate{FirstName: &newName})
 
 	require.NoError(t, err)
 }
@@ -228,7 +229,7 @@ func TestUpdate_NotFound(t *testing.T) {
 
 	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(model.User{}, model.ErrNotFound)
 
-	err := svc.Update(ctx, testUserID, model.UserUpdate{FirstName: ptr("Jane")})
+	err := svc.Update(ctx, testUserID, validation.UserUpdate{FirstName: ptr("Jane")})
 
 	assert.ErrorIs(t, err, model.ErrNotFound)
 }
@@ -240,12 +241,12 @@ func TestUpdate_PasswordMismatch(t *testing.T) {
 
 	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(baseUser(), nil)
 
-	err := svc.Update(ctx, testUserID, model.UserUpdate{
+	err := svc.Update(ctx, testUserID, validation.UserUpdate{
 		Password:             ptr(testPasswd),
 		PasswordConfirmation: ptr("DifferentPass1!"),
 	})
 
-	var ve model.ValidationErrors
+	var ve validation.Errors
 	require.ErrorAs(t, err, &ve)
 	assert.Contains(t, ve, "password_confirmation")
 }
@@ -256,12 +257,12 @@ func TestUpdate_IsSecurityUpdate_WhenPasswordChanged(t *testing.T) {
 	ctx := ctxWithUser(testUserID)
 
 	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(baseUser(), nil)
-	d.userRepo.EXPECT().Update(ctx, testUserID, mock.MatchedBy(func(u model.UserRepoUpdate) bool {
+	d.userRepo.EXPECT().Update(ctx, testUserID, mock.MatchedBy(func(u model.UserUpdate) bool {
 		return u.PasswordHash != nil && len(*u.PasswordHash) > 0
 	})).Return(nil)
 	d.publisher.EXPECT().PublishUserUpdated(ctx, testUserID, true).Return(nil)
 
-	err := svc.Update(ctx, testUserID, model.UserUpdate{
+	err := svc.Update(ctx, testUserID, validation.UserUpdate{
 		Password:             ptr(testPasswd),
 		PasswordConfirmation: ptr(testPasswd),
 	})
@@ -275,12 +276,12 @@ func TestUpdate_IsSecurityUpdate_WhenRolesChanged(t *testing.T) {
 	ctx := ctxWithUser(testUserID)
 
 	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(baseUser(), nil)
-	d.userRepo.EXPECT().Update(ctx, testUserID, mock.MatchedBy(func(u model.UserRepoUpdate) bool {
+	d.userRepo.EXPECT().Update(ctx, testUserID, mock.MatchedBy(func(u model.UserUpdate) bool {
 		return len(u.Roles) == 1 && u.Roles[0] == sharedmodel.RoleAdmin
 	})).Return(nil)
 	d.publisher.EXPECT().PublishUserUpdated(ctx, testUserID, true).Return(nil)
 
-	err := svc.Update(ctx, testUserID, model.UserUpdate{Roles: []sharedmodel.Role{sharedmodel.RoleAdmin}})
+	err := svc.Update(ctx, testUserID, validation.UserUpdate{Roles: []sharedmodel.Role{sharedmodel.RoleAdmin}})
 
 	require.NoError(t, err)
 }

@@ -10,9 +10,9 @@ import (
 	sharedmodel "carsharing/shared/model"
 	"carsharing/user-service/internal/model"
 	"carsharing/user-service/internal/pkg/security"
-	validatecfg "carsharing/user-service/internal/pkg/validate"
 	"carsharing/user-service/internal/service"
 	"carsharing/user-service/internal/service/mocks"
+	"carsharing/user-service/internal/validation"
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/require"
 )
@@ -87,8 +87,7 @@ func newDeps(t *testing.T) *deps {
 func newService(t *testing.T, d *deps) *service.UserService {
 	t.Helper()
 	v := validator.New()
-	require.NoError(t, v.RegisterValidation("min_age", validatecfg.MinAge))
-	require.NoError(t, v.RegisterValidation("complex_password", validatecfg.ComplexPassword))
+	require.NoError(t, validation.RegisterCustomValidators(v, slog.New(slog.NewTextHandler(io.Discard, nil))))
 	return service.NewUserService(
 		slog.New(slog.NewTextHandler(io.Discard, nil)),
 		v,
@@ -109,8 +108,8 @@ func baseUser() model.User {
 	}
 }
 
-func validUserCreate() model.UserCreate {
-	return model.UserCreate{
+func validUserCreate() validation.UserCreate {
+	return validation.UserCreate{
 		Email:                testEmail,
 		FirstName:            testFName,
 		LastName:             testLName,

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"carsharing/user-service/internal/model"
+	"carsharing/user-service/internal/validation"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -58,7 +59,7 @@ func TestCheckActivationCode_Success(t *testing.T) {
 
 	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(user, nil)
 	d.codeStorage.EXPECT().Get(ctx, testUserID).Return(codeHash, nil)
-	d.userRepo.EXPECT().Update(ctx, testUserID, mock.MatchedBy(func(u model.UserRepoUpdate) bool {
+	d.userRepo.EXPECT().Update(ctx, testUserID, mock.MatchedBy(func(u model.UserUpdate) bool {
 		return u.IsEmailVerified != nil && *u.IsEmailVerified
 	})).Return(nil)
 	d.publisher.EXPECT().PublishUserUpdated(ctx, testUserID, false).Return(nil)
@@ -101,7 +102,7 @@ func TestCheckActivationCode_InvalidFormat(t *testing.T) {
 	// Not 6 chars, not uppercase, not alphanumeric.
 	err := svc.CheckActivationCode(ctx, "short")
 
-	var ve model.ValidationErrors
+	var ve validation.Errors
 	require.ErrorAs(t, err, &ve)
 	assert.Contains(t, ve, "code")
 }
@@ -117,7 +118,7 @@ func TestCheckActivationCode_ExpiredCode(t *testing.T) {
 
 	err := svc.CheckActivationCode(ctx, testCode)
 
-	var ve model.ValidationErrors
+	var ve validation.Errors
 	require.ErrorAs(t, err, &ve)
 	assert.Contains(t, ve, "code")
 }
@@ -134,7 +135,7 @@ func TestCheckActivationCode_WrongCode(t *testing.T) {
 
 	err := svc.CheckActivationCode(ctx, testCode)
 
-	var ve model.ValidationErrors
+	var ve validation.Errors
 	require.ErrorAs(t, err, &ve)
 	assert.Contains(t, ve, "code")
 }

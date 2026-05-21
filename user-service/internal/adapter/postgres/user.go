@@ -214,10 +214,10 @@ func (r *UserRepository) Find(ctx context.Context, filter model.UserFilter) ([]m
 	return users, nil
 }
 
-func (r *UserRepository) Update(ctx context.Context, id string, update model.UserRepoUpdate) error {
+func (r *UserRepository) Update(ctx context.Context, id string, update model.UserUpdate) error {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Update"), utils.MetadataFromCtx(ctx))
 
-	setClauses, args, nextArg := pgdto.SetClausesFromRepoUpdate(update)
+	setClauses, args, nextArg := pgdto.SetClausesFromUpdate(update)
 	hasRoles := len(update.Roles) > 0
 
 	userQuery := "UPDATE users SET " + strings.Join(setClauses, ", ") +

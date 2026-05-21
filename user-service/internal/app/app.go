@@ -27,8 +27,8 @@ import (
 	"carsharing/user-service/internal/adapter/postgres"
 	redisadapter "carsharing/user-service/internal/adapter/redis"
 	"carsharing/user-service/internal/config"
-	validatecfg "carsharing/user-service/internal/pkg/validate"
 	"carsharing/user-service/internal/service"
+	"carsharing/user-service/internal/validation"
 	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5/pgxpool"
 	natsio "github.com/nats-io/nats.go"
@@ -53,11 +53,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	}
 
 	validate := validator.New()
-	if err := validate.RegisterValidation("min_age", validatecfg.MinAge); err != nil {
-		pool.Close()
-		return nil, fmt.Errorf("validator: %w", err)
-	}
-	if err := validate.RegisterValidation("complex_password", validatecfg.ComplexPassword); err != nil {
+	if err := validation.RegisterCustomValidators(validate, log); err != nil {
 		pool.Close()
 		return nil, fmt.Errorf("validator: %w", err)
 	}

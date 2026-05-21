@@ -175,12 +175,12 @@ func (h *UserHandler) GetProfileImageUploadData(ctx context.Context, _ *emptypb.
 func (h *UserHandler) CreateDocument(ctx context.Context, req *usersvc.CreateDocumentRequest) (*usersvc.CreateDocumentResponse, error) {
 	logger := h.logger(ctx, "CreateDocument")
 
-	objectKey, imageType, err := dto.FromCreateDocumentRequest(req)
+	data, err := dto.FromCreateDocumentRequest(req)
 	if err != nil {
 		return nil, dto.ToStatusError(err)
 	}
 
-	id, err := h.userService.CreateDocument(ctx, objectKey, imageType)
+	id, err := h.userService.CreateDocument(ctx, data)
 	if err != nil {
 		logger.Error("creating document", pkglog.Err(err))
 		return nil, dto.ToStatusError(err)
@@ -228,12 +228,12 @@ func (h *UserHandler) GetProcessedDocumentsForUser(ctx context.Context, req *use
 func (h *UserHandler) CheckDocument(ctx context.Context, req *usersvc.CheckDocumentRequest) (*emptypb.Empty, error) {
 	logger := h.logger(ctx, "CheckDocument")
 
-	docID, status, docError, err := dto.FromCheckDocumentRequest(req)
+	docID, data, err := dto.FromCheckDocumentRequest(req)
 	if err != nil {
 		return nil, dto.ToStatusError(err)
 	}
 
-	if err := h.userService.CheckDocument(ctx, docID, status, docError); err != nil {
+	if err := h.userService.CheckDocument(ctx, docID, data); err != nil {
 		logger.Error("checking document", pkglog.Err(err))
 		return nil, dto.ToStatusError(err)
 	}

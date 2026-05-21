@@ -10,9 +10,10 @@ import (
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 	"carsharing/user-service/internal/model"
+	"carsharing/user-service/internal/validation"
 )
 
-func (s *UserService) CreateDocument(ctx context.Context, objectKey string, imageType model.ImageType) (string, error) {
+func (s *UserService) CreateDocument(ctx context.Context, data validation.DocumentCreate) (string, error) {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "CreateDocument"), utils.MetadataFromCtx(ctx))
 
 	userID, err := userIDFromCtx(ctx)
@@ -20,11 +21,15 @@ func (s *UserService) CreateDocument(ctx context.Context, objectKey string, imag
 		return "", err
 	}
 
+	if err := validation.ValidateInput(s.validate, data); err != nil {
+		return "", err
+	}
+
 	doc := model.Document{
 		UserID:    userID,
-		ImageType: imageType,
+		ImageType: model.ImageType(data.ImageType),
 		Status:    model.DocumentStatusPending,
-		Image:     &model.Image{Key: objectKey},
+		Image:     &model.Image{Key: data.ObjectKey},
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -35,7 +40,7 @@ func (s *UserService) CreateDocument(ctx context.Context, objectKey string, imag
 		return "", err
 	}
 
-	s.documentAnalyzer.Analyze(ctx, id, objectKey)
+	s.documentAnalyzer.Analyze(ctx, id, data.ObjectKey)
 
 	return id, nil
 }
@@ -88,8 +93,14 @@ func (s *UserService) GetProcessedDocumentsForUser(ctx context.Context, userID s
 	return docs, nil
 }
 
-func (s *UserService) CheckDocument(ctx context.Context, docID string, status model.DocumentStatus, docError *string) error {
+func (s *UserService) CheckDocument(ctx context.Context, docID string, data validation.DocumentUpdate) error {
 	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "CheckDocument"), utils.MetadataFromCtx(ctx))
+
+	if err := validation.ValidateInput(s.validate, data); err != nil {
+		return err
+	}
+
+	status := model.DocumentStatus(data.Status)
 
 	doc, err := s.docRepo.FindByID(ctx, docID)
 	if err != nil {
@@ -101,7 +112,7 @@ func (s *UserService) CheckDocument(ctx context.Context, docID string, status mo
 
 	if err := s.docRepo.Update(ctx, docID, model.DocumentUpdate{
 		Status:    &status,
-		Error:     docError,
+		Error:     data.Error,
 		UpdatedAt: time.Now(),
 	}); err != nil {
 		logger.Error("repo: updating document", pkglog.Err(err))
@@ -171,7 +182,7 @@ func (s *UserService) checkAndFlagDocumentVerified(ctx context.Context, logger *
 	}
 
 	isDocVerified := true
-	if err := s.userRepo.Update(ctx, userID, model.UserRepoUpdate{
+	if err := s.userRepo.Update(ctx, userID, model.UserUpdate{
 		IsDocumentVerified: &isDocVerified,
 		UpdatedAt:          time.Now(),
 	}); err != nil {

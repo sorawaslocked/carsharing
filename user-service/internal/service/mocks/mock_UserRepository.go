@@ -300,7 +300,7 @@ func (_c *MockUserRepository_Insert_Call) RunAndReturn(run func(context.Context,
 }
 
 // Update provides a mock function with given fields: ctx, id, update
-func (_m *MockUserRepository) Update(ctx context.Context, id string, update model.UserRepoUpdate) error {
+func (_m *MockUserRepository) Update(ctx context.Context, id string, update model.UserUpdate) error {
 	ret := _m.Called(ctx, id, update)
 
 	if len(ret) == 0 {
@@ -308,7 +308,7 @@ func (_m *MockUserRepository) Update(ctx context.Context, id string, update mode
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, model.UserRepoUpdate) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, model.UserUpdate) error); ok {
 		r0 = rf(ctx, id, update)
 	} else {
 		r0 = ret.Error(0)
@@ -325,14 +325,14 @@ type MockUserRepository_Update_Call struct {
 // Update is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id string
-//   - update model.UserRepoUpdate
+//   - update model.UserUpdate
 func (_e *MockUserRepository_Expecter) Update(ctx interface{}, id interface{}, update interface{}) *MockUserRepository_Update_Call {
 	return &MockUserRepository_Update_Call{Call: _e.mock.On("Update", ctx, id, update)}
 }
 
-func (_c *MockUserRepository_Update_Call) Run(run func(ctx context.Context, id string, update model.UserRepoUpdate)) *MockUserRepository_Update_Call {
+func (_c *MockUserRepository_Update_Call) Run(run func(ctx context.Context, id string, update model.UserUpdate)) *MockUserRepository_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(model.UserRepoUpdate))
+		run(args[0].(context.Context), args[1].(string), args[2].(model.UserUpdate))
 	})
 	return _c
 }
@@ -342,7 +342,7 @@ func (_c *MockUserRepository_Update_Call) Return(_a0 error) *MockUserRepository_
 	return _c
 }
 
-func (_c *MockUserRepository_Update_Call) RunAndReturn(run func(context.Context, string, model.UserRepoUpdate) error) *MockUserRepository_Update_Call {
+func (_c *MockUserRepository_Update_Call) RunAndReturn(run func(context.Context, string, model.UserUpdate) error) *MockUserRepository_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

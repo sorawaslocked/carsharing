@@ -53,9 +53,9 @@ func WhereClausesFromFilter(filter model.UserFilter, args []any, argNumber int) 
 	return clauses, args, argNumber
 }
 
-// SetClausesFromRepoUpdate builds parameterised SET clauses from a UserRepoUpdate.
+// SetClausesFromUpdate builds parameterised SET clauses from a UserUpdate.
 // Returns the clauses, accumulated args, and the next available argument index.
-func SetClausesFromRepoUpdate(update model.UserRepoUpdate) ([]string, []any, int) {
+func SetClausesFromUpdate(update model.UserUpdate) ([]string, []any, int) {
 	var clauses []string
 	var args []any
 	argNumber := 1

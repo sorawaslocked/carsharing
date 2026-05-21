@@ -1,6 +1,11 @@
 package model
 
-import "time"
+import (
+	"errors"
+	"time"
+)
+
+var ErrInvalidDocumentStatus = errors.New("must be \"approved\" or \"rejected\"")
 
 type DocumentStatus string
 

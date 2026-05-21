@@ -11,7 +11,7 @@ type UserRepository interface {
 	FindByID(ctx context.Context, id string) (model.User, error)
 	FindOne(ctx context.Context, filter model.UserFilter) (model.User, error)
 	Find(ctx context.Context, filter model.UserFilter) ([]model.User, error)
-	Update(ctx context.Context, id string, update model.UserRepoUpdate) error
+	Update(ctx context.Context, id string, update model.UserUpdate) error
 	Delete(ctx context.Context, id string) error
 }
 

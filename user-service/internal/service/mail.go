@@ -9,6 +9,7 @@ import (
 	"carsharing/shared/pkg/utils"
 	"carsharing/user-service/internal/model"
 	"carsharing/user-service/internal/pkg/security"
+	"carsharing/user-service/internal/validation"
 )
 
 func (s *UserService) SendActivationCode(ctx context.Context) error {
@@ -61,25 +62,25 @@ func (s *UserService) CheckActivationCode(ctx context.Context, code string) erro
 		return model.ErrAlreadyExists
 	}
 
-	if err := validateInput(s.validate, &activationCodeValidation{Code: code}); err != nil {
+	if err := validation.ValidateActivationCode(s.validate, code); err != nil {
 		return err
 	}
 
 	codeHash, err := s.activationCodeStorage.Get(ctx, userID)
 	if err != nil {
 		if errors.Is(err, model.ErrNotFound) {
-			return model.ValidationErrors{"code": model.ErrInvalidActivationCode}
+			return validation.Errors{"code": validation.ErrInvalidActivationCode}
 		}
 		logger.Error("redis: getting activation code", pkglog.Err(err))
 		return err
 	}
 
 	if err := security.CheckStringHash(code, codeHash); err != nil {
-		return model.ValidationErrors{"code": model.ErrInvalidActivationCode}
+		return validation.Errors{"code": validation.ErrInvalidActivationCode}
 	}
 
 	isEmailVerified := true
-	if err := s.userRepo.Update(ctx, userID, model.UserRepoUpdate{
+	if err := s.userRepo.Update(ctx, userID, model.UserUpdate{
 		IsEmailVerified: &isEmailVerified,
 		UpdatedAt:       time.Now(),
 	}); err != nil {

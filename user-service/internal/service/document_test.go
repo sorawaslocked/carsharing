@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"carsharing/user-service/internal/model"
+	"carsharing/user-service/internal/validation"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -25,7 +26,7 @@ func TestCreateDocument_Success(t *testing.T) {
 	})).Return(testDocID, nil)
 	d.analyzer.EXPECT().Analyze(ctx, testDocID, testObjKey)
 
-	id, err := svc.CreateDocument(ctx, testObjKey, model.ImageTypeIDFront)
+	id, err := svc.CreateDocument(ctx, validation.DocumentCreate{ObjectKey: testObjKey, ImageType: testImgType})
 
 	require.NoError(t, err)
 	assert.Equal(t, testDocID, id)
@@ -35,7 +36,7 @@ func TestCreateDocument_NoUserIDInCtx(t *testing.T) {
 	d := newDeps(t)
 	svc := newService(t, d)
 
-	_, err := svc.CreateDocument(ctxAnon(), testObjKey, model.ImageTypeIDFront)
+	_, err := svc.CreateDocument(ctxAnon(), validation.DocumentCreate{ObjectKey: testObjKey, ImageType: testImgType})
 
 	assert.ErrorIs(t, err, model.ErrUnauthenticated)
 }
@@ -108,7 +109,7 @@ func TestCheckDocument_Rejected(t *testing.T) {
 		return u.Status != nil && *u.Status == rejected && u.Error != nil && *u.Error == errMsg
 	})).Return(nil)
 
-	err := svc.CheckDocument(ctx, testDocID, rejected, ptr(errMsg))
+	err := svc.CheckDocument(ctx, testDocID, validation.DocumentUpdate{Status: "rejected", Error: ptr(errMsg)})
 
 	require.NoError(t, err)
 }
@@ -128,7 +129,7 @@ func TestCheckDocument_Approved_NotAllTypesPresent(t *testing.T) {
 	d.docRepo.EXPECT().Find(ctx, model.DocumentFilter{UserID: ptr(testUserID), LatestPerType: true}).
 		Return([]model.Document{doc}, nil)
 
-	err := svc.CheckDocument(ctx, testDocID, approved, nil)
+	err := svc.CheckDocument(ctx, testDocID, validation.DocumentUpdate{Status: "approved"})
 
 	require.NoError(t, err)
 }
@@ -137,7 +138,6 @@ func TestCheckDocument_Approved_AllTypesApproved_SetsVerified(t *testing.T) {
 	d := newDeps(t)
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
-	approved := model.DocumentStatusApproved
 
 	doc := model.Document{ID: testDocID, UserID: testUserID, Status: model.DocumentStatusPending, ImageType: model.ImageTypeIDFront}
 
@@ -149,16 +149,16 @@ func TestCheckDocument_Approved_AllTypesApproved_SetsVerified(t *testing.T) {
 
 	d.docRepo.EXPECT().FindByID(ctx, testDocID).Return(doc, nil)
 	d.docRepo.EXPECT().Update(ctx, testDocID, mock.MatchedBy(func(u model.DocumentUpdate) bool {
-		return u.Status != nil && *u.Status == approved
+		return u.Status != nil && *u.Status == model.DocumentStatusApproved
 	})).Return(nil)
 	d.docRepo.EXPECT().Find(ctx, model.DocumentFilter{UserID: ptr(testUserID), LatestPerType: true}).
 		Return(allApproved, nil)
-	d.userRepo.EXPECT().Update(ctx, testUserID, mock.MatchedBy(func(u model.UserRepoUpdate) bool {
+	d.userRepo.EXPECT().Update(ctx, testUserID, mock.MatchedBy(func(u model.UserUpdate) bool {
 		return u.IsDocumentVerified != nil && *u.IsDocumentVerified
 	})).Return(nil)
 	d.publisher.EXPECT().PublishUserUpdated(ctx, testUserID, false).Return(nil)
 
-	err := svc.CheckDocument(ctx, testDocID, approved, nil)
+	err := svc.CheckDocument(ctx, testDocID, validation.DocumentUpdate{Status: "approved"})
 
 	require.NoError(t, err)
 }
@@ -170,7 +170,7 @@ func TestCheckDocument_NotFound(t *testing.T) {
 
 	d.docRepo.EXPECT().FindByID(ctx, testDocID).Return(model.Document{}, model.ErrNotFound)
 
-	err := svc.CheckDocument(ctx, testDocID, model.DocumentStatusApproved, nil)
+	err := svc.CheckDocument(ctx, testDocID, validation.DocumentUpdate{Status: "approved"})
 
 	assert.ErrorIs(t, err, model.ErrNotFound)
 }
@@ -235,7 +235,6 @@ func TestCheckDocument_UpdateTimestampSet(t *testing.T) {
 	d := newDeps(t)
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
-	rejected := model.DocumentStatusRejected
 	doc := model.Document{ID: testDocID, UserID: testUserID, Status: model.DocumentStatusPending, ImageType: model.ImageTypeIDFront}
 
 	d.docRepo.EXPECT().FindByID(ctx, testDocID).Return(doc, nil)
@@ -243,7 +242,7 @@ func TestCheckDocument_UpdateTimestampSet(t *testing.T) {
 		return !u.UpdatedAt.IsZero() && u.UpdatedAt.Before(time.Now().Add(time.Second))
 	})).Return(nil)
 
-	err := svc.CheckDocument(ctx, testDocID, rejected, nil)
+	err := svc.CheckDocument(ctx, testDocID, validation.DocumentUpdate{Status: "rejected"})
 
 	require.NoError(t, err)
 }

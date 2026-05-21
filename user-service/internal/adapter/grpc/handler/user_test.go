@@ -15,6 +15,7 @@ import (
 	"carsharing/user-service/internal/adapter/grpc/handler"
 	"carsharing/user-service/internal/adapter/grpc/handler/mocks"
 	"carsharing/user-service/internal/model"
+	"carsharing/user-service/internal/validation"
 	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -93,7 +94,7 @@ func TestCreateUser_Success(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxWithUser(testUserID)
 
-	svc.EXPECT().Create(ctx, model.UserCreate{
+	svc.EXPECT().Create(ctx, validation.UserCreate{
 		Email:                testEmail,
 		FirstName:            testFName,
 		LastName:             testLName,
@@ -132,7 +133,7 @@ func TestCreateUser_ServiceError_DuplicateEmail(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxWithUser(testUserID)
 
-	svc.EXPECT().Create(ctx, model.UserCreate{
+	svc.EXPECT().Create(ctx, validation.UserCreate{
 		Email:                testEmail,
 		FirstName:            testFName,
 		LastName:             testLName,
@@ -241,7 +242,7 @@ func TestUpdateUser_Success(t *testing.T) {
 	ctx := ctxWithUser(testUserID)
 	newName := "Jane"
 
-	svc.EXPECT().Update(ctx, testUserID, model.UserUpdate{FirstName: &newName}).Return(nil)
+	svc.EXPECT().Update(ctx, testUserID, validation.UserUpdate{FirstName: &newName}).Return(nil)
 
 	_, err := h.UpdateUser(ctx, &usersvc.UpdateUserRequest{Id: testUserID, FirstName: &newName})
 
@@ -253,7 +254,7 @@ func TestUpdateUser_NotFound(t *testing.T) {
 	ctx := ctxWithUser(testUserID)
 	newName := "Jane"
 
-	svc.EXPECT().Update(ctx, testUserID, model.UserUpdate{FirstName: &newName}).Return(model.ErrNotFound)
+	svc.EXPECT().Update(ctx, testUserID, validation.UserUpdate{FirstName: &newName}).Return(model.ErrNotFound)
 
 	_, err := h.UpdateUser(ctx, &usersvc.UpdateUserRequest{Id: testUserID, FirstName: &newName})
 
@@ -300,7 +301,7 @@ func TestRegister_Success(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxAnon()
 
-	svc.EXPECT().Register(ctx, model.UserCreate{
+	svc.EXPECT().Register(ctx, validation.UserCreate{
 		Email:                testEmail,
 		FirstName:            testFName,
 		LastName:             testLName,
@@ -389,7 +390,7 @@ func TestCheckActivationCode_Success(t *testing.T) {
 func TestCheckActivationCode_InvalidCode(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxWithUser(testUserID)
-	ve := model.ValidationErrors{"code": model.ErrInvalidActivationCode}
+	ve := validation.Errors{"code": validation.ErrInvalidActivationCode}
 
 	svc.EXPECT().CheckActivationCode(ctx, testCode).Return(ve)
 
@@ -421,7 +422,7 @@ func TestCreateDocument_Success(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxWithUser(testUserID)
 
-	svc.EXPECT().CreateDocument(ctx, testObjKey, model.ImageTypeIDFront).Return(testDocID, nil)
+	svc.EXPECT().CreateDocument(ctx, validation.DocumentCreate{ObjectKey: testObjKey, ImageType: testImgType}).Return(testDocID, nil)
 
 	resp, err := h.CreateDocument(ctx, &usersvc.CreateDocumentRequest{
 		ObjectKey: testObjKey,
@@ -504,7 +505,7 @@ func TestCheckDocument_Success(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxWithUser(testUserID)
 
-	svc.EXPECT().CheckDocument(ctx, testDocID, model.DocumentStatusApproved, (*string)(nil)).Return(nil)
+	svc.EXPECT().CheckDocument(ctx, testDocID, validation.DocumentUpdate{Status: "approved"}).Return(nil)
 
 	_, err := h.CheckDocument(ctx, &usersvc.CheckDocumentRequest{
 		DocId:  testDocID,
@@ -519,7 +520,7 @@ func TestCheckDocument_WithError(t *testing.T) {
 	ctx := ctxWithUser(testUserID)
 	errMsg := ptr("blurry image")
 
-	svc.EXPECT().CheckDocument(ctx, testDocID, model.DocumentStatusRejected, errMsg).Return(nil)
+	svc.EXPECT().CheckDocument(ctx, testDocID, validation.DocumentUpdate{Status: "rejected", Error: errMsg}).Return(nil)
 
 	_, err := h.CheckDocument(ctx, &usersvc.CheckDocumentRequest{
 		DocId:  testDocID,

@@ -16,20 +16,48 @@ import (
 	"carsharing/user-service/internal/model"
 
 	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 type ObjectStorage struct {
-	log    *slog.Logger
-	client *minio.Client
-	cfg    pkgminio.Config
+	log           *slog.Logger
+	client        *minio.Client
+	presignClient *minio.Client // signs URLs with PublicEndpoint so the host in the signature matches the URL the caller uses
+	cfg           pkgminio.Config
 }
 
-func NewObjectStorage(log *slog.Logger, client *minio.Client, cfg pkgminio.Config) *ObjectStorage {
-	return &ObjectStorage{
-		log:    pkglog.WithComponent(log, "ObjectStorage"),
-		client: client,
-		cfg:    cfg,
+func NewObjectStorage(log *slog.Logger, client *minio.Client, cfg pkgminio.Config) (*ObjectStorage, error) {
+	log = pkglog.WithComponent(log, "ObjectStorage")
+
+	var presignClient *minio.Client
+	if cfg.PublicEndpoint != "" {
+		c, err := minio.New(cfg.PublicEndpoint, &minio.Options{
+			Creds:  credentials.NewStaticV4(cfg.AccessKeyID, cfg.SecretAccessKey, ""),
+			Secure: cfg.UseSSL,
+		})
+		if err != nil {
+			log.Error("creating presign client for public endpoint", pkglog.Err(err), slog.String("public_endpoint", cfg.PublicEndpoint))
+			return nil, err
+		}
+		presignClient = c
 	}
+
+	return &ObjectStorage{
+		log:           log,
+		client:        client,
+		presignClient: presignClient,
+		cfg:           cfg,
+	}, nil
+}
+
+// presigner returns the client to use for generating presigned URLs.
+// When PublicEndpoint is configured, this is a separate client whose endpoint
+// matches the host clients will actually reach, so the HMAC signature is valid.
+func (s *ObjectStorage) presigner() *minio.Client {
+	if s.presignClient != nil {
+		return s.presignClient
+	}
+	return s.client
 }
 
 func (s *ObjectStorage) GetDocumentImageUploadData(ctx context.Context, imageType string) (sharedmodel.ImageUploadData, error) {
@@ -37,7 +65,7 @@ func (s *ObjectStorage) GetDocumentImageUploadData(ctx context.Context, imageTyp
 
 	objectKey := newObjectKey("documents/" + imageType)
 
-	presignedURL, err := s.client.PresignedPutObject(ctx, s.cfg.Bucket, objectKey, s.cfg.PresignedPutExpiry)
+	presignedURL, err := s.presigner().PresignedPutObject(ctx, s.cfg.Bucket, objectKey, s.cfg.PresignedPutExpiry)
 	if err != nil {
 		log.Error("generating presigned put url", pkglog.Err(err))
 
@@ -45,7 +73,7 @@ func (s *ObjectStorage) GetDocumentImageUploadData(ctx context.Context, imageTyp
 	}
 
 	return sharedmodel.ImageUploadData{
-		PresignedPutURL: s.publicURL(presignedURL).String(),
+		PresignedPutURL: presignedURL.String(),
 		ObjectKey:       objectKey,
 	}, nil
 }
@@ -55,7 +83,7 @@ func (s *ObjectStorage) GetUserProfileImageUploadData(ctx context.Context) (shar
 
 	objectKey := newObjectKey("users")
 
-	presignedURL, err := s.client.PresignedPutObject(ctx, s.cfg.Bucket, objectKey, s.cfg.PresignedPutExpiry)
+	presignedURL, err := s.presigner().PresignedPutObject(ctx, s.cfg.Bucket, objectKey, s.cfg.PresignedPutExpiry)
 	if err != nil {
 		log.Error("generating presigned put url", pkglog.Err(err))
 
@@ -63,7 +91,7 @@ func (s *ObjectStorage) GetUserProfileImageUploadData(ctx context.Context) (shar
 	}
 
 	return sharedmodel.ImageUploadData{
-		PresignedPutURL: s.publicURL(presignedURL).String(),
+		PresignedPutURL: presignedURL.String(),
 		ObjectKey:       objectKey,
 	}, nil
 }
@@ -71,25 +99,14 @@ func (s *ObjectStorage) GetUserProfileImageUploadData(ctx context.Context) (shar
 func (s *ObjectStorage) GetImageURL(ctx context.Context, objectKey string) (string, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetImageURL"), utils.MetadataFromCtx(ctx))
 
-	presignedURL, err := s.client.PresignedGetObject(ctx, s.cfg.Bucket, objectKey, s.cfg.PresignedGetExpiry, url.Values{})
+	presignedURL, err := s.presigner().PresignedGetObject(ctx, s.cfg.Bucket, objectKey, s.cfg.PresignedGetExpiry, url.Values{})
 	if err != nil {
 		log.Error("generating presigned get url", pkglog.Err(err))
 
 		return "", model.ErrObjectStorage
 	}
 
-	return s.publicURL(presignedURL).String(), nil
-}
-
-// publicURL rewrites the host to PublicEndpoint when configured, so clients
-// outside Docker receive a resolvable address instead of the internal service name.
-func (s *ObjectStorage) publicURL(u *url.URL) *url.URL {
-	if s.cfg.PublicEndpoint == "" {
-		return u
-	}
-	rewritten := *u
-	rewritten.Host = s.cfg.PublicEndpoint
-	return &rewritten
+	return presignedURL.String(), nil
 }
 
 // newObjectKey returns "{prefix}/{unix_timestamp}_{random_hex}".

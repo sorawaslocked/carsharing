@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import Any
 
@@ -39,10 +40,27 @@ class Config(BaseModel):
     analyzer: AnalyzerConfig = AnalyzerConfig()
 
 
+def _parse_bool(value: str) -> bool:
+    return value.lower() in ("1", "true", "yes")
+
+
 def load_config(path: str | Path = "config/config.yaml") -> Config:
     path = Path(path)
-    if not path.exists():
-        return Config()
-    with path.open() as f:
-        data: dict[str, Any] = yaml.safe_load(f) or {}
+    data: dict[str, Any] = {}
+    if path.exists():
+        with path.open() as f:
+            data = yaml.safe_load(f) or {}
+
+    minio: dict[str, Any] = data.get("minio", {})
+    if (v := os.getenv("MINIO_ENDPOINT")) is not None:
+        minio["endpoint"] = v
+    if (v := os.getenv("MINIO_USE_SSL")) is not None:
+        minio["secure"] = _parse_bool(v)
+    if (v := os.getenv("MINIO_ACCESS_KEY_ID")) is not None:
+        minio["access_key"] = v
+    if (v := os.getenv("MINIO_SECRET_ACCESS_KEY")) is not None:
+        minio["secret_key"] = v
+    if minio:
+        data["minio"] = minio
+
     return Config(**data)

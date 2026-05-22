@@ -8,7 +8,7 @@ minio:
   access_key: "minioadmin"
   secret_key: "minioadmin"
   secure: false
-  bucket: "car-rental"
+  bucket: "carsharing"
 
 nats:
   url: "nats://nats:4222"

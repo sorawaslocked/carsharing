@@ -117,6 +117,9 @@ func (s *UserService) CheckDocument(ctx context.Context, docID string, data vali
 	}
 
 	status := model.DocumentStatus(data.Status)
+	if status != model.DocumentStatusApproved && status != model.DocumentStatusRejected {
+		return validation.Errors{"status": validation.ErrDocumentStatusNotReviewable}
+	}
 
 	doc, err := s.docRepo.FindByID(ctx, docID)
 	if err != nil {

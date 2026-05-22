@@ -560,3 +560,18 @@ func TestCheckDocument_InvalidStatus(t *testing.T) {
 
 	assert.Equal(t, codes.InvalidArgument, grpcCode(err))
 }
+
+func TestCheckDocument_NonReviewableStatus(t *testing.T) {
+	h, svc := newHandler(t)
+	ctx := ctxWithUser(testUserID)
+
+	svc.EXPECT().CheckDocument(ctx, testDocID, validation.DocumentUpdate{Status: "pending"}).
+		Return(validation.Errors{"status": validation.ErrDocumentStatusNotReviewable})
+
+	_, err := h.CheckDocument(ctx, &usersvc.CheckDocumentRequest{
+		DocId:  testDocID,
+		Status: "pending",
+	})
+
+	assert.Equal(t, codes.InvalidArgument, grpcCode(err))
+}

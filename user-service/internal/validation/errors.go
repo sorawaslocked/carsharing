@@ -45,6 +45,7 @@ var (
 
 // Document
 var (
-	ErrInvalidDocumentStatus = errors.New("must be a valid document status")
-	ErrInvalidImageType      = errors.New("must be a valid image type")
+	ErrInvalidDocumentStatus       = errors.New("must be a valid document status")
+	ErrInvalidImageType            = errors.New("must be a valid image type")
+	ErrDocumentStatusNotReviewable = errors.New("must be approved or rejected")
 )

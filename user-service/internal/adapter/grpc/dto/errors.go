@@ -43,8 +43,6 @@ func ToStatusError(err error) error {
 		errors.Is(err, model.ErrDuplicatePhone),
 		errors.Is(err, model.ErrAlreadyExists):
 		return status.Error(codes.AlreadyExists, err.Error())
-	case errors.Is(err, model.ErrNoUpdateFields):
-		return status.Error(codes.InvalidArgument, err.Error())
 	case errors.Is(err, model.ErrActivationCodeResendTooSoon):
 		return status.Error(codes.ResourceExhausted, err.Error())
 	case errors.Is(err, validation.ErrInvalidEmail):

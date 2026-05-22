@@ -231,6 +231,30 @@ func TestHandleDocumentAnalyzed_DocumentNotFound(t *testing.T) {
 	assert.ErrorIs(t, err, model.ErrNotFound)
 }
 
+func TestCheckDocument_InvalidStatus_Pending(t *testing.T) {
+	d := newDeps(t)
+	svc := newService(t, d)
+	ctx := ctxWithUser(testUserID)
+
+	err := svc.CheckDocument(ctx, testDocID, validation.DocumentUpdate{Status: "pending"})
+
+	var ve validation.Errors
+	require.ErrorAs(t, err, &ve)
+	assert.ErrorIs(t, ve["status"], validation.ErrDocumentStatusNotReviewable)
+}
+
+func TestCheckDocument_InvalidStatus_Processed(t *testing.T) {
+	d := newDeps(t)
+	svc := newService(t, d)
+	ctx := ctxWithUser(testUserID)
+
+	err := svc.CheckDocument(ctx, testDocID, validation.DocumentUpdate{Status: "processed"})
+
+	var ve validation.Errors
+	require.ErrorAs(t, err, &ve)
+	assert.ErrorIs(t, ve["status"], validation.ErrDocumentStatusNotReviewable)
+}
+
 // Ensure timestamps in DocumentUpdate are not zero.
 func TestCheckDocument_UpdateTimestampSet(t *testing.T) {
 	d := newDeps(t)

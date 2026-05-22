@@ -6,31 +6,25 @@ import (
 
 	"carsharing/car-service/internal/adapter/grpc/dto"
 	"carsharing/car-service/internal/model"
-	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 
 	"google.golang.org/grpc"
 )
 
-type methodPolicy struct {
-	public       bool
-	allowedRoles []sharedmodel.Role
-}
-
-type AuthInterceptor struct {
+type Interceptor struct {
 	log      *slog.Logger
 	policies map[string]methodPolicy
 }
 
-func NewAuthInterceptor(log *slog.Logger) *AuthInterceptor {
-	return &AuthInterceptor{
-		log:      pkglog.WithComponent(log, "grpc.AuthInterceptor"),
+func NewInterceptor(log *slog.Logger) *Interceptor {
+	return &Interceptor{
+		log:      pkglog.WithComponent(log, "grpc.interceptor.auth.Interceptor"),
 		policies: buildPolicies(),
 	}
 }
 
-func (i *AuthInterceptor) Unary(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+func (i *Interceptor) Unary(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 	md := utils.MetadataFromCtx(ctx)
 	log := pkglog.WithMetadata(pkglog.WithMethod(i.log, info.FullMethod), md)
 
@@ -62,5 +56,6 @@ func (i *AuthInterceptor) Unary(ctx context.Context, req any, info *grpc.UnarySe
 	}
 
 	log.Warn("permission denied", slog.Any("userRoles", md.UserRoles))
+
 	return nil, dto.FromErrorToStatusCode(model.ErrInsufficientPermissions)
 }

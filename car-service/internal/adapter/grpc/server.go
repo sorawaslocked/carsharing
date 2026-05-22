@@ -6,68 +6,47 @@ import (
 	"carsharing/car-service/internal/adapter/grpc/handler"
 	"carsharing/car-service/internal/adapter/grpc/interceptor"
 	authinterceptor "carsharing/car-service/internal/adapter/grpc/interceptor/auth"
+	pkggrpc "carsharing/shared/pkg/grpc"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 )
-
-type Server struct {
-	s   *grpc.Server
-	log *slog.Logger
-}
 
 func NewServer(
 	log *slog.Logger,
+	cfg pkggrpc.ServerConfig,
 	carModelService handler.CarModelService,
 	carService handler.CarService,
 	carInsuranceService handler.CarInsuranceService,
 	carMaintenanceService handler.CarMaintenanceService,
 	zoneService handler.ZoneService,
 	telematicsSubscriber handler.TelematicsSubscriber,
-	dbPinger handler.DBPinger,
-	natsChecker handler.NATSChecker,
-) *Server {
-	server := &Server{log: log}
-
-	server.register(
-		carModelService, carService, carInsuranceService, carMaintenanceService, zoneService,
-		telematicsSubscriber, dbPinger, natsChecker,
-		log,
-	)
-
-	return server
-}
-
-func (s *Server) GRPCServer() *grpc.Server {
-	return s.s
-}
-
-func (s *Server) register(
-	carModelService handler.CarModelService,
-	carService handler.CarService,
-	carInsuranceService handler.CarInsuranceService,
-	carMaintenanceService handler.CarMaintenanceService,
-	zoneService handler.ZoneService,
-	telematicsSubscriber handler.TelematicsSubscriber,
-	dbPinger handler.DBPinger,
-	natsChecker handler.NATSChecker,
-	log *slog.Logger,
-) {
+	healthHandler *handler.HealthHandler,
+) (*grpc.Server, error) {
 	baseInterceptor := interceptor.NewBaseInterceptor()
-	authInterceptor := authinterceptor.NewAuthInterceptor(log)
+	loggerInterceptor := interceptor.NewLoggerInterceptor(log)
+	authInterceptor := authinterceptor.NewInterceptor(log)
 
-	s.s = grpc.NewServer(grpc.ChainUnaryInterceptor(
-		baseInterceptor.Unary,
-		authInterceptor.Unary,
-	))
+	s, err := pkggrpc.NewServer(
+		log,
+		cfg,
+		grpc.ChainUnaryInterceptor(
+			baseInterceptor.Unary,
+			loggerInterceptor.Unary,
+			authInterceptor.Unary,
+		),
+		grpc.ChainStreamInterceptor(),
+	)
+	if err != nil {
+		return nil, err
+	}
 
-	carsvc.RegisterCarModelServiceServer(s.s, handler.NewCarModelHandler(carModelService, log))
-	carsvc.RegisterCarServiceServer(s.s, handler.NewCarHandler(carService, log))
-	carsvc.RegisterCarInsuranceServiceServer(s.s, handler.NewCarInsuranceHandler(carInsuranceService, log))
-	carsvc.RegisterCarMaintenanceServiceServer(s.s, handler.NewCarMaintenanceHandler(carMaintenanceService, log))
-	carsvc.RegisterZoneServiceServer(s.s, handler.NewZoneHandler(zoneService, log))
-	carsvc.RegisterCarStreamServiceServer(s.s, handler.NewCarStreamHandler(carService, telematicsSubscriber, log))
-	carsvc.RegisterHealthServiceServer(s.s, handler.NewHealthHandler(dbPinger, natsChecker, log))
+	carsvc.RegisterCarModelServiceServer(s, handler.NewCarModelHandler(carModelService, log))
+	carsvc.RegisterCarServiceServer(s, handler.NewCarHandler(carService, log))
+	carsvc.RegisterCarInsuranceServiceServer(s, handler.NewCarInsuranceHandler(carInsuranceService, log))
+	carsvc.RegisterCarMaintenanceServiceServer(s, handler.NewCarMaintenanceHandler(carMaintenanceService, log))
+	carsvc.RegisterZoneServiceServer(s, handler.NewZoneHandler(zoneService, log))
+	carsvc.RegisterCarStreamServiceServer(s, handler.NewCarStreamHandler(carService, telematicsSubscriber, log))
+	carsvc.RegisterHealthServiceServer(s, healthHandler)
 
-	reflection.Register(s.s)
+	return s, nil
 }

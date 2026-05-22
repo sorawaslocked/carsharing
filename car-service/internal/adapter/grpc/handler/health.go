@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"time"
 
+	pkglog "carsharing/shared/pkg/log"
 	svcpb "github.com/sorawaslocked/car-rental-protos/gen/service"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -12,47 +13,33 @@ import (
 )
 
 type HealthHandler struct {
-	startTime   time.Time
-	db          DBPinger
-	natsChecker NATSChecker
-
-	log *slog.Logger
-
+	log       *slog.Logger
+	deps      map[string]Pinger
+	startTime time.Time
 	carsvc.UnimplementedHealthServiceServer
 }
 
-func NewHealthHandler(db DBPinger, natsChecker NATSChecker, log *slog.Logger) *HealthHandler {
+func NewHealthHandler(log *slog.Logger, deps map[string]Pinger) *HealthHandler {
 	return &HealthHandler{
-		startTime:   time.Now(),
-		db:          db,
-		natsChecker: natsChecker,
-		log: log.With(
-			slog.Group("src",
-				slog.String("component", "HealthHandler"),
-			),
-		),
+		log:       pkglog.WithComponent(log, "grpc.handler.HealthHandler"),
+		deps:      deps,
+		startTime: time.Now(),
 	}
 }
 
 func (h *HealthHandler) Health(ctx context.Context, _ *emptypb.Empty) (*svcpb.ServiceHealthResponse, error) {
-	status := "ok"
+	overallStatus := "healthy"
 
-	pingCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
-	defer cancel()
-
-	if err := h.db.Ping(pingCtx); err != nil {
-		h.log.Error("postgres health check failed", slog.String("error", err.Error()))
-		status = "degraded"
-	}
-
-	if !h.natsChecker.IsConnected() {
-		h.log.Error("nats health check failed: not connected")
-		status = "degraded"
+	for name, pinger := range h.deps {
+		if err := pinger.Ping(ctx); err != nil {
+			overallStatus = "unhealthy"
+			h.log.Error("dependency unhealthy", slog.String("dep", name), pkglog.Err(err))
+		}
 	}
 
 	return &svcpb.ServiceHealthResponse{
 		Name:          "car-service",
-		Status:        status,
+		Status:        overallStatus,
 		Timestamp:     timestamppb.Now(),
 		UptimeSeconds: uint64(time.Since(h.startTime).Seconds()),
 	}, nil

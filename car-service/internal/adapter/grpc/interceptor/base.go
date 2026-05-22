@@ -13,10 +13,10 @@ import (
 )
 
 const (
-	mdKeyRequestID = "x-request-id"
-	mdKeyClientIP  = "x-client-ip"
-	mdKeyUserID    = "x-user-id"
-	mdKeyUserRoles = "x-user-roles"
+	CtxRequestIDKey = "x-request-id"
+	CtxClientIPKey  = "x-client-ip"
+	CtxUserIDKey    = "x-user-id"
+	CtxUserRolesKey = "x-user-roles"
 )
 
 type BaseInterceptor struct{}
@@ -26,35 +26,44 @@ func NewBaseInterceptor() *BaseInterceptor {
 }
 
 func (i *BaseInterceptor) Unary(ctx context.Context, req any, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return nil, dto.FromErrorToStatusCode(model.ErrMissingMetadata)
-	}
+	md, _ := metadata.FromIncomingContext(ctx)
 
-	ctx = context.WithValue(ctx, mdKeyRequestID, firstVal(md.Get(mdKeyRequestID)))
-	ctx = context.WithValue(ctx, mdKeyClientIP, firstVal(md.Get(mdKeyClientIP)))
-	ctx = context.WithValue(ctx, mdKeyUserID, firstVal(md.Get(mdKeyUserID)))
-	ctx = context.WithValue(ctx, mdKeyUserRoles, parseRoles(firstVal(md.Get(mdKeyUserRoles))))
+	ctx = context.WithValue(ctx, CtxRequestIDKey, stringFromMD(md, "x-request-id"))
+	ctx = context.WithValue(ctx, CtxClientIPKey, stringFromMD(md, "x-client-ip"))
+
+	if userID := stringFromMD(md, "x-user-id"); userID != "" {
+		ctx = context.WithValue(ctx, CtxUserIDKey, userID)
+	}
+	if roleStrs := stringsFromMD(md, "x-user-roles"); len(roleStrs) > 0 {
+		roles := make([]sharedmodel.Role, len(roleStrs))
+		for i, s := range roleStrs {
+			role, ok := sharedmodel.RoleFromString(s)
+			if !ok {
+				return nil, dto.FromErrorToStatusCode(model.ErrInvalidMetadata)
+			}
+			roles[i] = role
+		}
+		ctx = context.WithValue(ctx, CtxUserRolesKey, roles)
+	}
 
 	return handler(ctx, req)
 }
 
-func firstVal(vals []string) string {
-	if len(vals) > 0 {
-		return vals[0]
+func stringFromMD(md metadata.MD, key string) string {
+	if values := md.Get(key); len(values) > 0 {
+		return values[0]
 	}
 	return ""
 }
 
-func parseRoles(s string) []sharedmodel.Role {
-	if s == "" {
+func stringsFromMD(md metadata.MD, key string) []string {
+	values := md.Get(key)
+	if len(values) == 0 {
 		return nil
 	}
-	var roles []sharedmodel.Role
-	for _, r := range strings.Split(s, ",") {
-		if r = strings.TrimSpace(r); r != "" {
-			roles = append(roles, sharedmodel.Role(r))
-		}
+	// x-user-roles is comma-separated: "admin,user"
+	if len(values) == 1 {
+		return strings.Split(values[0], ",")
 	}
-	return roles
+	return values
 }

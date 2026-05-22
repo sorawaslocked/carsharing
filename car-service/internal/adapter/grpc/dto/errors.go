@@ -18,7 +18,7 @@ func FromErrorToStatusCode(err error) error {
 	}
 
 	switch {
-	case errors.Is(err, model.ErrMissingMetadata):
+	case errors.Is(err, model.ErrInvalidMetadata):
 		return status.Error(codes.InvalidArgument, err.Error())
 
 	case errors.Is(err, model.ErrUnauthenticated):

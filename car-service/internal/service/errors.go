@@ -43,7 +43,7 @@ func handleError(logger *slog.Logger, err error) error {
 	}
 
 	switch {
-	case errors.Is(err, model.ErrMissingMetadata):
+	case errors.Is(err, model.ErrInvalidMetadata):
 		logger.Error("invalid request source", log.Err(err))
 
 		return err

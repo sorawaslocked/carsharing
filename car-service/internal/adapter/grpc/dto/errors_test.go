@@ -21,7 +21,7 @@ func TestFromErrorToStatusCode(t *testing.T) {
 		{"not found", model.ErrNotFound, codes.NotFound},
 		{"conflict", model.ErrConflict, codes.AlreadyExists},
 		{"internal server error", model.ErrInternalServerError, codes.Internal},
-		{"missing metadata", model.ErrMissingMetadata, codes.InvalidArgument},
+		{"invalid metadata", model.ErrInvalidMetadata, codes.InvalidArgument},
 		{"unauthenticated", model.ErrUnauthenticated, codes.Unauthenticated},
 		{"unauthorized", model.ErrUnauthorized, codes.PermissionDenied},
 		{"insufficient permissions", model.ErrInsufficientPermissions, codes.PermissionDenied},

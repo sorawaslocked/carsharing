@@ -10,12 +10,8 @@ type TelematicsSubscriber interface {
 	SubscribeCarStream(ctx context.Context, carID string) (<-chan model.TelematicsUpdate, error)
 }
 
-type DBPinger interface {
+type Pinger interface {
 	Ping(ctx context.Context) error
-}
-
-type NATSChecker interface {
-	IsConnected() bool
 }
 
 type CarModelService interface {

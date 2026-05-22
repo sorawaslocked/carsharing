@@ -14,66 +14,56 @@ import (
 func TestHealthHandlerHealth(t *testing.T) {
 	ctx := context.Background()
 
-	t.Run("ok when db ping and nats both healthy", func(t *testing.T) {
-		db := mocks.NewMockDBPinger(t)
-		nats := mocks.NewMockNATSChecker(t)
-		h := NewHealthHandler(db, nats, discardLogger())
+	t.Run("healthy when all deps ping successfully", func(t *testing.T) {
+		pg := mocks.NewMockPinger(t)
+		nc := mocks.NewMockPinger(t)
+		h := NewHealthHandler(discardLogger(), map[string]Pinger{"postgres": pg, "nats": nc})
 
-		db.EXPECT().Ping(mock.Anything).Return(nil)
-		nats.EXPECT().IsConnected().Return(true)
+		pg.EXPECT().Ping(mock.Anything).Return(nil)
+		nc.EXPECT().Ping(mock.Anything).Return(nil)
 
 		resp, err := h.Health(ctx, &emptypb.Empty{})
 		assert.NoError(t, err)
-		assert.Equal(t, "ok", resp.Status)
+		assert.Equal(t, "healthy", resp.Status)
 		assert.Equal(t, "car-service", resp.Name)
 	})
 
-	t.Run("degraded when db ping fails", func(t *testing.T) {
-		db := mocks.NewMockDBPinger(t)
-		nats := mocks.NewMockNATSChecker(t)
-		h := NewHealthHandler(db, nats, discardLogger())
+	t.Run("unhealthy when one dep ping fails", func(t *testing.T) {
+		pg := mocks.NewMockPinger(t)
+		nc := mocks.NewMockPinger(t)
+		h := NewHealthHandler(discardLogger(), map[string]Pinger{"postgres": pg, "nats": nc})
 
-		db.EXPECT().Ping(mock.Anything).Return(errors.New("connection refused"))
-		nats.EXPECT().IsConnected().Return(true)
-
-		resp, err := h.Health(ctx, &emptypb.Empty{})
-		assert.NoError(t, err)
-		assert.Equal(t, "degraded", resp.Status)
-	})
-
-	t.Run("degraded when nats not connected", func(t *testing.T) {
-		db := mocks.NewMockDBPinger(t)
-		nats := mocks.NewMockNATSChecker(t)
-		h := NewHealthHandler(db, nats, discardLogger())
-
-		db.EXPECT().Ping(mock.Anything).Return(nil)
-		nats.EXPECT().IsConnected().Return(false)
+		pg.EXPECT().Ping(mock.Anything).Return(errors.New("connection refused"))
+		nc.EXPECT().Ping(mock.Anything).Return(nil)
 
 		resp, err := h.Health(ctx, &emptypb.Empty{})
 		assert.NoError(t, err)
-		assert.Equal(t, "degraded", resp.Status)
+		assert.Equal(t, "unhealthy", resp.Status)
 	})
 
-	t.Run("degraded when both db and nats fail", func(t *testing.T) {
-		db := mocks.NewMockDBPinger(t)
-		nats := mocks.NewMockNATSChecker(t)
-		h := NewHealthHandler(db, nats, discardLogger())
+	t.Run("unhealthy when all deps fail", func(t *testing.T) {
+		pg := mocks.NewMockPinger(t)
+		nc := mocks.NewMockPinger(t)
+		h := NewHealthHandler(discardLogger(), map[string]Pinger{"postgres": pg, "nats": nc})
 
-		db.EXPECT().Ping(mock.Anything).Return(errors.New("connection refused"))
-		nats.EXPECT().IsConnected().Return(false)
+		pg.EXPECT().Ping(mock.Anything).Return(errors.New("connection refused"))
+		nc.EXPECT().Ping(mock.Anything).Return(errors.New("disconnected"))
 
 		resp, err := h.Health(ctx, &emptypb.Empty{})
 		assert.NoError(t, err)
-		assert.Equal(t, "degraded", resp.Status)
+		assert.Equal(t, "unhealthy", resp.Status)
 	})
 
-	t.Run("uptime increases with time", func(t *testing.T) {
-		db := mocks.NewMockDBPinger(t)
-		nats := mocks.NewMockNATSChecker(t)
-		h := NewHealthHandler(db, nats, discardLogger())
+	t.Run("healthy with no deps", func(t *testing.T) {
+		h := NewHealthHandler(discardLogger(), map[string]Pinger{})
 
-		db.EXPECT().Ping(mock.Anything).Return(nil).Maybe()
-		nats.EXPECT().IsConnected().Return(true).Maybe()
+		resp, err := h.Health(ctx, &emptypb.Empty{})
+		assert.NoError(t, err)
+		assert.Equal(t, "healthy", resp.Status)
+	})
+
+	t.Run("uptime is non-negative", func(t *testing.T) {
+		h := NewHealthHandler(discardLogger(), map[string]Pinger{})
 
 		resp, err := h.Health(ctx, &emptypb.Empty{})
 		assert.NoError(t, err)

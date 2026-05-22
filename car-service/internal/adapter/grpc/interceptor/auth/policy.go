@@ -2,8 +2,14 @@ package auth
 
 import (
 	sharedmodel "carsharing/shared/model"
+
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 )
+
+type methodPolicy struct {
+	public       bool
+	allowedRoles []sharedmodel.Role
+}
 
 var fleetRoles = []sharedmodel.Role{sharedmodel.RoleAdmin, sharedmodel.RoleFleetManager}
 

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/url"
+	"strings"
 	"time"
 
 	sharedmodel "carsharing/shared/model"
@@ -31,9 +32,10 @@ func NewObjectStorage(log *slog.Logger, client *minio.Client, cfg pkgminio.Confi
 
 	var presignClient *minio.Client
 	if cfg.PublicEndpoint != "" {
-		c, err := minio.New(cfg.PublicEndpoint, &minio.Options{
+		endpoint, secure := parsePublicEndpoint(cfg.PublicEndpoint, cfg.UseSSL)
+		c, err := minio.New(endpoint, &minio.Options{
 			Creds:  credentials.NewStaticV4(cfg.AccessKeyID, cfg.SecretAccessKey, ""),
-			Secure: cfg.UseSSL,
+			Secure: secure,
 		})
 		if err != nil {
 			log.Error("creating presign client for public endpoint", pkglog.Err(err), slog.String("public_endpoint", cfg.PublicEndpoint))
@@ -48,6 +50,20 @@ func NewObjectStorage(log *slog.Logger, client *minio.Client, cfg pkgminio.Confi
 		presignClient: presignClient,
 		cfg:           cfg,
 	}, nil
+}
+
+// parsePublicEndpoint splits an optional scheme prefix from the endpoint string.
+// "https://minio.example.com" → ("minio.example.com", true)
+// "http://minio.example.com"  → ("minio.example.com", false)
+// "localhost:9000"            → ("localhost:9000", defaultSecure)
+func parsePublicEndpoint(endpoint string, defaultSecure bool) (string, bool) {
+	if strings.HasPrefix(endpoint, "https://") {
+		return strings.TrimPrefix(endpoint, "https://"), true
+	}
+	if strings.HasPrefix(endpoint, "http://") {
+		return strings.TrimPrefix(endpoint, "http://"), false
+	}
+	return endpoint, defaultSecure
 }
 
 // presigner returns the client to use for generating presigned URLs.

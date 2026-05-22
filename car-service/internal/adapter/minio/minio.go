@@ -7,6 +7,7 @@ import (
 	"time"
 
 	sharedmodel "carsharing/shared/model"
+	pkgminio "carsharing/shared/pkg/minio"
 	"github.com/minio/minio-go/v7"
 )
 
@@ -14,13 +15,13 @@ const presignedURLTTL = 15 * time.Minute
 
 type ObjectStorage struct {
 	client *minio.Client
-	bucket string
+	cfg    pkgminio.Config
 }
 
-func NewObjectStorage(client *minio.Client, bucket string) *ObjectStorage {
+func NewObjectStorage(client *minio.Client, cfg pkgminio.Config) *ObjectStorage {
 	return &ObjectStorage{
 		client: client,
-		bucket: bucket,
+		cfg:    cfg,
 	}
 }
 
@@ -43,22 +44,31 @@ func (s *ObjectStorage) GetMaintenanceReceiptImageUploadData(ctx context.Context
 func (s *ObjectStorage) getImageUploadData(ctx context.Context, prefix string) (sharedmodel.ImageUploadData, error) {
 	key := fmt.Sprintf("%s/uploads/%d", prefix, time.Now().UnixNano())
 
-	u, err := s.client.PresignedPutObject(ctx, s.bucket, key, presignedURLTTL)
+	u, err := s.client.PresignedPutObject(ctx, s.cfg.Bucket, key, presignedURLTTL)
 	if err != nil {
 		return sharedmodel.ImageUploadData{}, fmt.Errorf("presign put object: %w", err)
 	}
 
 	return sharedmodel.ImageUploadData{
 		ObjectKey:       key,
-		PresignedPutURL: u.String(),
+		PresignedPutURL: s.publicURL(u).String(),
 	}, nil
 }
 
 func (s *ObjectStorage) GetPresignedURL(ctx context.Context, key string) (string, error) {
-	u, err := s.client.PresignedGetObject(ctx, s.bucket, key, presignedURLTTL, url.Values{})
+	u, err := s.client.PresignedGetObject(ctx, s.cfg.Bucket, key, presignedURLTTL, url.Values{})
 	if err != nil {
 		return "", fmt.Errorf("presign get object: %w", err)
 	}
 
-	return u.String(), nil
+	return s.publicURL(u).String(), nil
+}
+
+func (s *ObjectStorage) publicURL(u *url.URL) *url.URL {
+	if s.cfg.PublicEndpoint == "" {
+		return u
+	}
+	rewritten := *u
+	rewritten.Host = s.cfg.PublicEndpoint
+	return &rewritten
 }

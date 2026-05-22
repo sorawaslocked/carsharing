@@ -27,6 +27,7 @@ nats:
 
 minio:
   endpoint: minio:9000
+  public_endpoint: localhost:9000
   access_key_id: ""
   secret_access_key: ""
   bucket: carsharing

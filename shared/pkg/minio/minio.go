@@ -12,11 +12,12 @@ import (
 )
 
 type Config struct {
-	Endpoint        string `yaml:"endpoint"         env:"MINIO_ENDPOINT"          env-required:"true"`
-	AccessKeyID     string `yaml:"access_key_id"    env:"MINIO_ACCESS_KEY_ID"     env-required:"true"`
-	SecretAccessKey string `yaml:"secret_access_key" env:"MINIO_SECRET_ACCESS_KEY" env-required:"true"`
-	Bucket          string `yaml:"bucket"           env:"MINIO_BUCKET"            env-required:"true"`
-	UseSSL          bool   `yaml:"use_ssl"          env:"MINIO_USE_SSL" env-default:"false"`
+	Endpoint        string `yaml:"endpoint"          env:"MINIO_ENDPOINT"           env-required:"true"`
+	PublicEndpoint  string `yaml:"public_endpoint"   env:"MINIO_PUBLIC_ENDPOINT"`
+	AccessKeyID     string `yaml:"access_key_id"     env:"MINIO_ACCESS_KEY_ID"      env-required:"true"`
+	SecretAccessKey string `yaml:"secret_access_key" env:"MINIO_SECRET_ACCESS_KEY"  env-required:"true"`
+	Bucket          string `yaml:"bucket"            env:"MINIO_BUCKET"             env-required:"true"`
+	UseSSL          bool   `yaml:"use_ssl"           env:"MINIO_USE_SSL"            env-default:"false"`
 
 	PresignedPutExpiry time.Duration `yaml:"presigned_put_expiry" env:"MINIO_PRESIGNED_PUT_EXPIRY" env-default:"15m"`
 	PresignedGetExpiry time.Duration `yaml:"presigned_get_expiry" env:"MINIO_PRESIGNED_GET_EXPIRY" env-default:"1h"`

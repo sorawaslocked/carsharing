@@ -45,7 +45,7 @@ func (s *ObjectStorage) GetDocumentImageUploadData(ctx context.Context, imageTyp
 	}
 
 	return sharedmodel.ImageUploadData{
-		PresignedPutURL: presignedURL.String(),
+		PresignedPutURL: s.publicURL(presignedURL).String(),
 		ObjectKey:       objectKey,
 	}, nil
 }
@@ -63,7 +63,7 @@ func (s *ObjectStorage) GetUserProfileImageUploadData(ctx context.Context) (shar
 	}
 
 	return sharedmodel.ImageUploadData{
-		PresignedPutURL: presignedURL.String(),
+		PresignedPutURL: s.publicURL(presignedURL).String(),
 		ObjectKey:       objectKey,
 	}, nil
 }
@@ -78,7 +78,18 @@ func (s *ObjectStorage) GetImageURL(ctx context.Context, objectKey string) (stri
 		return "", model.ErrObjectStorage
 	}
 
-	return presignedURL.String(), nil
+	return s.publicURL(presignedURL).String(), nil
+}
+
+// publicURL rewrites the host to PublicEndpoint when configured, so clients
+// outside Docker receive a resolvable address instead of the internal service name.
+func (s *ObjectStorage) publicURL(u *url.URL) *url.URL {
+	if s.cfg.PublicEndpoint == "" {
+		return u
+	}
+	rewritten := *u
+	rewritten.Host = s.cfg.PublicEndpoint
+	return &rewritten
 }
 
 // newObjectKey returns "{prefix}/{unix_timestamp}_{random_hex}".

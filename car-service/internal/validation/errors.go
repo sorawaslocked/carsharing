@@ -22,7 +22,7 @@ func (e Errors) Error() string {
 
 // General
 var (
-	ErrRequiredField = errors.New("this field is required")
+	ErrRequiredField = errors.New("required")
 )
 
 // Car

@@ -1,5 +1,5 @@
 grpc_port: ":50051"
-db_url: "postgres://car_rental:car_rental@car-service-postgres:5432/car_rental?sslmode=disable"
+db_url: "postgres://carsharing:carsharing@car-service-postgres:5432/carsharing?sslmode=disable"
 osrm_url: "http://router.project-osrm.org"
 osrm_profile: "car"
 telemetry_interval: "15s"

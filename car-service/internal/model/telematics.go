@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	sharedmodel "carsharing/shared/model"
+)
 
 type CarTelematicsEvent struct {
 	ID           string
@@ -41,5 +45,5 @@ type TelematicsEventFilter struct {
 	From  *time.Time
 	To    *time.Time
 
-	Pagination
+	Pagination *sharedmodel.Pagination
 }

@@ -6,6 +6,8 @@ import (
 
 	"carsharing/car-service/internal/adapter/grpc/handler/mocks"
 	"carsharing/car-service/internal/model"
+	"carsharing/car-service/internal/validation"
+	sharedmodel "carsharing/shared/model"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -132,7 +134,7 @@ func TestCarHandlerUpdateCarStatus(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
 		h := NewCarHandler(svc, discardLogger())
 
-		svc.EXPECT().UpdateCarStatus(ctx, carID, mock.MatchedBy(func(in model.CarStatusUpdateInput) bool {
+		svc.EXPECT().UpdateCarStatus(ctx, carID, mock.MatchedBy(func(in validation.CarStatusUpdate) bool {
 			return in.Status == "reserved"
 		})).Return(nil)
 
@@ -185,9 +187,9 @@ func TestCarHandlerGetCarImageUploadData(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
 		h := NewCarHandler(svc, discardLogger())
 
-		svc.EXPECT().GetImageUploadData(ctx).Return(model.ImageUploadData{
-			URL:       "https://upload.example.com/car",
-			ObjectKey: "cars/photo.jpg",
+		svc.EXPECT().GetImageUploadData(ctx).Return(sharedmodel.ImageUploadData{
+			PresignedPutURL: "https://upload.example.com/car",
+			ObjectKey:       "cars/photo.jpg",
 		}, nil)
 
 		resp, err := h.GetCarImageUploadData(ctx, &emptypb.Empty{})

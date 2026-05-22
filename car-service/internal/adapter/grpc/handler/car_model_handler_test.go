@@ -6,6 +6,7 @@ import (
 
 	"carsharing/car-service/internal/adapter/grpc/handler/mocks"
 	"carsharing/car-service/internal/model"
+	sharedmodel "carsharing/shared/model"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -159,9 +160,9 @@ func TestCarModelHandlerGetCarModelImageUploadData(t *testing.T) {
 		svc := mocks.NewMockCarModelService(t)
 		h := NewCarModelHandler(svc, discardLogger())
 
-		svc.EXPECT().GetImageUploadData(ctx).Return(model.ImageUploadData{
-			URL:       "https://upload.example.com/put",
-			ObjectKey: "models/abc.jpg",
+		svc.EXPECT().GetImageUploadData(ctx).Return(sharedmodel.ImageUploadData{
+			PresignedPutURL: "https://upload.example.com/put",
+			ObjectKey:       "models/abc.jpg",
 		}, nil)
 
 		resp, err := h.GetCarModelImageUploadData(ctx, &emptypb.Empty{})
@@ -174,7 +175,7 @@ func TestCarModelHandlerGetCarModelImageUploadData(t *testing.T) {
 		svc := mocks.NewMockCarModelService(t)
 		h := NewCarModelHandler(svc, discardLogger())
 
-		svc.EXPECT().GetImageUploadData(ctx).Return(model.ImageUploadData{}, model.ErrInternalServerError)
+		svc.EXPECT().GetImageUploadData(ctx).Return(sharedmodel.ImageUploadData{}, model.ErrInternalServerError)
 
 		_, err := h.GetCarModelImageUploadData(ctx, &emptypb.Empty{})
 		assert.Equal(t, codes.Internal, grpcCode(err))

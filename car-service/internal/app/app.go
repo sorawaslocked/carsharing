@@ -80,7 +80,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	cl.add(func() { _ = telematicsConn.Close() })
 
 	validate := validator.New()
-	if err = validation.RegisterCustomValidators(validate); err != nil {
+	if err = validation.RegisterCustomValidators(validate, log); err != nil {
 		cl.closeAll()
 		return nil, fmt.Errorf("register validators: %w", err)
 	}

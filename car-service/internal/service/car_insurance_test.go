@@ -7,6 +7,8 @@ import (
 
 	"carsharing/car-service/internal/model"
 	"carsharing/car-service/internal/service/mocks"
+	"carsharing/car-service/internal/validation"
+	sharedmodel "carsharing/shared/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -22,8 +24,8 @@ var (
 	testEndsAt   = time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)
 )
 
-func validInsuranceCreateInput() model.CarInsuranceCreateInput {
-	return model.CarInsuranceCreateInput{
+func validInsuranceCreateInput() validation.CarInsuranceCreate {
+	return validation.CarInsuranceCreate{
 		CarID:     testCarID,
 		Type:      string(model.InsuranceTypeOSAGO),
 		Provider:  "InsureCo",
@@ -109,13 +111,13 @@ func TestCarInsuranceServiceGet(t *testing.T) {
 		presigned := "https://cdn/doc"
 		repo.EXPECT().FindByID(ctx, insID).Return(model.CarInsurance{
 			ID:     insID,
-			Images: []model.Image{{Key: &key}},
+			Images: []sharedmodel.Image{{Key: key}},
 		}, nil)
 		storage.EXPECT().GetPresignedURL(ctx, key).Return(presigned, nil)
 
 		got, err := svc.Get(ctx, insID)
 		assert.NoError(t, err)
-		assert.Equal(t, presigned, *got.Images[0].URL)
+		assert.Equal(t, presigned, got.Images[0].URL)
 	})
 
 	t.Run("not found returns ErrNotFound", func(t *testing.T) {
@@ -140,7 +142,7 @@ func TestCarInsuranceServiceGetAll(t *testing.T) {
 
 		repo.EXPECT().Find(ctx, mock.Anything).Return(nil, nil)
 
-		got, err := svc.GetAll(ctx, model.CarInsuranceFilterInput{})
+		got, err := svc.GetAll(ctx, validation.CarInsuranceFilter{})
 		assert.NoError(t, err)
 		assert.Empty(t, got)
 	})
@@ -154,7 +156,7 @@ func TestCarInsuranceServiceGetAll(t *testing.T) {
 			return f.CarID != nil && *f.CarID == testCarID
 		})).Return(nil, nil)
 
-		got, err := svc.GetAll(ctx, model.CarInsuranceFilterInput{CarID: &testCarID})
+		got, err := svc.GetAll(ctx, validation.CarInsuranceFilter{CarID: &testCarID})
 		assert.NoError(t, err)
 		assert.Empty(t, got)
 	})
@@ -166,7 +168,7 @@ func TestCarInsuranceServiceGetAll(t *testing.T) {
 
 		repo.EXPECT().Find(ctx, mock.Anything).Return(nil, model.ErrInternalServerError)
 
-		_, err := svc.GetAll(ctx, model.CarInsuranceFilterInput{})
+		_, err := svc.GetAll(ctx, validation.CarInsuranceFilter{})
 		assert.Error(t, err)
 	})
 }
@@ -181,7 +183,7 @@ func TestCarInsuranceServiceUpdate(t *testing.T) {
 
 		repo.EXPECT().Update(ctx, insID, mock.Anything).Return(nil)
 
-		assert.NoError(t, svc.Update(ctx, insID, model.CarInsuranceUpdateInput{}))
+		assert.NoError(t, svc.Update(ctx, insID, validation.CarInsuranceUpdate{}))
 	})
 
 	t.Run("status string is parsed to enum", func(t *testing.T) {
@@ -193,7 +195,7 @@ func TestCarInsuranceServiceUpdate(t *testing.T) {
 			return u.Status != nil && *u.Status == model.InsuranceStatusExpired
 		})).Return(nil)
 
-		assert.NoError(t, svc.Update(ctx, insID, model.CarInsuranceUpdateInput{Status: &statusStr}))
+		assert.NoError(t, svc.Update(ctx, insID, validation.CarInsuranceUpdate{Status: &statusStr}))
 	})
 
 	t.Run("not found returns ErrNotFound", func(t *testing.T) {
@@ -202,7 +204,7 @@ func TestCarInsuranceServiceUpdate(t *testing.T) {
 
 		repo.EXPECT().Update(ctx, insID, mock.Anything).Return(model.ErrNotFound)
 
-		assert.ErrorIs(t, svc.Update(ctx, insID, model.CarInsuranceUpdateInput{}), model.ErrNotFound)
+		assert.ErrorIs(t, svc.Update(ctx, insID, validation.CarInsuranceUpdate{}), model.ErrNotFound)
 	})
 }
 
@@ -237,7 +239,7 @@ func TestCarInsuranceServiceGetImageUploadData(t *testing.T) {
 		storage := mocks.NewMockObjectStorage(t)
 		svc := newTestCarInsuranceService(t, repo, storage)
 
-		want := model.ImageUploadData{ObjectKey: "insurance/doc.pdf", URL: "https://upload.example.com"}
+		want := sharedmodel.ImageUploadData{ObjectKey: "insurance/doc.pdf", PresignedPutURL: "https://upload.example.com"}
 		storage.EXPECT().GetInsuranceImageUploadData(ctx).Return(want, nil)
 
 		got, err := svc.GetImageUploadData(ctx)
@@ -250,7 +252,7 @@ func TestCarInsuranceServiceGetImageUploadData(t *testing.T) {
 		storage := mocks.NewMockObjectStorage(t)
 		svc := newTestCarInsuranceService(t, repo, storage)
 
-		storage.EXPECT().GetInsuranceImageUploadData(ctx).Return(model.ImageUploadData{}, model.ErrInternalServerError)
+		storage.EXPECT().GetInsuranceImageUploadData(ctx).Return(sharedmodel.ImageUploadData{}, model.ErrInternalServerError)
 
 		_, err := svc.GetImageUploadData(ctx)
 		assert.Error(t, err)

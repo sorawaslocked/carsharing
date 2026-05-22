@@ -18,21 +18,21 @@ import (
 	"github.com/minio/minio-go/v7"
 )
 
-type MinioObjectStorage struct {
+type ObjectStorage struct {
 	log    *slog.Logger
 	client *minio.Client
 	cfg    pkgminio.Config
 }
 
-func NewMinioObjectStorage(log *slog.Logger, client *minio.Client, cfg pkgminio.Config) *MinioObjectStorage {
-	return &MinioObjectStorage{
-		log:    pkglog.WithComponent(log, "MinioObjectStorage"),
+func NewObjectStorage(log *slog.Logger, client *minio.Client, cfg pkgminio.Config) *ObjectStorage {
+	return &ObjectStorage{
+		log:    pkglog.WithComponent(log, "ObjectStorage"),
 		client: client,
 		cfg:    cfg,
 	}
 }
 
-func (s *MinioObjectStorage) GetDocumentImageUploadData(ctx context.Context, imageType string) (sharedmodel.ImageUploadData, error) {
+func (s *ObjectStorage) GetDocumentImageUploadData(ctx context.Context, imageType string) (sharedmodel.ImageUploadData, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetDocumentImageUploadData"), utils.MetadataFromCtx(ctx))
 
 	objectKey := newObjectKey("documents/" + imageType)
@@ -50,7 +50,7 @@ func (s *MinioObjectStorage) GetDocumentImageUploadData(ctx context.Context, ima
 	}, nil
 }
 
-func (s *MinioObjectStorage) GetUserProfileImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
+func (s *ObjectStorage) GetUserProfileImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetUserProfileImageUploadData"), utils.MetadataFromCtx(ctx))
 
 	objectKey := newObjectKey("users")
@@ -68,7 +68,7 @@ func (s *MinioObjectStorage) GetUserProfileImageUploadData(ctx context.Context) 
 	}, nil
 }
 
-func (s *MinioObjectStorage) GetImageURL(ctx context.Context, objectKey string) (string, error) {
+func (s *ObjectStorage) GetImageURL(ctx context.Context, objectKey string) (string, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetImageURL"), utils.MetadataFromCtx(ctx))
 
 	presignedURL, err := s.client.PresignedGetObject(ctx, s.cfg.Bucket, objectKey, s.cfg.PresignedGetExpiry, url.Values{})

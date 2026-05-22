@@ -2,6 +2,8 @@ package dto
 
 import (
 	"carsharing/car-service/internal/model"
+	"carsharing/car-service/internal/validation"
+	sharedmodel "carsharing/shared/model"
 
 	"github.com/sorawaslocked/car-rental-protos/gen/base"
 	basecar "github.com/sorawaslocked/car-rental-protos/gen/base/car"
@@ -30,11 +32,9 @@ func FromGetCarStatusHistoryRequest(req *carsvc.GetCarStatusHistoryRequest) mode
 		CarID: &req.CarId,
 	}
 	if req.Pagination != nil {
-		limit := int64(req.Pagination.Limit)
-		offset := int64(req.Pagination.Offset)
-		filter.Pagination = model.Pagination{
-			Limit:  &limit,
-			Offset: &offset,
+		filter.Pagination = &sharedmodel.Pagination{
+			Limit:  int64(req.Pagination.Limit),
+			Offset: int64(req.Pagination.Offset),
 		}
 	}
 	return filter
@@ -53,11 +53,9 @@ func FromGetCarFuelHistoryRequest(req *carsvc.GetCarFuelHistoryRequest) model.Te
 		filter.To = &t
 	}
 	if req.Pagination != nil {
-		limit := int64(req.Pagination.Limit)
-		offset := int64(req.Pagination.Offset)
-		filter.Pagination = model.Pagination{
-			Limit:  &limit,
-			Offset: &offset,
+		filter.Pagination = &sharedmodel.Pagination{
+			Limit:  int64(req.Pagination.Limit),
+			Offset: int64(req.Pagination.Offset),
 		}
 	}
 	return filter
@@ -76,11 +74,9 @@ func FromGetTelematicsHistoryRequest(carID string, from, to *timestamppb.Timesta
 		filter.To = &t
 	}
 	if pagination != nil {
-		limit := pagination.Limit
-		offset := pagination.Offset
-		filter.Pagination = model.Pagination{
-			Limit:  &limit,
-			Offset: &offset,
+		filter.Pagination = &sharedmodel.Pagination{
+			Limit:  pagination.Limit,
+			Offset: pagination.Offset,
 		}
 	}
 	return filter
@@ -184,8 +180,8 @@ func ToSlimCarProto(c model.Car) *basecar.SlimCar {
 	return proto
 }
 
-func FromCreateCarRequest(req *carsvc.CreateCarRequest) model.CarCreateInput {
-	return model.CarCreateInput{
+func FromCreateCarRequest(req *carsvc.CreateCarRequest) validation.CarCreate {
+	return validation.CarCreate{
 		ModelID:          req.ModelId,
 		VIN:              req.Vin,
 		LicensePlate:     req.LicensePlate,
@@ -195,9 +191,9 @@ func FromCreateCarRequest(req *carsvc.CreateCarRequest) model.CarCreateInput {
 	}
 }
 
-func FromListCarsRequest(req *carsvc.ListCarsRequest) model.CarFilterInput {
+func FromListCarsRequest(req *carsvc.ListCarsRequest) validation.CarFilter {
 	carModelFilterIsNil := true
-	carModelFilter := model.CarModelFilterInput{}
+	carModelFilter := validation.CarModelFilter{}
 
 	if req.Brand != nil {
 		carModelFilter.Brand = req.Brand
@@ -242,15 +238,13 @@ func FromListCarsRequest(req *carsvc.ListCarsRequest) model.CarFilterInput {
 		locationFilterIsNil = false
 	}
 
-	carFilter := model.CarFilterInput{
+	carFilter := validation.CarFilter{
 		Status: req.Status,
 	}
 	if req.Pagination != nil {
-		limit := int64(req.Pagination.Limit)
-		offset := int64(req.Pagination.Offset)
-		carFilter.PaginationInput = model.PaginationInput{
-			Limit:  &limit,
-			Offset: &offset,
+		carFilter.Pagination = &sharedmodel.Pagination{
+			Limit:  int64(req.Pagination.Limit),
+			Offset: int64(req.Pagination.Offset),
 		}
 	}
 
@@ -264,8 +258,8 @@ func FromListCarsRequest(req *carsvc.ListCarsRequest) model.CarFilterInput {
 	return carFilter
 }
 
-func FromUpdateCarRequest(req *carsvc.UpdateCarRequest) model.CarUpdateInput {
-	return model.CarUpdateInput{
+func FromUpdateCarRequest(req *carsvc.UpdateCarRequest) validation.CarUpdate {
+	return validation.CarUpdate{
 		ModelID:      req.ModelId,
 		LicensePlate: req.LicensePlate,
 		Color:        req.Color,
@@ -274,8 +268,8 @@ func FromUpdateCarRequest(req *carsvc.UpdateCarRequest) model.CarUpdateInput {
 	}
 }
 
-func FromUpdateCarStatusRequest(req *carsvc.UpdateCarStatusRequest) model.CarStatusUpdateInput {
-	return model.CarStatusUpdateInput{
+func FromUpdateCarStatusRequest(req *carsvc.UpdateCarStatusRequest) validation.CarStatusUpdate {
+	return validation.CarStatusUpdate{
 		Status: req.Status,
 	}
 }
@@ -315,21 +309,21 @@ func ToCarProtos(cs []model.Car) []*basecar.Car {
 	return protos
 }
 
-func ToImageUploadData(uploadURL, objectKey string) *base.ImageUploadData {
+func ToImageUploadData(data sharedmodel.ImageUploadData) *base.ImageUploadData {
 	return &base.ImageUploadData{
-		PresignedPutUrl: uploadURL,
-		ObjectKey:       objectKey,
+		PresignedPutUrl: data.PresignedPutURL,
+		ObjectKey:       data.ObjectKey,
 	}
 }
 
-func imageURLsFromImages(images []model.Image) []string {
+func imageURLsFromImages(images []sharedmodel.Image) []string {
 	if len(images) == 0 {
 		return nil
 	}
 	urls := make([]string, 0, len(images))
 	for _, img := range images {
-		if img.URL != nil {
-			urls = append(urls, *img.URL)
+		if img.URL != "" {
+			urls = append(urls, img.URL)
 		}
 	}
 	return urls

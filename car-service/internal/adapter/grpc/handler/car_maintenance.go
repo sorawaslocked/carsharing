@@ -109,6 +109,6 @@ func (h *CarMaintenanceHandler) GetMaintenanceReceiptImageUploadData(ctx context
 	}
 
 	return &carsvc.GetMaintenanceReceiptImageUploadDataResponse{
-		UploadData: dto.ToImageUploadData(data.URL, data.ObjectKey),
+		UploadData: dto.ToImageUploadData(data),
 	}, nil
 }

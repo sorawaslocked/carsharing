@@ -4,7 +4,7 @@ services:
     container_name: telematics
     build: .
     environment:
-      DB_URL: "postgres://car_rental:car_rental@car-service-postgres:5432/car_rental?sslmode=disable"
+      DB_URL: "postgres://carsharing:carsharing@car-service-postgres:5432/carsharing?sslmode=disable"
       NATS_URL: "nats://nats:4222"
     networks:
       - car-rental-net

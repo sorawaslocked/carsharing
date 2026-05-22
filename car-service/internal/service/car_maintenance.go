@@ -7,6 +7,7 @@ import (
 
 	"carsharing/car-service/internal/model"
 	"carsharing/car-service/internal/validation"
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 	"github.com/go-playground/validator/v10"
@@ -49,7 +50,7 @@ func NewCarMaintenanceService(
 	return s
 }
 
-func (s *CarMaintenanceService) CreateTemplate(ctx context.Context, createInput model.CarMaintenanceTemplateCreateInput) (string, error) {
+func (s *CarMaintenanceService) CreateTemplate(ctx context.Context, createInput validation.CarMaintenanceTemplateCreate) (string, error) {
 	const method = "CreateTemplate"
 	logger := pkglog.WithMethod(s.log, method)
 
@@ -95,7 +96,7 @@ func (s *CarMaintenanceService) GetTemplate(ctx context.Context, id string) (mod
 	return template, nil
 }
 
-func (s *CarMaintenanceService) GetAllTemplates(ctx context.Context, filterInput model.CarMaintenanceTemplateFilterInput) ([]model.CarMaintenanceTemplate, error) {
+func (s *CarMaintenanceService) GetAllTemplates(ctx context.Context, filterInput validation.CarMaintenanceTemplateFilter) ([]model.CarMaintenanceTemplate, error) {
 	const method = "GetAllTemplates"
 	logger := pkglog.WithMethod(s.log, method)
 
@@ -116,7 +117,7 @@ func (s *CarMaintenanceService) GetAllTemplates(ctx context.Context, filterInput
 	return templates, nil
 }
 
-func (s *CarMaintenanceService) UpdateTemplate(ctx context.Context, id string, updateInput model.CarMaintenanceTemplateUpdateInput) error {
+func (s *CarMaintenanceService) UpdateTemplate(ctx context.Context, id string, updateInput validation.CarMaintenanceTemplateUpdate) error {
 	const method = "UpdateTemplate"
 	logger := pkglog.WithMethod(s.log, method)
 
@@ -172,17 +173,17 @@ func (s *CarMaintenanceService) GetRecord(ctx context.Context, id string) (model
 	}
 
 	for i := range record.ReceiptImages {
-		url, err := s.objectStorage.GetPresignedURL(ctx, *record.ReceiptImages[i].Key)
+		url, err := s.objectStorage.GetPresignedURL(ctx, record.ReceiptImages[i].Key)
 		if err != nil {
 			return model.CarMaintenanceRecord{}, handleError(logger, err)
 		}
-		record.ReceiptImages[i].URL = &url
+		record.ReceiptImages[i].URL = url
 	}
 
 	return record, nil
 }
 
-func (s *CarMaintenanceService) GetRecords(ctx context.Context, filterInput model.CarMaintenanceRecordFilterInput) ([]model.CarMaintenanceRecord, error) {
+func (s *CarMaintenanceService) GetRecords(ctx context.Context, filterInput validation.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error) {
 	const method = "GetRecords"
 	logger := pkglog.WithMethod(s.log, method)
 
@@ -202,18 +203,18 @@ func (s *CarMaintenanceService) GetRecords(ctx context.Context, filterInput mode
 
 	for i := range records {
 		for j := range records[i].ReceiptImages {
-			url, err := s.objectStorage.GetPresignedURL(ctx, *records[i].ReceiptImages[j].Key)
+			url, err := s.objectStorage.GetPresignedURL(ctx, records[i].ReceiptImages[j].Key)
 			if err != nil {
 				return nil, handleError(logger, err)
 			}
-			records[i].ReceiptImages[j].URL = &url
+			records[i].ReceiptImages[j].URL = url
 		}
 	}
 
 	return records, nil
 }
 
-func (s *CarMaintenanceService) CompleteRecord(ctx context.Context, id string, completeInput model.CarMaintenanceRecordCompleteInput) error {
+func (s *CarMaintenanceService) CompleteRecord(ctx context.Context, id string, completeInput validation.CarMaintenanceRecordComplete) error {
 	const method = "CompleteRecord"
 	logger := pkglog.WithMethod(s.log, method)
 
@@ -270,7 +271,7 @@ func (s *CarMaintenanceService) CompleteRecord(ctx context.Context, id string, c
 
 	if err = s.carService.UpdateCarStatus(
 		ctx, record.CarID,
-		model.CarStatusUpdateInput{Status: string(model.CarStatusAvailable)},
+		validation.CarStatusUpdate{Status: string(model.CarStatusAvailable)},
 	); err != nil {
 		return handleError(logger, err)
 	}
@@ -284,7 +285,7 @@ func (s *CarMaintenanceService) CompleteRecord(ctx context.Context, id string, c
 	return nil
 }
 
-func (s *CarMaintenanceService) GetReceiptImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (s *CarMaintenanceService) GetReceiptImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	const method = "GetReceiptImageUploadData"
 	logger := pkglog.WithMethod(s.log, method)
 
@@ -293,7 +294,7 @@ func (s *CarMaintenanceService) GetReceiptImageUploadData(ctx context.Context) (
 
 	data, err := s.objectStorage.GetMaintenanceReceiptImageUploadData(ctx)
 	if err != nil {
-		return model.ImageUploadData{}, handleError(logger, err)
+		return sharedmodel.ImageUploadData{}, handleError(logger, err)
 	}
 
 	return data, nil
@@ -341,7 +342,7 @@ func (s *CarMaintenanceService) EvaluateCarMaintenance(ctx context.Context, carI
 
 			if err = s.carService.UpdateCarStatus(
 				ctx, carID,
-				model.CarStatusUpdateInput{Status: string(model.CarStatusMaintenance)},
+				validation.CarStatusUpdate{Status: string(model.CarStatusMaintenance)},
 			); err != nil {
 				logger.Error("failed to transition car to maintenance",
 					slog.String("templateName", template.Name),

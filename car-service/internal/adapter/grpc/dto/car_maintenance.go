@@ -2,14 +2,16 @@ package dto
 
 import (
 	"carsharing/car-service/internal/model"
+	"carsharing/car-service/internal/validation"
+	sharedmodel "carsharing/shared/model"
 
 	basecar "github.com/sorawaslocked/car-rental-protos/gen/base/car"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func FromCreateMaintenanceTemplateRequest(req *carsvc.CreateMaintenanceTemplateRequest) model.CarMaintenanceTemplateCreateInput {
-	return model.CarMaintenanceTemplateCreateInput{
+func FromCreateMaintenanceTemplateRequest(req *carsvc.CreateMaintenanceTemplateRequest) validation.CarMaintenanceTemplateCreate {
+	return validation.CarMaintenanceTemplateCreate{
 		Name:        req.Name,
 		KmInterval:  req.KmInterval,
 		DayInterval: req.DayInterval,
@@ -19,8 +21,8 @@ func FromCreateMaintenanceTemplateRequest(req *carsvc.CreateMaintenanceTemplateR
 	}
 }
 
-func FromUpdateMaintenanceTemplateRequest(req *carsvc.UpdateMaintenanceTemplateRequest) model.CarMaintenanceTemplateUpdateInput {
-	return model.CarMaintenanceTemplateUpdateInput{
+func FromUpdateMaintenanceTemplateRequest(req *carsvc.UpdateMaintenanceTemplateRequest) validation.CarMaintenanceTemplateUpdate {
+	return validation.CarMaintenanceTemplateUpdate{
 		Name:        req.Name,
 		KmInterval:  req.KmInterval,
 		DayInterval: req.DayInterval,
@@ -30,38 +32,34 @@ func FromUpdateMaintenanceTemplateRequest(req *carsvc.UpdateMaintenanceTemplateR
 	}
 }
 
-func FromListMaintenanceTemplatesRequest(req *carsvc.ListMaintenanceTemplatesRequest) model.CarMaintenanceTemplateFilterInput {
-	filter := model.CarMaintenanceTemplateFilterInput{}
+func FromListMaintenanceTemplatesRequest(req *carsvc.ListMaintenanceTemplatesRequest) validation.CarMaintenanceTemplateFilter {
+	filter := validation.CarMaintenanceTemplateFilter{}
 	if req.Pagination != nil {
-		limit := req.Pagination.Limit
-		offset := req.Pagination.Offset
-		filter.PaginationInput = model.PaginationInput{
-			Limit:  &limit,
-			Offset: &offset,
+		filter.Pagination = &sharedmodel.Pagination{
+			Limit:  req.Pagination.Limit,
+			Offset: req.Pagination.Offset,
 		}
 	}
 	return filter
 }
 
-func FromListMaintenanceRecordsRequest(req *carsvc.ListMaintenanceRecordsRequest) model.CarMaintenanceRecordFilterInput {
-	filter := model.CarMaintenanceRecordFilterInput{
+func FromListMaintenanceRecordsRequest(req *carsvc.ListMaintenanceRecordsRequest) validation.CarMaintenanceRecordFilter {
+	filter := validation.CarMaintenanceRecordFilter{
 		CarID:      req.CarId,
 		TemplateID: req.TemplateId,
 		Status:     req.Status,
 	}
 	if req.Pagination != nil {
-		limit := req.Pagination.Limit
-		offset := req.Pagination.Offset
-		filter.PaginationInput = model.PaginationInput{
-			Limit:  &limit,
-			Offset: &offset,
+		filter.Pagination = &sharedmodel.Pagination{
+			Limit:  req.Pagination.Limit,
+			Offset: req.Pagination.Offset,
 		}
 	}
 	return filter
 }
 
-func FromCompleteMaintenanceRecordRequest(req *carsvc.CompleteMaintenanceRecordRequest) model.CarMaintenanceRecordCompleteInput {
-	return model.CarMaintenanceRecordCompleteInput{
+func FromCompleteMaintenanceRecordRequest(req *carsvc.CompleteMaintenanceRecordRequest) validation.CarMaintenanceRecordComplete {
+	return validation.CarMaintenanceRecordComplete{
 		CompletedKM:      req.OdometerAtCompletionKm,
 		CostTenge:        req.CostTenge,
 		Notes:            req.Notes,

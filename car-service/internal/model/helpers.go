@@ -9,23 +9,3 @@ type LocationFilter struct {
 	Location Location
 	RadiusKM float64
 }
-
-type Pagination struct {
-	Limit  *int64
-	Offset *int64
-}
-
-type PaginationInput struct {
-	Limit  *int64 `validate:"omitempty,min=1,max=100"`
-	Offset *int64 `validate:"omitempty,min=0"`
-}
-
-type Image struct {
-	Key *string
-	URL *string
-}
-
-type ImageUploadData struct {
-	ObjectKey string
-	URL       string
-}

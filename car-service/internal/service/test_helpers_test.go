@@ -12,7 +12,7 @@ import (
 func newTestValidator(t *testing.T) *validator.Validate {
 	t.Helper()
 	v := validator.New()
-	_ = validation.RegisterCustomValidators(v)
+	_ = validation.RegisterCustomValidators(v, slog.New(slog.NewTextHandler(io.Discard, nil)))
 	return v
 }
 

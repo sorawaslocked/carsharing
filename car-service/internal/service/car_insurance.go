@@ -7,6 +7,7 @@ import (
 
 	"carsharing/car-service/internal/model"
 	"carsharing/car-service/internal/validation"
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 	"github.com/go-playground/validator/v10"
@@ -37,7 +38,7 @@ func NewCarInsuranceService(
 	return s
 }
 
-func (s *CarInsuranceService) Create(ctx context.Context, createInput model.CarInsuranceCreateInput) (string, error) {
+func (s *CarInsuranceService) Create(ctx context.Context, createInput validation.CarInsuranceCreate) (string, error) {
 	const method = "Create"
 	logger := pkglog.WithMethod(s.log, method)
 
@@ -87,17 +88,17 @@ func (s *CarInsuranceService) Get(ctx context.Context, id string) (model.CarInsu
 	}
 
 	for i := range insurance.Images {
-		url, err := s.objectStorage.GetPresignedURL(ctx, *insurance.Images[i].Key)
+		url, err := s.objectStorage.GetPresignedURL(ctx, insurance.Images[i].Key)
 		if err != nil {
 			return model.CarInsurance{}, handleError(logger, err)
 		}
-		insurance.Images[i].URL = &url
+		insurance.Images[i].URL = url
 	}
 
 	return insurance, nil
 }
 
-func (s *CarInsuranceService) GetAll(ctx context.Context, filterInput model.CarInsuranceFilterInput) ([]model.CarInsurance, error) {
+func (s *CarInsuranceService) GetAll(ctx context.Context, filterInput validation.CarInsuranceFilter) ([]model.CarInsurance, error) {
 	const method = "GetAll"
 	logger := pkglog.WithMethod(s.log, method)
 
@@ -117,18 +118,18 @@ func (s *CarInsuranceService) GetAll(ctx context.Context, filterInput model.CarI
 
 	for i := range insurances {
 		for j := range insurances[i].Images {
-			url, err := s.objectStorage.GetPresignedURL(ctx, *insurances[i].Images[j].Key)
+			url, err := s.objectStorage.GetPresignedURL(ctx, insurances[i].Images[j].Key)
 			if err != nil {
 				return nil, handleError(logger, err)
 			}
-			insurances[i].Images[j].URL = &url
+			insurances[i].Images[j].URL = url
 		}
 	}
 
 	return insurances, nil
 }
 
-func (s *CarInsuranceService) Update(ctx context.Context, id string, updateInput model.CarInsuranceUpdateInput) error {
+func (s *CarInsuranceService) Update(ctx context.Context, id string, updateInput validation.CarInsuranceUpdate) error {
 	const method = "Update"
 	logger := pkglog.WithMethod(s.log, method)
 
@@ -177,7 +178,7 @@ func (s *CarInsuranceService) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (s *CarInsuranceService) GetImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (s *CarInsuranceService) GetImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	const method = "GetImageUploadData"
 	logger := pkglog.WithMethod(s.log, method)
 
@@ -186,7 +187,7 @@ func (s *CarInsuranceService) GetImageUploadData(ctx context.Context) (model.Ima
 
 	data, err := s.objectStorage.GetInsuranceImageUploadData(ctx)
 	if err != nil {
-		return model.ImageUploadData{}, handleError(logger, err)
+		return sharedmodel.ImageUploadData{}, handleError(logger, err)
 	}
 
 	return data, nil

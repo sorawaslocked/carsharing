@@ -5,7 +5,6 @@ import "errors"
 var (
 	ErrInvalidMetadata = errors.New("invalid metadata")
 
-	ErrInternalServerError     = errors.New("internal server error")
 	ErrUnauthorized            = errors.New("unauthorized")
 	ErrUnauthenticated         = errors.New("unauthenticated")
 	ErrInsufficientPermissions = errors.New("insufficient permissions")

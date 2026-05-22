@@ -6,6 +6,8 @@ import (
 
 	"carsharing/car-service/internal/adapter/grpc/handler/mocks"
 	"carsharing/car-service/internal/model"
+	"carsharing/car-service/internal/validation"
+	sharedmodel "carsharing/shared/model"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -20,7 +22,7 @@ func TestCarMaintenanceHandlerCreateMaintenanceTemplate(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
 		h := NewCarMaintenanceHandler(svc, discardLogger())
 
-		svc.EXPECT().CreateTemplate(ctx, mock.MatchedBy(func(in model.CarMaintenanceTemplateCreateInput) bool {
+		svc.EXPECT().CreateTemplate(ctx, mock.MatchedBy(func(in validation.CarMaintenanceTemplateCreate) bool {
 			return in.Name == "Oil Change" && in.IsMandatory
 		})).Return("tmpl-123", nil)
 
@@ -152,7 +154,7 @@ func TestCarMaintenanceHandlerListMaintenanceRecords(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
 		h := NewCarMaintenanceHandler(svc, discardLogger())
 
-		svc.EXPECT().GetRecords(ctx, mock.MatchedBy(func(in model.CarMaintenanceRecordFilterInput) bool {
+		svc.EXPECT().GetRecords(ctx, mock.MatchedBy(func(in validation.CarMaintenanceRecordFilter) bool {
 			return in.CarID != nil && *in.CarID == carID
 		})).Return([]model.CarMaintenanceRecord{
 			{ID: "rec-1", CarID: carID, Status: model.MaintenanceRecordStatusPending},
@@ -184,7 +186,7 @@ func TestCarMaintenanceHandlerCompleteMaintenanceRecord(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
 		h := NewCarMaintenanceHandler(svc, discardLogger())
 
-		svc.EXPECT().CompleteRecord(ctx, recordID, mock.MatchedBy(func(in model.CarMaintenanceRecordCompleteInput) bool {
+		svc.EXPECT().CompleteRecord(ctx, recordID, mock.MatchedBy(func(in validation.CarMaintenanceRecordComplete) bool {
 			return in.CompletedKM == 50_000 && in.CostTenge == 15_000
 		})).Return(nil)
 
@@ -215,9 +217,9 @@ func TestCarMaintenanceHandlerGetMaintenanceReceiptImageUploadData(t *testing.T)
 		svc := mocks.NewMockCarMaintenanceService(t)
 		h := NewCarMaintenanceHandler(svc, discardLogger())
 
-		svc.EXPECT().GetReceiptImageUploadData(ctx).Return(model.ImageUploadData{
-			URL:       "https://upload.example.com/receipt",
-			ObjectKey: "receipts/invoice.pdf",
+		svc.EXPECT().GetReceiptImageUploadData(ctx).Return(sharedmodel.ImageUploadData{
+			PresignedPutURL: "https://upload.example.com/receipt",
+			ObjectKey:       "receipts/invoice.pdf",
 		}, nil)
 
 		resp, err := h.GetMaintenanceReceiptImageUploadData(ctx, &emptypb.Empty{})
@@ -230,7 +232,7 @@ func TestCarMaintenanceHandlerGetMaintenanceReceiptImageUploadData(t *testing.T)
 		svc := mocks.NewMockCarMaintenanceService(t)
 		h := NewCarMaintenanceHandler(svc, discardLogger())
 
-		svc.EXPECT().GetReceiptImageUploadData(ctx).Return(model.ImageUploadData{}, model.ErrInternalServerError)
+		svc.EXPECT().GetReceiptImageUploadData(ctx).Return(sharedmodel.ImageUploadData{}, model.ErrInternalServerError)
 
 		_, err := h.GetMaintenanceReceiptImageUploadData(ctx, &emptypb.Empty{})
 		assert.Equal(t, codes.Internal, grpcCode(err))

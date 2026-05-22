@@ -7,6 +7,8 @@ import (
 
 	"carsharing/car-service/internal/model"
 	"carsharing/car-service/internal/service/mocks"
+	"carsharing/car-service/internal/validation"
+	sharedmodel "carsharing/shared/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -31,7 +33,7 @@ func newTestCarMaintenanceService(
 // with no status-log repo and no event publisher (both are nil-safe in UpdateCarStatus).
 func newTestCarServiceForMaintenance(t *testing.T, carRepo CarRepository) *CarService {
 	t.Helper()
-	return NewCarService(carRepo, nil, nil, nil, nil, newTestValidator(t), discardLogger())
+	return NewCarService(nil, carRepo, nil, nil, nil, nil, newTestValidator(t), discardLogger())
 }
 
 // ── maintenancePct ────────────────────────────────────────────────────────────
@@ -107,7 +109,7 @@ func TestMaintenancePct(t *testing.T) {
 func TestCarMaintenanceServiceCreateTemplate(t *testing.T) {
 	ctx := context.Background()
 
-	validInput := model.CarMaintenanceTemplateCreateInput{
+	validInput := validation.CarMaintenanceTemplateCreate{
 		Name:        "Oil Change",
 		IsMandatory: true,
 		WarnPct:     0.8,
@@ -140,7 +142,7 @@ func TestCarMaintenanceServiceCreateTemplate(t *testing.T) {
 	t.Run("validation rejects missing name", func(t *testing.T) {
 		svc := newTestCarMaintenanceService(t, nil, nil, nil, nil, nil, nil)
 
-		_, err := svc.CreateTemplate(ctx, model.CarMaintenanceTemplateCreateInput{PullPct: 1.0})
+		_, err := svc.CreateTemplate(ctx, validation.CarMaintenanceTemplateCreate{PullPct: 1.0})
 		assert.Error(t, err)
 	})
 }
@@ -186,7 +188,7 @@ func TestCarMaintenanceServiceGetAllTemplates(t *testing.T) {
 
 		templateRepo.EXPECT().Find(ctx, mock.Anything).Return(nil, nil)
 
-		got, err := svc.GetAllTemplates(ctx, model.CarMaintenanceTemplateFilterInput{})
+		got, err := svc.GetAllTemplates(ctx, validation.CarMaintenanceTemplateFilter{})
 		assert.NoError(t, err)
 		assert.Empty(t, got)
 	})
@@ -200,7 +202,7 @@ func TestCarMaintenanceServiceGetAllTemplates(t *testing.T) {
 			return f.IsMandatory != nil && *f.IsMandatory
 		})).Return(nil, nil)
 
-		_, err := svc.GetAllTemplates(ctx, model.CarMaintenanceTemplateFilterInput{IsMandatory: &mandatory})
+		_, err := svc.GetAllTemplates(ctx, validation.CarMaintenanceTemplateFilter{IsMandatory: &mandatory})
 		assert.NoError(t, err)
 	})
 }
@@ -217,7 +219,7 @@ func TestCarMaintenanceServiceUpdateTemplate(t *testing.T) {
 
 		templateRepo.EXPECT().Update(ctx, tmplID, mock.Anything).Return(nil)
 
-		assert.NoError(t, svc.UpdateTemplate(ctx, tmplID, model.CarMaintenanceTemplateUpdateInput{}))
+		assert.NoError(t, svc.UpdateTemplate(ctx, tmplID, validation.CarMaintenanceTemplateUpdate{}))
 	})
 
 	t.Run("not found returns ErrNotFound", func(t *testing.T) {
@@ -226,7 +228,7 @@ func TestCarMaintenanceServiceUpdateTemplate(t *testing.T) {
 
 		templateRepo.EXPECT().Update(ctx, tmplID, mock.Anything).Return(model.ErrNotFound)
 
-		assert.ErrorIs(t, svc.UpdateTemplate(ctx, tmplID, model.CarMaintenanceTemplateUpdateInput{}), model.ErrNotFound)
+		assert.ErrorIs(t, svc.UpdateTemplate(ctx, tmplID, validation.CarMaintenanceTemplateUpdate{}), model.ErrNotFound)
 	})
 }
 
@@ -284,13 +286,13 @@ func TestCarMaintenanceServiceGetRecord(t *testing.T) {
 		presigned := "https://cdn/invoice"
 		recordRepo.EXPECT().FindByID(ctx, recordID).Return(model.CarMaintenanceRecord{
 			ID:            recordID,
-			ReceiptImages: []model.Image{{Key: &key}},
+			ReceiptImages: []sharedmodel.Image{{Key: key}},
 		}, nil)
 		storage.EXPECT().GetPresignedURL(ctx, key).Return(presigned, nil)
 
 		got, err := svc.GetRecord(ctx, recordID)
 		assert.NoError(t, err)
-		assert.Equal(t, presigned, *got.ReceiptImages[0].URL)
+		assert.Equal(t, presigned, got.ReceiptImages[0].URL)
 	})
 
 	t.Run("not found returns ErrNotFound", func(t *testing.T) {
@@ -317,7 +319,7 @@ func TestCarMaintenanceServiceGetRecords(t *testing.T) {
 
 		recordRepo.EXPECT().Find(ctx, mock.Anything).Return(nil, nil)
 
-		got, err := svc.GetRecords(ctx, model.CarMaintenanceRecordFilterInput{})
+		got, err := svc.GetRecords(ctx, validation.CarMaintenanceRecordFilter{})
 		assert.NoError(t, err)
 		assert.Empty(t, got)
 	})
@@ -329,7 +331,7 @@ func TestCarMaintenanceServiceGetRecords(t *testing.T) {
 
 		recordRepo.EXPECT().Find(ctx, mock.Anything).Return(nil, model.ErrInternalServerError)
 
-		_, err := svc.GetRecords(ctx, model.CarMaintenanceRecordFilterInput{})
+		_, err := svc.GetRecords(ctx, validation.CarMaintenanceRecordFilter{})
 		assert.Error(t, err)
 	})
 }
@@ -382,7 +384,7 @@ func TestCarMaintenanceServiceCompleteRecord(t *testing.T) {
 			return u.Status != nil && *u.Status == model.CarStatusAvailable
 		})).Return(nil)
 
-		err := svc.CompleteRecord(ctx, recordID, model.CarMaintenanceRecordCompleteInput{
+		err := svc.CompleteRecord(ctx, recordID, validation.CarMaintenanceRecordComplete{
 			CompletedKM: 50_000,
 			CostTenge:   15_000,
 		})
@@ -415,7 +417,7 @@ func TestCarMaintenanceServiceCompleteRecord(t *testing.T) {
 		)
 		carRepo.EXPECT().Update(ctx, carID, mock.Anything).Return(nil)
 
-		err := svc.CompleteRecord(ctx, recordID, model.CarMaintenanceRecordCompleteInput{CompletedKM: 10_000})
+		err := svc.CompleteRecord(ctx, recordID, validation.CarMaintenanceRecordComplete{CompletedKM: 10_000})
 		assert.NoError(t, err)
 	})
 
@@ -425,7 +427,7 @@ func TestCarMaintenanceServiceCompleteRecord(t *testing.T) {
 
 		recordRepo.EXPECT().FindByID(ctx, recordID).Return(model.CarMaintenanceRecord{}, model.ErrNotFound)
 
-		err := svc.CompleteRecord(ctx, recordID, model.CarMaintenanceRecordCompleteInput{CompletedKM: 1000})
+		err := svc.CompleteRecord(ctx, recordID, validation.CarMaintenanceRecordComplete{CompletedKM: 1000})
 		assert.ErrorIs(t, err, model.ErrNotFound)
 	})
 
@@ -439,7 +441,7 @@ func TestCarMaintenanceServiceCompleteRecord(t *testing.T) {
 		}, nil)
 		templateRepo.EXPECT().FindByID(ctx, templateID).Return(model.CarMaintenanceTemplate{}, model.ErrNotFound)
 
-		err := svc.CompleteRecord(ctx, recordID, model.CarMaintenanceRecordCompleteInput{CompletedKM: 1000})
+		err := svc.CompleteRecord(ctx, recordID, validation.CarMaintenanceRecordComplete{CompletedKM: 1000})
 		assert.ErrorIs(t, err, model.ErrNotFound)
 	})
 }
@@ -453,7 +455,7 @@ func TestCarMaintenanceServiceGetReceiptImageUploadData(t *testing.T) {
 		storage := mocks.NewMockObjectStorage(t)
 		svc := newTestCarMaintenanceService(t, nil, nil, nil, nil, nil, storage)
 
-		want := model.ImageUploadData{ObjectKey: "receipts/abc.pdf", URL: "https://upload.example.com"}
+		want := sharedmodel.ImageUploadData{ObjectKey: "receipts/abc.pdf", PresignedPutURL: "https://upload.example.com"}
 		storage.EXPECT().GetMaintenanceReceiptImageUploadData(ctx).Return(want, nil)
 
 		got, err := svc.GetReceiptImageUploadData(ctx)
@@ -465,7 +467,7 @@ func TestCarMaintenanceServiceGetReceiptImageUploadData(t *testing.T) {
 		storage := mocks.NewMockObjectStorage(t)
 		svc := newTestCarMaintenanceService(t, nil, nil, nil, nil, nil, storage)
 
-		storage.EXPECT().GetMaintenanceReceiptImageUploadData(ctx).Return(model.ImageUploadData{}, model.ErrInternalServerError)
+		storage.EXPECT().GetMaintenanceReceiptImageUploadData(ctx).Return(sharedmodel.ImageUploadData{}, model.ErrInternalServerError)
 
 		_, err := svc.GetReceiptImageUploadData(ctx)
 		assert.Error(t, err)

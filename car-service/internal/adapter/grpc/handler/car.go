@@ -98,7 +98,7 @@ func (h *CarHandler) GetCarImageUploadData(ctx context.Context, _ *emptypb.Empty
 	}
 
 	return &carsvc.GetCarImageUploadDataResponse{
-		UploadData: dto.ToImageUploadData(data.URL, data.ObjectKey),
+		UploadData: dto.ToImageUploadData(data),
 	}, nil
 }
 

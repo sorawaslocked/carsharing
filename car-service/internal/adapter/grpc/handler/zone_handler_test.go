@@ -6,6 +6,7 @@ import (
 
 	"carsharing/car-service/internal/adapter/grpc/handler/mocks"
 	"carsharing/car-service/internal/model"
+	"carsharing/car-service/internal/validation"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -20,7 +21,7 @@ func TestZoneHandlerCreateZone(t *testing.T) {
 		svc := mocks.NewMockZoneService(t)
 		h := NewZoneHandler(svc, discardLogger())
 
-		svc.EXPECT().Create(ctx, mock.MatchedBy(func(in model.ZoneCreateInput) bool {
+		svc.EXPECT().Create(ctx, mock.MatchedBy(func(in validation.ZoneCreate) bool {
 			return in.Name == "Downtown" && in.Type == "operating"
 		})).Return("zone-123", nil)
 

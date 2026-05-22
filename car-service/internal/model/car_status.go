@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	sharedmodel "carsharing/shared/model"
+)
 
 type CarStatusLogEntry struct {
 	ID         string
@@ -17,7 +21,7 @@ type CarStatusLogEntry struct {
 type CarStatusLogFilter struct {
 	CarID *string
 
-	Pagination
+	Pagination *sharedmodel.Pagination
 }
 
 type CarStatusTransitionInput struct {

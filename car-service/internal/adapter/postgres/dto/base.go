@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"carsharing/car-service/internal/model"
+	sharedmodel "carsharing/shared/model"
 	"fmt"
 )
 
@@ -19,17 +19,12 @@ func (b *ArgsBuilder) Add(arg any) string {
 	return fmt.Sprintf("$%d", len(b.Args))
 }
 
-func BuildPagination(b *ArgsBuilder, p model.Pagination) string {
-	clause := ""
-
-	if p.Limit != nil {
-		clause += " LIMIT " + b.Add(*p.Limit)
-	}
-	if p.Offset != nil {
-		clause += " OFFSET " + b.Add(*p.Offset)
+func BuildPagination(b *ArgsBuilder, p *sharedmodel.Pagination) string {
+	if p == nil {
+		return ""
 	}
 
-	return clause
+	return " LIMIT " + b.Add(p.Limit) + " OFFSET " + b.Add(p.Offset)
 }
 
 func column(tableAlias, name string) string {
@@ -40,21 +35,18 @@ func column(tableAlias, name string) string {
 	return fmt.Sprintf("%s.%s", tableAlias, name)
 }
 
-func ImageKeysToImages(keys []string) []model.Image {
-	images := make([]model.Image, len(keys))
+func ImageKeysToImages(keys []string) []sharedmodel.Image {
+	images := make([]sharedmodel.Image, len(keys))
 	for i, k := range keys {
-		k := k
-		images[i] = model.Image{Key: &k}
+		images[i] = sharedmodel.Image{Key: k}
 	}
 	return images
 }
 
-func ImagesToKeys(images []model.Image) []string {
+func ImagesToKeys(images []sharedmodel.Image) []string {
 	keys := make([]string, len(images))
 	for i, img := range images {
-		if img.Key != nil {
-			keys[i] = *img.Key
-		}
+		keys[i] = img.Key
 	}
 	return keys
 }

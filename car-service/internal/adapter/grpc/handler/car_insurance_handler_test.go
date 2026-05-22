@@ -7,6 +7,8 @@ import (
 
 	"carsharing/car-service/internal/adapter/grpc/handler/mocks"
 	"carsharing/car-service/internal/model"
+	"carsharing/car-service/internal/validation"
+	sharedmodel "carsharing/shared/model"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -31,7 +33,7 @@ func TestCarInsuranceHandlerCreateCarInsurance(t *testing.T) {
 		svc := mocks.NewMockCarInsuranceService(t)
 		h := NewCarInsuranceHandler(svc, discardLogger())
 
-		svc.EXPECT().Create(ctx, mock.MatchedBy(func(in model.CarInsuranceCreateInput) bool {
+		svc.EXPECT().Create(ctx, mock.MatchedBy(func(in validation.CarInsuranceCreate) bool {
 			return in.CarID == req.CarId && in.Provider == "InsureCo"
 		})).Return("ins-123", nil)
 
@@ -171,9 +173,9 @@ func TestCarInsuranceHandlerGetCarInsuranceImageUploadData(t *testing.T) {
 		svc := mocks.NewMockCarInsuranceService(t)
 		h := NewCarInsuranceHandler(svc, discardLogger())
 
-		svc.EXPECT().GetImageUploadData(ctx).Return(model.ImageUploadData{
-			URL:       "https://upload.example.com/ins",
-			ObjectKey: "insurance/policy.pdf",
+		svc.EXPECT().GetImageUploadData(ctx).Return(sharedmodel.ImageUploadData{
+			PresignedPutURL: "https://upload.example.com/ins",
+			ObjectKey:       "insurance/policy.pdf",
 		}, nil)
 
 		resp, err := h.GetCarInsuranceImageUploadData(ctx, &emptypb.Empty{})

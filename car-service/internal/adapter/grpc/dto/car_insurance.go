@@ -2,14 +2,16 @@ package dto
 
 import (
 	"carsharing/car-service/internal/model"
+	"carsharing/car-service/internal/validation"
+	sharedmodel "carsharing/shared/model"
 
 	basecar "github.com/sorawaslocked/car-rental-protos/gen/base/car"
 	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func FromCreateCarInsuranceRequest(req *carsvc.CreateCarInsuranceRequest) model.CarInsuranceCreateInput {
-	return model.CarInsuranceCreateInput{
+func FromCreateCarInsuranceRequest(req *carsvc.CreateCarInsuranceRequest) validation.CarInsuranceCreate {
+	return validation.CarInsuranceCreate{
 		CarID:     req.CarId,
 		Type:      req.Type,
 		Provider:  req.Provider,
@@ -21,26 +23,24 @@ func FromCreateCarInsuranceRequest(req *carsvc.CreateCarInsuranceRequest) model.
 	}
 }
 
-func FromListCarInsurancesRequest(req *carsvc.ListCarInsurancesRequest) model.CarInsuranceFilterInput {
-	filter := model.CarInsuranceFilterInput{
+func FromListCarInsurancesRequest(req *carsvc.ListCarInsurancesRequest) validation.CarInsuranceFilter {
+	filter := validation.CarInsuranceFilter{
 		CarID:              req.CarId,
 		Type:               req.Type,
 		Status:             req.Status,
 		ExpiringWithinDays: req.ExpiringWithinDays,
 	}
 	if req.Pagination != nil {
-		limit := req.Pagination.Limit
-		offset := req.Pagination.Offset
-		filter.PaginationInput = model.PaginationInput{
-			Limit:  &limit,
-			Offset: &offset,
+		filter.Pagination = &sharedmodel.Pagination{
+			Limit:  req.Pagination.Limit,
+			Offset: req.Pagination.Offset,
 		}
 	}
 	return filter
 }
 
-func FromUpdateCarInsuranceRequest(req *carsvc.UpdateCarInsuranceRequest) model.CarInsuranceUpdateInput {
-	update := model.CarInsuranceUpdateInput{
+func FromUpdateCarInsuranceRequest(req *carsvc.UpdateCarInsuranceRequest) validation.CarInsuranceUpdate {
+	update := validation.CarInsuranceUpdate{
 		Provider:  req.Provider,
 		PolicyNum: req.PolicyNum,
 		CostTenge: req.CostTenge,

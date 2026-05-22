@@ -2,35 +2,21 @@ package service
 
 import (
 	"carsharing/car-service/internal/model"
+	"carsharing/car-service/internal/validation"
+	sharedmodel "carsharing/shared/model"
 )
 
-const (
-	defaultPaginationLimit  int64 = 20
-	defaultPaginationOffset int64 = 0
-)
-
-func paginationFromInput(input model.PaginationInput) model.Pagination {
-	defLimit := defaultPaginationLimit
-	defOffset := defaultPaginationOffset
-
-	p := model.Pagination{}
-
-	if input.Limit != nil {
-		p.Limit = input.Limit
-	} else {
-		p.Limit = &defLimit
+func paginationFromInput(p *sharedmodel.Pagination) *sharedmodel.Pagination {
+	if p != nil {
+		return p
 	}
-
-	if input.Offset != nil {
-		p.Offset = input.Offset
-	} else {
-		p.Offset = &defOffset
+	return &sharedmodel.Pagination{
+		Limit:  sharedmodel.DefaultPaginationLimit,
+		Offset: sharedmodel.DefaultPaginationOffset,
 	}
-
-	return p
 }
 
-func carModelFilterFromInput(filterInput model.CarModelFilterInput) model.CarModelFilter {
+func carModelFilterFromInput(filterInput validation.CarModelFilter) model.CarModelFilter {
 	filter := model.CarModelFilter{
 		Brand:    filterInput.Brand,
 		Model:    filterInput.Model,
@@ -54,12 +40,12 @@ func carModelFilterFromInput(filterInput model.CarModelFilterInput) model.CarMod
 		filter.Class = &class
 	}
 
-	filter.Pagination = paginationFromInput(filterInput.PaginationInput)
+	filter.Pagination = paginationFromInput(filterInput.Pagination)
 
 	return filter
 }
 
-func carFilterFromInput(filterInput model.CarFilterInput) model.CarFilter {
+func carFilterFromInput(filterInput validation.CarFilter) model.CarFilter {
 	filter := model.CarFilter{}
 
 	if filterInput.Status != nil {
@@ -72,22 +58,14 @@ func carFilterFromInput(filterInput model.CarFilterInput) model.CarFilter {
 		filter.ModelFilter = &mf
 	}
 
-	if filterInput.LocationFilter != nil {
-		filter.LocationFilter = &model.LocationFilter{
-			Location: model.Location{
-				Latitude:  filterInput.LocationFilter.Location.Latitude,
-				Longitude: filterInput.LocationFilter.Location.Longitude,
-			},
-			RadiusKM: filterInput.LocationFilter.RadiusKM,
-		}
-	}
+	filter.LocationFilter = filterInput.LocationFilter
 
-	filter.Pagination = paginationFromInput(filterInput.PaginationInput)
+	filter.Pagination = paginationFromInput(filterInput.Pagination)
 
 	return filter
 }
 
-func zoneFilterFromInput(filterInput model.ZoneFilterInput) model.ZoneFilter {
+func zoneFilterFromInput(filterInput validation.ZoneFilter) model.ZoneFilter {
 	filter := model.ZoneFilter{
 		IsActive: filterInput.IsActive,
 	}
@@ -97,12 +75,12 @@ func zoneFilterFromInput(filterInput model.ZoneFilterInput) model.ZoneFilter {
 		filter.Type = &zoneType
 	}
 
-	filter.Pagination = paginationFromInput(filterInput.PaginationInput)
+	filter.Pagination = paginationFromInput(filterInput.Pagination)
 
 	return filter
 }
 
-func insuranceFilterFromInput(filterInput model.CarInsuranceFilterInput) model.CarInsuranceFilter {
+func insuranceFilterFromInput(filterInput validation.CarInsuranceFilter) model.CarInsuranceFilter {
 	filter := model.CarInsuranceFilter{
 		CarID:              filterInput.CarID,
 		ExpiringWithinDays: filterInput.ExpiringWithinDays,
@@ -118,22 +96,22 @@ func insuranceFilterFromInput(filterInput model.CarInsuranceFilterInput) model.C
 		filter.Status = &status
 	}
 
-	filter.Pagination = paginationFromInput(filterInput.PaginationInput)
+	filter.Pagination = paginationFromInput(filterInput.Pagination)
 
 	return filter
 }
 
-func maintenanceTemplateFilterFromInput(filterInput model.CarMaintenanceTemplateFilterInput) model.CarMaintenanceTemplateFilter {
+func maintenanceTemplateFilterFromInput(filterInput validation.CarMaintenanceTemplateFilter) model.CarMaintenanceTemplateFilter {
 	filter := model.CarMaintenanceTemplateFilter{
 		IsMandatory: filterInput.IsMandatory,
 	}
 
-	filter.Pagination = paginationFromInput(filterInput.PaginationInput)
+	filter.Pagination = paginationFromInput(filterInput.Pagination)
 
 	return filter
 }
 
-func maintenanceRecordFilterFromInput(filterInput model.CarMaintenanceRecordFilterInput) model.CarMaintenanceRecordFilter {
+func maintenanceRecordFilterFromInput(filterInput validation.CarMaintenanceRecordFilter) model.CarMaintenanceRecordFilter {
 	filter := model.CarMaintenanceRecordFilter{
 		CarID:      filterInput.CarID,
 		TemplateID: filterInput.TemplateID,
@@ -144,7 +122,7 @@ func maintenanceRecordFilterFromInput(filterInput model.CarMaintenanceRecordFilt
 		filter.Status = &status
 	}
 
-	filter.Pagination = paginationFromInput(filterInput.PaginationInput)
+	filter.Pagination = paginationFromInput(filterInput.Pagination)
 
 	return filter
 }

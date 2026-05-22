@@ -93,7 +93,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	userRepo := postgres.NewUserRepository(log, pool)
 	docRepo := postgres.NewDocumentRepository(log, pool)
 	publisher := natsadapter.NewPublisher(log, natsConn)
-	minioStorage := minioadapter.NewMinioObjectStorage(log, minioClient, cfg.Minio)
+	minioStorage := minioadapter.NewObjectStorage(log, minioClient, cfg.Minio)
 	analyzerClient := grpcdocanalyzer.NewDocumentAnalyzer(log, analyzerConn)
 
 	userService := service.NewUserService(log, validate, userRepo, docRepo, minioStorage, analyzerClient, publisher, activationCodeCache, msMailer)

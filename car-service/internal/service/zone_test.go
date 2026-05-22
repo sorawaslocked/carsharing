@@ -6,6 +6,7 @@ import (
 
 	"carsharing/car-service/internal/model"
 	"carsharing/car-service/internal/service/mocks"
+	"carsharing/car-service/internal/validation"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -18,7 +19,7 @@ func newTestZoneService(t *testing.T, zoneRepo ZoneRepository) *ZoneService {
 func TestZoneServiceCreate(t *testing.T) {
 	ctx := context.Background()
 
-	validInput := model.ZoneCreateInput{
+	validInput := validation.ZoneCreate{
 		Name:            "Downtown",
 		Type:            string(model.ZoneTypeOperating),
 		BoundaryGeoJSON: `{"type":"Polygon","coordinates":[]}`,
@@ -62,7 +63,7 @@ func TestZoneServiceCreate(t *testing.T) {
 	t.Run("validation rejects missing name", func(t *testing.T) {
 		svc := newTestZoneService(t, nil)
 
-		_, err := svc.Create(ctx, model.ZoneCreateInput{
+		_, err := svc.Create(ctx, validation.ZoneCreate{
 			Type:            string(model.ZoneTypeOperating),
 			BoundaryGeoJSON: `{}`,
 		})
@@ -105,7 +106,7 @@ func TestZoneServiceGetAll(t *testing.T) {
 
 		repo.EXPECT().Find(ctx, mock.Anything).Return(nil, nil)
 
-		got, err := svc.GetAll(ctx, model.ZoneFilterInput{})
+		got, err := svc.GetAll(ctx, validation.ZoneFilter{})
 		assert.NoError(t, err)
 		assert.Empty(t, got)
 	})
@@ -119,7 +120,7 @@ func TestZoneServiceGetAll(t *testing.T) {
 			return f.IsActive != nil && *f.IsActive
 		})).Return([]model.Zone{{ID: "zone-1"}}, nil)
 
-		got, err := svc.GetAll(ctx, model.ZoneFilterInput{IsActive: &active})
+		got, err := svc.GetAll(ctx, validation.ZoneFilter{IsActive: &active})
 		assert.NoError(t, err)
 		assert.Len(t, got, 1)
 	})
@@ -130,7 +131,7 @@ func TestZoneServiceGetAll(t *testing.T) {
 
 		repo.EXPECT().Find(ctx, mock.Anything).Return(nil, model.ErrInternalServerError)
 
-		_, err := svc.GetAll(ctx, model.ZoneFilterInput{})
+		_, err := svc.GetAll(ctx, validation.ZoneFilter{})
 		assert.Error(t, err)
 	})
 }
@@ -148,7 +149,7 @@ func TestZoneServiceUpdate(t *testing.T) {
 			return u.Name != nil && *u.Name == "New Name"
 		})).Return(nil)
 
-		assert.NoError(t, svc.Update(ctx, zoneID, model.ZoneUpdateInput{Name: &name}))
+		assert.NoError(t, svc.Update(ctx, zoneID, validation.ZoneUpdate{Name: &name}))
 	})
 
 	t.Run("type string is parsed to enum", func(t *testing.T) {
@@ -160,7 +161,7 @@ func TestZoneServiceUpdate(t *testing.T) {
 			return u.Type != nil && *u.Type == model.ZoneTypeNoDrop
 		})).Return(nil)
 
-		assert.NoError(t, svc.Update(ctx, zoneID, model.ZoneUpdateInput{Type: &zoneType}))
+		assert.NoError(t, svc.Update(ctx, zoneID, validation.ZoneUpdate{Type: &zoneType}))
 	})
 
 	t.Run("not found returns ErrNotFound", func(t *testing.T) {
@@ -169,7 +170,7 @@ func TestZoneServiceUpdate(t *testing.T) {
 
 		repo.EXPECT().Update(ctx, zoneID, mock.Anything).Return(model.ErrNotFound)
 
-		assert.ErrorIs(t, svc.Update(ctx, zoneID, model.ZoneUpdateInput{}), model.ErrNotFound)
+		assert.ErrorIs(t, svc.Update(ctx, zoneID, validation.ZoneUpdate{}), model.ErrNotFound)
 	})
 }
 

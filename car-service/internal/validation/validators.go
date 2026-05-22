@@ -1,6 +1,9 @@
 package validation
 
 import (
+	"fmt"
+	"log/slog"
+
 	"carsharing/car-service/internal/model"
 
 	"github.com/go-playground/validator/v10"
@@ -11,50 +14,35 @@ const (
 	minRadiusKM float64 = 0.1
 )
 
-func RegisterCustomValidators(v *validator.Validate) error {
-	err := v.RegisterValidation("carfueltype", carFuelTypeValidator)
-	if err != nil {
-		return err
+type ErrRegisterValidator struct {
+	Tag string
+}
+
+func (e ErrRegisterValidator) Error() string {
+	return fmt.Sprintf("failed to register validator %q", e.Tag)
+}
+
+func RegisterCustomValidators(v *validator.Validate, log *slog.Logger) error {
+	validators := []struct {
+		tag string
+		fn  validator.Func
+	}{
+		{"carfueltype", carFuelTypeValidator},
+		{"cartransmission", carTransmissionValidator},
+		{"carbodytype", carBodyTypeValidator},
+		{"carclass", carClassValidator},
+		{"carstatus", carStatusValidator},
+		{"zonetype", zoneTypeValidator},
+		{"insurancetype", insuranceTypeValidator},
+		{"insurancestatus", insuranceStatusValidator},
+		{"maintenancerecordstatus", maintenanceRecordStatusValidator},
 	}
 
-	err = v.RegisterValidation("cartransmission", carTransmissionValidator)
-	if err != nil {
-		return err
-	}
-
-	err = v.RegisterValidation("carbodytype", carBodyTypeValidator)
-	if err != nil {
-		return err
-	}
-
-	err = v.RegisterValidation("carclass", carClassValidator)
-	if err != nil {
-		return err
-	}
-
-	err = v.RegisterValidation("carstatus", carStatusValidator)
-	if err != nil {
-		return err
-	}
-
-	err = v.RegisterValidation("zonetype", zoneTypeValidator)
-	if err != nil {
-		return err
-	}
-
-	err = v.RegisterValidation("insurancetype", insuranceTypeValidator)
-	if err != nil {
-		return err
-	}
-
-	err = v.RegisterValidation("insurancestatus", insuranceStatusValidator)
-	if err != nil {
-		return err
-	}
-
-	err = v.RegisterValidation("maintenancerecordstatus", maintenanceRecordStatusValidator)
-	if err != nil {
-		return err
+	for _, vd := range validators {
+		if err := v.RegisterValidation(vd.tag, vd.fn); err != nil {
+			log.Error("registering validator", slog.String("tag", vd.tag), slog.Any("error", err))
+			return ErrRegisterValidator{Tag: vd.tag}
+		}
 	}
 
 	v.RegisterStructValidation(locationFilterValidator, model.LocationFilter{})

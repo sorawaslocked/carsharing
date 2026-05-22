@@ -88,6 +88,6 @@ func (h *CarInsuranceHandler) GetCarInsuranceImageUploadData(ctx context.Context
 	}
 
 	return &carsvc.GetCarInsuranceImageUploadDataResponse{
-		UploadData: dto.ToImageUploadData(data.URL, data.ObjectKey),
+		UploadData: dto.ToImageUploadData(data),
 	}, nil
 }

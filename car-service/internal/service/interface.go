@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"carsharing/car-service/internal/model"
+	sharedmodel "carsharing/shared/model"
 )
 
 type CarModelRepository interface {
@@ -81,9 +82,9 @@ type EventPublisher interface {
 }
 
 type ObjectStorage interface {
-	GetCarImageUploadData(ctx context.Context) (model.ImageUploadData, error)
-	GetCarModelImageUploadData(ctx context.Context) (model.ImageUploadData, error)
-	GetInsuranceImageUploadData(ctx context.Context) (model.ImageUploadData, error)
-	GetMaintenanceReceiptImageUploadData(ctx context.Context) (model.ImageUploadData, error)
+	GetCarImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error)
+	GetCarModelImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error)
+	GetInsuranceImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error)
+	GetMaintenanceReceiptImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error)
 	GetPresignedURL(ctx context.Context, key string) (string, error)
 }

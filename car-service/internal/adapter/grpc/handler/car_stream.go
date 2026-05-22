@@ -6,6 +6,7 @@ import (
 
 	"carsharing/car-service/internal/adapter/grpc/dto"
 	"carsharing/car-service/internal/model"
+	"carsharing/car-service/internal/validation"
 
 	"github.com/sorawaslocked/car-rental-protos/gen/base"
 	basecar "github.com/sorawaslocked/car-rental-protos/gen/base/car"
@@ -61,7 +62,7 @@ func (h *CarStreamHandler) StreamCarsWithFilter(req *carsvc.StreamCarsWithFilter
 	}
 }
 
-func (h *CarStreamHandler) sendFilteredCars(req *carsvc.StreamCarsWithFilterRequest, filterInput model.CarFilterInput, stream grpc.ServerStreamingServer[carsvc.StreamCarsWithFilterResponse]) error {
+func (h *CarStreamHandler) sendFilteredCars(req *carsvc.StreamCarsWithFilterRequest, filterInput validation.CarFilter, stream grpc.ServerStreamingServer[carsvc.StreamCarsWithFilterResponse]) error {
 	ctx := stream.Context()
 
 	cars, err := h.carService.GetAll(ctx, filterInput)
@@ -139,8 +140,8 @@ func (h *CarStreamHandler) StreamCarTelemetry(req *carsvc.StreamCarTelemetryRequ
 	}
 }
 
-func filterInputFromStreamRequest(req *carsvc.StreamCarsWithFilterRequest) model.CarFilterInput {
-	filterInput := model.CarFilterInput{}
+func filterInputFromStreamRequest(req *carsvc.StreamCarsWithFilterRequest) validation.CarFilter {
+	filterInput := validation.CarFilter{}
 
 	if req.Status != nil {
 		filterInput.Status = req.Status
@@ -161,7 +162,7 @@ func filterInputFromStreamRequest(req *carsvc.StreamCarsWithFilterRequest) model
 	}
 
 	if req.Brand != nil || req.Model != nil || req.FuelType != nil || req.Transmission != nil || req.BodyType != nil || req.Class != nil || req.MinSeats != nil {
-		mf := &model.CarModelFilterInput{
+		mf := &validation.CarModelFilter{
 			Brand:        req.Brand,
 			Model:        req.Model,
 			FuelType:     req.FuelType,

@@ -17,9 +17,9 @@ import (
 func newTestCarService(t *testing.T, carRepo CarRepository, statusLogRepo CarStatusLogRepository, eventPub EventPublisher) *CarService {
 	t.Helper()
 	v := validator.New()
-	_ = validation.RegisterCustomValidators(v)
-	return NewCarService(carRepo, statusLogRepo, nil, nil, eventPub, v,
-		slog.New(slog.NewTextHandler(io.Discard, nil)))
+	log := slog.New(slog.NewTextHandler(io.Discard, nil))
+	_ = validation.RegisterCustomValidators(v, log)
+	return NewCarService(nil, carRepo, statusLogRepo, nil, nil, eventPub, v, log)
 }
 
 func TestTransitionCarStatus(t *testing.T) {
@@ -97,7 +97,7 @@ func TestUpdateCarStatus(t *testing.T) {
 			).
 			Return(nil)
 
-		err := svc.UpdateCarStatus(ctx, carID, model.CarStatusUpdateInput{
+		err := svc.UpdateCarStatus(ctx, carID, validation.CarStatusUpdate{
 			Status: string(model.CarStatusReserved),
 		})
 		assert.NoError(t, err)
@@ -111,7 +111,7 @@ func TestUpdateCarStatus(t *testing.T) {
 			FindByID(ctx, carID).
 			Return(model.Car{ID: carID, Status: model.CarStatusAvailable}, nil)
 
-		err := svc.UpdateCarStatus(ctx, carID, model.CarStatusUpdateInput{
+		err := svc.UpdateCarStatus(ctx, carID, validation.CarStatusUpdate{
 			Status: string(model.CarStatusInUse), // available → in_use not in transition map
 		})
 		assert.Error(t, err)
@@ -125,7 +125,7 @@ func TestUpdateCarStatus(t *testing.T) {
 			FindByID(ctx, carID).
 			Return(model.Car{}, model.ErrNotFound)
 
-		err := svc.UpdateCarStatus(ctx, carID, model.CarStatusUpdateInput{
+		err := svc.UpdateCarStatus(ctx, carID, validation.CarStatusUpdate{
 			Status: string(model.CarStatusReserved),
 		})
 		assert.ErrorIs(t, err, model.ErrNotFound)
@@ -149,7 +149,7 @@ func TestUpdateCarStatus(t *testing.T) {
 			).
 			Return(nil)
 
-		err := svc.UpdateCarStatus(ctx, carID, model.CarStatusUpdateInput{
+		err := svc.UpdateCarStatus(ctx, carID, validation.CarStatusUpdate{
 			Status: string(model.CarStatusAvailable),
 		})
 		assert.NoError(t, err)
@@ -170,7 +170,7 @@ func TestUpdateCarStatus(t *testing.T) {
 			PublishCarStatusUpdated(ctx, carID, mock.Anything, mock.Anything).
 			Return(model.ErrInternalServerError)
 
-		err := svc.UpdateCarStatus(ctx, carID, model.CarStatusUpdateInput{
+		err := svc.UpdateCarStatus(ctx, carID, validation.CarStatusUpdate{
 			Status: string(model.CarStatusAvailable),
 		})
 		assert.NoError(t, err)

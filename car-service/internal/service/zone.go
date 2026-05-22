@@ -34,7 +34,7 @@ func NewZoneService(
 	return s
 }
 
-func (s *ZoneService) Create(ctx context.Context, createInput model.ZoneCreateInput) (string, error) {
+func (s *ZoneService) Create(ctx context.Context, createInput validation.ZoneCreate) (string, error) {
 	const method = "Create"
 	logger := pkglog.WithMethod(s.log, method)
 
@@ -81,7 +81,7 @@ func (s *ZoneService) Get(ctx context.Context, id string) (model.Zone, error) {
 	return zone, nil
 }
 
-func (s *ZoneService) GetAll(ctx context.Context, filterInput model.ZoneFilterInput) ([]model.Zone, error) {
+func (s *ZoneService) GetAll(ctx context.Context, filterInput validation.ZoneFilter) ([]model.Zone, error) {
 	const method = "GetAll"
 	logger := pkglog.WithMethod(s.log, method)
 
@@ -101,7 +101,7 @@ func (s *ZoneService) GetAll(ctx context.Context, filterInput model.ZoneFilterIn
 	return zones, nil
 }
 
-func (s *ZoneService) Update(ctx context.Context, id string, updateInput model.ZoneUpdateInput) error {
+func (s *ZoneService) Update(ctx context.Context, id string, updateInput validation.ZoneUpdate) error {
 	const method = "Update"
 	logger := pkglog.WithMethod(s.log, method)
 

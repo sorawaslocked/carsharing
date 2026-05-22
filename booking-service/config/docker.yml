@@ -7,9 +7,9 @@ grpc_server:
 postgres:
   host: "postgres"
   port: 5432
-  user: "car_rental"
-  password: "car_rental"
-  database: "car_rental"
+  user: "carsharing"
+  password: "carsharing"
+  database: "carsharing"
   ssl_mode: "disable"
 
 nats_publisher:

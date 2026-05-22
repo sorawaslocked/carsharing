@@ -7,6 +7,7 @@ import (
 
 	"carsharing/car-service/internal/model"
 	"carsharing/car-service/internal/validation"
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 
@@ -55,7 +56,7 @@ func (s *CarService) SetCarCreatedNotifier(n CarCreatedNotifier) {
 	s.carCreatedNotifier = n
 }
 
-func (s *CarService) Create(ctx context.Context, createInput model.CarCreateInput) (string, error) {
+func (s *CarService) Create(ctx context.Context, createInput validation.CarCreate) (string, error) {
 	const method = "Create"
 	logger := pkglog.WithMethod(s.log, method)
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
@@ -111,17 +112,17 @@ func (s *CarService) Get(ctx context.Context, id string) (model.Car, error) {
 	}
 
 	for i := range car.Images {
-		url, err := s.objectStorage.GetPresignedURL(ctx, *car.Images[i].Key)
+		url, err := s.objectStorage.GetPresignedURL(ctx, car.Images[i].Key)
 		if err != nil {
 			return model.Car{}, handleError(logger, err)
 		}
-		car.Images[i].URL = &url
+		car.Images[i].URL = url
 	}
 
 	return car, nil
 }
 
-func (s *CarService) GetAll(ctx context.Context, filterInput model.CarFilterInput) ([]model.Car, error) {
+func (s *CarService) GetAll(ctx context.Context, filterInput validation.CarFilter) ([]model.Car, error) {
 	const method = "GetAll"
 	logger := pkglog.WithMethod(s.log, method)
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
@@ -139,18 +140,18 @@ func (s *CarService) GetAll(ctx context.Context, filterInput model.CarFilterInpu
 
 	for i := range cars {
 		for j := range cars[i].Images {
-			url, err := s.objectStorage.GetPresignedURL(ctx, *cars[i].Images[j].Key)
+			url, err := s.objectStorage.GetPresignedURL(ctx, cars[i].Images[j].Key)
 			if err != nil {
 				return nil, handleError(logger, err)
 			}
-			cars[i].Images[j].URL = &url
+			cars[i].Images[j].URL = url
 		}
 	}
 
 	return cars, nil
 }
 
-func (s *CarService) Update(ctx context.Context, id string, updateInput model.CarUpdateInput) error {
+func (s *CarService) Update(ctx context.Context, id string, updateInput validation.CarUpdate) error {
 	const method = "Update"
 	logger := pkglog.WithMethod(s.log, method)
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
@@ -177,7 +178,7 @@ func (s *CarService) Update(ctx context.Context, id string, updateInput model.Ca
 	return nil
 }
 
-func (s *CarService) UpdateCarStatus(ctx context.Context, id string, statusInput model.CarStatusUpdateInput) error {
+func (s *CarService) UpdateCarStatus(ctx context.Context, id string, statusInput validation.CarStatusUpdate) error {
 	const method = "UpdateCarStatus"
 	md := utils.MetadataFromCtx(ctx)
 	logger := pkglog.WithMethod(s.log, method)
@@ -346,14 +347,14 @@ func (s *CarService) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (s *CarService) GetImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (s *CarService) GetImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	const method = "GetImageUploadData"
 	logger := pkglog.WithMethod(s.log, method)
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	data, err := s.objectStorage.GetCarImageUploadData(ctx)
 	if err != nil {
-		return model.ImageUploadData{}, handleError(logger, err)
+		return sharedmodel.ImageUploadData{}, handleError(logger, err)
 	}
 
 	return data, nil
@@ -364,7 +365,7 @@ func (s *CarService) OnBookingCreated(ctx context.Context, event model.BookingCr
 	logger := pkglog.WithMethod(s.log, method)
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
-	if err := s.UpdateCarStatus(ctx, event.CarID, model.CarStatusUpdateInput{
+	if err := s.UpdateCarStatus(ctx, event.CarID, validation.CarStatusUpdate{
 		Status: string(model.CarStatusReserved),
 	}); err != nil {
 		return handleError(logger, err)
@@ -383,7 +384,7 @@ func (s *CarService) OnTripStarted(ctx context.Context, event model.TripStartedE
 	logger := pkglog.WithMethod(s.log, method)
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
-	if err := s.UpdateCarStatus(ctx, event.CarID, model.CarStatusUpdateInput{
+	if err := s.UpdateCarStatus(ctx, event.CarID, validation.CarStatusUpdate{
 		Status: string(model.CarStatusInUse),
 	}); err != nil {
 		return handleError(logger, err)
@@ -403,7 +404,7 @@ func (s *CarService) OnBookingCancelled(ctx context.Context, event model.Booking
 	logger := pkglog.WithMethod(s.log, method)
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
-	if err := s.UpdateCarStatus(ctx, event.CarID, model.CarStatusUpdateInput{
+	if err := s.UpdateCarStatus(ctx, event.CarID, validation.CarStatusUpdate{
 		Status: string(model.CarStatusAvailable),
 	}); err != nil {
 		return handleError(logger, err)
@@ -422,7 +423,7 @@ func (s *CarService) OnTripEnded(ctx context.Context, event model.TripEndedEvent
 	logger := pkglog.WithMethod(s.log, method)
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
-	if err := s.UpdateCarStatus(ctx, event.CarID, model.CarStatusUpdateInput{
+	if err := s.UpdateCarStatus(ctx, event.CarID, validation.CarStatusUpdate{
 		Status: string(model.CarStatusAvailable),
 	}); err != nil {
 		return handleError(logger, err)
@@ -442,7 +443,7 @@ func (s *CarService) OnBookingExpired(ctx context.Context, event model.BookingEx
 	logger := pkglog.WithMethod(s.log, method)
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
-	if err := s.UpdateCarStatus(ctx, event.CarID, model.CarStatusUpdateInput{
+	if err := s.UpdateCarStatus(ctx, event.CarID, validation.CarStatusUpdate{
 		Status: string(model.CarStatusAvailable),
 	}); err != nil {
 		return handleError(logger, err)
@@ -461,7 +462,7 @@ func (s *CarService) OnBookingCompleted(ctx context.Context, event model.Booking
 	logger := pkglog.WithMethod(s.log, method)
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
-	if err := s.UpdateCarStatus(ctx, event.CarID, model.CarStatusUpdateInput{
+	if err := s.UpdateCarStatus(ctx, event.CarID, validation.CarStatusUpdate{
 		Status: string(model.CarStatusAvailable),
 	}); err != nil {
 		return handleError(logger, err)
@@ -480,7 +481,7 @@ func (s *CarService) OnTripCancelled(ctx context.Context, event model.TripCancel
 	logger := pkglog.WithMethod(s.log, method)
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
-	if err := s.UpdateCarStatus(ctx, event.CarID, model.CarStatusUpdateInput{
+	if err := s.UpdateCarStatus(ctx, event.CarID, validation.CarStatusUpdate{
 		Status: string(model.CarStatusAvailable),
 	}); err != nil {
 		return handleError(logger, err)

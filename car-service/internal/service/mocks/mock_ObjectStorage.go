@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	model "carsharing/car-service/internal/model"
+	sharedmodel "carsharing/shared/model"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -23,22 +23,22 @@ func (_m *MockObjectStorage) EXPECT() *MockObjectStorage_Expecter {
 }
 
 // GetCarImageUploadData provides a mock function with given fields: ctx
-func (_m *MockObjectStorage) GetCarImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (_m *MockObjectStorage) GetCarImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetCarImageUploadData")
 	}
 
-	var r0 model.ImageUploadData
+	var r0 sharedmodel.ImageUploadData
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) (model.ImageUploadData, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) (sharedmodel.ImageUploadData, error)); ok {
 		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) model.ImageUploadData); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) sharedmodel.ImageUploadData); ok {
 		r0 = rf(ctx)
 	} else {
-		r0 = ret.Get(0).(model.ImageUploadData)
+		r0 = ret.Get(0).(sharedmodel.ImageUploadData)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
@@ -68,33 +68,33 @@ func (_c *MockObjectStorage_GetCarImageUploadData_Call) Run(run func(ctx context
 	return _c
 }
 
-func (_c *MockObjectStorage_GetCarImageUploadData_Call) Return(_a0 model.ImageUploadData, _a1 error) *MockObjectStorage_GetCarImageUploadData_Call {
+func (_c *MockObjectStorage_GetCarImageUploadData_Call) Return(_a0 sharedmodel.ImageUploadData, _a1 error) *MockObjectStorage_GetCarImageUploadData_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockObjectStorage_GetCarImageUploadData_Call) RunAndReturn(run func(context.Context) (model.ImageUploadData, error)) *MockObjectStorage_GetCarImageUploadData_Call {
+func (_c *MockObjectStorage_GetCarImageUploadData_Call) RunAndReturn(run func(context.Context) (sharedmodel.ImageUploadData, error)) *MockObjectStorage_GetCarImageUploadData_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetCarModelImageUploadData provides a mock function with given fields: ctx
-func (_m *MockObjectStorage) GetCarModelImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (_m *MockObjectStorage) GetCarModelImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetCarModelImageUploadData")
 	}
 
-	var r0 model.ImageUploadData
+	var r0 sharedmodel.ImageUploadData
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) (model.ImageUploadData, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) (sharedmodel.ImageUploadData, error)); ok {
 		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) model.ImageUploadData); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) sharedmodel.ImageUploadData); ok {
 		r0 = rf(ctx)
 	} else {
-		r0 = ret.Get(0).(model.ImageUploadData)
+		r0 = ret.Get(0).(sharedmodel.ImageUploadData)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
@@ -124,33 +124,33 @@ func (_c *MockObjectStorage_GetCarModelImageUploadData_Call) Run(run func(ctx co
 	return _c
 }
 
-func (_c *MockObjectStorage_GetCarModelImageUploadData_Call) Return(_a0 model.ImageUploadData, _a1 error) *MockObjectStorage_GetCarModelImageUploadData_Call {
+func (_c *MockObjectStorage_GetCarModelImageUploadData_Call) Return(_a0 sharedmodel.ImageUploadData, _a1 error) *MockObjectStorage_GetCarModelImageUploadData_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockObjectStorage_GetCarModelImageUploadData_Call) RunAndReturn(run func(context.Context) (model.ImageUploadData, error)) *MockObjectStorage_GetCarModelImageUploadData_Call {
+func (_c *MockObjectStorage_GetCarModelImageUploadData_Call) RunAndReturn(run func(context.Context) (sharedmodel.ImageUploadData, error)) *MockObjectStorage_GetCarModelImageUploadData_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetInsuranceImageUploadData provides a mock function with given fields: ctx
-func (_m *MockObjectStorage) GetInsuranceImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (_m *MockObjectStorage) GetInsuranceImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetInsuranceImageUploadData")
 	}
 
-	var r0 model.ImageUploadData
+	var r0 sharedmodel.ImageUploadData
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) (model.ImageUploadData, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) (sharedmodel.ImageUploadData, error)); ok {
 		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) model.ImageUploadData); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) sharedmodel.ImageUploadData); ok {
 		r0 = rf(ctx)
 	} else {
-		r0 = ret.Get(0).(model.ImageUploadData)
+		r0 = ret.Get(0).(sharedmodel.ImageUploadData)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
@@ -180,33 +180,33 @@ func (_c *MockObjectStorage_GetInsuranceImageUploadData_Call) Run(run func(ctx c
 	return _c
 }
 
-func (_c *MockObjectStorage_GetInsuranceImageUploadData_Call) Return(_a0 model.ImageUploadData, _a1 error) *MockObjectStorage_GetInsuranceImageUploadData_Call {
+func (_c *MockObjectStorage_GetInsuranceImageUploadData_Call) Return(_a0 sharedmodel.ImageUploadData, _a1 error) *MockObjectStorage_GetInsuranceImageUploadData_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockObjectStorage_GetInsuranceImageUploadData_Call) RunAndReturn(run func(context.Context) (model.ImageUploadData, error)) *MockObjectStorage_GetInsuranceImageUploadData_Call {
+func (_c *MockObjectStorage_GetInsuranceImageUploadData_Call) RunAndReturn(run func(context.Context) (sharedmodel.ImageUploadData, error)) *MockObjectStorage_GetInsuranceImageUploadData_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetMaintenanceReceiptImageUploadData provides a mock function with given fields: ctx
-func (_m *MockObjectStorage) GetMaintenanceReceiptImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (_m *MockObjectStorage) GetMaintenanceReceiptImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetMaintenanceReceiptImageUploadData")
 	}
 
-	var r0 model.ImageUploadData
+	var r0 sharedmodel.ImageUploadData
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) (model.ImageUploadData, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) (sharedmodel.ImageUploadData, error)); ok {
 		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) model.ImageUploadData); ok {
+	if rf, ok := ret.Get(0).(func(context.Context) sharedmodel.ImageUploadData); ok {
 		r0 = rf(ctx)
 	} else {
-		r0 = ret.Get(0).(model.ImageUploadData)
+		r0 = ret.Get(0).(sharedmodel.ImageUploadData)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
@@ -236,12 +236,12 @@ func (_c *MockObjectStorage_GetMaintenanceReceiptImageUploadData_Call) Run(run f
 	return _c
 }
 
-func (_c *MockObjectStorage_GetMaintenanceReceiptImageUploadData_Call) Return(_a0 model.ImageUploadData, _a1 error) *MockObjectStorage_GetMaintenanceReceiptImageUploadData_Call {
+func (_c *MockObjectStorage_GetMaintenanceReceiptImageUploadData_Call) Return(_a0 sharedmodel.ImageUploadData, _a1 error) *MockObjectStorage_GetMaintenanceReceiptImageUploadData_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockObjectStorage_GetMaintenanceReceiptImageUploadData_Call) RunAndReturn(run func(context.Context) (model.ImageUploadData, error)) *MockObjectStorage_GetMaintenanceReceiptImageUploadData_Call {
+func (_c *MockObjectStorage_GetMaintenanceReceiptImageUploadData_Call) RunAndReturn(run func(context.Context) (sharedmodel.ImageUploadData, error)) *MockObjectStorage_GetMaintenanceReceiptImageUploadData_Call {
 	_c.Call.Return(run)
 	return _c
 }

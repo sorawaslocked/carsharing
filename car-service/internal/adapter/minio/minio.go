@@ -2,27 +2,36 @@ package minio
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
+	"log/slog"
 	"net/url"
 	"time"
 
+	"carsharing/car-service/internal/model"
 	sharedmodel "carsharing/shared/model"
+	pkglog "carsharing/shared/pkg/log"
 	pkgminio "carsharing/shared/pkg/minio"
+	"carsharing/shared/pkg/utils"
+
 	"github.com/minio/minio-go/v7"
 )
 
-const presignedURLTTL = 15 * time.Minute
-
 type ObjectStorage struct {
+	log    *slog.Logger
 	client *minio.Client
 	cfg    pkgminio.Config
 }
 
-func NewObjectStorage(client *minio.Client, cfg pkgminio.Config) *ObjectStorage {
+func NewObjectStorage(log *slog.Logger, client *minio.Client, cfg pkgminio.Config) (*ObjectStorage, error) {
+	log = pkglog.WithComponent(log, "ObjectStorage")
+
 	return &ObjectStorage{
+		log:    log,
 		client: client,
 		cfg:    cfg,
-	}
+	}, nil
 }
 
 func (s *ObjectStorage) GetCarImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
@@ -42,33 +51,41 @@ func (s *ObjectStorage) GetMaintenanceReceiptImageUploadData(ctx context.Context
 }
 
 func (s *ObjectStorage) getImageUploadData(ctx context.Context, prefix string) (sharedmodel.ImageUploadData, error) {
-	key := fmt.Sprintf("%s/uploads/%d", prefix, time.Now().UnixNano())
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "getImageUploadData"), utils.MetadataFromCtx(ctx))
 
-	u, err := s.client.PresignedPutObject(ctx, s.cfg.Bucket, key, presignedURLTTL)
+	objectKey := newObjectKey(prefix)
+
+	presignedURL, err := s.client.PresignedPutObject(ctx, s.cfg.Bucket, objectKey, s.cfg.PresignedPutExpiry)
 	if err != nil {
-		return sharedmodel.ImageUploadData{}, fmt.Errorf("presign put object: %w", err)
+		log.Error("generating presigned put url", pkglog.Err(err))
+
+		return sharedmodel.ImageUploadData{}, model.ErrObjectStorage
 	}
 
 	return sharedmodel.ImageUploadData{
-		ObjectKey:       key,
-		PresignedPutURL: s.publicURL(u).String(),
+		PresignedPutURL: presignedURL.String(),
+		ObjectKey:       objectKey,
 	}, nil
 }
 
 func (s *ObjectStorage) GetPresignedURL(ctx context.Context, key string) (string, error) {
-	u, err := s.client.PresignedGetObject(ctx, s.cfg.Bucket, key, presignedURLTTL, url.Values{})
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetPresignedURL"), utils.MetadataFromCtx(ctx))
+
+	presignedURL, err := s.client.PresignedGetObject(ctx, s.cfg.Bucket, key, s.cfg.PresignedGetExpiry, url.Values{})
 	if err != nil {
-		return "", fmt.Errorf("presign get object: %w", err)
+		log.Error("generating presigned get url", pkglog.Err(err))
+
+		return "", model.ErrObjectStorage
 	}
 
-	return s.publicURL(u).String(), nil
+	return presignedURL.String(), nil
 }
 
-func (s *ObjectStorage) publicURL(u *url.URL) *url.URL {
-	if s.cfg.PublicEndpoint == "" {
-		return u
+func newObjectKey(prefix string) string {
+	b := make([]byte, 8)
+	if _, err := rand.Read(b); err != nil {
+		b = []byte{0, 0, 0, 0, 0, 0, 0, 0}
 	}
-	rewritten := *u
-	rewritten.Host = s.cfg.PublicEndpoint
-	return &rewritten
+
+	return fmt.Sprintf("%s/%d_%s", prefix, time.Now().UnixNano(), hex.EncodeToString(b))
 }

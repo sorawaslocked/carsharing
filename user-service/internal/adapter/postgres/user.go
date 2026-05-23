@@ -25,7 +25,7 @@ type UserRepository struct {
 
 func NewUserRepository(log *slog.Logger, pool *pgxpool.Pool) *UserRepository {
 	return &UserRepository{
-		log:  pkglog.WithComponent(log, "repo.UserRepository"),
+		log:  pkglog.WithComponent(log, "adapter.postgres.UserRepository"),
 		pool: pool,
 	}
 }

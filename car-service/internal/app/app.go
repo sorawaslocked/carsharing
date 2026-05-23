@@ -85,7 +85,11 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 		return nil, fmt.Errorf("register validators: %w", err)
 	}
 
-	objectStorage := minioadapter.NewObjectStorage(minioClient, cfg.MinIO)
+	objectStorage, err := minioadapter.NewObjectStorage(log, minioClient, cfg.MinIO)
+	if err != nil {
+		cl.closeAll()
+		return nil, fmt.Errorf("init object storage: %w", err)
+	}
 	natsPublisher := natsadapter.NewPublisher(ncPub)
 
 	carModelRepo := postgres.NewCarModelRepository(pool, log)

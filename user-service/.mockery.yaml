@@ -9,7 +9,7 @@ packages:
       DocumentRepository:
       ObjectStorage:
       DocumentAnalyzer:
-      Publisher:
+      UserPublisher:
       ActivationCodeStorage:
       Mailer:
   github.com/sorawaslocked/car-rental-user-service/internal/adapter/grpc/handler:

@@ -24,7 +24,7 @@ type DocumentRepository struct {
 
 func NewDocumentRepository(log *slog.Logger, pool *pgxpool.Pool) *DocumentRepository {
 	return &DocumentRepository{
-		log:  pkglog.WithComponent(log, "repo.DocumentRepository"),
+		log:  pkglog.WithComponent(log, "adapter.postgres.DocumentRepository"),
 		pool: pool,
 	}
 }

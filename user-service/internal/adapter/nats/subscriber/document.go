@@ -1,4 +1,4 @@
-package handler
+package subscriber
 
 import (
 	"context"
@@ -14,29 +14,29 @@ import (
 
 const subjectDocumentAnalyzed = "document.analyzed"
 
-type DocumentHandler struct {
+type DocumentSubscriber struct {
 	log     *slog.Logger
 	conn    *nats.Conn
 	service DocumentService
 }
 
-func NewDocumentHandler(log *slog.Logger, conn *nats.Conn, service DocumentService) *DocumentHandler {
-	return &DocumentHandler{
-		log:     pkglog.WithComponent(log, "adapter.nats.DocumentHandler"),
+func NewDocumentSubscriber(log *slog.Logger, conn *nats.Conn, service DocumentService) *DocumentSubscriber {
+	return &DocumentSubscriber{
+		log:     pkglog.WithComponent(log, "adapter.nats.subscriber.DocumentSubscriber"),
 		conn:    conn,
 		service: service,
 	}
 }
 
-func (h *DocumentHandler) Subscribe() error {
-	_, err := h.conn.Subscribe(subjectDocumentAnalyzed, h.handleDocumentAnalyzed)
+func (s *DocumentSubscriber) Subscribe() error {
+	_, err := s.conn.Subscribe(subjectDocumentAnalyzed, s.handleDocumentAnalyzed)
 
 	return err
 }
 
-func (h *DocumentHandler) handleDocumentAnalyzed(msg *nats.Msg) {
+func (s *DocumentSubscriber) handleDocumentAnalyzed(msg *nats.Msg) {
 	ctx := context.Background()
-	log := pkglog.WithMethod(h.log, "handleDocumentAnalyzed")
+	log := pkglog.WithMethod(s.log, "handleDocumentAnalyzed")
 
 	var event eventuserpb.DocumentAnalyzedEvent
 	if err := proto.Unmarshal(msg.Data, &event); err != nil {
@@ -45,7 +45,7 @@ func (h *DocumentHandler) handleDocumentAnalyzed(msg *nats.Msg) {
 		return
 	}
 
-	if err := h.service.HandleDocumentAnalyzed(ctx, natsdto.DocumentAnalyzedEventFromProto(&event)); err != nil {
+	if err := s.service.HandleDocumentAnalyzed(ctx, natsdto.DocumentAnalyzedEventFromProto(&event)); err != nil {
 		log.Error("handling document analyzed event",
 			slog.String("documentID", event.GetDocumentId()),
 			pkglog.Err(err),

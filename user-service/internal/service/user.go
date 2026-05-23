@@ -23,7 +23,7 @@ type UserService struct {
 	docRepo               DocumentRepository
 	objectStorage         ObjectStorage
 	documentAnalyzer      DocumentAnalyzer
-	publisher             Publisher
+	publisher             UserPublisher
 	activationCodeStorage ActivationCodeStorage
 	mailer                Mailer
 }
@@ -35,7 +35,7 @@ func NewUserService(
 	docRepo DocumentRepository,
 	objectStorage ObjectStorage,
 	documentAnalyzer DocumentAnalyzer,
-	publisher Publisher,
+	publisher UserPublisher,
 	activationCodeStorage ActivationCodeStorage,
 	mailer Mailer,
 ) *UserService {

@@ -13,7 +13,6 @@ import (
 
 type Config struct {
 	Endpoint        string `yaml:"endpoint"          env:"MINIO_ENDPOINT"           env-required:"true"`
-	PublicEndpoint  string `yaml:"public_endpoint"   env:"MINIO_PUBLIC_ENDPOINT"`
 	AccessKeyID     string `yaml:"access_key_id"     env:"MINIO_ACCESS_KEY_ID"      env-required:"true"`
 	SecretAccessKey string `yaml:"secret_access_key" env:"MINIO_SECRET_ACCESS_KEY"  env-required:"true"`
 	Bucket          string `yaml:"bucket"            env:"MINIO_BUCKET"             env-required:"true"`

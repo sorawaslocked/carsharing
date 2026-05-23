@@ -1,4 +1,4 @@
-package nats
+package publisher
 
 import (
 	"context"
@@ -19,37 +19,37 @@ const (
 	subjectUserDeleted = "user.deleted"
 )
 
-type Publisher struct {
+type UserPublisher struct {
 	log  *slog.Logger
 	conn *nats.Conn
 }
 
-func NewPublisher(log *slog.Logger, conn *nats.Conn) *Publisher {
-	return &Publisher{
-		log:  pkglog.WithComponent(log, "adapter.nats.Publisher"),
+func NewUserPublisher(log *slog.Logger, conn *nats.Conn) *UserPublisher {
+	return &UserPublisher{
+		log:  pkglog.WithComponent(log, "adapter.nats.publisher.UserPublisher"),
 		conn: conn,
 	}
 }
 
-func (p *Publisher) PublishUserCreated(ctx context.Context, id string) error {
+func (p *UserPublisher) PublishUserCreated(ctx context.Context, id string) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(p.log, "PublishUserCreated"), utils.MetadataFromCtx(ctx))
 
 	return p.publish(log, subjectUserCreated, &eventuserpb.UserCreatedEvent{Id: id})
 }
 
-func (p *Publisher) PublishUserUpdated(ctx context.Context, id string, isSecurityUpdate bool) error {
+func (p *UserPublisher) PublishUserUpdated(ctx context.Context, id string, isSecurityUpdate bool) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(p.log, "PublishUserUpdated"), utils.MetadataFromCtx(ctx))
 
 	return p.publish(log, subjectUserUpdated, &eventuserpb.UserUpdatedEvent{Id: id, IsSecurityUpdate: isSecurityUpdate})
 }
 
-func (p *Publisher) PublishUserDeleted(ctx context.Context, id string) error {
+func (p *UserPublisher) PublishUserDeleted(ctx context.Context, id string) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(p.log, "PublishUserDeleted"), utils.MetadataFromCtx(ctx))
 
 	return p.publish(log, subjectUserDeleted, &eventuserpb.UserDeletedEvent{Id: id})
 }
 
-func (p *Publisher) publish(log *slog.Logger, subject string, msg proto.Message) error {
+func (p *UserPublisher) publish(log *slog.Logger, subject string, msg proto.Message) error {
 	data, err := proto.Marshal(msg)
 	if err != nil {
 		log.Error("marshalling event", slog.String("subject", subject), pkglog.Err(err))

@@ -66,7 +66,7 @@ type deps struct {
 	docRepo     *mocks.MockDocumentRepository
 	storage     *mocks.MockObjectStorage
 	analyzer    *mocks.MockDocumentAnalyzer
-	publisher   *mocks.MockPublisher
+	publisher   *mocks.MockUserPublisher
 	codeStorage *mocks.MockActivationCodeStorage
 	mailer      *mocks.MockMailer
 }
@@ -78,7 +78,7 @@ func newDeps(t *testing.T) *deps {
 		docRepo:     mocks.NewMockDocumentRepository(t),
 		storage:     mocks.NewMockObjectStorage(t),
 		analyzer:    mocks.NewMockDocumentAnalyzer(t),
-		publisher:   mocks.NewMockPublisher(t),
+		publisher:   mocks.NewMockUserPublisher(t),
 		codeStorage: mocks.NewMockActivationCodeStorage(t),
 		mailer:      mocks.NewMockMailer(t),
 	}

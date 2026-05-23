@@ -34,7 +34,7 @@ type DocumentAnalyzer interface {
 	Analyze(ctx context.Context, documentID string, objectKey string)
 }
 
-type Publisher interface {
+type UserPublisher interface {
 	PublishUserCreated(ctx context.Context, id string) error
 	PublishUserUpdated(ctx context.Context, id string, isSecurityUpdate bool) error
 	PublishUserDeleted(ctx context.Context, id string) error

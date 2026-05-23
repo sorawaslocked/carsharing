@@ -22,7 +22,8 @@ import (
 	"carsharing/user-service/internal/adapter/grpc/interceptor"
 	minioadapter "carsharing/user-service/internal/adapter/minio"
 	natsadapter "carsharing/user-service/internal/adapter/nats"
-	natshandler "carsharing/user-service/internal/adapter/nats/handler"
+	natspublisher "carsharing/user-service/internal/adapter/nats/publisher"
+	natssubscriber "carsharing/user-service/internal/adapter/nats/subscriber"
 	"carsharing/user-service/internal/adapter/postgres"
 	redisadapter "carsharing/user-service/internal/adapter/redis"
 	"carsharing/user-service/internal/config"
@@ -92,7 +93,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	msMailer := brevo.New(log, cfg.Brevo)
 	userRepo := postgres.NewUserRepository(log, pool)
 	docRepo := postgres.NewDocumentRepository(log, pool)
-	publisher := natsadapter.NewPublisher(log, natsConn)
+	publisher := natspublisher.NewUserPublisher(log, natsConn)
 	minioStorage, err := minioadapter.NewObjectStorage(log, minioClient, cfg.Minio)
 	if err != nil {
 		cl.closeAll()
@@ -102,8 +103,8 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 
 	userService := service.NewUserService(log, validate, userRepo, docRepo, minioStorage, analyzerClient, publisher, activationCodeCache, msMailer)
 
-	docHandler := natshandler.NewDocumentHandler(log, natsConn, userService)
-	if err := docHandler.Subscribe(); err != nil {
+	docSubscriber := natssubscriber.NewDocumentSubscriber(log, natsConn, userService)
+	if err := docSubscriber.Subscribe(); err != nil {
 		cl.closeAll()
 		return nil, fmt.Errorf("nats subscribe: %w", err)
 	}

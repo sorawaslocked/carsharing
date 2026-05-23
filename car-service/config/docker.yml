@@ -34,6 +34,9 @@ minio:
   bucket: "carsharing"
   use_ssl: false
 
-telematics_stream:
+telemetry_stream:
   host: "carsharing-telemetry-service"
   port: 50051
+
+telemetry:
+  staleness_threshold: 2m

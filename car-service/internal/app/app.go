@@ -71,7 +71,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	baseClientInterceptor := interceptor.NewClientBaseInterceptor()
 	telematicsConn, err := pkggrpc.NewClientConn(
 		log,
-		cfg.TelematicsStream,
+		cfg.TelemetryStream,
 		grpc.WithChainUnaryInterceptor(baseClientInterceptor.Unary),
 		grpc.WithChainStreamInterceptor(),
 	)
@@ -106,7 +106,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	zoneRepo := postgres.NewZoneRepository(log, pool)
 
 	telemetryStreamClient := grpcclient.NewTelemetryStreamClient(telematicsConn, log)
-	telemetryService := service.NewTelemetryService(log, validate, telemetryStreamClient, telemetryReadingRepo, carRepo)
+	telemetryService := service.NewTelemetryService(log, validate, telemetryStreamClient, telemetryReadingRepo, carRepo, cfg.Telemetry.StalenessThreshold)
 
 	carModelService := service.NewCarModelService(log, validate, carModelRepo, objectStorage)
 	carService := service.NewCarService(log, validate, carModelRepo, carRepo, statusReadingRepo, telemetryReadingRepo, objectStorage, carPublisher)

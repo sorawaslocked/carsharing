@@ -14,10 +14,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-const (
-	telemetryReconnectDelay     = 5 * time.Second
-	telemetryStalenessThreshold = 2 * time.Minute
-)
+const telemetryReconnectDelay = 5 * time.Second
 
 type TelemetryService struct {
 	log      *slog.Logger
@@ -26,6 +23,7 @@ type TelemetryService struct {
 	streamClient         TelemetryStreamClient
 	telemetryReadingRepo TelemetryReadingRepository
 	carRepo              CarRepository
+	stalenessThreshold   time.Duration
 
 	mu  sync.Mutex
 	ctx context.Context
@@ -42,6 +40,7 @@ func NewTelemetryService(
 	streamClient TelemetryStreamClient,
 	telemetryReadingRepo TelemetryReadingRepository,
 	carRepo CarRepository,
+	stalenessThreshold time.Duration,
 ) *TelemetryService {
 	return &TelemetryService{
 		log:                  pkglog.WithComponent(log, "service.TelemetryService"),
@@ -49,6 +48,7 @@ func NewTelemetryService(
 		streamClient:         streamClient,
 		telemetryReadingRepo: telemetryReadingRepo,
 		carRepo:              carRepo,
+		stalenessThreshold:   stalenessThreshold,
 	}
 }
 
@@ -105,7 +105,7 @@ func (s *TelemetryService) Ping(_ context.Context) error {
 		return model.ErrTelemetryAllStreamsDisconnected{LastActivity: time.Since(*last).Round(time.Second)}
 	}
 
-	if last != nil && time.Since(*last) > telemetryStalenessThreshold {
+	if last != nil && time.Since(*last) > s.stalenessThreshold {
 		return model.ErrTelemetryStreamStale{SinceLastUpdate: time.Since(*last).Round(time.Second)}
 	}
 
@@ -125,6 +125,7 @@ func (s *TelemetryService) OnCarCreated(car model.Car) {
 		return
 	}
 
+	s.totalStreams.Add(1)
 	s.wg.Add(1)
 	go func() {
 		defer s.wg.Done()

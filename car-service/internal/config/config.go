@@ -3,22 +3,29 @@ package config
 import (
 	"flag"
 	"os"
+	"time"
 
 	pkggrpc "carsharing/shared/pkg/grpc"
 	pkgminio "carsharing/shared/pkg/minio"
 	pkgnats "carsharing/shared/pkg/nats"
 	pkgpostgres "carsharing/shared/pkg/postgres"
+
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
+type TelemetryConfig struct {
+	StalenessThreshold time.Duration `yaml:"staleness_threshold" env-default:"2m"`
+}
+
 type Config struct {
-	Env              string                   `yaml:"env"              env:"ENV"             env-default:"local"`
-	GRPC             pkggrpc.ServerConfig     `yaml:"grpc_server"`
-	PG               pkgpostgres.Config       `yaml:"postgres"`
-	NATSPublisher    pkgnats.PublisherConfig  `yaml:"nats_publisher"`
-	NATSSubscriber   pkgnats.SubscriberConfig `yaml:"nats_subscriber"`
-	MinIO            pkgminio.Config          `yaml:"minio"`
-	TelematicsStream pkggrpc.ClientConfig     `yaml:"telematics_stream"`
+	Env             string                   `yaml:"env"              env:"ENV"             env-default:"local"`
+	GRPC            pkggrpc.ServerConfig     `yaml:"grpc_server"`
+	PG              pkgpostgres.Config       `yaml:"postgres"`
+	NATSPublisher   pkgnats.PublisherConfig  `yaml:"nats_publisher"`
+	NATSSubscriber  pkgnats.SubscriberConfig `yaml:"nats_subscriber"`
+	MinIO           pkgminio.Config          `yaml:"minio"`
+	TelemetryStream pkggrpc.ClientConfig     `yaml:"telemetry_stream"`
+	Telemetry       TelemetryConfig          `yaml:"telemetry"`
 }
 
 func MustLoad() Config {

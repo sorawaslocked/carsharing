@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS car_telematics_events;
+DROP TABLE IF EXISTS car_telemetry_readings;

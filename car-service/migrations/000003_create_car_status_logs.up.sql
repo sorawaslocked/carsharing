@@ -1,4 +1,4 @@
-CREATE TABLE car_status_logs (
+CREATE TABLE car_status_readings (
     id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
     car_id      UUID        NOT NULL REFERENCES cars (id) ON DELETE CASCADE,
     from_status car_status  NOT NULL,
@@ -7,8 +7,8 @@ CREATE TABLE car_status_logs (
     actor_id    VARCHAR(100),
     reason      TEXT,
     metadata    JSONB,
-    changed_at  TIMESTAMPTZ NOT NULL
+    recorded_at TIMESTAMPTZ NOT NULL
 );
 
-CREATE INDEX idx_car_status_logs_car_id    ON car_status_logs (car_id);
-CREATE INDEX idx_car_status_logs_changed_at ON car_status_logs (changed_at DESC);
+CREATE INDEX idx_car_status_readings_car_id     ON car_status_readings (car_id);
+CREATE INDEX idx_car_status_readings_recorded_at ON car_status_readings (recorded_at DESC);

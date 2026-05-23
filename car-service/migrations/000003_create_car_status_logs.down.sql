@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS car_status_logs;
+DROP TABLE IF EXISTS car_status_readings;

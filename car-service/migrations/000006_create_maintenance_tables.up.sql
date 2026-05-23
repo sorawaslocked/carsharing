@@ -21,6 +21,7 @@ CREATE TABLE car_maintenance_records (
     due_by             TIMESTAMPTZ,
     completed_km       INT,
     cost_tenge         INT,
+    assigned_to        VARCHAR(100),
     completed_at       TIMESTAMPTZ,
     notes              TEXT,
     receipt_image_keys TEXT[]                    NOT NULL DEFAULT '{}',

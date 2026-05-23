@@ -15,7 +15,7 @@ CREATE TABLE cars (
       battery_level     NUMERIC(5, 2),
       latitude          DOUBLE PRECISION NOT NULL,
       longitude         DOUBLE PRECISION NOT NULL,
-      notes             TEXT[]           NOT NULL DEFAULT '{}',
+      notes             TEXT,
       image_keys        TEXT[]           NOT NULL DEFAULT '{}',
       last_seen_at      TIMESTAMPTZ      NOT NULL,
       created_at        TIMESTAMPTZ      NOT NULL,

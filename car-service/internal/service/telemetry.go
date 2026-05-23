@@ -2,20 +2,22 @@ package service
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"carsharing/car-service/internal/model"
-	"carsharing/car-service/internal/validation"
 	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 
 	"github.com/go-playground/validator/v10"
 )
 
-const telemetryReconnectDelay = 5 * time.Second
+const (
+	telemetryReconnectDelay     = 5 * time.Second
+	telemetryStalenessThreshold = 2 * time.Minute
+)
 
 type TelemetryService struct {
 	log      *slog.Logger
@@ -28,6 +30,10 @@ type TelemetryService struct {
 	mu  sync.Mutex
 	ctx context.Context
 	wg  sync.WaitGroup
+
+	totalStreams  atomic.Int32
+	activeStreams atomic.Int32
+	lastSeenAt    atomic.Pointer[time.Time]
 }
 
 func NewTelemetryService(
@@ -64,6 +70,7 @@ func (s *TelemetryService) Start(ctx context.Context) error {
 	log.Info("subscribing to telemetry streams", slog.Int("cars", len(cars)))
 
 	for _, car := range cars {
+		s.totalStreams.Add(1)
 		s.wg.Add(1)
 		go func(c model.Car) {
 			defer s.wg.Done()
@@ -77,6 +84,32 @@ func (s *TelemetryService) Start(ctx context.Context) error {
 // Stop waits for all telemetry goroutines to finish after the context is cancelled.
 func (s *TelemetryService) Stop() {
 	s.wg.Wait()
+}
+
+// Ping implements the health Pinger interface. Returns an error if all streams
+// are disconnected or if connected streams have not delivered data within the
+// staleness threshold.
+func (s *TelemetryService) Ping(_ context.Context) error {
+	total := s.totalStreams.Load()
+	if total == 0 {
+		return nil
+	}
+
+	active := s.activeStreams.Load()
+	last := s.lastSeenAt.Load()
+
+	if active == 0 {
+		if last == nil {
+			return model.ErrTelemetryNoStreamsConnected
+		}
+		return model.ErrTelemetryAllStreamsDisconnected{LastActivity: time.Since(*last).Round(time.Second)}
+	}
+
+	if last != nil && time.Since(*last) > telemetryStalenessThreshold {
+		return model.ErrTelemetryStreamStale{SinceLastUpdate: time.Since(*last).Round(time.Second)}
+	}
+
+	return nil
 }
 
 // OnCarCreated starts a telemetry stream goroutine for a newly created car.
@@ -99,23 +132,9 @@ func (s *TelemetryService) OnCarCreated(car model.Car) {
 	}()
 }
 
-// SubscribeCarStream opens a live telemetry stream for a single car.
-// Used by the gRPC streaming handler.
-func (s *TelemetryService) SubscribeCarStream(ctx context.Context, carID string) (<-chan model.TelemetryUpdate, error) {
-	log := pkglog.WithMethod(s.log, "SubscribeCarStream")
-
-	if err := validation.ValidateID(s.validate, carID); err != nil {
-		return nil, err
-	}
-
-	car, err := s.carRepo.FindByID(ctx, carID)
-	if err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
-			log.Error("repo: finding car by id", pkglog.Err(err))
-		}
-		return nil, err
-	}
-
+// Subscribe opens a live telemetry stream for a single car.
+// Used by the gRPC streaming handler which already holds the full car.
+func (s *TelemetryService) Subscribe(ctx context.Context, car model.Car) (<-chan model.TelemetryUpdate, error) {
 	return s.streamClient.Subscribe(ctx, car)
 }
 

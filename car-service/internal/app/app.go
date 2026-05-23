@@ -11,10 +11,13 @@ import (
 	"time"
 
 	grpcserver "carsharing/car-service/internal/adapter/grpc"
+	grpcclient "carsharing/car-service/internal/adapter/grpc/client"
 	"carsharing/car-service/internal/adapter/grpc/handler"
 	"carsharing/car-service/internal/adapter/grpc/interceptor"
 	minioadapter "carsharing/car-service/internal/adapter/minio"
 	natsadapter "carsharing/car-service/internal/adapter/nats"
+	natspublisher "carsharing/car-service/internal/adapter/nats/publisher"
+	natssubscriber "carsharing/car-service/internal/adapter/nats/subscriber"
 	"carsharing/car-service/internal/adapter/postgres"
 	"carsharing/car-service/internal/config"
 	"carsharing/car-service/internal/service"
@@ -30,11 +33,10 @@ import (
 )
 
 type App struct {
-	log               *slog.Logger
-	grpcServer        *grpc.Server
-	grpcAddr          string
-	closer            closer
-	telematicsService *service.TelematicsService
+	log        *slog.Logger
+	grpcServer *grpc.Server
+	grpcAddr   string
+	closer     closer
 }
 
 func New(log *slog.Logger, cfg config.Config) (*App, error) {
@@ -46,10 +48,10 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	}
 	cl.add(pool.Close)
 
-	minioClient, err := pkgminio.NewClient(log, cfg.MinIO)
-	if err != nil {
+	validate := validator.New()
+	if err = validation.RegisterCustomValidators(validate, log); err != nil {
 		cl.closeAll()
-		return nil, fmt.Errorf("minio: %w", err)
+		return nil, fmt.Errorf("register validators: %w", err)
 	}
 
 	ncPub, err := pkgnats.NewPublisher(log, cfg.NATSPublisher)
@@ -79,10 +81,10 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	}
 	cl.add(func() { _ = telematicsConn.Close() })
 
-	validate := validator.New()
-	if err = validation.RegisterCustomValidators(validate, log); err != nil {
+	minioClient, err := pkgminio.NewClient(log, cfg.MinIO)
+	if err != nil {
 		cl.closeAll()
-		return nil, fmt.Errorf("register validators: %w", err)
+		return nil, fmt.Errorf("minio: %w", err)
 	}
 
 	objectStorage, err := minioadapter.NewObjectStorage(log, minioClient, cfg.MinIO)
@@ -90,7 +92,8 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 		cl.closeAll()
 		return nil, fmt.Errorf("init object storage: %w", err)
 	}
-	natsPublisher := natsadapter.NewPublisher(ncPub)
+
+	carPublisher := natspublisher.NewCarPublisher(log, ncPub)
 
 	carModelRepo := postgres.NewCarModelRepository(log, pool)
 	carRepo := postgres.NewCarRepository(log, pool)
@@ -102,21 +105,36 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	telemetryReadingRepo := postgres.NewTelemetryReadingRepository(log, pool)
 	zoneRepo := postgres.NewZoneRepository(log, pool)
 
-	telematicsStreamClient := grpcserver.NewTelematicsStreamClient(telematicsConn, log)
-	telematicsService := service.NewTelematicsService(telematicsStreamClient, telemetryReadingRepo, carRepo, log)
+	telemetryStreamClient := grpcclient.NewTelemetryStreamClient(telematicsConn, log)
+	telemetryService := service.NewTelemetryService(log, validate, telemetryStreamClient, telemetryReadingRepo, carRepo)
 
-	carModelService := service.NewCarModelService(carModelRepo, objectStorage, validate, log)
-	carService := service.NewCarService(carModelRepo, carRepo, statusReadingRepo, telemetryReadingRepo, objectStorage, natsPublisher, validate, log)
-	carService.SetCarCreatedNotifier(telematicsService)
+	carModelService := service.NewCarModelService(log, validate, carModelRepo, objectStorage)
+	carService := service.NewCarService(log, validate, carModelRepo, carRepo, statusReadingRepo, telemetryReadingRepo, objectStorage, carPublisher)
+	carService.SetCarCreatedNotifier(telemetryService)
 
-	carInsuranceService := service.NewCarInsuranceService(carInsuranceRepo, objectStorage, validate, log)
-	carMaintenanceService := service.NewCarMaintenanceService(templateRepo, recordRepo, serviceStateRepo, carRepo, carService, objectStorage, validate, log)
-	zoneService := service.NewZoneService(zoneRepo, validate, log)
+	carInsuranceService := service.NewCarInsuranceService(log, validate, carInsuranceRepo, objectStorage)
+	carMaintenanceService := service.NewCarMaintenanceService(log, validate, templateRepo, recordRepo, serviceStateRepo, carRepo, carService, objectStorage)
+	zoneService := service.NewZoneService(log, validate, zoneRepo)
 
-	natsSubscriber := natsadapter.NewSubscriber(ncSub, carService, log)
-	if err = natsSubscriber.Subscribe(); err != nil {
+	ctx, cancel := context.WithCancel(context.Background())
+	if err = telemetryService.Start(ctx); err != nil {
+		cancel()
 		cl.closeAll()
-		return nil, fmt.Errorf("nats subscribe: %w", err)
+		return nil, fmt.Errorf("telemetry service start: %w", err)
+	}
+	cl.add(telemetryService.Stop)
+	cl.add(cancel)
+
+	bookingSubscriber := natssubscriber.NewBookingSubscriber(log, ncSub, carService)
+	if err = bookingSubscriber.Subscribe(); err != nil {
+		cl.closeAll()
+		return nil, fmt.Errorf("nats booking subscribe: %w", err)
+	}
+
+	tripSubscriber := natssubscriber.NewTripSubscriber(log, ncSub, carService)
+	if err = tripSubscriber.Subscribe(); err != nil {
+		cl.closeAll()
+		return nil, fmt.Errorf("nats trip subscribe: %w", err)
 	}
 
 	healthHandler := handler.NewHealthHandler(log, map[string]handler.Pinger{
@@ -124,13 +142,14 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 		"nats-publisher":  natsadapter.NewPinger(log, ncPub),
 		"nats-subscriber": natsadapter.NewPinger(log, ncSub),
 		"minio":           minioadapter.NewPinger(log, minioClient),
+		"telemetry":       telemetryService,
 	})
 
 	grpcSrv, err := grpcserver.NewServer(
 		log,
 		cfg.GRPC,
 		carModelService, carService, carInsuranceService, carMaintenanceService, zoneService,
-		telematicsService,
+		telemetryService,
 		healthHandler,
 	)
 	if err != nil {
@@ -139,25 +158,16 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	}
 
 	return &App{
-		log:               pkglog.WithComponent(log, "app"),
-		grpcServer:        grpcSrv,
-		grpcAddr:          fmt.Sprintf("%s:%d", cfg.GRPC.Host, cfg.GRPC.Port),
-		closer:            cl,
-		telematicsService: telematicsService,
+		log:        pkglog.WithComponent(log, "app"),
+		grpcServer: grpcSrv,
+		grpcAddr:   fmt.Sprintf("%s:%d", cfg.GRPC.Host, cfg.GRPC.Port),
+		closer:     cl,
 	}, nil
 }
 
 func (a *App) Run() error {
-	ctx, cancel := context.WithCancel(context.Background())
-
-	if err := a.telematicsService.Start(ctx); err != nil {
-		cancel()
-		return fmt.Errorf("telemetry service start: %w", err)
-	}
-
 	lis, err := net.Listen("tcp", a.grpcAddr)
 	if err != nil {
-		cancel()
 		return fmt.Errorf("gRPC listen: %w", err)
 	}
 	a.log.Info("gRPC server listening", slog.String("addr", a.grpcAddr))
@@ -174,11 +184,9 @@ func (a *App) Run() error {
 	case sig := <-quit:
 		a.log.Info("received signal, shutting down", slog.String("signal", sig.String()))
 	case err := <-errCh:
-		cancel()
 		return fmt.Errorf("gRPC server stopped unexpectedly: %w", err)
 	}
 
-	cancel()
 	a.stop()
 
 	return nil
@@ -201,6 +209,5 @@ func (a *App) stop() {
 		a.grpcServer.Stop()
 	}
 
-	a.telematicsService.Stop()
 	a.closer.closeAll()
 }

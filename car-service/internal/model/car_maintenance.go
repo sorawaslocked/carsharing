@@ -6,6 +6,32 @@ import (
 	sharedmodel "carsharing/shared/model"
 )
 
+type MaintenanceRecordStatus string
+
+const (
+	MaintenanceRecordStatusPending    MaintenanceRecordStatus = "pending"
+	MaintenanceRecordStatusInProgress MaintenanceRecordStatus = "in_progress"
+	MaintenanceRecordStatusCompleted  MaintenanceRecordStatus = "completed"
+)
+
+var validMaintenanceRecordStatuses = map[MaintenanceRecordStatus]struct{}{
+	MaintenanceRecordStatusPending:    {},
+	MaintenanceRecordStatusInProgress: {},
+	MaintenanceRecordStatusCompleted:  {},
+}
+
+func MaintenanceRecordStatusFromString(s string) (MaintenanceRecordStatus, bool) {
+	ms := MaintenanceRecordStatus(s)
+	if _, ok := validMaintenanceRecordStatuses[ms]; !ok {
+		return "", false
+	}
+	return ms, true
+}
+
+func (s MaintenanceRecordStatus) String() string {
+	return string(s)
+}
+
 type CarMaintenanceTemplate struct {
 	ID          string
 	Name        string

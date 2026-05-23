@@ -36,6 +36,9 @@ func RegisterCustomValidators(v *validator.Validate, log *slog.Logger) error {
 		{"insurancetype", insuranceTypeValidator},
 		{"insurancestatus", insuranceStatusValidator},
 		{"maintenancerecordstatus", maintenanceRecordStatusValidator},
+		{"latitude_range", latitudeValidator},
+		{"longitude_range", longitudeValidator},
+		{"radius_range", radiusValidator},
 	}
 
 	for _, vd := range validators {
@@ -45,71 +48,65 @@ func RegisterCustomValidators(v *validator.Validate, log *slog.Logger) error {
 		}
 	}
 
-	v.RegisterStructValidation(locationFilterValidator, model.LocationFilter{})
-
 	return nil
 }
 
 func carFuelTypeValidator(fl validator.FieldLevel) bool {
-	_, ok := model.ParseCarFuelType(fl.Field().String())
-
+	_, ok := model.CarFuelTypeFromString(fl.Field().String())
 	return ok
 }
 
 func carTransmissionValidator(fl validator.FieldLevel) bool {
-	_, ok := model.ParseCarTransmission(fl.Field().String())
-
+	_, ok := model.CarTransmissionFromString(fl.Field().String())
 	return ok
 }
 
 func carBodyTypeValidator(fl validator.FieldLevel) bool {
-	_, ok := model.ParseCarBodyType(fl.Field().String())
-
+	_, ok := model.CarBodyTypeFromString(fl.Field().String())
 	return ok
 }
 
 func carClassValidator(fl validator.FieldLevel) bool {
-	_, ok := model.ParseCarClass(fl.Field().String())
-
+	_, ok := model.CarClassFromString(fl.Field().String())
 	return ok
 }
 
 func carStatusValidator(fl validator.FieldLevel) bool {
-	_, ok := model.ParseCarStatus(fl.Field().String())
-
+	_, ok := model.CarStatusFromString(fl.Field().String())
 	return ok
 }
 
 func zoneTypeValidator(fl validator.FieldLevel) bool {
-	_, ok := model.ParseZoneType(fl.Field().String())
+	_, ok := model.ZoneTypeFromString(fl.Field().String())
 	return ok
 }
 
 func insuranceTypeValidator(fl validator.FieldLevel) bool {
-	_, ok := model.ParseInsuranceType(fl.Field().String())
+	_, ok := model.InsuranceTypeFromString(fl.Field().String())
 	return ok
 }
 
 func insuranceStatusValidator(fl validator.FieldLevel) bool {
-	_, ok := model.ParseInsuranceStatus(fl.Field().String())
+	_, ok := model.InsuranceStatusFromString(fl.Field().String())
 	return ok
 }
 
 func maintenanceRecordStatusValidator(fl validator.FieldLevel) bool {
-	_, ok := model.ParseMaintenanceRecordStatus(fl.Field().String())
+	_, ok := model.MaintenanceRecordStatusFromString(fl.Field().String())
 	return ok
 }
 
-func locationFilterValidator(sl validator.StructLevel) {
-	lf := sl.Current().Interface().(model.LocationFilter)
+func latitudeValidator(fl validator.FieldLevel) bool {
+	lat := fl.Field().Float()
+	return lat >= -90 && lat <= 90
+}
 
-	if lf.Location.Latitude < -90 || lf.Location.Latitude > 90 {
-		sl.ReportError(lf.Location, "Location", "latitude", "latitude_range", "")
-	}
-	if lf.Location.Longitude < -180 || lf.Location.Longitude > 180 {
-		sl.ReportError(lf.Location.Longitude, "Location.Longitude", "longitude", "longitude_range", "")
-	}
-	if lf.RadiusKM < minRadiusKM || lf.RadiusKM > maxRadiusKM {
-		sl.ReportError(lf.RadiusKM, "RadiusKM", "radiuskm", "radius_range", "")
-	}
+func longitudeValidator(fl validator.FieldLevel) bool {
+	lon := fl.Field().Float()
+	return lon >= -180 && lon <= 180
+}
+
+func radiusValidator(fl validator.FieldLevel) bool {
+	r := fl.Field().Float()
+	return r >= minRadiusKM && r <= maxRadiusKM
 }

@@ -6,41 +6,39 @@ import (
 	sharedmodel "carsharing/shared/model"
 )
 
-type CarTelematicsEvent struct {
+type CarTelemetryEvent struct {
 	ID           string
 	CarID        string
-	Latitude     float64
-	Longitude    float64
-	FuelLevel    *float32
+	Location     *sharedmodel.Location
+	FuelPct      *float32
+	FuelRawPct   *float32
 	BatteryLevel *float32
-	OdometerKM   int64
+	MileageKM    *int64
 	ActorID      *string
 	ActorType    string
+	Reason       *string
 	Metadata     map[string]any
 	RecordedAt   time.Time
-	ReceivedAt   time.Time
 }
 
-type TelematicsUpdate struct {
+type TelemetryUpdate struct {
 	CarID        string
 	Latitude     float64
 	Longitude    float64
 	FuelLevel    *float32
 	BatteryLevel *float32
-	OdometerKM   int64
-	ActorID      *string
-	ActorType    string
+	MileageKM    int64
 	RecordedAt   time.Time
 }
 
-type CarTelematicsUpdateInput struct {
+type CarTelemetryUpdateInput struct {
 	MileageKM    int64
 	FuelLevel    *float32
 	BatteryLevel *float32
-	Location     *Location
+	Location     *sharedmodel.Location
 }
 
-type TelematicsEventFilter struct {
+type TelemetryEventFilter struct {
 	CarID *string
 	From  *time.Time
 	To    *time.Time

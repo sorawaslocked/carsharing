@@ -1,11 +1,8 @@
 package model
 
-type Location struct {
-	Latitude  float64
-	Longitude float64
-}
+import sharedmodel "carsharing/shared/model"
 
 type LocationFilter struct {
-	Location Location
+	Location sharedmodel.Location
 	RadiusKM float64
 }

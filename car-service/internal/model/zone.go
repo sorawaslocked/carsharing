@@ -6,6 +6,34 @@ import (
 	sharedmodel "carsharing/shared/model"
 )
 
+type ZoneType string
+
+const (
+	ZoneTypeOperating ZoneType = "operating"
+	ZoneTypeNoDrop    ZoneType = "no_drop"
+	ZoneParkingHub    ZoneType = "parking_hub"
+	ZoneTypeSurcharge ZoneType = "surcharge"
+)
+
+var validZoneTypes = map[ZoneType]struct{}{
+	ZoneTypeOperating: {},
+	ZoneTypeNoDrop:    {},
+	ZoneParkingHub:    {},
+	ZoneTypeSurcharge: {},
+}
+
+func ZoneTypeFromString(s string) (ZoneType, bool) {
+	zt := ZoneType(s)
+	if _, ok := validZoneTypes[zt]; !ok {
+		return "", false
+	}
+	return zt, true
+}
+
+func (t ZoneType) String() string {
+	return string(t)
+}
+
 type Zone struct {
 	ID              string
 	Name            string

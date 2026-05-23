@@ -1,13 +1,17 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	sharedmodel "carsharing/shared/model"
+)
 
 type CarCreatedEvent struct {
 	CarID        string
 	MileageKM    int64
 	FuelLevel    *float32
 	BatteryLevel *float32
-	Location     Location
+	Location     sharedmodel.Location
 }
 
 type BookingCreatedEvent struct {

@@ -11,11 +11,11 @@ type CarStatusLogEntry struct {
 	CarID      string
 	FromStatus CarStatus
 	ToStatus   CarStatus
-	ActorType  CarStatusActor
+	ActorType  string
 	ActorID    *string
 	Reason     *string
 	Metadata   map[string]any
-	ChangedAt  time.Time
+	RecordedAt time.Time
 }
 
 type CarStatusLogFilter struct {
@@ -27,7 +27,7 @@ type CarStatusLogFilter struct {
 type CarStatusTransitionInput struct {
 	CarID     string
 	ToStatus  CarStatus
-	ActorType CarStatusActor
+	ActorType string
 	ActorID   *string
 	Reason    *string
 	Metadata  map[string]any

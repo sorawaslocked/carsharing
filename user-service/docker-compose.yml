@@ -1,7 +1,7 @@
 services:
   redis:
     image: redis:7-alpine
-    container_name: user-service-redis
+    container_name: carsharing-user-service-redis
     command: "redis-server --requirepass ${REDIS_PASSWORD}"
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
@@ -11,10 +11,10 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - car-rental-net
+      - carsharing-net
 
   migrate:
-    container_name: user-service-migrate
+    container_name: carsharing-user-service-migrate
     image: migrate/migrate
     volumes:
       - ./migrations:/migrations
@@ -23,11 +23,11 @@ services:
       - "-database=postgres://carsharing:${POSTGRES_PASSWORD}@postgres:5432/carsharing?sslmode=disable&x-migrations-table=user_service_migrations"
       - "up"
     networks:
-      - car-rental-net
+      - carsharing-net
 
   user-service:
     image: ghcr.io/sorawaslocked/carsharing/user-service:latest
-    container_name: user-service
+    container_name: carsharing-user-service
     build:
       context: ..
       dockerfile: user-service/Dockerfile
@@ -50,8 +50,8 @@ services:
         condition: service_healthy
     restart: on-failure
     networks:
-      - car-rental-net
+      - carsharing-net
 
 networks:
-  car-rental-net:
+  carsharing-net:
     external: true

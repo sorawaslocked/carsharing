@@ -4,7 +4,7 @@ services:
     build:
       context: ..
       dockerfile: api-gateway/Dockerfile
-    container_name: car-rental-api-gateway
+    container_name: carsharing-api-gateway
     ports:
       - "4000:4000"
     environment:
@@ -18,11 +18,11 @@ services:
         condition: service_healthy
     restart: unless-stopped
     networks:
-      - car-rental-net
+      - carsharing-net
 
   redis:
     image: redis:7-alpine
-    container_name: api-gateway-redis
+    container_name: carsharing-api-gateway-redis
     command: "redis-server --requirepass ${REDIS_PASSWORD}"
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
@@ -33,8 +33,8 @@ services:
       retries: 5
     restart: unless-stopped
     networks:
-      - car-rental-net
+      - carsharing-net
 
 networks:
-  car-rental-net:
+  carsharing-net:
     external: true

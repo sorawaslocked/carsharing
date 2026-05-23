@@ -1,6 +1,6 @@
 services:
   migrate:
-    container_name: trip-service-migrate
+    container_name: carsharing-trip-service-migrate
     image: migrate/migrate
     volumes:
       - ./migrations:/migrations
@@ -9,11 +9,11 @@ services:
       - "-database=postgres://carsharing:${POSTGRES_PASSWORD}@postgres:5432/carsharing?sslmode=disable&x-migrations-table=trip_service_migrations"
       - "up"
     networks:
-      - car-rental-net
+      - carsharing-net
 
   trip-service:
     image: ghcr.io/sorawaslocked/carsharing/trip-service:latest
-    container_name: trip-service
+    container_name: carsharing-trip-service
     build:
       context: ..
       dockerfile: trip-service/Dockerfile
@@ -22,12 +22,12 @@ services:
       NATS_PUBLISHER_USERNAME: ""
       NATS_PUBLISHER_PASSWORD: ""
     networks:
-      - car-rental-net
+      - carsharing-net
     depends_on:
       migrate:
         condition: service_completed_successfully
     restart: on-failure
 
 networks:
-  car-rental-net:
+  carsharing-net:
     external: true

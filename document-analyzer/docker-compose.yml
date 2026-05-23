@@ -1,11 +1,11 @@
 services:
   document-analyzer:
     image: ghcr.io/sorawaslocked/carsharing/document-analyzer:latest
-    container_name: document-analyzer
+    container_name: carsharing-document-analyzer
     build: .
     networks:
-      - car-rental-net
+      - carsharing-net
 
 networks:
-  car-rental-net:
+  carsharing-net:
     external: true

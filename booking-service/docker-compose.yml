@@ -1,6 +1,6 @@
 services:
   migrate:
-    container_name: booking-service-migrate
+    container_name: carsharing-booking-service-migrate
     image: migrate/migrate
     volumes:
       - ./migrations:/migrations
@@ -9,11 +9,11 @@ services:
       - "-database=postgres://carsharing:${POSTGRES_PASSWORD}@postgres:5432/carsharing?sslmode=disable&x-migrations-table=booking_service_migrations"
       - "up"
     networks:
-      - car-rental-net
+      - carsharing-net
 
   booking-service:
     image: ghcr.io/sorawaslocked/carsharing/booking-service:latest
-    container_name: booking-service
+    container_name: carsharing-booking-service
     build:
       context: ..
       dockerfile: booking-service/Dockerfile
@@ -24,12 +24,12 @@ services:
       NATS_SUBSCRIBER_USERNAME: ""
       NATS_SUBSCRIBER_PASSWORD: ""
     networks:
-      - car-rental-net
+      - carsharing-net
     depends_on:
       migrate:
         condition: service_completed_successfully
     restart: on-failure
 
 networks:
-  car-rental-net:
+  carsharing-net:
     external: true

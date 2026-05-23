@@ -6,7 +6,7 @@ use (
 	./car-service
 	./protos
 	./shared
-	./telematics-service
+	./telemetry-service
 	./trip-service
 	./user-service
 )

@@ -1,0 +1,14 @@
+services:
+  telemetry-service:
+    image: ghcr.io/sorawaslocked/carsharing/telemetry-service:latest
+    container_name: carsharing-telemetry-service
+    build: .
+    environment:
+      DB_URL: "postgres://carsharing:carsharing@carsharing-postgres:5432/carsharing?sslmode=disable"
+      NATS_URL: "nats://nats:4222"
+    networks:
+      - carsharing-net
+
+networks:
+  carsharing-net:
+    external: true

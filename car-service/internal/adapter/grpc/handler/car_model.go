@@ -5,31 +5,24 @@ import (
 	"log/slog"
 
 	"carsharing/car-service/internal/adapter/grpc/dto"
+	pkglog "carsharing/shared/pkg/log"
 
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
+	carsvc "carsharing/protos/gen/service/car"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type CarModelHandler struct {
+	log             *slog.Logger
 	carModelService CarModelService
-
-	log *slog.Logger
 
 	carsvc.UnimplementedCarModelServiceServer
 }
 
-func NewCarModelHandler(carModelService CarModelService, log *slog.Logger) *CarModelHandler {
-	s := &CarModelHandler{
+func NewCarModelHandler(log *slog.Logger, carModelService CarModelService) *CarModelHandler {
+	return &CarModelHandler{
+		log:             pkglog.WithComponent(log, "grpc.handler.CarModelHandler"),
 		carModelService: carModelService,
 	}
-
-	s.log = log.With(
-		slog.Group("src",
-			slog.String("component", "CarModelHandler"),
-		),
-	)
-
-	return s
 }
 
 func (h *CarModelHandler) CreateCarModel(ctx context.Context, req *carsvc.CreateCarModelRequest) (*carsvc.CreateCarModelResponse, error) {
@@ -55,7 +48,7 @@ func (h *CarModelHandler) GetCarModel(ctx context.Context, req *carsvc.GetCarMod
 func (h *CarModelHandler) ListCarModels(ctx context.Context, req *carsvc.ListCarModelsRequest) (*carsvc.ListCarModelsResponse, error) {
 	filterInput := dto.FromListCarModelsRequest(req)
 
-	carModels, err := h.carModelService.GetAll(ctx, filterInput)
+	carModels, err := h.carModelService.List(ctx, filterInput)
 	if err != nil {
 		return nil, dto.FromErrorToStatusCode(err)
 	}

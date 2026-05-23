@@ -19,11 +19,9 @@ func TestFromErrorToStatusCode(t *testing.T) {
 		wantCode codes.Code
 	}{
 		{"not found", model.ErrNotFound, codes.NotFound},
-		{"conflict", model.ErrConflict, codes.AlreadyExists},
-		{"internal server error", model.ErrInternalServerError, codes.Internal},
+		{"already exists", model.ErrAlreadyExists, codes.AlreadyExists},
 		{"invalid metadata", model.ErrInvalidMetadata, codes.InvalidArgument},
 		{"unauthenticated", model.ErrUnauthenticated, codes.Unauthenticated},
-		{"unauthorized", model.ErrUnauthorized, codes.PermissionDenied},
 		{"insufficient permissions", model.ErrInsufficientPermissions, codes.PermissionDenied},
 		{"unknown error defaults to internal", errors.New("something unexpected"), codes.Internal},
 	}

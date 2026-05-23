@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"carsharing/car-service/internal/adapter/grpc/interceptor/auth"
+	carsvc "carsharing/protos/gen/service/car"
 	sharedmodel "carsharing/shared/model"
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

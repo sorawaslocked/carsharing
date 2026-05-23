@@ -20,6 +20,5 @@ var (
 	ErrInsufficientPermissions = errors.New("insufficient permissions")
 	ErrNotFound                = errors.New("resource not found")
 	ErrAlreadyExists           = errors.New("resource already exists")
-	ErrInvalidRole             = errors.New("must be a valid role")
 	ErrMileageRegression       = errors.New("incoming mileage value is lower than the current mileage")
 )

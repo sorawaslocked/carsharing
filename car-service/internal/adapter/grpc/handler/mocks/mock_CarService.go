@@ -186,12 +186,12 @@ func (_c *MockCarService_Get_Call) RunAndReturn(run func(context.Context, string
 	return _c
 }
 
-// GetAll provides a mock function with given fields: ctx, filterInput
-func (_m *MockCarService) GetAll(ctx context.Context, filterInput validation.CarFilter) ([]model.Car, error) {
+// List provides a mock function with given fields: ctx, filterInput
+func (_m *MockCarService) List(ctx context.Context, filterInput validation.CarFilter) ([]model.Car, error) {
 	ret := _m.Called(ctx, filterInput)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetAll")
+		panic("no return value specified for List")
 	}
 
 	var r0 []model.Car
@@ -216,326 +216,31 @@ func (_m *MockCarService) GetAll(ctx context.Context, filterInput validation.Car
 	return r0, r1
 }
 
-// MockCarService_GetAll_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAll'
-type MockCarService_GetAll_Call struct {
+// MockCarService_List_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'List'
+type MockCarService_List_Call struct {
 	*mock.Call
 }
 
-// GetAll is a helper method to define mock.On call
+// List is a helper method to define mock.On call
 //   - ctx context.Context
 //   - filterInput validation.CarFilter
-func (_e *MockCarService_Expecter) GetAll(ctx interface{}, filterInput interface{}) *MockCarService_GetAll_Call {
-	return &MockCarService_GetAll_Call{Call: _e.mock.On("GetAll", ctx, filterInput)}
+func (_e *MockCarService_Expecter) List(ctx interface{}, filterInput interface{}) *MockCarService_List_Call {
+	return &MockCarService_List_Call{Call: _e.mock.On("List", ctx, filterInput)}
 }
 
-func (_c *MockCarService_GetAll_Call) Run(run func(ctx context.Context, filterInput validation.CarFilter)) *MockCarService_GetAll_Call {
+func (_c *MockCarService_List_Call) Run(run func(ctx context.Context, filterInput validation.CarFilter)) *MockCarService_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(validation.CarFilter))
 	})
 	return _c
 }
 
-func (_c *MockCarService_GetAll_Call) Return(_a0 []model.Car, _a1 error) *MockCarService_GetAll_Call {
+func (_c *MockCarService_List_Call) Return(_a0 []model.Car, _a1 error) *MockCarService_List_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockCarService_GetAll_Call) RunAndReturn(run func(context.Context, validation.CarFilter) ([]model.Car, error)) *MockCarService_GetAll_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetCarBatteryHistory provides a mock function with given fields: ctx, filter
-func (_m *MockCarService) GetCarBatteryHistory(ctx context.Context, filter model.TelematicsEventFilter) ([]model.CarTelematicsEvent, error) {
-	ret := _m.Called(ctx, filter)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetCarBatteryHistory")
-	}
-
-	var r0 []model.CarTelematicsEvent
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.TelematicsEventFilter) ([]model.CarTelematicsEvent, error)); ok {
-		return rf(ctx, filter)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, model.TelematicsEventFilter) []model.CarTelematicsEvent); ok {
-		r0 = rf(ctx, filter)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]model.CarTelematicsEvent)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, model.TelematicsEventFilter) error); ok {
-		r1 = rf(ctx, filter)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// MockCarService_GetCarBatteryHistory_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCarBatteryHistory'
-type MockCarService_GetCarBatteryHistory_Call struct {
-	*mock.Call
-}
-
-// GetCarBatteryHistory is a helper method to define mock.On call
-//   - ctx context.Context
-//   - filter model.TelematicsEventFilter
-func (_e *MockCarService_Expecter) GetCarBatteryHistory(ctx interface{}, filter interface{}) *MockCarService_GetCarBatteryHistory_Call {
-	return &MockCarService_GetCarBatteryHistory_Call{Call: _e.mock.On("GetCarBatteryHistory", ctx, filter)}
-}
-
-func (_c *MockCarService_GetCarBatteryHistory_Call) Run(run func(ctx context.Context, filter model.TelematicsEventFilter)) *MockCarService_GetCarBatteryHistory_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.TelematicsEventFilter))
-	})
-	return _c
-}
-
-func (_c *MockCarService_GetCarBatteryHistory_Call) Return(_a0 []model.CarTelematicsEvent, _a1 error) *MockCarService_GetCarBatteryHistory_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *MockCarService_GetCarBatteryHistory_Call) RunAndReturn(run func(context.Context, model.TelematicsEventFilter) ([]model.CarTelematicsEvent, error)) *MockCarService_GetCarBatteryHistory_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetCarFuelHistory provides a mock function with given fields: ctx, filter
-func (_m *MockCarService) GetCarFuelHistory(ctx context.Context, filter model.TelematicsEventFilter) ([]model.CarTelematicsEvent, error) {
-	ret := _m.Called(ctx, filter)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetCarFuelHistory")
-	}
-
-	var r0 []model.CarTelematicsEvent
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.TelematicsEventFilter) ([]model.CarTelematicsEvent, error)); ok {
-		return rf(ctx, filter)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, model.TelematicsEventFilter) []model.CarTelematicsEvent); ok {
-		r0 = rf(ctx, filter)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]model.CarTelematicsEvent)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, model.TelematicsEventFilter) error); ok {
-		r1 = rf(ctx, filter)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// MockCarService_GetCarFuelHistory_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCarFuelHistory'
-type MockCarService_GetCarFuelHistory_Call struct {
-	*mock.Call
-}
-
-// GetCarFuelHistory is a helper method to define mock.On call
-//   - ctx context.Context
-//   - filter model.TelematicsEventFilter
-func (_e *MockCarService_Expecter) GetCarFuelHistory(ctx interface{}, filter interface{}) *MockCarService_GetCarFuelHistory_Call {
-	return &MockCarService_GetCarFuelHistory_Call{Call: _e.mock.On("GetCarFuelHistory", ctx, filter)}
-}
-
-func (_c *MockCarService_GetCarFuelHistory_Call) Run(run func(ctx context.Context, filter model.TelematicsEventFilter)) *MockCarService_GetCarFuelHistory_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.TelematicsEventFilter))
-	})
-	return _c
-}
-
-func (_c *MockCarService_GetCarFuelHistory_Call) Return(_a0 []model.CarTelematicsEvent, _a1 error) *MockCarService_GetCarFuelHistory_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *MockCarService_GetCarFuelHistory_Call) RunAndReturn(run func(context.Context, model.TelematicsEventFilter) ([]model.CarTelematicsEvent, error)) *MockCarService_GetCarFuelHistory_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetCarLocationHistory provides a mock function with given fields: ctx, filter
-func (_m *MockCarService) GetCarLocationHistory(ctx context.Context, filter model.TelematicsEventFilter) ([]model.CarTelematicsEvent, error) {
-	ret := _m.Called(ctx, filter)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetCarLocationHistory")
-	}
-
-	var r0 []model.CarTelematicsEvent
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.TelematicsEventFilter) ([]model.CarTelematicsEvent, error)); ok {
-		return rf(ctx, filter)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, model.TelematicsEventFilter) []model.CarTelematicsEvent); ok {
-		r0 = rf(ctx, filter)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]model.CarTelematicsEvent)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, model.TelematicsEventFilter) error); ok {
-		r1 = rf(ctx, filter)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// MockCarService_GetCarLocationHistory_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCarLocationHistory'
-type MockCarService_GetCarLocationHistory_Call struct {
-	*mock.Call
-}
-
-// GetCarLocationHistory is a helper method to define mock.On call
-//   - ctx context.Context
-//   - filter model.TelematicsEventFilter
-func (_e *MockCarService_Expecter) GetCarLocationHistory(ctx interface{}, filter interface{}) *MockCarService_GetCarLocationHistory_Call {
-	return &MockCarService_GetCarLocationHistory_Call{Call: _e.mock.On("GetCarLocationHistory", ctx, filter)}
-}
-
-func (_c *MockCarService_GetCarLocationHistory_Call) Run(run func(ctx context.Context, filter model.TelematicsEventFilter)) *MockCarService_GetCarLocationHistory_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.TelematicsEventFilter))
-	})
-	return _c
-}
-
-func (_c *MockCarService_GetCarLocationHistory_Call) Return(_a0 []model.CarTelematicsEvent, _a1 error) *MockCarService_GetCarLocationHistory_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *MockCarService_GetCarLocationHistory_Call) RunAndReturn(run func(context.Context, model.TelematicsEventFilter) ([]model.CarTelematicsEvent, error)) *MockCarService_GetCarLocationHistory_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetCarMileageHistory provides a mock function with given fields: ctx, filter
-func (_m *MockCarService) GetCarMileageHistory(ctx context.Context, filter model.TelematicsEventFilter) ([]model.CarTelematicsEvent, error) {
-	ret := _m.Called(ctx, filter)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetCarMileageHistory")
-	}
-
-	var r0 []model.CarTelematicsEvent
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.TelematicsEventFilter) ([]model.CarTelematicsEvent, error)); ok {
-		return rf(ctx, filter)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, model.TelematicsEventFilter) []model.CarTelematicsEvent); ok {
-		r0 = rf(ctx, filter)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]model.CarTelematicsEvent)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, model.TelematicsEventFilter) error); ok {
-		r1 = rf(ctx, filter)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// MockCarService_GetCarMileageHistory_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCarMileageHistory'
-type MockCarService_GetCarMileageHistory_Call struct {
-	*mock.Call
-}
-
-// GetCarMileageHistory is a helper method to define mock.On call
-//   - ctx context.Context
-//   - filter model.TelematicsEventFilter
-func (_e *MockCarService_Expecter) GetCarMileageHistory(ctx interface{}, filter interface{}) *MockCarService_GetCarMileageHistory_Call {
-	return &MockCarService_GetCarMileageHistory_Call{Call: _e.mock.On("GetCarMileageHistory", ctx, filter)}
-}
-
-func (_c *MockCarService_GetCarMileageHistory_Call) Run(run func(ctx context.Context, filter model.TelematicsEventFilter)) *MockCarService_GetCarMileageHistory_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.TelematicsEventFilter))
-	})
-	return _c
-}
-
-func (_c *MockCarService_GetCarMileageHistory_Call) Return(_a0 []model.CarTelematicsEvent, _a1 error) *MockCarService_GetCarMileageHistory_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *MockCarService_GetCarMileageHistory_Call) RunAndReturn(run func(context.Context, model.TelematicsEventFilter) ([]model.CarTelematicsEvent, error)) *MockCarService_GetCarMileageHistory_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetCarStatusHistory provides a mock function with given fields: ctx, filter
-func (_m *MockCarService) GetCarStatusHistory(ctx context.Context, filter model.CarStatusLogFilter) ([]model.CarStatusLogEntry, error) {
-	ret := _m.Called(ctx, filter)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetCarStatusHistory")
-	}
-
-	var r0 []model.CarStatusLogEntry
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.CarStatusLogFilter) ([]model.CarStatusLogEntry, error)); ok {
-		return rf(ctx, filter)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, model.CarStatusLogFilter) []model.CarStatusLogEntry); ok {
-		r0 = rf(ctx, filter)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]model.CarStatusLogEntry)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, model.CarStatusLogFilter) error); ok {
-		r1 = rf(ctx, filter)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// MockCarService_GetCarStatusHistory_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCarStatusHistory'
-type MockCarService_GetCarStatusHistory_Call struct {
-	*mock.Call
-}
-
-// GetCarStatusHistory is a helper method to define mock.On call
-//   - ctx context.Context
-//   - filter model.CarStatusLogFilter
-func (_e *MockCarService_Expecter) GetCarStatusHistory(ctx interface{}, filter interface{}) *MockCarService_GetCarStatusHistory_Call {
-	return &MockCarService_GetCarStatusHistory_Call{Call: _e.mock.On("GetCarStatusHistory", ctx, filter)}
-}
-
-func (_c *MockCarService_GetCarStatusHistory_Call) Run(run func(ctx context.Context, filter model.CarStatusLogFilter)) *MockCarService_GetCarStatusHistory_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.CarStatusLogFilter))
-	})
-	return _c
-}
-
-func (_c *MockCarService_GetCarStatusHistory_Call) Return(_a0 []model.CarStatusLogEntry, _a1 error) *MockCarService_GetCarStatusHistory_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *MockCarService_GetCarStatusHistory_Call) RunAndReturn(run func(context.Context, model.CarStatusLogFilter) ([]model.CarStatusLogEntry, error)) *MockCarService_GetCarStatusHistory_Call {
+func (_c *MockCarService_List_Call) RunAndReturn(run func(context.Context, validation.CarFilter) ([]model.Car, error)) *MockCarService_List_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -692,17 +397,17 @@ func (_c *MockCarService_UpdateCarStatus_Call) RunAndReturn(run func(context.Con
 	return _c
 }
 
-// UpdateCarTelemetry provides a mock function with given fields: ctx, id, input
-func (_m *MockCarService) UpdateCarTelemetry(ctx context.Context, id string, input model.CarTelematicsUpdateInput) error {
-	ret := _m.Called(ctx, id, input)
+// UpdateCarTelemetry provides a mock function with given fields: ctx, id, data
+func (_m *MockCarService) UpdateCarTelemetry(ctx context.Context, id string, data validation.CarTelemetryUpdate) error {
+	ret := _m.Called(ctx, id, data)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateCarTelemetry")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, model.CarTelematicsUpdateInput) error); ok {
-		r0 = rf(ctx, id, input)
+	if rf, ok := ret.Get(0).(func(context.Context, string, validation.CarTelemetryUpdate) error); ok {
+		r0 = rf(ctx, id, data)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -718,14 +423,14 @@ type MockCarService_UpdateCarTelemetry_Call struct {
 // UpdateCarTelemetry is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id string
-//   - input model.CarTelematicsUpdateInput
-func (_e *MockCarService_Expecter) UpdateCarTelemetry(ctx interface{}, id interface{}, input interface{}) *MockCarService_UpdateCarTelemetry_Call {
-	return &MockCarService_UpdateCarTelemetry_Call{Call: _e.mock.On("UpdateCarTelemetry", ctx, id, input)}
+//   - data validation.CarTelemetryUpdate
+func (_e *MockCarService_Expecter) UpdateCarTelemetry(ctx interface{}, id interface{}, data interface{}) *MockCarService_UpdateCarTelemetry_Call {
+	return &MockCarService_UpdateCarTelemetry_Call{Call: _e.mock.On("UpdateCarTelemetry", ctx, id, data)}
 }
 
-func (_c *MockCarService_UpdateCarTelemetry_Call) Run(run func(ctx context.Context, id string, input model.CarTelematicsUpdateInput)) *MockCarService_UpdateCarTelemetry_Call {
+func (_c *MockCarService_UpdateCarTelemetry_Call) Run(run func(ctx context.Context, id string, data validation.CarTelemetryUpdate)) *MockCarService_UpdateCarTelemetry_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(model.CarTelematicsUpdateInput))
+		run(args[0].(context.Context), args[1].(string), args[2].(validation.CarTelemetryUpdate))
 	})
 	return _c
 }
@@ -735,7 +440,125 @@ func (_c *MockCarService_UpdateCarTelemetry_Call) Return(_a0 error) *MockCarServ
 	return _c
 }
 
-func (_c *MockCarService_UpdateCarTelemetry_Call) RunAndReturn(run func(context.Context, string, model.CarTelematicsUpdateInput) error) *MockCarService_UpdateCarTelemetry_Call {
+func (_c *MockCarService_UpdateCarTelemetry_Call) RunAndReturn(run func(context.Context, string, validation.CarTelemetryUpdate) error) *MockCarService_UpdateCarTelemetry_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ListCarStatusHistory provides a mock function with given fields: ctx, filter
+func (_m *MockCarService) ListCarStatusHistory(ctx context.Context, filter validation.CarStatusReadingFilter) ([]model.CarStatusReading, error) {
+	ret := _m.Called(ctx, filter)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListCarStatusHistory")
+	}
+
+	var r0 []model.CarStatusReading
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, validation.CarStatusReadingFilter) ([]model.CarStatusReading, error)); ok {
+		return rf(ctx, filter)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, validation.CarStatusReadingFilter) []model.CarStatusReading); ok {
+		r0 = rf(ctx, filter)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]model.CarStatusReading)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, validation.CarStatusReadingFilter) error); ok {
+		r1 = rf(ctx, filter)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockCarService_ListCarStatusHistory_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListCarStatusHistory'
+type MockCarService_ListCarStatusHistory_Call struct {
+	*mock.Call
+}
+
+// ListCarStatusHistory is a helper method to define mock.On call
+//   - ctx context.Context
+//   - filter validation.CarStatusReadingFilter
+func (_e *MockCarService_Expecter) ListCarStatusHistory(ctx interface{}, filter interface{}) *MockCarService_ListCarStatusHistory_Call {
+	return &MockCarService_ListCarStatusHistory_Call{Call: _e.mock.On("ListCarStatusHistory", ctx, filter)}
+}
+
+func (_c *MockCarService_ListCarStatusHistory_Call) Run(run func(ctx context.Context, filter validation.CarStatusReadingFilter)) *MockCarService_ListCarStatusHistory_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(validation.CarStatusReadingFilter))
+	})
+	return _c
+}
+
+func (_c *MockCarService_ListCarStatusHistory_Call) Return(_a0 []model.CarStatusReading, _a1 error) *MockCarService_ListCarStatusHistory_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockCarService_ListCarStatusHistory_Call) RunAndReturn(run func(context.Context, validation.CarStatusReadingFilter) ([]model.CarStatusReading, error)) *MockCarService_ListCarStatusHistory_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ListCarTelemetryHistory provides a mock function with given fields: ctx, filter
+func (_m *MockCarService) ListCarTelemetryHistory(ctx context.Context, filter validation.TelemetryReadingFilter) ([]model.TelemetryReading, error) {
+	ret := _m.Called(ctx, filter)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListCarTelemetryHistory")
+	}
+
+	var r0 []model.TelemetryReading
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, validation.TelemetryReadingFilter) ([]model.TelemetryReading, error)); ok {
+		return rf(ctx, filter)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, validation.TelemetryReadingFilter) []model.TelemetryReading); ok {
+		r0 = rf(ctx, filter)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]model.TelemetryReading)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, validation.TelemetryReadingFilter) error); ok {
+		r1 = rf(ctx, filter)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockCarService_ListCarTelemetryHistory_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListCarTelemetryHistory'
+type MockCarService_ListCarTelemetryHistory_Call struct {
+	*mock.Call
+}
+
+// ListCarTelemetryHistory is a helper method to define mock.On call
+//   - ctx context.Context
+//   - filter validation.TelemetryReadingFilter
+func (_e *MockCarService_Expecter) ListCarTelemetryHistory(ctx interface{}, filter interface{}) *MockCarService_ListCarTelemetryHistory_Call {
+	return &MockCarService_ListCarTelemetryHistory_Call{Call: _e.mock.On("ListCarTelemetryHistory", ctx, filter)}
+}
+
+func (_c *MockCarService_ListCarTelemetryHistory_Call) Run(run func(ctx context.Context, filter validation.TelemetryReadingFilter)) *MockCarService_ListCarTelemetryHistory_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(validation.TelemetryReadingFilter))
+	})
+	return _c
+}
+
+func (_c *MockCarService_ListCarTelemetryHistory_Call) Return(_a0 []model.TelemetryReading, _a1 error) *MockCarService_ListCarTelemetryHistory_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockCarService_ListCarTelemetryHistory_Call) RunAndReturn(run func(context.Context, validation.TelemetryReadingFilter) ([]model.TelemetryReading, error)) *MockCarService_ListCarTelemetryHistory_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -3,7 +3,7 @@ package auth
 import (
 	sharedmodel "carsharing/shared/model"
 
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
+	carsvc "carsharing/protos/gen/service/car"
 )
 
 type methodPolicy struct {
@@ -27,19 +27,16 @@ func buildPolicies() map[string]methodPolicy {
 		carsvc.CarModelService_GetCarModelImageUploadData_FullMethodName: {allowedRoles: fleetRoles},
 
 		// CarService — reads open to any authenticated caller; writes restricted to fleet roles.
-		carsvc.CarService_CreateCar_FullMethodName:             {allowedRoles: fleetRoles},
-		carsvc.CarService_GetCar_FullMethodName:                {},
-		carsvc.CarService_ListCars_FullMethodName:              {},
-		carsvc.CarService_UpdateCar_FullMethodName:             {allowedRoles: fleetRoles},
-		carsvc.CarService_UpdateCarTelemetry_FullMethodName:    {allowedRoles: fleetRoles},
-		carsvc.CarService_UpdateCarStatus_FullMethodName:       {allowedRoles: fleetRoles},
-		carsvc.CarService_DeleteCar_FullMethodName:             {allowedRoles: fleetRoles},
-		carsvc.CarService_GetCarImageUploadData_FullMethodName: {allowedRoles: fleetRoles},
-		carsvc.CarService_GetCarStatusHistory_FullMethodName:   {allowedRoles: fleetRoles},
-		carsvc.CarService_GetCarFuelHistory_FullMethodName:     {allowedRoles: fleetRoles},
-		carsvc.CarService_GetCarLocationHistory_FullMethodName: {allowedRoles: fleetRoles},
-		carsvc.CarService_GetCarBatteryHistory_FullMethodName:  {allowedRoles: fleetRoles},
-		carsvc.CarService_GetCarMileageHistory_FullMethodName:  {allowedRoles: fleetRoles},
+		carsvc.CarService_CreateCar_FullMethodName:              {allowedRoles: fleetRoles},
+		carsvc.CarService_GetCar_FullMethodName:                 {},
+		carsvc.CarService_ListCars_FullMethodName:               {},
+		carsvc.CarService_UpdateCar_FullMethodName:              {allowedRoles: fleetRoles},
+		carsvc.CarService_UpdateCarTelemetry_FullMethodName:     {allowedRoles: fleetRoles},
+		carsvc.CarService_UpdateCarStatus_FullMethodName:        {allowedRoles: fleetRoles},
+		carsvc.CarService_DeleteCar_FullMethodName:              {allowedRoles: fleetRoles},
+		carsvc.CarService_GetCarImageUploadData_FullMethodName:  {allowedRoles: fleetRoles},
+		carsvc.CarService_GetCarStatusHistory_FullMethodName:    {allowedRoles: fleetRoles},
+		carsvc.CarService_GetCarTelemetryHistory_FullMethodName: {allowedRoles: fleetRoles},
 
 		// ZoneService — restricted to fleet roles.
 		carsvc.ZoneService_CreateZone_FullMethodName: {allowedRoles: fleetRoles},

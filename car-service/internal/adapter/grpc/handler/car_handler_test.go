@@ -7,8 +7,8 @@ import (
 	"carsharing/car-service/internal/adapter/grpc/handler/mocks"
 	"carsharing/car-service/internal/model"
 	"carsharing/car-service/internal/validation"
+	carsvc "carsharing/protos/gen/service/car"
 	sharedmodel "carsharing/shared/model"
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
@@ -20,7 +20,7 @@ func TestCarHandlerCreateCar(t *testing.T) {
 
 	t.Run("returns id from service", func(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
+		h := NewCarHandler(discardLogger(), svc)
 
 		svc.EXPECT().Create(ctx, mock.Anything).Return("car-123", nil)
 
@@ -34,9 +34,9 @@ func TestCarHandlerCreateCar(t *testing.T) {
 
 	t.Run("service error maps to gRPC Internal", func(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
+		h := NewCarHandler(discardLogger(), svc)
 
-		svc.EXPECT().Create(ctx, mock.Anything).Return("", model.ErrInternalServerError)
+		svc.EXPECT().Create(ctx, mock.Anything).Return("", errInternal)
 
 		_, err := h.CreateCar(ctx, &carsvc.CreateCarRequest{})
 		assert.Equal(t, codes.Internal, grpcCode(err))
@@ -49,7 +49,7 @@ func TestCarHandlerGetCar(t *testing.T) {
 
 	t.Run("returns populated car proto", func(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
+		h := NewCarHandler(discardLogger(), svc)
 
 		svc.EXPECT().Get(ctx, carID).Return(model.Car{
 			ID: carID, LicensePlate: "ABC-001", Status: model.CarStatusAvailable,
@@ -64,7 +64,7 @@ func TestCarHandlerGetCar(t *testing.T) {
 
 	t.Run("not found maps to gRPC NotFound", func(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
+		h := NewCarHandler(discardLogger(), svc)
 
 		svc.EXPECT().Get(ctx, carID).Return(model.Car{}, model.ErrNotFound)
 
@@ -78,9 +78,9 @@ func TestCarHandlerListCars(t *testing.T) {
 
 	t.Run("returns car list", func(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
+		h := NewCarHandler(discardLogger(), svc)
 
-		svc.EXPECT().GetAll(ctx, mock.Anything).Return([]model.Car{
+		svc.EXPECT().List(ctx, mock.Anything).Return([]model.Car{
 			{ID: "c-1"}, {ID: "c-2"},
 		}, nil)
 
@@ -91,9 +91,9 @@ func TestCarHandlerListCars(t *testing.T) {
 
 	t.Run("service error maps to gRPC Internal", func(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
+		h := NewCarHandler(discardLogger(), svc)
 
-		svc.EXPECT().GetAll(ctx, mock.Anything).Return(nil, model.ErrInternalServerError)
+		svc.EXPECT().List(ctx, mock.Anything).Return(nil, errInternal)
 
 		_, err := h.ListCars(ctx, &carsvc.ListCarsRequest{})
 		assert.Equal(t, codes.Internal, grpcCode(err))
@@ -106,7 +106,7 @@ func TestCarHandlerUpdateCar(t *testing.T) {
 
 	t.Run("returns empty on success", func(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
+		h := NewCarHandler(discardLogger(), svc)
 
 		svc.EXPECT().Update(ctx, carID, mock.Anything).Return(nil)
 
@@ -117,7 +117,7 @@ func TestCarHandlerUpdateCar(t *testing.T) {
 
 	t.Run("not found maps to gRPC NotFound", func(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
+		h := NewCarHandler(discardLogger(), svc)
 
 		svc.EXPECT().Update(ctx, carID, mock.Anything).Return(model.ErrNotFound)
 
@@ -132,7 +132,7 @@ func TestCarHandlerUpdateCarStatus(t *testing.T) {
 
 	t.Run("returns empty on success", func(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
+		h := NewCarHandler(discardLogger(), svc)
 
 		svc.EXPECT().UpdateCarStatus(ctx, carID, mock.MatchedBy(func(in validation.CarStatusUpdate) bool {
 			return in.Status == "reserved"
@@ -145,9 +145,9 @@ func TestCarHandlerUpdateCarStatus(t *testing.T) {
 
 	t.Run("service error maps to gRPC Internal", func(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
+		h := NewCarHandler(discardLogger(), svc)
 
-		svc.EXPECT().UpdateCarStatus(ctx, carID, mock.Anything).Return(model.ErrInternalServerError)
+		svc.EXPECT().UpdateCarStatus(ctx, carID, mock.Anything).Return(errInternal)
 
 		_, err := h.UpdateCarStatus(ctx, &carsvc.UpdateCarStatusRequest{Id: carID, Status: "reserved"})
 		assert.Equal(t, codes.Internal, grpcCode(err))
@@ -160,7 +160,7 @@ func TestCarHandlerDeleteCar(t *testing.T) {
 
 	t.Run("returns empty on success", func(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
+		h := NewCarHandler(discardLogger(), svc)
 
 		svc.EXPECT().Delete(ctx, carID).Return(nil)
 
@@ -171,7 +171,7 @@ func TestCarHandlerDeleteCar(t *testing.T) {
 
 	t.Run("not found maps to gRPC NotFound", func(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
+		h := NewCarHandler(discardLogger(), svc)
 
 		svc.EXPECT().Delete(ctx, carID).Return(model.ErrNotFound)
 
@@ -185,7 +185,7 @@ func TestCarHandlerGetCarImageUploadData(t *testing.T) {
 
 	t.Run("returns upload data", func(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
+		h := NewCarHandler(discardLogger(), svc)
 
 		svc.EXPECT().GetImageUploadData(ctx).Return(sharedmodel.ImageUploadData{
 			PresignedPutURL: "https://upload.example.com/car",
@@ -205,10 +205,10 @@ func TestCarHandlerUpdateCarTelemetry(t *testing.T) {
 
 	t.Run("returns empty on success", func(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
+		h := NewCarHandler(discardLogger(), svc)
 
 		mileage := int64(50_000)
-		svc.EXPECT().UpdateCarTelemetry(ctx, carID, mock.MatchedBy(func(in model.CarTelematicsUpdateInput) bool {
+		svc.EXPECT().UpdateCarTelemetry(ctx, carID, mock.MatchedBy(func(in validation.CarTelemetryUpdate) bool {
 			return in.MileageKM == 50_000
 		})).Return(nil)
 
@@ -226,9 +226,9 @@ func TestCarHandlerGetCarStatusHistory(t *testing.T) {
 
 	t.Run("returns status readings", func(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
+		h := NewCarHandler(discardLogger(), svc)
 
-		svc.EXPECT().GetCarStatusHistory(ctx, mock.Anything).Return([]model.CarStatusLogEntry{
+		svc.EXPECT().ListCarStatusHistory(ctx, mock.Anything).Return([]model.CarStatusReading{
 			{CarID: carID, FromStatus: model.CarStatusAvailable, ToStatus: model.CarStatusReserved},
 		}, nil)
 
@@ -240,89 +240,40 @@ func TestCarHandlerGetCarStatusHistory(t *testing.T) {
 
 	t.Run("service error maps to gRPC Internal", func(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
+		h := NewCarHandler(discardLogger(), svc)
 
-		svc.EXPECT().GetCarStatusHistory(ctx, mock.Anything).Return(nil, model.ErrInternalServerError)
+		svc.EXPECT().ListCarStatusHistory(ctx, mock.Anything).Return(nil, errInternal)
 
 		_, err := h.GetCarStatusHistory(ctx, &carsvc.GetCarStatusHistoryRequest{CarId: carID})
 		assert.Equal(t, codes.Internal, grpcCode(err))
 	})
 }
 
-func TestCarHandlerGetCarFuelHistory(t *testing.T) {
+func TestCarHandlerGetCarTelemetryHistory(t *testing.T) {
 	ctx := context.Background()
 	carID := "car-123"
 
-	t.Run("returns fuel readings", func(t *testing.T) {
+	t.Run("returns telemetry readings", func(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
+		h := NewCarHandler(discardLogger(), svc)
 
-		fuel := float32(75.5)
-		svc.EXPECT().GetCarFuelHistory(ctx, mock.Anything).Return([]model.CarTelematicsEvent{
-			{CarID: carID, FuelLevel: &fuel},
+		svc.EXPECT().ListCarTelemetryHistory(ctx, mock.Anything).Return([]model.TelemetryReading{
+			{ID: "tr-1", CarID: carID},
 		}, nil)
 
-		resp, err := h.GetCarFuelHistory(ctx, &carsvc.GetCarFuelHistoryRequest{CarId: carID})
+		resp, err := h.GetCarTelemetryHistory(ctx, &carsvc.GetCarTelemetryHistoryRequest{CarId: carID})
 		assert.NoError(t, err)
 		assert.Len(t, resp.Readings, 1)
-		assert.InDelta(t, 75.5, resp.Readings[0].FuelPct, 0.01)
+		assert.Equal(t, "tr-1", resp.Readings[0].Id)
 	})
-}
 
-func TestCarHandlerGetCarLocationHistory(t *testing.T) {
-	ctx := context.Background()
-	carID := "car-123"
-
-	t.Run("returns location readings", func(t *testing.T) {
+	t.Run("service error maps to gRPC Internal", func(t *testing.T) {
 		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
+		h := NewCarHandler(discardLogger(), svc)
 
-		svc.EXPECT().GetCarLocationHistory(ctx, mock.Anything).Return([]model.CarTelematicsEvent{
-			{ID: "evt-1", CarID: carID, Latitude: 51.5, Longitude: 0.1},
-		}, nil)
+		svc.EXPECT().ListCarTelemetryHistory(ctx, mock.Anything).Return(nil, errInternal)
 
-		resp, err := h.GetCarLocationHistory(ctx, &carsvc.GetCarLocationHistoryRequest{CarId: carID})
-		assert.NoError(t, err)
-		assert.Len(t, resp.Readings, 1)
-		assert.InDelta(t, 51.5, resp.Readings[0].Location.Latitude, 0.001)
-	})
-}
-
-func TestCarHandlerGetCarBatteryHistory(t *testing.T) {
-	ctx := context.Background()
-	carID := "car-123"
-
-	t.Run("returns battery readings", func(t *testing.T) {
-		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
-
-		battery := float32(88.0)
-		svc.EXPECT().GetCarBatteryHistory(ctx, mock.Anything).Return([]model.CarTelematicsEvent{
-			{ID: "evt-1", CarID: carID, BatteryLevel: &battery},
-		}, nil)
-
-		resp, err := h.GetCarBatteryHistory(ctx, &carsvc.GetCarBatteryHistoryRequest{CarId: carID})
-		assert.NoError(t, err)
-		assert.Len(t, resp.Readings, 1)
-		assert.InDelta(t, 88.0, resp.Readings[0].BatteryLevel, 0.01)
-	})
-}
-
-func TestCarHandlerGetCarMileageHistory(t *testing.T) {
-	ctx := context.Background()
-	carID := "car-123"
-
-	t.Run("returns mileage readings", func(t *testing.T) {
-		svc := mocks.NewMockCarService(t)
-		h := NewCarHandler(svc, discardLogger())
-
-		svc.EXPECT().GetCarMileageHistory(ctx, mock.Anything).Return([]model.CarTelematicsEvent{
-			{ID: "evt-1", CarID: carID, OdometerKM: 123_456},
-		}, nil)
-
-		resp, err := h.GetCarMileageHistory(ctx, &carsvc.GetCarMileageHistoryRequest{CarId: carID})
-		assert.NoError(t, err)
-		assert.Len(t, resp.Readings, 1)
-		assert.Equal(t, int64(123_456), resp.Readings[0].MileageKm)
+		_, err := h.GetCarTelemetryHistory(ctx, &carsvc.GetCarTelemetryHistoryRequest{CarId: carID})
+		assert.Equal(t, codes.Internal, grpcCode(err))
 	})
 }

@@ -185,12 +185,12 @@ func (_c *MockZoneService_Get_Call) RunAndReturn(run func(context.Context, strin
 	return _c
 }
 
-// GetAll provides a mock function with given fields: ctx, filterInput
-func (_m *MockZoneService) GetAll(ctx context.Context, filterInput validation.ZoneFilter) ([]model.Zone, error) {
+// List provides a mock function with given fields: ctx, filterInput
+func (_m *MockZoneService) List(ctx context.Context, filterInput validation.ZoneFilter) ([]model.Zone, error) {
 	ret := _m.Called(ctx, filterInput)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetAll")
+		panic("no return value specified for List")
 	}
 
 	var r0 []model.Zone
@@ -215,31 +215,31 @@ func (_m *MockZoneService) GetAll(ctx context.Context, filterInput validation.Zo
 	return r0, r1
 }
 
-// MockZoneService_GetAll_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAll'
-type MockZoneService_GetAll_Call struct {
+// MockZoneService_List_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'List'
+type MockZoneService_List_Call struct {
 	*mock.Call
 }
 
-// GetAll is a helper method to define mock.On call
+// List is a helper method to define mock.On call
 //   - ctx context.Context
 //   - filterInput validation.ZoneFilter
-func (_e *MockZoneService_Expecter) GetAll(ctx interface{}, filterInput interface{}) *MockZoneService_GetAll_Call {
-	return &MockZoneService_GetAll_Call{Call: _e.mock.On("GetAll", ctx, filterInput)}
+func (_e *MockZoneService_Expecter) List(ctx interface{}, filterInput interface{}) *MockZoneService_List_Call {
+	return &MockZoneService_List_Call{Call: _e.mock.On("List", ctx, filterInput)}
 }
 
-func (_c *MockZoneService_GetAll_Call) Run(run func(ctx context.Context, filterInput validation.ZoneFilter)) *MockZoneService_GetAll_Call {
+func (_c *MockZoneService_List_Call) Run(run func(ctx context.Context, filterInput validation.ZoneFilter)) *MockZoneService_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(validation.ZoneFilter))
 	})
 	return _c
 }
 
-func (_c *MockZoneService_GetAll_Call) Return(_a0 []model.Zone, _a1 error) *MockZoneService_GetAll_Call {
+func (_c *MockZoneService_List_Call) Return(_a0 []model.Zone, _a1 error) *MockZoneService_List_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockZoneService_GetAll_Call) RunAndReturn(run func(context.Context, validation.ZoneFilter) ([]model.Zone, error)) *MockZoneService_GetAll_Call {
+func (_c *MockZoneService_List_Call) RunAndReturn(run func(context.Context, validation.ZoneFilter) ([]model.Zone, error)) *MockZoneService_List_Call {
 	_c.Call.Return(run)
 	return _c
 }

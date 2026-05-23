@@ -30,25 +30,35 @@ func validationError(ve validation.Errors) error {
 }
 
 func ToStatusError(err error) error {
-	var ve validation.Errors
+	ve, ok := errors.AsType[validation.Errors](err)
+	if ok {
+		return validationError(ve)
+	}
 
 	switch {
+	case errors.Is(err, model.ErrInvalidMetadata):
+		return status.Error(codes.InvalidArgument, err.Error())
+
 	case errors.Is(err, model.ErrUnauthenticated):
 		return status.Error(codes.Unauthenticated, err.Error())
+
 	case errors.Is(err, model.ErrInsufficientPermissions):
 		return status.Error(codes.PermissionDenied, err.Error())
+
 	case errors.Is(err, model.ErrNotFound):
 		return status.Error(codes.NotFound, err.Error())
+
 	case errors.Is(err, model.ErrDuplicateEmail),
 		errors.Is(err, model.ErrDuplicatePhone),
 		errors.Is(err, model.ErrAlreadyExists):
 		return status.Error(codes.AlreadyExists, err.Error())
+
 	case errors.Is(err, model.ErrActivationCodeResendTooSoon):
 		return status.Error(codes.ResourceExhausted, err.Error())
+
 	case errors.Is(err, validation.ErrInvalidEmail):
 		return status.Error(codes.FailedPrecondition, err.Error())
-	case errors.As(err, &ve):
-		return validationError(ve)
+
 	default:
 		return status.Error(codes.Internal, "something went wrong")
 	}

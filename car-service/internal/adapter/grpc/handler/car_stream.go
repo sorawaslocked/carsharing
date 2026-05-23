@@ -5,37 +5,30 @@ import (
 	"time"
 
 	"carsharing/car-service/internal/adapter/grpc/dto"
-	"carsharing/car-service/internal/model"
 	"carsharing/car-service/internal/validation"
+	pkglog "carsharing/shared/pkg/log"
+	sharedvalidation "carsharing/shared/validation"
 
-	"github.com/sorawaslocked/car-rental-protos/gen/base"
-	basecar "github.com/sorawaslocked/car-rental-protos/gen/base/car"
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
+	"carsharing/protos/gen/base"
+	basecar "carsharing/protos/gen/base/car"
+	carsvc "carsharing/protos/gen/service/car"
 	"google.golang.org/grpc"
 )
 
 type CarStreamHandler struct {
-	carService           CarService
-	telematicsSubscriber TelematicsSubscriber
-
-	log *slog.Logger
+	log                 *slog.Logger
+	carService          CarService
+	telemetrySubscriber TelemetrySubscriber
 
 	carsvc.UnimplementedCarStreamServiceServer
 }
 
-func NewCarStreamHandler(carService CarService, telematicsSubscriber TelematicsSubscriber, log *slog.Logger) *CarStreamHandler {
-	h := &CarStreamHandler{
-		carService:           carService,
-		telematicsSubscriber: telematicsSubscriber,
+func NewCarStreamHandler(log *slog.Logger, carService CarService, telemetrySubscriber TelemetrySubscriber) *CarStreamHandler {
+	return &CarStreamHandler{
+		log:                 pkglog.WithComponent(log, "grpc.handler.CarStreamHandler"),
+		carService:          carService,
+		telemetrySubscriber: telemetrySubscriber,
 	}
-
-	h.log = log.With(
-		slog.Group("src",
-			slog.String("component", "CarStreamHandler"),
-		),
-	)
-
-	return h
 }
 
 const carFilterStreamInterval = 30 * time.Second
@@ -65,7 +58,7 @@ func (h *CarStreamHandler) StreamCarsWithFilter(req *carsvc.StreamCarsWithFilter
 func (h *CarStreamHandler) sendFilteredCars(req *carsvc.StreamCarsWithFilterRequest, filterInput validation.CarFilter, stream grpc.ServerStreamingServer[carsvc.StreamCarsWithFilterResponse]) error {
 	ctx := stream.Context()
 
-	cars, err := h.carService.GetAll(ctx, filterInput)
+	cars, err := h.carService.List(ctx, filterInput)
 	if err != nil {
 		return dto.FromErrorToStatusCode(err)
 	}
@@ -109,7 +102,7 @@ func (h *CarStreamHandler) StreamCarTelemetry(req *carsvc.StreamCarTelemetryRequ
 		return err
 	}
 
-	ch, err := h.telematicsSubscriber.SubscribeCarStream(ctx, req.CarId)
+	ch, err := h.telemetrySubscriber.Subscribe(ctx, car)
 	if err != nil {
 		return dto.FromErrorToStatusCode(err)
 	}
@@ -123,7 +116,7 @@ func (h *CarStreamHandler) StreamCarTelemetry(req *carsvc.StreamCarTelemetryRequ
 			resp := &carsvc.StreamCarTelemetryResponse{
 				FuelLevel:    update.FuelLevel,
 				BatteryLevel: update.BatteryLevel,
-				MileageKm:    update.OdometerKM,
+				MileageKm:    update.MileageKM,
 			}
 			if update.Latitude != 0 || update.Longitude != 0 {
 				resp.Location = &base.Location{
@@ -148,9 +141,9 @@ func filterInputFromStreamRequest(req *carsvc.StreamCarsWithFilterRequest) valid
 	}
 
 	if req.Location != nil || req.RadiusM != nil {
-		lf := &model.LocationFilter{}
+		lf := &sharedvalidation.LocationFilter{}
 		if req.Location != nil {
-			lf.Location = model.Location{
+			lf.Location = sharedvalidation.Location{
 				Latitude:  req.Location.Latitude,
 				Longitude: req.Location.Longitude,
 			}

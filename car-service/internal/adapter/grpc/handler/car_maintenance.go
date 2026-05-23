@@ -5,31 +5,24 @@ import (
 	"log/slog"
 
 	"carsharing/car-service/internal/adapter/grpc/dto"
+	pkglog "carsharing/shared/pkg/log"
 
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
+	carsvc "carsharing/protos/gen/service/car"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type CarMaintenanceHandler struct {
+	log                *slog.Logger
 	maintenanceService CarMaintenanceService
-
-	log *slog.Logger
 
 	carsvc.UnimplementedCarMaintenanceServiceServer
 }
 
-func NewCarMaintenanceHandler(maintenanceService CarMaintenanceService, log *slog.Logger) *CarMaintenanceHandler {
-	h := &CarMaintenanceHandler{
+func NewCarMaintenanceHandler(log *slog.Logger, maintenanceService CarMaintenanceService) *CarMaintenanceHandler {
+	return &CarMaintenanceHandler{
+		log:                pkglog.WithComponent(log, "grpc.handler.CarMaintenanceHandler"),
 		maintenanceService: maintenanceService,
 	}
-
-	h.log = log.With(
-		slog.Group("src",
-			slog.String("component", "CarMaintenanceHandler"),
-		),
-	)
-
-	return h
 }
 
 func (h *CarMaintenanceHandler) CreateMaintenanceTemplate(ctx context.Context, req *carsvc.CreateMaintenanceTemplateRequest) (*carsvc.CreateMaintenanceTemplateResponse, error) {
@@ -55,7 +48,7 @@ func (h *CarMaintenanceHandler) GetMaintenanceTemplate(ctx context.Context, req 
 func (h *CarMaintenanceHandler) ListMaintenanceTemplates(ctx context.Context, req *carsvc.ListMaintenanceTemplatesRequest) (*carsvc.ListMaintenanceTemplatesResponse, error) {
 	filterInput := dto.FromListMaintenanceTemplatesRequest(req)
 
-	templates, err := h.maintenanceService.GetAllTemplates(ctx, filterInput)
+	templates, err := h.maintenanceService.ListTemplates(ctx, filterInput)
 	if err != nil {
 		return nil, dto.FromErrorToStatusCode(err)
 	}
@@ -84,7 +77,7 @@ func (h *CarMaintenanceHandler) DeleteMaintenanceTemplate(ctx context.Context, r
 func (h *CarMaintenanceHandler) ListMaintenanceRecords(ctx context.Context, req *carsvc.ListMaintenanceRecordsRequest) (*carsvc.ListMaintenanceRecordsResponse, error) {
 	filterInput := dto.FromListMaintenanceRecordsRequest(req)
 
-	records, err := h.maintenanceService.GetRecords(ctx, filterInput)
+	records, err := h.maintenanceService.ListRecords(ctx, filterInput)
 	if err != nil {
 		return nil, dto.FromErrorToStatusCode(err)
 	}

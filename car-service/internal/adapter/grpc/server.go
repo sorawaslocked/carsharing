@@ -6,8 +6,8 @@ import (
 	"carsharing/car-service/internal/adapter/grpc/handler"
 	"carsharing/car-service/internal/adapter/grpc/interceptor"
 	authinterceptor "carsharing/car-service/internal/adapter/grpc/interceptor/auth"
+	carsvc "carsharing/protos/gen/service/car"
 	pkggrpc "carsharing/shared/pkg/grpc"
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"google.golang.org/grpc"
 )
 
@@ -19,7 +19,7 @@ func NewServer(
 	carInsuranceService handler.CarInsuranceService,
 	carMaintenanceService handler.CarMaintenanceService,
 	zoneService handler.ZoneService,
-	telematicsSubscriber handler.TelematicsSubscriber,
+	telemetrySubscriber handler.TelemetrySubscriber,
 	healthHandler *handler.HealthHandler,
 ) (*grpc.Server, error) {
 	baseInterceptor := interceptor.NewBaseInterceptor()
@@ -40,12 +40,12 @@ func NewServer(
 		return nil, err
 	}
 
-	carsvc.RegisterCarModelServiceServer(s, handler.NewCarModelHandler(carModelService, log))
-	carsvc.RegisterCarServiceServer(s, handler.NewCarHandler(carService, log))
-	carsvc.RegisterCarInsuranceServiceServer(s, handler.NewCarInsuranceHandler(carInsuranceService, log))
-	carsvc.RegisterCarMaintenanceServiceServer(s, handler.NewCarMaintenanceHandler(carMaintenanceService, log))
-	carsvc.RegisterZoneServiceServer(s, handler.NewZoneHandler(zoneService, log))
-	carsvc.RegisterCarStreamServiceServer(s, handler.NewCarStreamHandler(carService, telematicsSubscriber, log))
+	carsvc.RegisterCarModelServiceServer(s, handler.NewCarModelHandler(log, carModelService))
+	carsvc.RegisterCarServiceServer(s, handler.NewCarHandler(log, carService))
+	carsvc.RegisterCarInsuranceServiceServer(s, handler.NewCarInsuranceHandler(log, carInsuranceService))
+	carsvc.RegisterCarMaintenanceServiceServer(s, handler.NewCarMaintenanceHandler(log, carMaintenanceService))
+	carsvc.RegisterZoneServiceServer(s, handler.NewZoneHandler(log, zoneService))
+	carsvc.RegisterCarStreamServiceServer(s, handler.NewCarStreamHandler(log, carService, telemetrySubscriber))
 	carsvc.RegisterHealthServiceServer(s, healthHandler)
 
 	return s, nil

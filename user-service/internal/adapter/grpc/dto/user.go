@@ -7,7 +7,7 @@ import (
 
 	baseuserpb "carsharing/protos/gen/base/user"
 	usersvc "carsharing/protos/gen/service/user"
-	sharedmodel "carsharing/shared/model"
+	sharedvalidation "carsharing/shared/validation"
 	"carsharing/user-service/internal/model"
 	"carsharing/user-service/internal/validation"
 )
@@ -62,7 +62,7 @@ func FromListUsersRequest(req *usersvc.ListUsersRequest) validation.UserFilter {
 	}
 
 	if req.Pagination != nil {
-		filter.Pagination = &sharedmodel.Pagination{
+		filter.Pagination = &sharedvalidation.Pagination{
 			Limit:  req.Pagination.Limit,
 			Offset: req.Pagination.Offset,
 		}

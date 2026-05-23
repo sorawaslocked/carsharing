@@ -3,10 +3,11 @@ package dto
 import (
 	"carsharing/car-service/internal/model"
 	"carsharing/car-service/internal/validation"
-	sharedmodel "carsharing/shared/model"
+	sharedvalidation "carsharing/shared/validation"
 
-	basecar "github.com/sorawaslocked/car-rental-protos/gen/base/car"
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
+	basecar "carsharing/protos/gen/base/car"
+	carsvc "carsharing/protos/gen/service/car"
+
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -35,7 +36,7 @@ func FromUpdateMaintenanceTemplateRequest(req *carsvc.UpdateMaintenanceTemplateR
 func FromListMaintenanceTemplatesRequest(req *carsvc.ListMaintenanceTemplatesRequest) validation.CarMaintenanceTemplateFilter {
 	filter := validation.CarMaintenanceTemplateFilter{}
 	if req.Pagination != nil {
-		filter.Pagination = &sharedmodel.Pagination{
+		filter.Pagination = &sharedvalidation.Pagination{
 			Limit:  req.Pagination.Limit,
 			Offset: req.Pagination.Offset,
 		}
@@ -50,7 +51,7 @@ func FromListMaintenanceRecordsRequest(req *carsvc.ListMaintenanceRecordsRequest
 		Status:     req.Status,
 	}
 	if req.Pagination != nil {
-		filter.Pagination = &sharedmodel.Pagination{
+		filter.Pagination = &sharedvalidation.Pagination{
 			Limit:  req.Pagination.Limit,
 			Offset: req.Pagination.Offset,
 		}
@@ -60,7 +61,7 @@ func FromListMaintenanceRecordsRequest(req *carsvc.ListMaintenanceRecordsRequest
 
 func FromCompleteMaintenanceRecordRequest(req *carsvc.CompleteMaintenanceRecordRequest) validation.CarMaintenanceRecordComplete {
 	return validation.CarMaintenanceRecordComplete{
-		CompletedKM:      req.OdometerAtCompletionKm,
+		CompletedKM:      req.MileageAtCompletionKm,
 		CostTenge:        req.CostTenge,
 		Notes:            req.Notes,
 		ReceiptImageKeys: req.ReceiptImageKeys,
@@ -89,17 +90,17 @@ func ToCarMaintenanceTemplateProtos(templates []model.CarMaintenanceTemplate) []
 
 func ToCarMaintenanceRecordProto(r model.CarMaintenanceRecord) *basecar.CarMaintenanceRecord {
 	proto := &basecar.CarMaintenanceRecord{
-		Id:                     r.ID,
-		CarId:                  r.CarID,
-		TemplateId:             r.TemplateID,
-		Status:                 string(r.Status),
-		OdometerAtWarningKm:    r.OdometerAt,
-		OdometerAtCompletionKm: r.CompletedKM,
-		CostTenge:              r.CostTenge,
-		AssignedTo:             r.AssignedTo,
-		Notes:                  r.Notes,
-		ReceiptImageUrls:       imageURLsFromImages(r.ReceiptImages),
-		CreatedAt:              timestamppb.New(r.CreatedAt),
+		Id:                    r.ID,
+		CarId:                 r.CarID,
+		TemplateId:            r.TemplateID,
+		Status:                string(r.Status),
+		MileageAtWarningKm:    r.OdometerAt,
+		MileageAtCompletionKm: r.CompletedKM,
+		CostTenge:             r.CostTenge,
+		AssignedTo:            r.AssignedTo,
+		Notes:                 r.Notes,
+		ReceiptImageUrls:      imageURLsFromImages(r.ReceiptImages),
+		CreatedAt:             timestamppb.New(r.CreatedAt),
 	}
 	if r.DueBy != nil {
 		proto.DueBy = timestamppb.New(*r.DueBy)

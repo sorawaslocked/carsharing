@@ -1,4 +1,4 @@
-package grpc
+package client
 
 import (
 	"context"
@@ -7,33 +7,34 @@ import (
 
 	"carsharing/car-service/internal/model"
 	pkglog "carsharing/shared/pkg/log"
-	telematicspb "github.com/sorawaslocked/car-rental-protos/gen/service/telematics"
+
+	telemetrypb "carsharing/protos/gen/service/telemetry"
 	"google.golang.org/grpc"
 )
 
-type TelematicsStreamClient struct {
-	client telematicspb.CarTelematicsStreamServiceClient
+type TelemetryStreamClient struct {
+	client telemetrypb.CarTelemetryStreamServiceClient
 	log    *slog.Logger
 }
 
-func NewTelematicsStreamClient(conn *grpc.ClientConn, log *slog.Logger) *TelematicsStreamClient {
-	return &TelematicsStreamClient{
-		client: telematicspb.NewCarTelematicsStreamServiceClient(conn),
-		log:    pkglog.WithComponent(log, "adapter.TelematicsStreamClient"),
+func NewTelemetryStreamClient(conn *grpc.ClientConn, log *slog.Logger) *TelemetryStreamClient {
+	return &TelemetryStreamClient{
+		client: telemetrypb.NewCarTelemetryStreamServiceClient(conn),
+		log:    pkglog.WithComponent(log, "grpc.client.TelemetryStreamClient"),
 	}
 }
 
-func (c *TelematicsStreamClient) Subscribe(ctx context.Context, car model.Car) (<-chan model.TelematicsUpdate, error) {
-	req := &telematicspb.StreamCarTelematicsEventsRequest{
+func (c *TelemetryStreamClient) Subscribe(ctx context.Context, car model.Car) (<-chan model.TelemetryUpdate, error) {
+	req := &telemetrypb.StreamCarTelemetryEventsRequest{
 		CarId: car.ID,
 	}
 
-	stream, err := c.client.StreamCarTelematicsEvents(ctx, req)
+	stream, err := c.client.StreamCarTelemetryEvents(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 
-	ch := make(chan model.TelematicsUpdate, 16)
+	ch := make(chan model.TelemetryUpdate, 16)
 
 	go func() {
 		defer close(ch)
@@ -49,11 +50,11 @@ func (c *TelematicsStreamClient) Subscribe(ctx context.Context, car model.Car) (
 				return
 			}
 
-			update := model.TelematicsUpdate{
+			update := model.TelemetryUpdate{
 				CarID:        resp.GetCarId(),
 				Latitude:     resp.GetLatitude(),
 				Longitude:    resp.GetLongitude(),
-				OdometerKM:   resp.GetOdometerKm(),
+				MileageKM:    resp.GetMileageKm(),
 				FuelLevel:    resp.FuelLevel,
 				BatteryLevel: resp.BatteryLevel,
 			}

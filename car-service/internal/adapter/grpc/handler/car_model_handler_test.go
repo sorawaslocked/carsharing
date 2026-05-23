@@ -6,8 +6,8 @@ import (
 
 	"carsharing/car-service/internal/adapter/grpc/handler/mocks"
 	"carsharing/car-service/internal/model"
+	carsvc "carsharing/protos/gen/service/car"
 	sharedmodel "carsharing/shared/model"
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
@@ -19,7 +19,7 @@ func TestCarModelHandlerCreateCarModel(t *testing.T) {
 
 	t.Run("returns id from service", func(t *testing.T) {
 		svc := mocks.NewMockCarModelService(t)
-		h := NewCarModelHandler(svc, discardLogger())
+		h := NewCarModelHandler(discardLogger(), svc)
 
 		svc.EXPECT().Create(ctx, mock.Anything).Return("model-123", nil)
 
@@ -34,9 +34,9 @@ func TestCarModelHandlerCreateCarModel(t *testing.T) {
 
 	t.Run("service error maps to gRPC Internal", func(t *testing.T) {
 		svc := mocks.NewMockCarModelService(t)
-		h := NewCarModelHandler(svc, discardLogger())
+		h := NewCarModelHandler(discardLogger(), svc)
 
-		svc.EXPECT().Create(ctx, mock.Anything).Return("", model.ErrInternalServerError)
+		svc.EXPECT().Create(ctx, mock.Anything).Return("", errInternal)
 
 		_, err := h.CreateCarModel(ctx, &carsvc.CreateCarModelRequest{})
 		assert.Equal(t, codes.Internal, grpcCode(err))
@@ -49,7 +49,7 @@ func TestCarModelHandlerGetCarModel(t *testing.T) {
 
 	t.Run("returns populated car model proto", func(t *testing.T) {
 		svc := mocks.NewMockCarModelService(t)
-		h := NewCarModelHandler(svc, discardLogger())
+		h := NewCarModelHandler(discardLogger(), svc)
 
 		svc.EXPECT().Get(ctx, modelID).Return(model.CarModel{
 			ID: modelID, Brand: "BMW", Model: "X5",
@@ -63,7 +63,7 @@ func TestCarModelHandlerGetCarModel(t *testing.T) {
 
 	t.Run("not found maps to gRPC NotFound", func(t *testing.T) {
 		svc := mocks.NewMockCarModelService(t)
-		h := NewCarModelHandler(svc, discardLogger())
+		h := NewCarModelHandler(discardLogger(), svc)
 
 		svc.EXPECT().Get(ctx, modelID).Return(model.CarModel{}, model.ErrNotFound)
 
@@ -77,9 +77,9 @@ func TestCarModelHandlerListCarModels(t *testing.T) {
 
 	t.Run("returns car model list", func(t *testing.T) {
 		svc := mocks.NewMockCarModelService(t)
-		h := NewCarModelHandler(svc, discardLogger())
+		h := NewCarModelHandler(discardLogger(), svc)
 
-		svc.EXPECT().GetAll(ctx, mock.Anything).Return([]model.CarModel{
+		svc.EXPECT().List(ctx, mock.Anything).Return([]model.CarModel{
 			{ID: "m-1", Brand: "Toyota"},
 			{ID: "m-2", Brand: "Honda"},
 		}, nil)
@@ -92,9 +92,9 @@ func TestCarModelHandlerListCarModels(t *testing.T) {
 
 	t.Run("service error maps to gRPC Internal", func(t *testing.T) {
 		svc := mocks.NewMockCarModelService(t)
-		h := NewCarModelHandler(svc, discardLogger())
+		h := NewCarModelHandler(discardLogger(), svc)
 
-		svc.EXPECT().GetAll(ctx, mock.Anything).Return(nil, model.ErrInternalServerError)
+		svc.EXPECT().List(ctx, mock.Anything).Return(nil, errInternal)
 
 		_, err := h.ListCarModels(ctx, &carsvc.ListCarModelsRequest{})
 		assert.Equal(t, codes.Internal, grpcCode(err))
@@ -107,7 +107,7 @@ func TestCarModelHandlerUpdateCarModel(t *testing.T) {
 
 	t.Run("returns empty on success", func(t *testing.T) {
 		svc := mocks.NewMockCarModelService(t)
-		h := NewCarModelHandler(svc, discardLogger())
+		h := NewCarModelHandler(discardLogger(), svc)
 
 		svc.EXPECT().Update(ctx, modelID, mock.Anything).Return(nil)
 
@@ -118,7 +118,7 @@ func TestCarModelHandlerUpdateCarModel(t *testing.T) {
 
 	t.Run("not found maps to gRPC NotFound", func(t *testing.T) {
 		svc := mocks.NewMockCarModelService(t)
-		h := NewCarModelHandler(svc, discardLogger())
+		h := NewCarModelHandler(discardLogger(), svc)
 
 		svc.EXPECT().Update(ctx, modelID, mock.Anything).Return(model.ErrNotFound)
 
@@ -133,7 +133,7 @@ func TestCarModelHandlerDeleteCarModel(t *testing.T) {
 
 	t.Run("returns empty on success", func(t *testing.T) {
 		svc := mocks.NewMockCarModelService(t)
-		h := NewCarModelHandler(svc, discardLogger())
+		h := NewCarModelHandler(discardLogger(), svc)
 
 		svc.EXPECT().Delete(ctx, modelID).Return(nil)
 
@@ -144,7 +144,7 @@ func TestCarModelHandlerDeleteCarModel(t *testing.T) {
 
 	t.Run("not found maps to gRPC NotFound", func(t *testing.T) {
 		svc := mocks.NewMockCarModelService(t)
-		h := NewCarModelHandler(svc, discardLogger())
+		h := NewCarModelHandler(discardLogger(), svc)
 
 		svc.EXPECT().Delete(ctx, modelID).Return(model.ErrNotFound)
 
@@ -158,7 +158,7 @@ func TestCarModelHandlerGetCarModelImageUploadData(t *testing.T) {
 
 	t.Run("returns presigned URL and object key", func(t *testing.T) {
 		svc := mocks.NewMockCarModelService(t)
-		h := NewCarModelHandler(svc, discardLogger())
+		h := NewCarModelHandler(discardLogger(), svc)
 
 		svc.EXPECT().GetImageUploadData(ctx).Return(sharedmodel.ImageUploadData{
 			PresignedPutURL: "https://upload.example.com/put",
@@ -173,9 +173,9 @@ func TestCarModelHandlerGetCarModelImageUploadData(t *testing.T) {
 
 	t.Run("service error maps to gRPC Internal", func(t *testing.T) {
 		svc := mocks.NewMockCarModelService(t)
-		h := NewCarModelHandler(svc, discardLogger())
+		h := NewCarModelHandler(discardLogger(), svc)
 
-		svc.EXPECT().GetImageUploadData(ctx).Return(sharedmodel.ImageUploadData{}, model.ErrInternalServerError)
+		svc.EXPECT().GetImageUploadData(ctx).Return(sharedmodel.ImageUploadData{}, errInternal)
 
 		_, err := h.GetCarModelImageUploadData(ctx, &emptypb.Empty{})
 		assert.Equal(t, codes.Internal, grpcCode(err))

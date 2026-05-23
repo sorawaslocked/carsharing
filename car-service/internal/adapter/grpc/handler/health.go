@@ -6,8 +6,10 @@ import (
 	"time"
 
 	pkglog "carsharing/shared/pkg/log"
-	svcpb "github.com/sorawaslocked/car-rental-protos/gen/service"
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
+
+	servicepb "carsharing/protos/gen/service"
+	carsvc "carsharing/protos/gen/service/car"
+
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -27,20 +29,34 @@ func NewHealthHandler(log *slog.Logger, deps map[string]Pinger) *HealthHandler {
 	}
 }
 
-func (h *HealthHandler) Health(ctx context.Context, _ *emptypb.Empty) (*svcpb.ServiceHealthResponse, error) {
+func (h *HealthHandler) Health(ctx context.Context, _ *emptypb.Empty) (*servicepb.ServiceHealthResponse, error) {
+	depHealths := make([]*servicepb.DependencyHealth, 0, len(h.deps))
 	overallStatus := "healthy"
 
 	for name, pinger := range h.deps {
-		if err := pinger.Ping(ctx); err != nil {
+		start := time.Now()
+		err := pinger.Ping(ctx)
+		latencyMs := uint32(time.Since(start).Milliseconds())
+
+		status := "healthy"
+		if err != nil {
+			status = "unhealthy"
 			overallStatus = "unhealthy"
 			h.log.Error("dependency unhealthy", slog.String("dep", name), pkglog.Err(err))
 		}
+
+		depHealths = append(depHealths, &servicepb.DependencyHealth{
+			Name:      name,
+			Status:    status,
+			LatencyMs: &latencyMs,
+		})
 	}
 
-	return &svcpb.ServiceHealthResponse{
+	return &servicepb.ServiceHealthResponse{
 		Name:          "car-service",
 		Status:        overallStatus,
 		Timestamp:     timestamppb.Now(),
 		UptimeSeconds: uint64(time.Since(h.startTime).Seconds()),
+		Dependencies:  depHealths,
 	}, nil
 }

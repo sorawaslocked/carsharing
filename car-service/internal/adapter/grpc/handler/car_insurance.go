@@ -5,31 +5,24 @@ import (
 	"log/slog"
 
 	"carsharing/car-service/internal/adapter/grpc/dto"
+	pkglog "carsharing/shared/pkg/log"
 
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
+	carsvc "carsharing/protos/gen/service/car"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type CarInsuranceHandler struct {
+	log              *slog.Logger
 	insuranceService CarInsuranceService
-
-	log *slog.Logger
 
 	carsvc.UnimplementedCarInsuranceServiceServer
 }
 
-func NewCarInsuranceHandler(insuranceService CarInsuranceService, log *slog.Logger) *CarInsuranceHandler {
-	h := &CarInsuranceHandler{
+func NewCarInsuranceHandler(log *slog.Logger, insuranceService CarInsuranceService) *CarInsuranceHandler {
+	return &CarInsuranceHandler{
+		log:              pkglog.WithComponent(log, "grpc.handler.CarInsuranceHandler"),
 		insuranceService: insuranceService,
 	}
-
-	h.log = log.With(
-		slog.Group("src",
-			slog.String("component", "CarInsuranceHandler"),
-		),
-	)
-
-	return h
 }
 
 func (h *CarInsuranceHandler) CreateCarInsurance(ctx context.Context, req *carsvc.CreateCarInsuranceRequest) (*carsvc.CreateCarInsuranceResponse, error) {
@@ -55,7 +48,7 @@ func (h *CarInsuranceHandler) GetCarInsurance(ctx context.Context, req *carsvc.G
 func (h *CarInsuranceHandler) ListCarInsurances(ctx context.Context, req *carsvc.ListCarInsurancesRequest) (*carsvc.ListCarInsurancesResponse, error) {
 	filterInput := dto.FromListCarInsurancesRequest(req)
 
-	insurances, err := h.insuranceService.GetAll(ctx, filterInput)
+	insurances, err := h.insuranceService.List(ctx, filterInput)
 	if err != nil {
 		return nil, dto.FromErrorToStatusCode(err)
 	}

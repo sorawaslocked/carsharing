@@ -7,8 +7,8 @@ import (
 	"carsharing/car-service/internal/adapter/grpc/handler/mocks"
 	"carsharing/car-service/internal/model"
 	"carsharing/car-service/internal/validation"
+	carsvc "carsharing/protos/gen/service/car"
 	sharedmodel "carsharing/shared/model"
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
@@ -20,7 +20,7 @@ func TestCarMaintenanceHandlerCreateMaintenanceTemplate(t *testing.T) {
 
 	t.Run("returns id from service", func(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
-		h := NewCarMaintenanceHandler(svc, discardLogger())
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
 		svc.EXPECT().CreateTemplate(ctx, mock.MatchedBy(func(in validation.CarMaintenanceTemplateCreate) bool {
 			return in.Name == "Oil Change" && in.IsMandatory
@@ -35,9 +35,9 @@ func TestCarMaintenanceHandlerCreateMaintenanceTemplate(t *testing.T) {
 
 	t.Run("service error maps to gRPC Internal", func(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
-		h := NewCarMaintenanceHandler(svc, discardLogger())
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
-		svc.EXPECT().CreateTemplate(ctx, mock.Anything).Return("", model.ErrInternalServerError)
+		svc.EXPECT().CreateTemplate(ctx, mock.Anything).Return("", errInternal)
 
 		_, err := h.CreateMaintenanceTemplate(ctx, &carsvc.CreateMaintenanceTemplateRequest{})
 		assert.Equal(t, codes.Internal, grpcCode(err))
@@ -50,7 +50,7 @@ func TestCarMaintenanceHandlerGetMaintenanceTemplate(t *testing.T) {
 
 	t.Run("returns populated template proto", func(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
-		h := NewCarMaintenanceHandler(svc, discardLogger())
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
 		kmInterval := int32(5_000)
 		svc.EXPECT().GetTemplate(ctx, tmplID).Return(model.CarMaintenanceTemplate{
@@ -66,7 +66,7 @@ func TestCarMaintenanceHandlerGetMaintenanceTemplate(t *testing.T) {
 
 	t.Run("not found maps to gRPC NotFound", func(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
-		h := NewCarMaintenanceHandler(svc, discardLogger())
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
 		svc.EXPECT().GetTemplate(ctx, tmplID).Return(model.CarMaintenanceTemplate{}, model.ErrNotFound)
 
@@ -80,9 +80,9 @@ func TestCarMaintenanceHandlerListMaintenanceTemplates(t *testing.T) {
 
 	t.Run("returns template list", func(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
-		h := NewCarMaintenanceHandler(svc, discardLogger())
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
-		svc.EXPECT().GetAllTemplates(ctx, mock.Anything).Return([]model.CarMaintenanceTemplate{
+		svc.EXPECT().ListTemplates(ctx, mock.Anything).Return([]model.CarMaintenanceTemplate{
 			{ID: "t-1", Name: "Oil Change"},
 			{ID: "t-2", Name: "Brake Check"},
 		}, nil)
@@ -100,7 +100,7 @@ func TestCarMaintenanceHandlerUpdateMaintenanceTemplate(t *testing.T) {
 
 	t.Run("returns empty on success", func(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
-		h := NewCarMaintenanceHandler(svc, discardLogger())
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
 		svc.EXPECT().UpdateTemplate(ctx, tmplID, mock.Anything).Return(nil)
 
@@ -111,7 +111,7 @@ func TestCarMaintenanceHandlerUpdateMaintenanceTemplate(t *testing.T) {
 
 	t.Run("not found maps to gRPC NotFound", func(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
-		h := NewCarMaintenanceHandler(svc, discardLogger())
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
 		svc.EXPECT().UpdateTemplate(ctx, tmplID, mock.Anything).Return(model.ErrNotFound)
 
@@ -126,7 +126,7 @@ func TestCarMaintenanceHandlerDeleteMaintenanceTemplate(t *testing.T) {
 
 	t.Run("returns empty on success", func(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
-		h := NewCarMaintenanceHandler(svc, discardLogger())
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
 		svc.EXPECT().DeleteTemplate(ctx, tmplID).Return(nil)
 
@@ -137,7 +137,7 @@ func TestCarMaintenanceHandlerDeleteMaintenanceTemplate(t *testing.T) {
 
 	t.Run("not found maps to gRPC NotFound", func(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
-		h := NewCarMaintenanceHandler(svc, discardLogger())
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
 		svc.EXPECT().DeleteTemplate(ctx, tmplID).Return(model.ErrNotFound)
 
@@ -152,9 +152,9 @@ func TestCarMaintenanceHandlerListMaintenanceRecords(t *testing.T) {
 
 	t.Run("returns record list filtered by car", func(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
-		h := NewCarMaintenanceHandler(svc, discardLogger())
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
-		svc.EXPECT().GetRecords(ctx, mock.MatchedBy(func(in validation.CarMaintenanceRecordFilter) bool {
+		svc.EXPECT().ListRecords(ctx, mock.MatchedBy(func(in validation.CarMaintenanceRecordFilter) bool {
 			return in.CarID != nil && *in.CarID == carID
 		})).Return([]model.CarMaintenanceRecord{
 			{ID: "rec-1", CarID: carID, Status: model.MaintenanceRecordStatusPending},
@@ -169,9 +169,9 @@ func TestCarMaintenanceHandlerListMaintenanceRecords(t *testing.T) {
 
 	t.Run("service error maps to gRPC Internal", func(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
-		h := NewCarMaintenanceHandler(svc, discardLogger())
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
-		svc.EXPECT().GetRecords(ctx, mock.Anything).Return(nil, model.ErrInternalServerError)
+		svc.EXPECT().ListRecords(ctx, mock.Anything).Return(nil, errInternal)
 
 		_, err := h.ListMaintenanceRecords(ctx, &carsvc.ListMaintenanceRecordsRequest{})
 		assert.Equal(t, codes.Internal, grpcCode(err))
@@ -184,16 +184,16 @@ func TestCarMaintenanceHandlerCompleteMaintenanceRecord(t *testing.T) {
 
 	t.Run("returns empty on success", func(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
-		h := NewCarMaintenanceHandler(svc, discardLogger())
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
 		svc.EXPECT().CompleteRecord(ctx, recordID, mock.MatchedBy(func(in validation.CarMaintenanceRecordComplete) bool {
 			return in.CompletedKM == 50_000 && in.CostTenge == 15_000
 		})).Return(nil)
 
 		resp, err := h.CompleteMaintenanceRecord(ctx, &carsvc.CompleteMaintenanceRecordRequest{
-			RecordId:               recordID,
-			OdometerAtCompletionKm: 50_000,
-			CostTenge:              15_000,
+			RecordId:              recordID,
+			MileageAtCompletionKm: 50_000,
+			CostTenge:             15_000,
 		})
 		assert.NoError(t, err)
 		assert.IsType(t, &emptypb.Empty{}, resp)
@@ -201,7 +201,7 @@ func TestCarMaintenanceHandlerCompleteMaintenanceRecord(t *testing.T) {
 
 	t.Run("not found maps to gRPC NotFound", func(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
-		h := NewCarMaintenanceHandler(svc, discardLogger())
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
 		svc.EXPECT().CompleteRecord(ctx, recordID, mock.Anything).Return(model.ErrNotFound)
 
@@ -215,7 +215,7 @@ func TestCarMaintenanceHandlerGetMaintenanceReceiptImageUploadData(t *testing.T)
 
 	t.Run("returns upload data", func(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
-		h := NewCarMaintenanceHandler(svc, discardLogger())
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
 		svc.EXPECT().GetReceiptImageUploadData(ctx).Return(sharedmodel.ImageUploadData{
 			PresignedPutURL: "https://upload.example.com/receipt",
@@ -230,9 +230,9 @@ func TestCarMaintenanceHandlerGetMaintenanceReceiptImageUploadData(t *testing.T)
 
 	t.Run("service error maps to gRPC Internal", func(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
-		h := NewCarMaintenanceHandler(svc, discardLogger())
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
-		svc.EXPECT().GetReceiptImageUploadData(ctx).Return(sharedmodel.ImageUploadData{}, model.ErrInternalServerError)
+		svc.EXPECT().GetReceiptImageUploadData(ctx).Return(sharedmodel.ImageUploadData{}, errInternal)
 
 		_, err := h.GetMaintenanceReceiptImageUploadData(ctx, &emptypb.Empty{})
 		assert.Equal(t, codes.Internal, grpcCode(err))

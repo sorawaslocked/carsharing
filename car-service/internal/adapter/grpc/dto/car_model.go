@@ -3,10 +3,10 @@ package dto
 import (
 	"carsharing/car-service/internal/model"
 	"carsharing/car-service/internal/validation"
-	sharedmodel "carsharing/shared/model"
+	sharedvalidation "carsharing/shared/validation"
 
-	basecar "github.com/sorawaslocked/car-rental-protos/gen/base/car"
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
+	basecar "carsharing/protos/gen/base/car"
+	carsvc "carsharing/protos/gen/service/car"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -40,9 +40,9 @@ func FromListCarModelsRequest(req *carsvc.ListCarModelsRequest) validation.CarMo
 		filter.MinSeats = &v
 	}
 	if req.Pagination != nil {
-		filter.Pagination = &sharedmodel.Pagination{
-			Limit:  int64(req.Pagination.Limit),
-			Offset: int64(req.Pagination.Offset),
+		filter.Pagination = &sharedvalidation.Pagination{
+			Limit:  req.Pagination.Limit,
+			Offset: req.Pagination.Offset,
 		}
 	}
 

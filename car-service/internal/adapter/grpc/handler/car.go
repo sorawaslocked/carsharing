@@ -5,31 +5,24 @@ import (
 	"log/slog"
 
 	"carsharing/car-service/internal/adapter/grpc/dto"
+	pkglog "carsharing/shared/pkg/log"
 
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
+	carsvc "carsharing/protos/gen/service/car"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type CarHandler struct {
+	log        *slog.Logger
 	carService CarService
-
-	log *slog.Logger
 
 	carsvc.UnimplementedCarServiceServer
 }
 
-func NewCarHandler(carService CarService, log *slog.Logger) *CarHandler {
-	s := &CarHandler{
+func NewCarHandler(log *slog.Logger, carService CarService) *CarHandler {
+	return &CarHandler{
+		log:        pkglog.WithComponent(log, "grpc.handler.CarHandler"),
 		carService: carService,
 	}
-
-	s.log = log.With(
-		slog.Group("src",
-			slog.String("component", "CarHandler"),
-		),
-	)
-
-	return s
 }
 
 func (h *CarHandler) CreateCar(ctx context.Context, req *carsvc.CreateCarRequest) (*carsvc.CreateCarResponse, error) {
@@ -55,7 +48,7 @@ func (h *CarHandler) GetCar(ctx context.Context, req *carsvc.GetCarRequest) (*ca
 func (h *CarHandler) ListCars(ctx context.Context, req *carsvc.ListCarsRequest) (*carsvc.ListCarsResponse, error) {
 	filterInput := dto.FromListCarsRequest(req)
 
-	cars, err := h.carService.GetAll(ctx, filterInput)
+	cars, err := h.carService.List(ctx, filterInput)
 	if err != nil {
 		return nil, dto.FromErrorToStatusCode(err)
 	}
@@ -83,6 +76,16 @@ func (h *CarHandler) UpdateCarStatus(ctx context.Context, req *carsvc.UpdateCarS
 	return &emptypb.Empty{}, nil
 }
 
+func (h *CarHandler) UpdateCarTelemetry(ctx context.Context, req *carsvc.UpdateCarTelemetryRequest) (*emptypb.Empty, error) {
+	input := dto.FromUpdateCarTelemetryRequest(req)
+
+	if err := h.carService.UpdateCarTelemetry(ctx, req.Id, input); err != nil {
+		return nil, dto.FromErrorToStatusCode(err)
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
 func (h *CarHandler) DeleteCar(ctx context.Context, req *carsvc.DeleteCarRequest) (*emptypb.Empty, error) {
 	if err := h.carService.Delete(ctx, req.Id); err != nil {
 		return nil, dto.FromErrorToStatusCode(err)
@@ -102,20 +105,10 @@ func (h *CarHandler) GetCarImageUploadData(ctx context.Context, _ *emptypb.Empty
 	}, nil
 }
 
-func (h *CarHandler) UpdateCarTelemetry(ctx context.Context, req *carsvc.UpdateCarTelemetryRequest) (*emptypb.Empty, error) {
-	input := dto.FromUpdateCarTelemetryRequest(req)
-
-	if err := h.carService.UpdateCarTelemetry(ctx, req.Id, input); err != nil {
-		return nil, dto.FromErrorToStatusCode(err)
-	}
-
-	return &emptypb.Empty{}, nil
-}
-
 func (h *CarHandler) GetCarStatusHistory(ctx context.Context, req *carsvc.GetCarStatusHistoryRequest) (*carsvc.GetCarStatusHistoryResponse, error) {
 	filter := dto.FromGetCarStatusHistoryRequest(req)
 
-	entries, err := h.carService.GetCarStatusHistory(ctx, filter)
+	entries, err := h.carService.ListCarStatusHistory(ctx, filter)
 	if err != nil {
 		return nil, dto.FromErrorToStatusCode(err)
 	}
@@ -123,46 +116,13 @@ func (h *CarHandler) GetCarStatusHistory(ctx context.Context, req *carsvc.GetCar
 	return &carsvc.GetCarStatusHistoryResponse{Readings: dto.ToCarStatusReadingProtos(entries)}, nil
 }
 
-func (h *CarHandler) GetCarFuelHistory(ctx context.Context, req *carsvc.GetCarFuelHistoryRequest) (*carsvc.GetCarFuelHistoryResponse, error) {
-	filter := dto.FromGetCarFuelHistoryRequest(req)
+func (h *CarHandler) GetCarTelemetryHistory(ctx context.Context, req *carsvc.GetCarTelemetryHistoryRequest) (*carsvc.GetCarTelemetryHistoryResponse, error) {
+	filter := dto.FromGetCarTelemetryHistoryRequest(req)
 
-	readings, err := h.carService.GetCarFuelHistory(ctx, filter)
+	readings, err := h.carService.ListCarTelemetryHistory(ctx, filter)
 	if err != nil {
 		return nil, dto.FromErrorToStatusCode(err)
 	}
 
-	return &carsvc.GetCarFuelHistoryResponse{Readings: dto.ToCarFuelReadingProtos(readings)}, nil
-}
-
-func (h *CarHandler) GetCarLocationHistory(ctx context.Context, req *carsvc.GetCarLocationHistoryRequest) (*carsvc.GetCarLocationHistoryResponse, error) {
-	filter := dto.FromGetTelematicsHistoryRequest(req.CarId, req.From, req.To, req.Pagination)
-
-	events, err := h.carService.GetCarLocationHistory(ctx, filter)
-	if err != nil {
-		return nil, dto.FromErrorToStatusCode(err)
-	}
-
-	return &carsvc.GetCarLocationHistoryResponse{Readings: dto.ToCarLocationReadingProtos(events)}, nil
-}
-
-func (h *CarHandler) GetCarBatteryHistory(ctx context.Context, req *carsvc.GetCarBatteryHistoryRequest) (*carsvc.GetCarBatteryHistoryResponse, error) {
-	filter := dto.FromGetTelematicsHistoryRequest(req.CarId, req.From, req.To, req.Pagination)
-
-	events, err := h.carService.GetCarBatteryHistory(ctx, filter)
-	if err != nil {
-		return nil, dto.FromErrorToStatusCode(err)
-	}
-
-	return &carsvc.GetCarBatteryHistoryResponse{Readings: dto.ToCarBatteryReadingProtos(events)}, nil
-}
-
-func (h *CarHandler) GetCarMileageHistory(ctx context.Context, req *carsvc.GetCarMileageHistoryRequest) (*carsvc.GetCarMileageHistoryResponse, error) {
-	filter := dto.FromGetTelematicsHistoryRequest(req.CarId, req.From, req.To, req.Pagination)
-
-	events, err := h.carService.GetCarMileageHistory(ctx, filter)
-	if err != nil {
-		return nil, dto.FromErrorToStatusCode(err)
-	}
-
-	return &carsvc.GetCarMileageHistoryResponse{Readings: dto.ToCarMileageReadingProtos(events)}, nil
+	return &carsvc.GetCarTelemetryHistoryResponse{Readings: dto.ToCarTelemetryReadingProtos(readings)}, nil
 }

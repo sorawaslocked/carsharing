@@ -4,191 +4,36 @@ import (
 	"carsharing/car-service/internal/model"
 	"carsharing/car-service/internal/validation"
 	sharedmodel "carsharing/shared/model"
+	sharedvalidation "carsharing/shared/validation"
 
-	"github.com/sorawaslocked/car-rental-protos/gen/base"
-	basecar "github.com/sorawaslocked/car-rental-protos/gen/base/car"
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
+	"carsharing/protos/gen/base"
+	basecar "carsharing/protos/gen/base/car"
+	carsvc "carsharing/protos/gen/service/car"
+
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func FromUpdateCarTelemetryRequest(req *carsvc.UpdateCarTelemetryRequest) model.CarTelematicsUpdateInput {
-	input := model.CarTelematicsUpdateInput{}
-	if req.MileageKm != nil {
-		input.MileageKM = *req.MileageKm
-	}
-	input.FuelLevel = req.FuelLevel
-	input.BatteryLevel = req.BatteryLevel
-	if req.Location != nil {
-		input.Location = &model.Location{
-			Latitude:  req.Location.Latitude,
-			Longitude: req.Location.Longitude,
-		}
-	}
-	return input
-}
-
-func FromGetCarStatusHistoryRequest(req *carsvc.GetCarStatusHistoryRequest) model.CarStatusLogFilter {
-	filter := model.CarStatusLogFilter{
-		CarID: &req.CarId,
-	}
-	if req.Pagination != nil {
-		filter.Pagination = &sharedmodel.Pagination{
-			Limit:  int64(req.Pagination.Limit),
-			Offset: int64(req.Pagination.Offset),
-		}
-	}
-	return filter
-}
-
-func FromGetCarFuelHistoryRequest(req *carsvc.GetCarFuelHistoryRequest) model.TelematicsEventFilter {
-	filter := model.TelematicsEventFilter{
-		CarID: &req.CarId,
-	}
-	if req.From != nil {
-		t := req.From.AsTime()
-		filter.From = &t
-	}
-	if req.To != nil {
-		t := req.To.AsTime()
-		filter.To = &t
-	}
-	if req.Pagination != nil {
-		filter.Pagination = &sharedmodel.Pagination{
-			Limit:  int64(req.Pagination.Limit),
-			Offset: int64(req.Pagination.Offset),
-		}
-	}
-	return filter
-}
-
-func FromGetTelematicsHistoryRequest(carID string, from, to *timestamppb.Timestamp, pagination *base.Pagination) model.TelematicsEventFilter {
-	filter := model.TelematicsEventFilter{
-		CarID: &carID,
-	}
-	if from != nil {
-		t := from.AsTime()
-		filter.From = &t
-	}
-	if to != nil {
-		t := to.AsTime()
-		filter.To = &t
-	}
-	if pagination != nil {
-		filter.Pagination = &sharedmodel.Pagination{
-			Limit:  pagination.Limit,
-			Offset: pagination.Offset,
-		}
-	}
-	return filter
-}
-
-func ToCarStatusReadingProtos(entries []model.CarStatusLogEntry) []*basecar.CarStatusReading {
-	protos := make([]*basecar.CarStatusReading, len(entries))
-	for i, e := range entries {
-		protos[i] = &basecar.CarStatusReading{
-			Id:         e.ID,
-			CarId:      e.CarID,
-			FromStatus: string(e.FromStatus),
-			ToStatus:   string(e.ToStatus),
-			ActorType:  string(e.ActorType),
-			ActorId:    e.ActorID,
-			Reason:     e.Reason,
-			RecordedAt: timestamppb.New(e.ChangedAt),
-		}
-	}
-	return protos
-}
-
-func ToCarFuelReadingProtos(events []model.CarTelematicsEvent) []*basecar.CarFuelReading {
-	protos := make([]*basecar.CarFuelReading, len(events))
-	for i, e := range events {
-		proto := &basecar.CarFuelReading{
-			CarId:      e.CarID,
-			RecordedAt: timestamppb.New(e.RecordedAt),
-		}
-		if e.FuelLevel != nil {
-			proto.FuelPct = *e.FuelLevel
-		}
-		protos[i] = proto
-	}
-	return protos
-}
-
-func ToCarLocationReadingProtos(events []model.CarTelematicsEvent) []*basecar.CarLocationReading {
-	protos := make([]*basecar.CarLocationReading, len(events))
-	for i, e := range events {
-		proto := &basecar.CarLocationReading{
-			Id:         e.ID,
-			CarId:      e.CarID,
-			RecordedAt: timestamppb.New(e.RecordedAt),
-		}
-		if e.Latitude != 0 || e.Longitude != 0 {
-			proto.Location = &base.Location{
-				Latitude:  e.Latitude,
-				Longitude: e.Longitude,
-			}
-		}
-		protos[i] = proto
-	}
-	return protos
-}
-
-func ToCarBatteryReadingProtos(events []model.CarTelematicsEvent) []*basecar.CarBatteryReading {
-	protos := make([]*basecar.CarBatteryReading, len(events))
-	for i, e := range events {
-		proto := &basecar.CarBatteryReading{
-			Id:         e.ID,
-			CarId:      e.CarID,
-			RecordedAt: timestamppb.New(e.RecordedAt),
-		}
-		if e.BatteryLevel != nil {
-			proto.BatteryLevel = *e.BatteryLevel
-		}
-		protos[i] = proto
-	}
-	return protos
-}
-
-func ToCarMileageReadingProtos(events []model.CarTelematicsEvent) []*basecar.CarMileageReading {
-	protos := make([]*basecar.CarMileageReading, len(events))
-	for i, e := range events {
-		protos[i] = &basecar.CarMileageReading{
-			Id:         e.ID,
-			CarId:      e.CarID,
-			MileageKm:  e.OdometerKM,
-			RecordedAt: timestamppb.New(e.RecordedAt),
-		}
-	}
-	return protos
-}
-
-func ToSlimCarProto(c model.Car) *basecar.SlimCar {
-	proto := &basecar.SlimCar{
-		Id:           c.ID,
-		ModelId:      c.ModelID,
-		LicensePlate: c.LicensePlate,
-		Color:        c.Color,
-		Status:       string(c.Status),
-		FuelLevel:    c.FuelLevel,
-	}
-	if c.Location.Latitude != 0 || c.Location.Longitude != 0 {
-		proto.Location = &base.Location{
-			Latitude:  c.Location.Latitude,
-			Longitude: c.Location.Longitude,
-		}
-	}
-	return proto
-}
-
 func FromCreateCarRequest(req *carsvc.CreateCarRequest) validation.CarCreate {
-	return validation.CarCreate{
+	input := validation.CarCreate{
 		ModelID:          req.ModelId,
 		VIN:              req.Vin,
 		LicensePlate:     req.LicensePlate,
 		Color:            req.Color,
 		YearManufactured: int16(req.YearManufactured),
-		Notes:            ptrToSlice(req.Notes),
+		TelemetryID:      req.TelemetryId,
+		MileageKM:        req.MileageKm,
+		FuelLevel:        req.FuelLevel,
+		BatteryLevel:     req.BatteryLevel,
+		Notes:            req.Notes,
 	}
+	if req.Location != nil {
+		input.Location = &sharedvalidation.Location{
+			Latitude:  req.Location.Latitude,
+			Longitude: req.Location.Longitude,
+		}
+	}
+	return input
 }
 
 func FromListCarsRequest(req *carsvc.ListCarsRequest) validation.CarFilter {
@@ -226,7 +71,7 @@ func FromListCarsRequest(req *carsvc.ListCarsRequest) validation.CarFilter {
 	}
 
 	locationFilterIsNil := true
-	locationFilter := model.LocationFilter{}
+	locationFilter := sharedvalidation.LocationFilter{}
 
 	if req.Location != nil {
 		locationFilter.Location.Latitude = req.Location.Latitude
@@ -242,9 +87,9 @@ func FromListCarsRequest(req *carsvc.ListCarsRequest) validation.CarFilter {
 		Status: req.Status,
 	}
 	if req.Pagination != nil {
-		carFilter.Pagination = &sharedmodel.Pagination{
-			Limit:  int64(req.Pagination.Limit),
-			Offset: int64(req.Pagination.Offset),
+		carFilter.Pagination = &sharedvalidation.Pagination{
+			Limit:  req.Pagination.Limit,
+			Offset: req.Pagination.Offset,
 		}
 	}
 
@@ -263,7 +108,10 @@ func FromUpdateCarRequest(req *carsvc.UpdateCarRequest) validation.CarUpdate {
 		ModelID:      req.ModelId,
 		LicensePlate: req.LicensePlate,
 		Color:        req.Color,
-		Notes:        ptrToSlice(req.Notes),
+		TelemetryID:  req.TelemetryId,
+		ZoneID:       req.ZoneId,
+		IsRetired:    req.IsRetired,
+		Notes:        req.Notes,
 		ImageKeys:    req.ImageKeys,
 	}
 }
@@ -272,6 +120,57 @@ func FromUpdateCarStatusRequest(req *carsvc.UpdateCarStatusRequest) validation.C
 	return validation.CarStatusUpdate{
 		Status: req.Status,
 	}
+}
+
+func FromUpdateCarTelemetryRequest(req *carsvc.UpdateCarTelemetryRequest) validation.CarTelemetryUpdate {
+	input := validation.CarTelemetryUpdate{
+		FuelLevel:    req.FuelLevel,
+		BatteryLevel: req.BatteryLevel,
+	}
+	if req.MileageKm != nil {
+		input.MileageKM = *req.MileageKm
+	}
+	if req.Location != nil {
+		input.Location = &sharedvalidation.Location{
+			Latitude:  req.Location.Latitude,
+			Longitude: req.Location.Longitude,
+		}
+	}
+	return input
+}
+
+func FromGetCarStatusHistoryRequest(req *carsvc.GetCarStatusHistoryRequest) validation.CarStatusReadingFilter {
+	filter := validation.CarStatusReadingFilter{
+		CarID: &req.CarId,
+	}
+	if req.Pagination != nil {
+		filter.Pagination = &sharedvalidation.Pagination{
+			Limit:  req.Pagination.Limit,
+			Offset: req.Pagination.Offset,
+		}
+	}
+	return filter
+}
+
+func FromGetCarTelemetryHistoryRequest(req *carsvc.GetCarTelemetryHistoryRequest) validation.TelemetryReadingFilter {
+	filter := validation.TelemetryReadingFilter{
+		CarID: &req.CarId,
+	}
+	if req.From != nil {
+		t := req.From.AsTime()
+		filter.From = &t
+	}
+	if req.To != nil {
+		t := req.To.AsTime()
+		filter.To = &t
+	}
+	if req.Pagination != nil {
+		filter.Pagination = &sharedvalidation.Pagination{
+			Limit:  req.Pagination.Limit,
+			Offset: req.Pagination.Offset,
+		}
+	}
+	return filter
 }
 
 func ToCarProto(c model.Car) *basecar.Car {
@@ -285,8 +184,12 @@ func ToCarProto(c model.Car) *basecar.Car {
 		MileageKm:        c.MileageKM,
 		FuelLevel:        c.FuelLevel,
 		BatteryLevel:     c.BatteryLevel,
+		TelemetryId:      c.TelemetryID,
+		ZoneId:           c.ZoneID,
+		FuelStatus:       c.FuelStatus,
+		IsRetired:        c.IsRetired,
 		Status:           string(c.Status),
-		Notes:            sliceToPtr(c.Notes),
+		Notes:            c.Notes,
 		ImageUrls:        imageURLsFromImages(c.Images),
 		LastSeenAt:       timestamppb.New(c.LastSeenAt),
 		CreatedAt:        timestamppb.New(c.CreatedAt),
@@ -309,6 +212,76 @@ func ToCarProtos(cs []model.Car) []*basecar.Car {
 	return protos
 }
 
+func ToSlimCarProto(c model.Car) *basecar.SlimCar {
+	proto := &basecar.SlimCar{
+		Id:           c.ID,
+		ModelId:      c.ModelID,
+		LicensePlate: c.LicensePlate,
+		Color:        c.Color,
+		Status:       string(c.Status),
+		FuelLevel:    c.FuelLevel,
+	}
+	if c.Location.Latitude != 0 || c.Location.Longitude != 0 {
+		proto.Location = &base.Location{
+			Latitude:  c.Location.Latitude,
+			Longitude: c.Location.Longitude,
+		}
+	}
+	return proto
+}
+
+func ToCarStatusReadingProtos(entries []model.CarStatusReading) []*basecar.CarStatusReading {
+	protos := make([]*basecar.CarStatusReading, len(entries))
+	for i, e := range entries {
+		proto := &basecar.CarStatusReading{
+			Id:         e.ID,
+			CarId:      e.CarID,
+			FromStatus: string(e.FromStatus),
+			ToStatus:   string(e.ToStatus),
+			ActorType:  string(e.ActorType),
+			ActorId:    e.ActorID,
+			Reason:     e.Reason,
+			RecordedAt: timestamppb.New(e.RecordedAt),
+		}
+		if len(e.Metadata) > 0 {
+			meta, _ := structpb.NewStruct(e.Metadata)
+			proto.Metadata = meta
+		}
+		protos[i] = proto
+	}
+	return protos
+}
+
+func ToCarTelemetryReadingProtos(readings []model.TelemetryReading) []*basecar.CarTelemetryReading {
+	protos := make([]*basecar.CarTelemetryReading, len(readings))
+	for i, r := range readings {
+		proto := &basecar.CarTelemetryReading{
+			Id:           r.ID,
+			CarId:        r.CarID,
+			FuelPct:      r.FuelPct,
+			FuelRawPct:   r.FuelRawPct,
+			BatteryLevel: r.BatteryLevel,
+			MileageKm:    r.MileageKM,
+			ActorType:    string(r.ActorType),
+			ActorId:      r.ActorID,
+			Reason:       r.Reason,
+			RecordedAt:   timestamppb.New(r.RecordedAt),
+		}
+		if r.Location != nil {
+			proto.Location = &base.Location{
+				Latitude:  r.Location.Latitude,
+				Longitude: r.Location.Longitude,
+			}
+		}
+		if len(r.Metadata) > 0 {
+			meta, _ := structpb.NewStruct(r.Metadata)
+			proto.Metadata = meta
+		}
+		protos[i] = proto
+	}
+	return protos
+}
+
 func ToImageUploadData(data sharedmodel.ImageUploadData) *base.ImageUploadData {
 	return &base.ImageUploadData{
 		PresignedPutUrl: data.PresignedPutURL,
@@ -327,18 +300,4 @@ func imageURLsFromImages(images []sharedmodel.Image) []string {
 		}
 	}
 	return urls
-}
-
-func ptrToSlice(s *string) []string {
-	if s == nil {
-		return nil
-	}
-	return []string{*s}
-}
-
-func sliceToPtr(ss []string) *string {
-	if len(ss) == 0 {
-		return nil
-	}
-	return &ss[0]
 }

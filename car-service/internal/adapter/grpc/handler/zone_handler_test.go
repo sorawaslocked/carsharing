@@ -7,7 +7,7 @@ import (
 	"carsharing/car-service/internal/adapter/grpc/handler/mocks"
 	"carsharing/car-service/internal/model"
 	"carsharing/car-service/internal/validation"
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
+	carsvc "carsharing/protos/gen/service/car"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
@@ -19,7 +19,7 @@ func TestZoneHandlerCreateZone(t *testing.T) {
 
 	t.Run("returns id from service", func(t *testing.T) {
 		svc := mocks.NewMockZoneService(t)
-		h := NewZoneHandler(svc, discardLogger())
+		h := NewZoneHandler(discardLogger(), svc)
 
 		svc.EXPECT().Create(ctx, mock.MatchedBy(func(in validation.ZoneCreate) bool {
 			return in.Name == "Downtown" && in.Type == "operating"
@@ -34,9 +34,9 @@ func TestZoneHandlerCreateZone(t *testing.T) {
 
 	t.Run("service error maps to gRPC Internal", func(t *testing.T) {
 		svc := mocks.NewMockZoneService(t)
-		h := NewZoneHandler(svc, discardLogger())
+		h := NewZoneHandler(discardLogger(), svc)
 
-		svc.EXPECT().Create(ctx, mock.Anything).Return("", model.ErrInternalServerError)
+		svc.EXPECT().Create(ctx, mock.Anything).Return("", errInternal)
 
 		_, err := h.CreateZone(ctx, &carsvc.CreateZoneRequest{})
 		assert.Equal(t, codes.Internal, grpcCode(err))
@@ -49,7 +49,7 @@ func TestZoneHandlerGetZone(t *testing.T) {
 
 	t.Run("returns populated zone proto", func(t *testing.T) {
 		svc := mocks.NewMockZoneService(t)
-		h := NewZoneHandler(svc, discardLogger())
+		h := NewZoneHandler(discardLogger(), svc)
 
 		svc.EXPECT().Get(ctx, zoneID).Return(model.Zone{
 			ID: zoneID, Name: "Uptown", Type: model.ZoneTypeOperating, IsActive: true,
@@ -64,7 +64,7 @@ func TestZoneHandlerGetZone(t *testing.T) {
 
 	t.Run("not found maps to gRPC NotFound", func(t *testing.T) {
 		svc := mocks.NewMockZoneService(t)
-		h := NewZoneHandler(svc, discardLogger())
+		h := NewZoneHandler(discardLogger(), svc)
 
 		svc.EXPECT().Get(ctx, zoneID).Return(model.Zone{}, model.ErrNotFound)
 
@@ -78,9 +78,9 @@ func TestZoneHandlerListZones(t *testing.T) {
 
 	t.Run("returns zone list", func(t *testing.T) {
 		svc := mocks.NewMockZoneService(t)
-		h := NewZoneHandler(svc, discardLogger())
+		h := NewZoneHandler(discardLogger(), svc)
 
-		svc.EXPECT().GetAll(ctx, mock.Anything).Return([]model.Zone{
+		svc.EXPECT().List(ctx, mock.Anything).Return([]model.Zone{
 			{ID: "z-1", Name: "North"},
 			{ID: "z-2", Name: "South"},
 		}, nil)
@@ -93,9 +93,9 @@ func TestZoneHandlerListZones(t *testing.T) {
 
 	t.Run("service error maps to gRPC Internal", func(t *testing.T) {
 		svc := mocks.NewMockZoneService(t)
-		h := NewZoneHandler(svc, discardLogger())
+		h := NewZoneHandler(discardLogger(), svc)
 
-		svc.EXPECT().GetAll(ctx, mock.Anything).Return(nil, model.ErrInternalServerError)
+		svc.EXPECT().List(ctx, mock.Anything).Return(nil, errInternal)
 
 		_, err := h.ListZones(ctx, &carsvc.ListZonesRequest{})
 		assert.Equal(t, codes.Internal, grpcCode(err))
@@ -108,7 +108,7 @@ func TestZoneHandlerUpdateZone(t *testing.T) {
 
 	t.Run("returns empty on success", func(t *testing.T) {
 		svc := mocks.NewMockZoneService(t)
-		h := NewZoneHandler(svc, discardLogger())
+		h := NewZoneHandler(discardLogger(), svc)
 
 		svc.EXPECT().Update(ctx, zoneID, mock.Anything).Return(nil)
 
@@ -119,7 +119,7 @@ func TestZoneHandlerUpdateZone(t *testing.T) {
 
 	t.Run("not found maps to gRPC NotFound", func(t *testing.T) {
 		svc := mocks.NewMockZoneService(t)
-		h := NewZoneHandler(svc, discardLogger())
+		h := NewZoneHandler(discardLogger(), svc)
 
 		svc.EXPECT().Update(ctx, zoneID, mock.Anything).Return(model.ErrNotFound)
 
@@ -134,7 +134,7 @@ func TestZoneHandlerDeleteZone(t *testing.T) {
 
 	t.Run("returns empty on success", func(t *testing.T) {
 		svc := mocks.NewMockZoneService(t)
-		h := NewZoneHandler(svc, discardLogger())
+		h := NewZoneHandler(discardLogger(), svc)
 
 		svc.EXPECT().Delete(ctx, zoneID).Return(nil)
 
@@ -145,7 +145,7 @@ func TestZoneHandlerDeleteZone(t *testing.T) {
 
 	t.Run("not found maps to gRPC NotFound", func(t *testing.T) {
 		svc := mocks.NewMockZoneService(t)
-		h := NewZoneHandler(svc, discardLogger())
+		h := NewZoneHandler(discardLogger(), svc)
 
 		svc.EXPECT().Delete(ctx, zoneID).Return(model.ErrNotFound)
 

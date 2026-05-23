@@ -2,16 +2,19 @@ module carsharing/car-service
 
 go 1.26
 
-replace carsharing/shared v0.0.0 => ../shared
+replace (
+	carsharing/protos v0.0.0 => ../protos
+	carsharing/shared v0.0.0 => ../shared
+)
 
 require (
+	carsharing/protos v0.0.0
 	carsharing/shared v0.0.0
 	github.com/go-playground/validator/v10 v10.30.2
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jackc/pgx/v5 v5.9.2
 	github.com/minio/minio-go/v7 v7.1.0
 	github.com/nats-io/nats.go v1.52.0
-	github.com/sorawaslocked/car-rental-protos v0.0.33
 	github.com/stretchr/testify v1.11.1
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260226221140-a57be14db171
 	google.golang.org/grpc v1.81.1

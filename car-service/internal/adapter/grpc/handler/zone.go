@@ -5,31 +5,24 @@ import (
 	"log/slog"
 
 	"carsharing/car-service/internal/adapter/grpc/dto"
+	pkglog "carsharing/shared/pkg/log"
 
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
+	carsvc "carsharing/protos/gen/service/car"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type ZoneHandler struct {
+	log         *slog.Logger
 	zoneService ZoneService
-
-	log *slog.Logger
 
 	carsvc.UnimplementedZoneServiceServer
 }
 
-func NewZoneHandler(zoneService ZoneService, log *slog.Logger) *ZoneHandler {
-	h := &ZoneHandler{
+func NewZoneHandler(log *slog.Logger, zoneService ZoneService) *ZoneHandler {
+	return &ZoneHandler{
+		log:         pkglog.WithComponent(log, "grpc.handler.ZoneHandler"),
 		zoneService: zoneService,
 	}
-
-	h.log = log.With(
-		slog.Group("src",
-			slog.String("component", "ZoneHandler"),
-		),
-	)
-
-	return h
 }
 
 func (h *ZoneHandler) CreateZone(ctx context.Context, req *carsvc.CreateZoneRequest) (*carsvc.CreateZoneResponse, error) {
@@ -55,7 +48,7 @@ func (h *ZoneHandler) GetZone(ctx context.Context, req *carsvc.GetZoneRequest) (
 func (h *ZoneHandler) ListZones(ctx context.Context, req *carsvc.ListZonesRequest) (*carsvc.ListZonesResponse, error) {
 	filterInput := dto.FromListZonesRequest(req)
 
-	zones, err := h.zoneService.GetAll(ctx, filterInput)
+	zones, err := h.zoneService.List(ctx, filterInput)
 	if err != nil {
 		return nil, dto.FromErrorToStatusCode(err)
 	}

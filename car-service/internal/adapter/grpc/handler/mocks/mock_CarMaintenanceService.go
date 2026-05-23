@@ -177,12 +177,12 @@ func (_c *MockCarMaintenanceService_DeleteTemplate_Call) RunAndReturn(run func(c
 	return _c
 }
 
-// GetAllTemplates provides a mock function with given fields: ctx, filterInput
-func (_m *MockCarMaintenanceService) GetAllTemplates(ctx context.Context, filterInput validation.CarMaintenanceTemplateFilter) ([]model.CarMaintenanceTemplate, error) {
+// ListTemplates provides a mock function with given fields: ctx, filterInput
+func (_m *MockCarMaintenanceService) ListTemplates(ctx context.Context, filterInput validation.CarMaintenanceTemplateFilter) ([]model.CarMaintenanceTemplate, error) {
 	ret := _m.Called(ctx, filterInput)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetAllTemplates")
+		panic("no return value specified for ListTemplates")
 	}
 
 	var r0 []model.CarMaintenanceTemplate
@@ -207,31 +207,31 @@ func (_m *MockCarMaintenanceService) GetAllTemplates(ctx context.Context, filter
 	return r0, r1
 }
 
-// MockCarMaintenanceService_GetAllTemplates_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAllTemplates'
-type MockCarMaintenanceService_GetAllTemplates_Call struct {
+// MockCarMaintenanceService_ListTemplates_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListTemplates'
+type MockCarMaintenanceService_ListTemplates_Call struct {
 	*mock.Call
 }
 
-// GetAllTemplates is a helper method to define mock.On call
+// ListTemplates is a helper method to define mock.On call
 //   - ctx context.Context
 //   - filterInput validation.CarMaintenanceTemplateFilter
-func (_e *MockCarMaintenanceService_Expecter) GetAllTemplates(ctx interface{}, filterInput interface{}) *MockCarMaintenanceService_GetAllTemplates_Call {
-	return &MockCarMaintenanceService_GetAllTemplates_Call{Call: _e.mock.On("GetAllTemplates", ctx, filterInput)}
+func (_e *MockCarMaintenanceService_Expecter) ListTemplates(ctx interface{}, filterInput interface{}) *MockCarMaintenanceService_ListTemplates_Call {
+	return &MockCarMaintenanceService_ListTemplates_Call{Call: _e.mock.On("ListTemplates", ctx, filterInput)}
 }
 
-func (_c *MockCarMaintenanceService_GetAllTemplates_Call) Run(run func(ctx context.Context, filterInput validation.CarMaintenanceTemplateFilter)) *MockCarMaintenanceService_GetAllTemplates_Call {
+func (_c *MockCarMaintenanceService_ListTemplates_Call) Run(run func(ctx context.Context, filterInput validation.CarMaintenanceTemplateFilter)) *MockCarMaintenanceService_ListTemplates_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(validation.CarMaintenanceTemplateFilter))
 	})
 	return _c
 }
 
-func (_c *MockCarMaintenanceService_GetAllTemplates_Call) Return(_a0 []model.CarMaintenanceTemplate, _a1 error) *MockCarMaintenanceService_GetAllTemplates_Call {
+func (_c *MockCarMaintenanceService_ListTemplates_Call) Return(_a0 []model.CarMaintenanceTemplate, _a1 error) *MockCarMaintenanceService_ListTemplates_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockCarMaintenanceService_GetAllTemplates_Call) RunAndReturn(run func(context.Context, validation.CarMaintenanceTemplateFilter) ([]model.CarMaintenanceTemplate, error)) *MockCarMaintenanceService_GetAllTemplates_Call {
+func (_c *MockCarMaintenanceService_ListTemplates_Call) RunAndReturn(run func(context.Context, validation.CarMaintenanceTemplateFilter) ([]model.CarMaintenanceTemplate, error)) *MockCarMaintenanceService_ListTemplates_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -292,12 +292,12 @@ func (_c *MockCarMaintenanceService_GetReceiptImageUploadData_Call) RunAndReturn
 	return _c
 }
 
-// GetRecords provides a mock function with given fields: ctx, filterInput
-func (_m *MockCarMaintenanceService) GetRecords(ctx context.Context, filterInput validation.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error) {
+// ListRecords provides a mock function with given fields: ctx, filterInput
+func (_m *MockCarMaintenanceService) ListRecords(ctx context.Context, filterInput validation.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error) {
 	ret := _m.Called(ctx, filterInput)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetRecords")
+		panic("no return value specified for ListRecords")
 	}
 
 	var r0 []model.CarMaintenanceRecord
@@ -322,31 +322,31 @@ func (_m *MockCarMaintenanceService) GetRecords(ctx context.Context, filterInput
 	return r0, r1
 }
 
-// MockCarMaintenanceService_GetRecords_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetRecords'
-type MockCarMaintenanceService_GetRecords_Call struct {
+// MockCarMaintenanceService_ListRecords_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListRecords'
+type MockCarMaintenanceService_ListRecords_Call struct {
 	*mock.Call
 }
 
-// GetRecords is a helper method to define mock.On call
+// ListRecords is a helper method to define mock.On call
 //   - ctx context.Context
 //   - filterInput validation.CarMaintenanceRecordFilter
-func (_e *MockCarMaintenanceService_Expecter) GetRecords(ctx interface{}, filterInput interface{}) *MockCarMaintenanceService_GetRecords_Call {
-	return &MockCarMaintenanceService_GetRecords_Call{Call: _e.mock.On("GetRecords", ctx, filterInput)}
+func (_e *MockCarMaintenanceService_Expecter) ListRecords(ctx interface{}, filterInput interface{}) *MockCarMaintenanceService_ListRecords_Call {
+	return &MockCarMaintenanceService_ListRecords_Call{Call: _e.mock.On("ListRecords", ctx, filterInput)}
 }
 
-func (_c *MockCarMaintenanceService_GetRecords_Call) Run(run func(ctx context.Context, filterInput validation.CarMaintenanceRecordFilter)) *MockCarMaintenanceService_GetRecords_Call {
+func (_c *MockCarMaintenanceService_ListRecords_Call) Run(run func(ctx context.Context, filterInput validation.CarMaintenanceRecordFilter)) *MockCarMaintenanceService_ListRecords_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(validation.CarMaintenanceRecordFilter))
 	})
 	return _c
 }
 
-func (_c *MockCarMaintenanceService_GetRecords_Call) Return(_a0 []model.CarMaintenanceRecord, _a1 error) *MockCarMaintenanceService_GetRecords_Call {
+func (_c *MockCarMaintenanceService_ListRecords_Call) Return(_a0 []model.CarMaintenanceRecord, _a1 error) *MockCarMaintenanceService_ListRecords_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockCarMaintenanceService_GetRecords_Call) RunAndReturn(run func(context.Context, validation.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error)) *MockCarMaintenanceService_GetRecords_Call {
+func (_c *MockCarMaintenanceService_ListRecords_Call) RunAndReturn(run func(context.Context, validation.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error)) *MockCarMaintenanceService_ListRecords_Call {
 	_c.Call.Return(run)
 	return _c
 }

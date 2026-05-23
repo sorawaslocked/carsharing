@@ -186,12 +186,12 @@ func (_c *MockCarInsuranceService_Get_Call) RunAndReturn(run func(context.Contex
 	return _c
 }
 
-// GetAll provides a mock function with given fields: ctx, filterInput
-func (_m *MockCarInsuranceService) GetAll(ctx context.Context, filterInput validation.CarInsuranceFilter) ([]model.CarInsurance, error) {
+// List provides a mock function with given fields: ctx, filterInput
+func (_m *MockCarInsuranceService) List(ctx context.Context, filterInput validation.CarInsuranceFilter) ([]model.CarInsurance, error) {
 	ret := _m.Called(ctx, filterInput)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetAll")
+		panic("no return value specified for List")
 	}
 
 	var r0 []model.CarInsurance
@@ -216,31 +216,31 @@ func (_m *MockCarInsuranceService) GetAll(ctx context.Context, filterInput valid
 	return r0, r1
 }
 
-// MockCarInsuranceService_GetAll_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAll'
-type MockCarInsuranceService_GetAll_Call struct {
+// MockCarInsuranceService_List_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'List'
+type MockCarInsuranceService_List_Call struct {
 	*mock.Call
 }
 
-// GetAll is a helper method to define mock.On call
+// List is a helper method to define mock.On call
 //   - ctx context.Context
 //   - filterInput validation.CarInsuranceFilter
-func (_e *MockCarInsuranceService_Expecter) GetAll(ctx interface{}, filterInput interface{}) *MockCarInsuranceService_GetAll_Call {
-	return &MockCarInsuranceService_GetAll_Call{Call: _e.mock.On("GetAll", ctx, filterInput)}
+func (_e *MockCarInsuranceService_Expecter) List(ctx interface{}, filterInput interface{}) *MockCarInsuranceService_List_Call {
+	return &MockCarInsuranceService_List_Call{Call: _e.mock.On("List", ctx, filterInput)}
 }
 
-func (_c *MockCarInsuranceService_GetAll_Call) Run(run func(ctx context.Context, filterInput validation.CarInsuranceFilter)) *MockCarInsuranceService_GetAll_Call {
+func (_c *MockCarInsuranceService_List_Call) Run(run func(ctx context.Context, filterInput validation.CarInsuranceFilter)) *MockCarInsuranceService_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(validation.CarInsuranceFilter))
 	})
 	return _c
 }
 
-func (_c *MockCarInsuranceService_GetAll_Call) Return(_a0 []model.CarInsurance, _a1 error) *MockCarInsuranceService_GetAll_Call {
+func (_c *MockCarInsuranceService_List_Call) Return(_a0 []model.CarInsurance, _a1 error) *MockCarInsuranceService_List_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockCarInsuranceService_GetAll_Call) RunAndReturn(run func(context.Context, validation.CarInsuranceFilter) ([]model.CarInsurance, error)) *MockCarInsuranceService_GetAll_Call {
+func (_c *MockCarInsuranceService_List_Call) RunAndReturn(run func(context.Context, validation.CarInsuranceFilter) ([]model.CarInsurance, error)) *MockCarInsuranceService_List_Call {
 	_c.Call.Return(run)
 	return _c
 }

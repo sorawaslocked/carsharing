@@ -1,10 +1,11 @@
 package dto
 
 import (
-	"carsharing/car-service/internal/model"
-	sharedmodel "carsharing/shared/model"
 	"fmt"
 	"time"
+
+	"carsharing/car-service/internal/model"
+	sharedmodel "carsharing/shared/model"
 )
 
 type carRow struct {
@@ -20,7 +21,7 @@ type carRow struct {
 	BatteryLevel     *float32
 	Latitude         float64
 	Longitude        float64
-	Notes            []string
+	Notes            *string
 	ImageKeys        []string
 	LastSeenAt       time.Time
 	CreatedAt        time.Time
@@ -39,7 +40,7 @@ func (r carRow) toDomain() model.Car {
 		MileageKM:        r.MileageKM,
 		FuelLevel:        r.FuelLevel,
 		BatteryLevel:     r.BatteryLevel,
-		Location: model.Location{
+		Location: sharedmodel.Location{
 			Latitude:  r.Latitude,
 			Longitude: r.Longitude,
 		},
@@ -68,45 +69,73 @@ func ScanCarRow(s scanner) (model.Car, error) {
 	return r.toDomain(), nil
 }
 
-func BuildCarSetClauses(u model.CarUpdate, b *ArgsBuilder) []string {
+func SetClausesFromCarUpdate(update model.CarUpdate) ([]string, []any, int) {
 	var clauses []string
+	var args []any
+	n := 0
 
-	if u.ModelID != nil {
-		clauses = append(clauses, fmt.Sprintf("model_id = %s", b.Add(*u.ModelID)))
+	if update.ModelID != nil {
+		n++
+		args = append(args, *update.ModelID)
+		clauses = append(clauses, fmt.Sprintf("model_id = $%d", n))
 	}
-	if u.LicensePlate != nil {
-		clauses = append(clauses, fmt.Sprintf("license_plate = %s", b.Add(*u.LicensePlate)))
+	if update.LicensePlate != nil {
+		n++
+		args = append(args, *update.LicensePlate)
+		clauses = append(clauses, fmt.Sprintf("license_plate = $%d", n))
 	}
-	if u.Color != nil {
-		clauses = append(clauses, fmt.Sprintf("color = %s", b.Add(*u.Color)))
+	if update.Color != nil {
+		n++
+		args = append(args, *update.Color)
+		clauses = append(clauses, fmt.Sprintf("color = $%d", n))
 	}
-	if u.MileageKM != nil {
-		clauses = append(clauses, fmt.Sprintf("mileage_km = %s", b.Add(*u.MileageKM)))
+	if update.MileageKM != nil {
+		n++
+		args = append(args, *update.MileageKM)
+		clauses = append(clauses, fmt.Sprintf("mileage_km = $%d", n))
 	}
-	if u.FuelLevel != nil {
-		clauses = append(clauses, fmt.Sprintf("fuel_level = %s", b.Add(*u.FuelLevel)))
+	if update.FuelLevel != nil {
+		n++
+		args = append(args, *update.FuelLevel)
+		clauses = append(clauses, fmt.Sprintf("fuel_level = $%d", n))
 	}
-	if u.BatteryLevel != nil {
-		clauses = append(clauses, fmt.Sprintf("battery_level = %s", b.Add(*u.BatteryLevel)))
+	if update.BatteryLevel != nil {
+		n++
+		args = append(args, *update.BatteryLevel)
+		clauses = append(clauses, fmt.Sprintf("battery_level = $%d", n))
 	}
-	if u.Location != nil {
-		clauses = append(clauses, fmt.Sprintf("latitude = %s", b.Add(u.Location.Latitude)))
-		clauses = append(clauses, fmt.Sprintf("longitude = %s", b.Add(u.Location.Longitude)))
+	if update.Location != nil {
+		n++
+		args = append(args, update.Location.Latitude)
+		clauses = append(clauses, fmt.Sprintf("latitude = $%d", n))
+		n++
+		args = append(args, update.Location.Longitude)
+		clauses = append(clauses, fmt.Sprintf("longitude = $%d", n))
 	}
-	if u.Status != nil {
-		clauses = append(clauses, fmt.Sprintf("status = %s", b.Add(string(*u.Status))))
+	if update.Status != nil {
+		n++
+		args = append(args, string(*update.Status))
+		clauses = append(clauses, fmt.Sprintf("status = $%d", n))
 	}
-	if u.Notes != nil {
-		clauses = append(clauses, fmt.Sprintf("notes = %s", b.Add(u.Notes)))
+	if update.Notes != nil {
+		n++
+		args = append(args, *update.Notes)
+		clauses = append(clauses, fmt.Sprintf("notes = $%d", n))
 	}
-	if u.ImageKeys != nil {
-		clauses = append(clauses, fmt.Sprintf("image_keys = %s", b.Add(u.ImageKeys)))
+	if update.ImageKeys != nil {
+		n++
+		args = append(args, update.ImageKeys)
+		clauses = append(clauses, fmt.Sprintf("image_keys = $%d", n))
 	}
-	if u.LastSeenAt != nil {
-		clauses = append(clauses, fmt.Sprintf("last_seen_at = %s", b.Add(*u.LastSeenAt)))
+	if update.LastSeenAt != nil {
+		n++
+		args = append(args, *update.LastSeenAt)
+		clauses = append(clauses, fmt.Sprintf("last_seen_at = $%d", n))
 	}
 
-	clauses = append(clauses, fmt.Sprintf("updated_at = %s", b.Add(u.UpdatedAt)))
+	n++
+	args = append(args, update.UpdatedAt)
+	clauses = append(clauses, fmt.Sprintf("updated_at = $%d", n))
 
-	return clauses
+	return clauses, args, n
 }

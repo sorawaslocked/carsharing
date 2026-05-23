@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"strings"
 
@@ -15,88 +16,82 @@ import (
 )
 
 type ZoneRepository struct {
-	pool *pgxpool.Pool
 	log  *slog.Logger
+	pool *pgxpool.Pool
 }
 
-func NewZoneRepository(pool *pgxpool.Pool, log *slog.Logger) *ZoneRepository {
+func NewZoneRepository(log *slog.Logger, pool *pgxpool.Pool) *ZoneRepository {
 	return &ZoneRepository{
+		log:  pkglog.WithComponent(log, "adapter.postgres.ZoneRepository"),
 		pool: pool,
-		log:  pkglog.WithComponent(log, "repo.ZoneRepo"),
 	}
 }
 
 func (r *ZoneRepository) Insert(ctx context.Context, zone model.Zone) (string, error) {
-	logger := pkglog.WithMethod(r.log, "Insert")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Insert"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	q := `
-		INSERT INTO zones (name, type, boundary_geo_json, fee_adjustment, is_active, created_at, updated_at)
-		VALUES (` + strings.Join([]string{
-		b.Add(zone.Name),
-		b.Add(string(zone.Type)),
-		b.Add(zone.BoundaryGeoJSON),
-		b.Add(zone.FeeAdjustment),
-		b.Add(zone.IsActive),
-		b.Add(zone.CreatedAt),
-		b.Add(zone.UpdatedAt),
-	}, ", ") + `) RETURNING id`
+	args := []any{
+		zone.Name, string(zone.Type), zone.BoundaryGeoJSON,
+		zone.FeeAdjustment, zone.IsActive, zone.CreatedAt, zone.UpdatedAt,
+	}
+	q := `INSERT INTO zones (name, type, boundary_geo_json, fee_adjustment, is_active, created_at, updated_at)
+		  VALUES ($1, $2, $3, $4, $5, $6, $7)
+		  RETURNING id`
 
 	var id string
-
-	err := r.pool.QueryRow(ctx, q, b.Args...).Scan(&id)
-	if err != nil {
-		logger.Error("failed to insert zone", pkglog.Err(err))
-		return "", ErrSql
+	if err := r.pool.QueryRow(ctx, q, args...).Scan(&id); err != nil {
+		log.Error("failed to insert zone", pkglog.Err(err))
+		return "", model.ErrSql
 	}
 
 	return id, nil
 }
 
 func (r *ZoneRepository) FindByID(ctx context.Context, id string) (model.Zone, error) {
-	logger := pkglog.WithMethod(r.log, "FindByID")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
-
-	b := &dto.ArgsBuilder{}
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindByID"), utils.MetadataFromCtx(ctx))
 
 	q := `SELECT id, name, type, boundary_geo_json, fee_adjustment, is_active, created_at, updated_at
-		FROM zones WHERE id = ` + b.Add(id) + ` LIMIT 1`
+		FROM zones WHERE id = $1 LIMIT 1`
 
-	row := r.pool.QueryRow(ctx, q, b.Args...)
+	row := r.pool.QueryRow(ctx, q, id)
 
 	zone, err := dto.ScanZoneRow(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return model.Zone{}, ErrNotFound
+			return model.Zone{}, model.ErrNotFound
 		}
-		logger.Error("failed to find zone by id", pkglog.Err(err))
-		return model.Zone{}, ErrSql
+		log.Error("failed to find zone by id", pkglog.Err(err))
+		return model.Zone{}, model.ErrSql
 	}
 
 	return zone, nil
 }
 
 func (r *ZoneRepository) Find(ctx context.Context, filter model.ZoneFilter) ([]model.Zone, error) {
-	logger := pkglog.WithMethod(r.log, "Find")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Find"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	clauses := dto.BuildZoneWhereClauses(filter, b)
+	whereClauses, args, n := dto.WhereClausesFromZoneFilter(filter, make([]any, 0), 0)
 	where := ""
-	if len(clauses) > 0 {
-		where = " WHERE " + strings.Join(clauses, " AND ")
+	if len(whereClauses) > 0 {
+		where = " WHERE " + strings.Join(whereClauses, " AND ")
 	}
 
 	q := `SELECT id, name, type, boundary_geo_json, fee_adjustment, is_active, created_at, updated_at
-		FROM zones` + where + dto.BuildPagination(b, filter.Pagination)
+		FROM zones` + where
 
-	rows, err := r.pool.Query(ctx, q, b.Args...)
+	if filter.Pagination != nil {
+		n++
+		args = append(args, filter.Pagination.Limit)
+		q += fmt.Sprintf(" LIMIT $%d", n)
+		n++
+		args = append(args, filter.Pagination.Offset)
+		q += fmt.Sprintf(" OFFSET $%d", n)
+	}
+
+	rows, err := r.pool.Query(ctx, q, args...)
 	if err != nil {
-		logger.Error("failed to query zones", pkglog.Err(err))
-		return nil, ErrSql
+		log.Error("failed to query zones", pkglog.Err(err))
+		return nil, model.ErrSql
 	}
 	defer rows.Close()
 
@@ -104,62 +99,56 @@ func (r *ZoneRepository) Find(ctx context.Context, filter model.ZoneFilter) ([]m
 	for rows.Next() {
 		zone, err := dto.ScanZoneRow(rows)
 		if err != nil {
-			logger.Error("failed to scan zone row", pkglog.Err(err))
-			return nil, ErrSql
+			log.Error("failed to scan zone row", pkglog.Err(err))
+			return nil, model.ErrSql
 		}
 		result = append(result, zone)
 	}
 
 	if err = rows.Err(); err != nil {
-		logger.Error("rows iteration error", pkglog.Err(err))
-		return nil, ErrSql
+		log.Error("rows iteration error", pkglog.Err(err))
+		return nil, model.ErrSql
 	}
 
 	return result, nil
 }
 
 func (r *ZoneRepository) Update(ctx context.Context, id string, update model.ZoneUpdate) error {
-	logger := pkglog.WithMethod(r.log, "Update")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Update"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	setClauses := dto.BuildZoneSetClauses(update, b)
+	setClauses, args, n := dto.SetClausesFromZoneUpdate(update)
 	if len(setClauses) <= 1 {
 		return nil
 	}
 
-	q := `UPDATE zones SET ` + strings.Join(setClauses, ", ") + ` WHERE id = ` + b.Add(id)
+	n++
+	args = append(args, id)
+	q := `UPDATE zones SET ` + strings.Join(setClauses, ", ") + fmt.Sprintf(" WHERE id = $%d", n)
 
-	tag, err := r.pool.Exec(ctx, q, b.Args...)
+	tag, err := r.pool.Exec(ctx, q, args...)
 	if err != nil {
-		logger.Error("failed to update zone", pkglog.Err(err))
-		return ErrSql
+		log.Error("failed to update zone", pkglog.Err(err))
+		return model.ErrSql
 	}
 
 	if tag.RowsAffected() == 0 {
-		return ErrNotFound
+		return model.ErrNotFound
 	}
 
 	return nil
 }
 
 func (r *ZoneRepository) Delete(ctx context.Context, id string) error {
-	logger := pkglog.WithMethod(r.log, "Delete")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Delete"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	q := `DELETE FROM zones WHERE id = ` + b.Add(id)
-
-	tag, err := r.pool.Exec(ctx, q, b.Args...)
+	tag, err := r.pool.Exec(ctx, `DELETE FROM zones WHERE id = $1`, id)
 	if err != nil {
-		logger.Error("failed to delete zone", pkglog.Err(err))
-		return ErrSql
+		log.Error("failed to delete zone", pkglog.Err(err))
+		return model.ErrSql
 	}
 
 	if tag.RowsAffected() == 0 {
-		return ErrNotFound
+		return model.ErrNotFound
 	}
 
 	return nil

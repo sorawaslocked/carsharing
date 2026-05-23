@@ -1,9 +1,10 @@
 package dto
 
 import (
-	"carsharing/car-service/internal/model"
 	"fmt"
 	"time"
+
+	"carsharing/car-service/internal/model"
 )
 
 // --- CarMaintenanceTemplate ---
@@ -48,41 +49,59 @@ func ScanMaintenanceTemplateRow(s scanner) (model.CarMaintenanceTemplate, error)
 	return r.toDomain(), nil
 }
 
-func BuildMaintenanceTemplateWhereClauses(f model.CarMaintenanceTemplateFilter, b *ArgsBuilder) []string {
+func WhereClausesFromMaintenanceTemplateFilter(f model.CarMaintenanceTemplateFilter, args []any, n int) ([]string, []any, int) {
 	var clauses []string
 
 	if f.IsMandatory != nil {
-		clauses = append(clauses, fmt.Sprintf("is_mandatory = %s", b.Add(*f.IsMandatory)))
+		n++
+		args = append(args, *f.IsMandatory)
+		clauses = append(clauses, fmt.Sprintf("is_mandatory = $%d", n))
 	}
 
-	return clauses
+	return clauses, args, n
 }
 
-func BuildMaintenanceTemplateSetClauses(u model.CarMaintenanceTemplateUpdate, b *ArgsBuilder) []string {
+func SetClausesFromMaintenanceTemplateUpdate(update model.CarMaintenanceTemplateUpdate) ([]string, []any, int) {
 	var clauses []string
+	var args []any
+	n := 0
 
-	if u.Name != nil {
-		clauses = append(clauses, fmt.Sprintf("name = %s", b.Add(*u.Name)))
+	if update.Name != nil {
+		n++
+		args = append(args, *update.Name)
+		clauses = append(clauses, fmt.Sprintf("name = $%d", n))
 	}
-	if u.KmInterval != nil {
-		clauses = append(clauses, fmt.Sprintf("km_interval = %s", b.Add(*u.KmInterval)))
+	if update.KmInterval != nil {
+		n++
+		args = append(args, *update.KmInterval)
+		clauses = append(clauses, fmt.Sprintf("km_interval = $%d", n))
 	}
-	if u.DayInterval != nil {
-		clauses = append(clauses, fmt.Sprintf("day_interval = %s", b.Add(*u.DayInterval)))
+	if update.DayInterval != nil {
+		n++
+		args = append(args, *update.DayInterval)
+		clauses = append(clauses, fmt.Sprintf("day_interval = $%d", n))
 	}
-	if u.IsMandatory != nil {
-		clauses = append(clauses, fmt.Sprintf("is_mandatory = %s", b.Add(*u.IsMandatory)))
+	if update.IsMandatory != nil {
+		n++
+		args = append(args, *update.IsMandatory)
+		clauses = append(clauses, fmt.Sprintf("is_mandatory = $%d", n))
 	}
-	if u.WarnPct != nil {
-		clauses = append(clauses, fmt.Sprintf("warn_pct = %s", b.Add(*u.WarnPct)))
+	if update.WarnPct != nil {
+		n++
+		args = append(args, *update.WarnPct)
+		clauses = append(clauses, fmt.Sprintf("warn_pct = $%d", n))
 	}
-	if u.PullPct != nil {
-		clauses = append(clauses, fmt.Sprintf("pull_pct = %s", b.Add(*u.PullPct)))
+	if update.PullPct != nil {
+		n++
+		args = append(args, *update.PullPct)
+		clauses = append(clauses, fmt.Sprintf("pull_pct = $%d", n))
 	}
 
-	clauses = append(clauses, fmt.Sprintf("updated_at = %s", b.Add(u.UpdatedAt)))
+	n++
+	args = append(args, update.UpdatedAt)
+	clauses = append(clauses, fmt.Sprintf("updated_at = $%d", n))
 
-	return clauses
+	return clauses, args, n
 }
 
 // --- CarMaintenanceRecord ---
@@ -139,51 +158,77 @@ func ScanMaintenanceRecordRow(s scanner) (model.CarMaintenanceRecord, error) {
 	return r.toDomain(), nil
 }
 
-func BuildMaintenanceRecordWhereClauses(f model.CarMaintenanceRecordFilter, b *ArgsBuilder) []string {
+func WhereClausesFromMaintenanceRecordFilter(f model.CarMaintenanceRecordFilter, args []any, n int) ([]string, []any, int) {
 	var clauses []string
 
 	if f.CarID != nil {
-		clauses = append(clauses, fmt.Sprintf("car_id = %s", b.Add(*f.CarID)))
+		n++
+		args = append(args, *f.CarID)
+		clauses = append(clauses, fmt.Sprintf("car_id = $%d", n))
 	}
 	if f.TemplateID != nil {
-		clauses = append(clauses, fmt.Sprintf("template_id = %s", b.Add(*f.TemplateID)))
+		n++
+		args = append(args, *f.TemplateID)
+		clauses = append(clauses, fmt.Sprintf("template_id = $%d", n))
 	}
 	if f.Status != nil {
-		clauses = append(clauses, fmt.Sprintf("status = %s", b.Add(string(*f.Status))))
+		n++
+		args = append(args, string(*f.Status))
+		clauses = append(clauses, fmt.Sprintf("status = $%d", n))
 	}
 
-	return clauses
+	return clauses, args, n
 }
 
-func BuildMaintenanceRecordSetClauses(u model.CarMaintenanceRecordUpdate, b *ArgsBuilder) []string {
+func SetClausesFromMaintenanceRecordUpdate(update model.CarMaintenanceRecordUpdate) ([]string, []any, int) {
 	var clauses []string
+	var args []any
+	n := 0
 
-	if u.Status != nil {
-		clauses = append(clauses, fmt.Sprintf("status = %s", b.Add(string(*u.Status))))
+	if update.Status != nil {
+		n++
+		args = append(args, string(*update.Status))
+		clauses = append(clauses, fmt.Sprintf("status = $%d", n))
 	}
-	if u.AssignedTo != nil {
-		clauses = append(clauses, fmt.Sprintf("assigned_to = %s", b.Add(*u.AssignedTo)))
+	if update.AssignedTo != nil {
+		n++
+		args = append(args, *update.AssignedTo)
+		clauses = append(clauses, fmt.Sprintf("assigned_to = $%d", n))
 	}
-	if u.DueBy != nil {
-		clauses = append(clauses, fmt.Sprintf("due_by = %s", b.Add(*u.DueBy)))
+	if update.DueBy != nil {
+		n++
+		args = append(args, *update.DueBy)
+		clauses = append(clauses, fmt.Sprintf("due_by = $%d", n))
 	}
-	if u.CompletedKM != nil {
-		clauses = append(clauses, fmt.Sprintf("completed_km = %s", b.Add(*u.CompletedKM)))
+	if update.CompletedKM != nil {
+		n++
+		args = append(args, *update.CompletedKM)
+		clauses = append(clauses, fmt.Sprintf("completed_km = $%d", n))
 	}
-	if u.CostTenge != nil {
-		clauses = append(clauses, fmt.Sprintf("cost_tenge = %s", b.Add(*u.CostTenge)))
+	if update.CostTenge != nil {
+		n++
+		args = append(args, *update.CostTenge)
+		clauses = append(clauses, fmt.Sprintf("cost_tenge = $%d", n))
 	}
-	if u.CompletedAt != nil {
-		clauses = append(clauses, fmt.Sprintf("completed_at = %s", b.Add(*u.CompletedAt)))
+	if update.CompletedAt != nil {
+		n++
+		args = append(args, *update.CompletedAt)
+		clauses = append(clauses, fmt.Sprintf("completed_at = $%d", n))
 	}
-	if u.Notes != nil {
-		clauses = append(clauses, fmt.Sprintf("notes = %s", b.Add(*u.Notes)))
+	if update.Notes != nil {
+		n++
+		args = append(args, *update.Notes)
+		clauses = append(clauses, fmt.Sprintf("notes = $%d", n))
 	}
-	if u.ReceiptImageKeys != nil {
-		clauses = append(clauses, fmt.Sprintf("receipt_image_keys = %s", b.Add(u.ReceiptImageKeys)))
+	if update.ReceiptImageKeys != nil {
+		n++
+		args = append(args, update.ReceiptImageKeys)
+		clauses = append(clauses, fmt.Sprintf("receipt_image_keys = $%d", n))
 	}
 
-	clauses = append(clauses, fmt.Sprintf("updated_at = %s", b.Add(u.UpdatedAt)))
+	n++
+	args = append(args, update.UpdatedAt)
+	clauses = append(clauses, fmt.Sprintf("updated_at = $%d", n))
 
-	return clauses
+	return clauses, args, n
 }

@@ -45,39 +45,57 @@ func ScanZoneRow(s scanner) (model.Zone, error) {
 	return r.toDomain(), nil
 }
 
-func BuildZoneWhereClauses(f model.ZoneFilter, b *ArgsBuilder) []string {
+func WhereClausesFromZoneFilter(f model.ZoneFilter, args []any, n int) ([]string, []any, int) {
 	var clauses []string
 
 	if f.Type != nil {
-		clauses = append(clauses, fmt.Sprintf("type = %s", b.Add(string(*f.Type))))
+		n++
+		args = append(args, string(*f.Type))
+		clauses = append(clauses, fmt.Sprintf("type = $%d", n))
 	}
 	if f.IsActive != nil {
-		clauses = append(clauses, fmt.Sprintf("is_active = %s", b.Add(*f.IsActive)))
+		n++
+		args = append(args, *f.IsActive)
+		clauses = append(clauses, fmt.Sprintf("is_active = $%d", n))
 	}
 
-	return clauses
+	return clauses, args, n
 }
 
-func BuildZoneSetClauses(u model.ZoneUpdate, b *ArgsBuilder) []string {
+func SetClausesFromZoneUpdate(update model.ZoneUpdate) ([]string, []any, int) {
 	var clauses []string
+	var args []any
+	n := 0
 
-	if u.Name != nil {
-		clauses = append(clauses, fmt.Sprintf("name = %s", b.Add(*u.Name)))
+	if update.Name != nil {
+		n++
+		args = append(args, *update.Name)
+		clauses = append(clauses, fmt.Sprintf("name = $%d", n))
 	}
-	if u.Type != nil {
-		clauses = append(clauses, fmt.Sprintf("type = %s", b.Add(string(*u.Type))))
+	if update.Type != nil {
+		n++
+		args = append(args, string(*update.Type))
+		clauses = append(clauses, fmt.Sprintf("type = $%d", n))
 	}
-	if u.BoundaryGeoJSON != nil {
-		clauses = append(clauses, fmt.Sprintf("boundary_geo_json = %s", b.Add(*u.BoundaryGeoJSON)))
+	if update.BoundaryGeoJSON != nil {
+		n++
+		args = append(args, *update.BoundaryGeoJSON)
+		clauses = append(clauses, fmt.Sprintf("boundary_geo_json = $%d", n))
 	}
-	if u.FeeAdjustment != nil {
-		clauses = append(clauses, fmt.Sprintf("fee_adjustment = %s", b.Add(*u.FeeAdjustment)))
+	if update.FeeAdjustment != nil {
+		n++
+		args = append(args, *update.FeeAdjustment)
+		clauses = append(clauses, fmt.Sprintf("fee_adjustment = $%d", n))
 	}
-	if u.IsActive != nil {
-		clauses = append(clauses, fmt.Sprintf("is_active = %s", b.Add(*u.IsActive)))
+	if update.IsActive != nil {
+		n++
+		args = append(args, *update.IsActive)
+		clauses = append(clauses, fmt.Sprintf("is_active = $%d", n))
 	}
 
-	clauses = append(clauses, fmt.Sprintf("updated_at = %s", b.Add(u.UpdatedAt)))
+	n++
+	args = append(args, update.UpdatedAt)
+	clauses = append(clauses, fmt.Sprintf("updated_at = $%d", n))
 
-	return clauses
+	return clauses, args, n
 }

@@ -92,21 +92,21 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	}
 	natsPublisher := natsadapter.NewPublisher(ncPub)
 
-	carModelRepo := postgres.NewCarModelRepository(pool, log)
-	carRepo := postgres.NewCarRepository(pool, log)
-	carInsuranceRepo := postgres.NewCarInsuranceRepository(pool, log)
-	templateRepo := postgres.NewCarMaintenanceTemplateRepository(pool, log)
-	recordRepo := postgres.NewCarMaintenanceRecordRepository(pool, log)
-	serviceStateRepo := postgres.NewCarServiceStateRepository(pool, log)
-	statusLogRepo := postgres.NewCarStatusLogRepository(pool, log)
-	telematicsRepo := postgres.NewTelematicsRepository(pool, log)
-	zoneRepo := postgres.NewZoneRepository(pool, log)
+	carModelRepo := postgres.NewCarModelRepository(log, pool)
+	carRepo := postgres.NewCarRepository(log, pool)
+	carInsuranceRepo := postgres.NewCarInsuranceRepository(log, pool)
+	templateRepo := postgres.NewCarMaintenanceTemplateRepository(log, pool)
+	recordRepo := postgres.NewCarMaintenanceRecordRepository(log, pool)
+	serviceStateRepo := postgres.NewCarServiceStateRepository(log, pool)
+	statusReadingRepo := postgres.NewCarStatusReadingRepository(log, pool)
+	telemetryReadingRepo := postgres.NewTelemetryReadingRepository(log, pool)
+	zoneRepo := postgres.NewZoneRepository(log, pool)
 
 	telematicsStreamClient := grpcserver.NewTelematicsStreamClient(telematicsConn, log)
-	telematicsService := service.NewTelematicsService(telematicsStreamClient, telematicsRepo, carRepo, log)
+	telematicsService := service.NewTelematicsService(telematicsStreamClient, telemetryReadingRepo, carRepo, log)
 
 	carModelService := service.NewCarModelService(carModelRepo, objectStorage, validate, log)
-	carService := service.NewCarService(carModelRepo, carRepo, statusLogRepo, telematicsRepo, objectStorage, natsPublisher, validate, log)
+	carService := service.NewCarService(carModelRepo, carRepo, statusReadingRepo, telemetryReadingRepo, objectStorage, natsPublisher, validate, log)
 	carService.SetCarCreatedNotifier(telematicsService)
 
 	carInsuranceService := service.NewCarInsuranceService(carInsuranceRepo, objectStorage, validate, log)

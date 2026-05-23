@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"strings"
 	"time"
@@ -18,90 +19,83 @@ import (
 // --- CarMaintenanceTemplateRepository ---
 
 type CarMaintenanceTemplateRepository struct {
-	pool *pgxpool.Pool
 	log  *slog.Logger
+	pool *pgxpool.Pool
 }
 
-func NewCarMaintenanceTemplateRepository(pool *pgxpool.Pool, log *slog.Logger) *CarMaintenanceTemplateRepository {
+func NewCarMaintenanceTemplateRepository(log *slog.Logger, pool *pgxpool.Pool) *CarMaintenanceTemplateRepository {
 	return &CarMaintenanceTemplateRepository{
+		log:  pkglog.WithComponent(log, "adapter.postgres.CarMaintenanceTemplateRepository"),
 		pool: pool,
-		log:  pkglog.WithComponent(log, "repo.CarMaintenanceTemplateRepo"),
 	}
 }
 
 func (r *CarMaintenanceTemplateRepository) Insert(ctx context.Context, t model.CarMaintenanceTemplate) (string, error) {
-	logger := pkglog.WithMethod(r.log, "Insert")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Insert"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	q := `
-		INSERT INTO car_maintenance_templates
+	args := []any{
+		t.Name, t.KmInterval, t.DayInterval, t.IsMandatory,
+		t.WarnPct, t.PullPct, t.CreatedAt, t.UpdatedAt,
+	}
+	q := `INSERT INTO car_maintenance_templates
 			(name, km_interval, day_interval, is_mandatory, warn_pct, pull_pct, created_at, updated_at)
-		VALUES (` + strings.Join([]string{
-		b.Add(t.Name),
-		b.Add(t.KmInterval),
-		b.Add(t.DayInterval),
-		b.Add(t.IsMandatory),
-		b.Add(t.WarnPct),
-		b.Add(t.PullPct),
-		b.Add(t.CreatedAt),
-		b.Add(t.UpdatedAt),
-	}, ", ") + `) RETURNING id`
+		  VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		  RETURNING id`
 
 	var id string
-
-	err := r.pool.QueryRow(ctx, q, b.Args...).Scan(&id)
-	if err != nil {
-		logger.Error("failed to insert maintenance template", pkglog.Err(err))
-		return "", ErrSql
+	if err := r.pool.QueryRow(ctx, q, args...).Scan(&id); err != nil {
+		log.Error("failed to insert maintenance template", pkglog.Err(err))
+		return "", model.ErrSql
 	}
 
 	return id, nil
 }
 
 func (r *CarMaintenanceTemplateRepository) FindByID(ctx context.Context, id string) (model.CarMaintenanceTemplate, error) {
-	logger := pkglog.WithMethod(r.log, "FindByID")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
-
-	b := &dto.ArgsBuilder{}
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindByID"), utils.MetadataFromCtx(ctx))
 
 	q := `SELECT id, name, km_interval, day_interval, is_mandatory, warn_pct, pull_pct, created_at, updated_at
-		FROM car_maintenance_templates WHERE id = ` + b.Add(id) + ` LIMIT 1`
+		FROM car_maintenance_templates WHERE id = $1 LIMIT 1`
 
-	row := r.pool.QueryRow(ctx, q, b.Args...)
+	row := r.pool.QueryRow(ctx, q, id)
 
 	tmpl, err := dto.ScanMaintenanceTemplateRow(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return model.CarMaintenanceTemplate{}, ErrNotFound
+			return model.CarMaintenanceTemplate{}, model.ErrNotFound
 		}
-		logger.Error("failed to find maintenance template by id", pkglog.Err(err))
-		return model.CarMaintenanceTemplate{}, ErrSql
+		log.Error("failed to find maintenance template by id", pkglog.Err(err))
+		return model.CarMaintenanceTemplate{}, model.ErrSql
 	}
 
 	return tmpl, nil
 }
 
 func (r *CarMaintenanceTemplateRepository) Find(ctx context.Context, filter model.CarMaintenanceTemplateFilter) ([]model.CarMaintenanceTemplate, error) {
-	logger := pkglog.WithMethod(r.log, "Find")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Find"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	clauses := dto.BuildMaintenanceTemplateWhereClauses(filter, b)
+	whereClauses, args, n := dto.WhereClausesFromMaintenanceTemplateFilter(filter, make([]any, 0), 0)
 	where := ""
-	if len(clauses) > 0 {
-		where = " WHERE " + strings.Join(clauses, " AND ")
+	if len(whereClauses) > 0 {
+		where = " WHERE " + strings.Join(whereClauses, " AND ")
 	}
 
 	q := `SELECT id, name, km_interval, day_interval, is_mandatory, warn_pct, pull_pct, created_at, updated_at
-		FROM car_maintenance_templates` + where + dto.BuildPagination(b, filter.Pagination)
+		FROM car_maintenance_templates` + where
 
-	rows, err := r.pool.Query(ctx, q, b.Args...)
+	if filter.Pagination != nil {
+		n++
+		args = append(args, filter.Pagination.Limit)
+		q += fmt.Sprintf(" LIMIT $%d", n)
+		n++
+		args = append(args, filter.Pagination.Offset)
+		q += fmt.Sprintf(" OFFSET $%d", n)
+	}
+
+	rows, err := r.pool.Query(ctx, q, args...)
 	if err != nil {
-		logger.Error("failed to query maintenance templates", pkglog.Err(err))
-		return nil, ErrSql
+		log.Error("failed to query maintenance templates", pkglog.Err(err))
+		return nil, model.ErrSql
 	}
 	defer rows.Close()
 
@@ -109,62 +103,56 @@ func (r *CarMaintenanceTemplateRepository) Find(ctx context.Context, filter mode
 	for rows.Next() {
 		tmpl, err := dto.ScanMaintenanceTemplateRow(rows)
 		if err != nil {
-			logger.Error("failed to scan maintenance template row", pkglog.Err(err))
-			return nil, ErrSql
+			log.Error("failed to scan maintenance template row", pkglog.Err(err))
+			return nil, model.ErrSql
 		}
 		result = append(result, tmpl)
 	}
 
 	if err = rows.Err(); err != nil {
-		logger.Error("rows iteration error", pkglog.Err(err))
-		return nil, ErrSql
+		log.Error("rows iteration error", pkglog.Err(err))
+		return nil, model.ErrSql
 	}
 
 	return result, nil
 }
 
 func (r *CarMaintenanceTemplateRepository) Update(ctx context.Context, id string, update model.CarMaintenanceTemplateUpdate) error {
-	logger := pkglog.WithMethod(r.log, "Update")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Update"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	setClauses := dto.BuildMaintenanceTemplateSetClauses(update, b)
+	setClauses, args, n := dto.SetClausesFromMaintenanceTemplateUpdate(update)
 	if len(setClauses) <= 1 {
 		return nil
 	}
 
-	q := `UPDATE car_maintenance_templates SET ` + strings.Join(setClauses, ", ") + ` WHERE id = ` + b.Add(id)
+	n++
+	args = append(args, id)
+	q := `UPDATE car_maintenance_templates SET ` + strings.Join(setClauses, ", ") + fmt.Sprintf(" WHERE id = $%d", n)
 
-	tag, err := r.pool.Exec(ctx, q, b.Args...)
+	tag, err := r.pool.Exec(ctx, q, args...)
 	if err != nil {
-		logger.Error("failed to update maintenance template", pkglog.Err(err))
-		return ErrSql
+		log.Error("failed to update maintenance template", pkglog.Err(err))
+		return model.ErrSql
 	}
 
 	if tag.RowsAffected() == 0 {
-		return ErrNotFound
+		return model.ErrNotFound
 	}
 
 	return nil
 }
 
 func (r *CarMaintenanceTemplateRepository) Delete(ctx context.Context, id string) error {
-	logger := pkglog.WithMethod(r.log, "Delete")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Delete"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	q := `DELETE FROM car_maintenance_templates WHERE id = ` + b.Add(id)
-
-	tag, err := r.pool.Exec(ctx, q, b.Args...)
+	tag, err := r.pool.Exec(ctx, `DELETE FROM car_maintenance_templates WHERE id = $1`, id)
 	if err != nil {
-		logger.Error("failed to delete maintenance template", pkglog.Err(err))
-		return ErrSql
+		log.Error("failed to delete maintenance template", pkglog.Err(err))
+		return model.ErrSql
 	}
 
 	if tag.RowsAffected() == 0 {
-		return ErrNotFound
+		return model.ErrNotFound
 	}
 
 	return nil
@@ -173,98 +161,88 @@ func (r *CarMaintenanceTemplateRepository) Delete(ctx context.Context, id string
 // --- CarMaintenanceRecordRepository ---
 
 type CarMaintenanceRecordRepository struct {
-	pool *pgxpool.Pool
 	log  *slog.Logger
+	pool *pgxpool.Pool
 }
 
-func NewCarMaintenanceRecordRepository(pool *pgxpool.Pool, log *slog.Logger) *CarMaintenanceRecordRepository {
+func NewCarMaintenanceRecordRepository(log *slog.Logger, pool *pgxpool.Pool) *CarMaintenanceRecordRepository {
 	return &CarMaintenanceRecordRepository{
+		log:  pkglog.WithComponent(log, "adapter.postgres.CarMaintenanceRecordRepository"),
 		pool: pool,
-		log:  pkglog.WithComponent(log, "repo.CarMaintenanceRecordRepo"),
 	}
 }
 
 func (r *CarMaintenanceRecordRepository) Insert(ctx context.Context, rec model.CarMaintenanceRecord) (string, error) {
-	logger := pkglog.WithMethod(r.log, "Insert")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Insert"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	q := `
-		INSERT INTO car_maintenance_records
+	args := []any{
+		rec.CarID, rec.TemplateID, string(rec.Status),
+		rec.OdometerAt, rec.CompletedKM, rec.CostTenge,
+		rec.AssignedTo, rec.DueBy, rec.CompletedAt, rec.Notes,
+		dto.ImagesToKeys(rec.ReceiptImages), rec.CreatedAt, rec.UpdatedAt,
+	}
+	q := `INSERT INTO car_maintenance_records
 			(car_id, template_id, status, odometer_at, completed_km, cost_tenge,
 			 assigned_to, due_by, completed_at, notes, receipt_image_keys, created_at, updated_at)
-		VALUES (` + strings.Join([]string{
-		b.Add(rec.CarID),
-		b.Add(rec.TemplateID),
-		b.Add(string(rec.Status)),
-		b.Add(rec.OdometerAt),
-		b.Add(rec.CompletedKM),
-		b.Add(rec.CostTenge),
-		b.Add(rec.AssignedTo),
-		b.Add(rec.DueBy),
-		b.Add(rec.CompletedAt),
-		b.Add(rec.Notes),
-		b.Add(dto.ImagesToKeys(rec.ReceiptImages)),
-		b.Add(rec.CreatedAt),
-		b.Add(rec.UpdatedAt),
-	}, ", ") + `) RETURNING id`
+		  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+		  RETURNING id`
 
 	var id string
-
-	err := r.pool.QueryRow(ctx, q, b.Args...).Scan(&id)
-	if err != nil {
-		logger.Error("failed to insert maintenance record", pkglog.Err(err))
-		return "", ErrSql
+	if err := r.pool.QueryRow(ctx, q, args...).Scan(&id); err != nil {
+		log.Error("failed to insert maintenance record", pkglog.Err(err))
+		return "", model.ErrSql
 	}
 
 	return id, nil
 }
 
 func (r *CarMaintenanceRecordRepository) FindByID(ctx context.Context, id string) (model.CarMaintenanceRecord, error) {
-	logger := pkglog.WithMethod(r.log, "FindByID")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
-
-	b := &dto.ArgsBuilder{}
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindByID"), utils.MetadataFromCtx(ctx))
 
 	q := `SELECT id, car_id, template_id, status, odometer_at, completed_km, cost_tenge,
 		assigned_to, due_by, completed_at, notes, receipt_image_keys, created_at, updated_at
-		FROM car_maintenance_records WHERE id = ` + b.Add(id) + ` LIMIT 1`
+		FROM car_maintenance_records WHERE id = $1 LIMIT 1`
 
-	row := r.pool.QueryRow(ctx, q, b.Args...)
+	row := r.pool.QueryRow(ctx, q, id)
 
 	rec, err := dto.ScanMaintenanceRecordRow(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return model.CarMaintenanceRecord{}, ErrNotFound
+			return model.CarMaintenanceRecord{}, model.ErrNotFound
 		}
-		logger.Error("failed to find maintenance record by id", pkglog.Err(err))
-		return model.CarMaintenanceRecord{}, ErrSql
+		log.Error("failed to find maintenance record by id", pkglog.Err(err))
+		return model.CarMaintenanceRecord{}, model.ErrSql
 	}
 
 	return rec, nil
 }
 
 func (r *CarMaintenanceRecordRepository) Find(ctx context.Context, filter model.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error) {
-	logger := pkglog.WithMethod(r.log, "Find")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Find"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	clauses := dto.BuildMaintenanceRecordWhereClauses(filter, b)
+	whereClauses, args, n := dto.WhereClausesFromMaintenanceRecordFilter(filter, make([]any, 0), 0)
 	where := ""
-	if len(clauses) > 0 {
-		where = " WHERE " + strings.Join(clauses, " AND ")
+	if len(whereClauses) > 0 {
+		where = " WHERE " + strings.Join(whereClauses, " AND ")
 	}
 
 	q := `SELECT id, car_id, template_id, status, odometer_at, completed_km, cost_tenge,
 		assigned_to, due_by, completed_at, notes, receipt_image_keys, created_at, updated_at
-		FROM car_maintenance_records` + where + dto.BuildPagination(b, filter.Pagination)
+		FROM car_maintenance_records` + where
 
-	rows, err := r.pool.Query(ctx, q, b.Args...)
+	if filter.Pagination != nil {
+		n++
+		args = append(args, filter.Pagination.Limit)
+		q += fmt.Sprintf(" LIMIT $%d", n)
+		n++
+		args = append(args, filter.Pagination.Offset)
+		q += fmt.Sprintf(" OFFSET $%d", n)
+	}
+
+	rows, err := r.pool.Query(ctx, q, args...)
 	if err != nil {
-		logger.Error("failed to query maintenance records", pkglog.Err(err))
-		return nil, ErrSql
+		log.Error("failed to query maintenance records", pkglog.Err(err))
+		return nil, model.ErrSql
 	}
 	defer rows.Close()
 
@@ -272,41 +250,40 @@ func (r *CarMaintenanceRecordRepository) Find(ctx context.Context, filter model.
 	for rows.Next() {
 		rec, err := dto.ScanMaintenanceRecordRow(rows)
 		if err != nil {
-			logger.Error("failed to scan maintenance record row", pkglog.Err(err))
-			return nil, ErrSql
+			log.Error("failed to scan maintenance record row", pkglog.Err(err))
+			return nil, model.ErrSql
 		}
 		result = append(result, rec)
 	}
 
 	if err = rows.Err(); err != nil {
-		logger.Error("rows iteration error", pkglog.Err(err))
-		return nil, ErrSql
+		log.Error("rows iteration error", pkglog.Err(err))
+		return nil, model.ErrSql
 	}
 
 	return result, nil
 }
 
 func (r *CarMaintenanceRecordRepository) Update(ctx context.Context, id string, update model.CarMaintenanceRecordUpdate) error {
-	logger := pkglog.WithMethod(r.log, "Update")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Update"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	setClauses := dto.BuildMaintenanceRecordSetClauses(update, b)
+	setClauses, args, n := dto.SetClausesFromMaintenanceRecordUpdate(update)
 	if len(setClauses) <= 1 {
 		return nil
 	}
 
-	q := `UPDATE car_maintenance_records SET ` + strings.Join(setClauses, ", ") + ` WHERE id = ` + b.Add(id)
+	n++
+	args = append(args, id)
+	q := `UPDATE car_maintenance_records SET ` + strings.Join(setClauses, ", ") + fmt.Sprintf(" WHERE id = $%d", n)
 
-	tag, err := r.pool.Exec(ctx, q, b.Args...)
+	tag, err := r.pool.Exec(ctx, q, args...)
 	if err != nil {
-		logger.Error("failed to update maintenance record", pkglog.Err(err))
-		return ErrSql
+		log.Error("failed to update maintenance record", pkglog.Err(err))
+		return model.ErrSql
 	}
 
 	if tag.RowsAffected() == 0 {
-		return ErrNotFound
+		return model.ErrNotFound
 	}
 
 	return nil
@@ -315,60 +292,56 @@ func (r *CarMaintenanceRecordRepository) Update(ctx context.Context, id string, 
 // --- CarServiceStateRepository ---
 
 type CarServiceStateRepository struct {
-	pool *pgxpool.Pool
 	log  *slog.Logger
+	pool *pgxpool.Pool
 }
 
-func NewCarServiceStateRepository(pool *pgxpool.Pool, log *slog.Logger) *CarServiceStateRepository {
+func NewCarServiceStateRepository(log *slog.Logger, pool *pgxpool.Pool) *CarServiceStateRepository {
 	return &CarServiceStateRepository{
+		log:  pkglog.WithComponent(log, "adapter.postgres.CarServiceStateRepository"),
 		pool: pool,
-		log:  pkglog.WithComponent(log, "repo.CarServiceStateRepo"),
 	}
 }
 
 func (r *CarServiceStateRepository) Upsert(ctx context.Context, state model.CarServiceState) error {
-	logger := pkglog.WithMethod(r.log, "Upsert")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Upsert"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	q := `
-		INSERT INTO car_service_states (car_id, template_id, last_km, last_date, next_due_km, next_due_date)
-		VALUES (` + strings.Join([]string{
-		b.Add(state.CarID),
-		b.Add(state.TemplateID),
-		b.Add(state.LastKM),
-		b.Add(state.LastDate),
-		b.Add(state.NextDueKM),
-		b.Add(state.NextDueDate),
-	}, ", ") + `)
-		ON CONFLICT (car_id, template_id) DO UPDATE SET
-			last_km      = EXCLUDED.last_km,
-			last_date    = EXCLUDED.last_date,
-			next_due_km  = EXCLUDED.next_due_km,
+	args := []any{
+		state.CarID, state.TemplateID, state.LastKM,
+		state.LastDate, state.NextDueKM, state.NextDueDate,
+	}
+	q := `INSERT INTO car_service_states (car_id, template_id, last_km, last_date, next_due_km, next_due_date)
+		  VALUES ($1, $2, $3, $4, $5, $6)
+		  ON CONFLICT (car_id, template_id) DO UPDATE SET
+			last_km       = EXCLUDED.last_km,
+			last_date     = EXCLUDED.last_date,
+			next_due_km   = EXCLUDED.next_due_km,
 			next_due_date = EXCLUDED.next_due_date`
 
-	_, err := r.pool.Exec(ctx, q, b.Args...)
-	if err != nil {
-		logger.Error("failed to upsert car service state", pkglog.Err(err))
-		return ErrSql
+	if _, err := r.pool.Exec(ctx, q, args...); err != nil {
+		log.Error("failed to upsert car service state", pkglog.Err(err))
+		return model.ErrSql
 	}
 
 	return nil
 }
 
 func (r *CarServiceStateRepository) FindAll(ctx context.Context, filter model.CarServiceStateFilter) ([]model.CarServiceState, error) {
-	logger := pkglog.WithMethod(r.log, "FindAll")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
-
-	b := &dto.ArgsBuilder{}
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindAll"), utils.MetadataFromCtx(ctx))
 
 	var clauses []string
+	var args []any
+	n := 0
+
 	if filter.CarID != nil {
-		clauses = append(clauses, "car_id = "+b.Add(*filter.CarID))
+		n++
+		args = append(args, *filter.CarID)
+		clauses = append(clauses, fmt.Sprintf("car_id = $%d", n))
 	}
 	if filter.TemplateID != nil {
-		clauses = append(clauses, "template_id = "+b.Add(*filter.TemplateID))
+		n++
+		args = append(args, *filter.TemplateID)
+		clauses = append(clauses, fmt.Sprintf("template_id = $%d", n))
 	}
 
 	where := ""
@@ -379,10 +352,10 @@ func (r *CarServiceStateRepository) FindAll(ctx context.Context, filter model.Ca
 	q := `SELECT car_id, template_id, last_km, last_date, next_due_km, next_due_date
 		FROM car_service_states` + where
 
-	rows, err := r.pool.Query(ctx, q, b.Args...)
+	rows, err := r.pool.Query(ctx, q, args...)
 	if err != nil {
-		logger.Error("failed to query car service states", pkglog.Err(err))
-		return nil, ErrSql
+		log.Error("failed to query car service states", pkglog.Err(err))
+		return nil, model.ErrSql
 	}
 	defer rows.Close()
 
@@ -397,8 +370,8 @@ func (r *CarServiceStateRepository) FindAll(ctx context.Context, filter model.Ca
 			&s.CarID, &s.TemplateID, &s.LastKM,
 			&lastDate, &nextDueKM, &nextDueDate,
 		); err != nil {
-			logger.Error("failed to scan service state row", pkglog.Err(err))
-			return nil, ErrSql
+			log.Error("failed to scan service state row", pkglog.Err(err))
+			return nil, model.ErrSql
 		}
 
 		s.LastDate = lastDate
@@ -409,8 +382,8 @@ func (r *CarServiceStateRepository) FindAll(ctx context.Context, filter model.Ca
 	}
 
 	if err = rows.Err(); err != nil {
-		logger.Error("rows iteration error", pkglog.Err(err))
-		return nil, ErrSql
+		log.Error("rows iteration error", pkglog.Err(err))
+		return nil, model.ErrSql
 	}
 
 	return result, nil

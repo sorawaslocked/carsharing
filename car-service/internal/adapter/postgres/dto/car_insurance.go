@@ -1,9 +1,10 @@
 package dto
 
 import (
-	"carsharing/car-service/internal/model"
 	"fmt"
 	"time"
+
+	"carsharing/car-service/internal/model"
 )
 
 type carInsuranceRow struct {
@@ -55,56 +56,82 @@ func ScanCarInsuranceRow(s scanner) (model.CarInsurance, error) {
 	return r.toDomain(), nil
 }
 
-func BuildCarInsuranceWhereClauses(f model.CarInsuranceFilter, b *ArgsBuilder) []string {
+func WhereClausesFromCarInsuranceFilter(f model.CarInsuranceFilter, args []any, n int) ([]string, []any, int) {
 	var clauses []string
 
 	if f.CarID != nil {
-		clauses = append(clauses, fmt.Sprintf("car_id = %s", b.Add(*f.CarID)))
+		n++
+		args = append(args, *f.CarID)
+		clauses = append(clauses, fmt.Sprintf("car_id = $%d", n))
 	}
 	if f.Type != nil {
-		clauses = append(clauses, fmt.Sprintf("type = %s", b.Add(string(*f.Type))))
+		n++
+		args = append(args, string(*f.Type))
+		clauses = append(clauses, fmt.Sprintf("type = $%d", n))
 	}
 	if f.Status != nil {
-		clauses = append(clauses, fmt.Sprintf("status = %s", b.Add(string(*f.Status))))
+		n++
+		args = append(args, string(*f.Status))
+		clauses = append(clauses, fmt.Sprintf("status = $%d", n))
 	}
 	if f.ExpiringWithinDays != nil {
-		clauses = append(clauses, fmt.Sprintf(
-			"expires_at <= NOW() + make_interval(days => %s)", b.Add(*f.ExpiringWithinDays),
-		))
+		n++
+		args = append(args, *f.ExpiringWithinDays)
+		clauses = append(clauses, fmt.Sprintf("expires_at <= NOW() + make_interval(days => $%d)", n))
 	}
 
-	return clauses
+	return clauses, args, n
 }
 
-func BuildCarInsuranceSetClauses(u model.CarInsuranceUpdate, b *ArgsBuilder) []string {
+func SetClausesFromCarInsuranceUpdate(update model.CarInsuranceUpdate) ([]string, []any, int) {
 	var clauses []string
+	var args []any
+	n := 0
 
-	if u.Provider != nil {
-		clauses = append(clauses, fmt.Sprintf("provider = %s", b.Add(*u.Provider)))
+	if update.Provider != nil {
+		n++
+		args = append(args, *update.Provider)
+		clauses = append(clauses, fmt.Sprintf("provider = $%d", n))
 	}
-	if u.PolicyNum != nil {
-		clauses = append(clauses, fmt.Sprintf("policy_num = %s", b.Add(*u.PolicyNum)))
+	if update.PolicyNum != nil {
+		n++
+		args = append(args, *update.PolicyNum)
+		clauses = append(clauses, fmt.Sprintf("policy_num = $%d", n))
 	}
-	if u.StartsAt != nil {
-		clauses = append(clauses, fmt.Sprintf("starts_at = %s", b.Add(*u.StartsAt)))
+	if update.StartsAt != nil {
+		n++
+		args = append(args, *update.StartsAt)
+		clauses = append(clauses, fmt.Sprintf("starts_at = $%d", n))
 	}
-	if u.ExpiresAt != nil {
-		clauses = append(clauses, fmt.Sprintf("expires_at = %s", b.Add(*u.ExpiresAt)))
+	if update.ExpiresAt != nil {
+		n++
+		args = append(args, *update.ExpiresAt)
+		clauses = append(clauses, fmt.Sprintf("expires_at = $%d", n))
 	}
-	if u.CostTenge != nil {
-		clauses = append(clauses, fmt.Sprintf("cost_tenge = %s", b.Add(*u.CostTenge)))
+	if update.CostTenge != nil {
+		n++
+		args = append(args, *update.CostTenge)
+		clauses = append(clauses, fmt.Sprintf("cost_tenge = $%d", n))
 	}
-	if u.Status != nil {
-		clauses = append(clauses, fmt.Sprintf("status = %s", b.Add(string(*u.Status))))
+	if update.Status != nil {
+		n++
+		args = append(args, string(*update.Status))
+		clauses = append(clauses, fmt.Sprintf("status = $%d", n))
 	}
-	if u.Notes != nil {
-		clauses = append(clauses, fmt.Sprintf("notes = %s", b.Add(*u.Notes)))
+	if update.Notes != nil {
+		n++
+		args = append(args, *update.Notes)
+		clauses = append(clauses, fmt.Sprintf("notes = $%d", n))
 	}
-	if u.ImageKeys != nil {
-		clauses = append(clauses, fmt.Sprintf("image_keys = %s", b.Add(u.ImageKeys)))
+	if update.ImageKeys != nil {
+		n++
+		args = append(args, update.ImageKeys)
+		clauses = append(clauses, fmt.Sprintf("image_keys = $%d", n))
 	}
 
-	clauses = append(clauses, fmt.Sprintf("updated_at = %s", b.Add(u.UpdatedAt)))
+	n++
+	args = append(args, update.UpdatedAt)
+	clauses = append(clauses, fmt.Sprintf("updated_at = $%d", n))
 
-	return clauses
+	return clauses, args, n
 }

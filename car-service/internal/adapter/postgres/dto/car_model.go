@@ -1,9 +1,10 @@
 package dto
 
 import (
-	"carsharing/car-service/internal/model"
 	"fmt"
 	"time"
+
+	"carsharing/car-service/internal/model"
 )
 
 type carModelRow struct {
@@ -60,78 +61,122 @@ func ScanCarModelRow(s scanner) (model.CarModel, error) {
 	return r.toDomain(), nil
 }
 
-func BuildCarModelWhereClauses(b *ArgsBuilder, f model.CarModelFilter, tableAlias string) []string {
+func WhereClausesFromCarModelFilter(f model.CarModelFilter, args []any, n int, tableAlias string) ([]string, []any, int) {
 	var clauses []string
 
 	if f.ID != nil {
-		clauses = append(clauses, fmt.Sprintf("%s = %s", column(tableAlias, "id"), b.Add(*f.ID)))
+		n++
+		args = append(args, *f.ID)
+		clauses = append(clauses, fmt.Sprintf("%s = $%d", column(tableAlias, "id"), n))
 	}
 	if f.Brand != nil {
-		clauses = append(clauses, fmt.Sprintf("%s = %s", column(tableAlias, "brand"), b.Add(*f.Brand)))
+		n++
+		args = append(args, *f.Brand)
+		clauses = append(clauses, fmt.Sprintf("%s = $%d", column(tableAlias, "brand"), n))
 	}
 	if f.Model != nil {
-		clauses = append(clauses, fmt.Sprintf("%s = %s", column(tableAlias, "model"), b.Add(*f.Model)))
+		n++
+		args = append(args, *f.Model)
+		clauses = append(clauses, fmt.Sprintf("%s = $%d", column(tableAlias, "model"), n))
 	}
 	if f.FuelType != nil {
-		clauses = append(clauses, fmt.Sprintf("%s = %s", column(tableAlias, "fuel_type"), b.Add(string(*f.FuelType))))
+		n++
+		args = append(args, string(*f.FuelType))
+		clauses = append(clauses, fmt.Sprintf("%s = $%d", column(tableAlias, "fuel_type"), n))
 	}
 	if f.Transmission != nil {
-		clauses = append(clauses, fmt.Sprintf("%s = %s", column(tableAlias, "transmission"), b.Add(string(*f.Transmission))))
+		n++
+		args = append(args, string(*f.Transmission))
+		clauses = append(clauses, fmt.Sprintf("%s = $%d", column(tableAlias, "transmission"), n))
 	}
 	if f.BodyType != nil {
-		clauses = append(clauses, fmt.Sprintf("%s = %s", column(tableAlias, "body_type"), b.Add(string(*f.BodyType))))
+		n++
+		args = append(args, string(*f.BodyType))
+		clauses = append(clauses, fmt.Sprintf("%s = $%d", column(tableAlias, "body_type"), n))
 	}
 	if f.Class != nil {
-		clauses = append(clauses, fmt.Sprintf("%s = %s", column(tableAlias, "class"), b.Add(string(*f.Class))))
+		n++
+		args = append(args, string(*f.Class))
+		clauses = append(clauses, fmt.Sprintf("%s = $%d", column(tableAlias, "class"), n))
 	}
 	if f.MinSeats != nil {
-		clauses = append(clauses, fmt.Sprintf("%s >= %s", column(tableAlias, "seats"), b.Add(*f.MinSeats)))
+		n++
+		args = append(args, *f.MinSeats)
+		clauses = append(clauses, fmt.Sprintf("%s >= $%d", column(tableAlias, "seats"), n))
 	}
 
-	return clauses
+	return clauses, args, n
 }
 
-func BuildCarModelSetClauses(u model.CarModelUpdate, b *ArgsBuilder) []string {
+func SetClausesFromCarModelUpdate(update model.CarModelUpdate) ([]string, []any, int) {
 	var clauses []string
+	var args []any
+	n := 0
 
-	if u.Brand != nil {
-		clauses = append(clauses, fmt.Sprintf("brand = %s", b.Add(*u.Brand)))
+	if update.Brand != nil {
+		n++
+		args = append(args, *update.Brand)
+		clauses = append(clauses, fmt.Sprintf("brand = $%d", n))
 	}
-	if u.Model != nil {
-		clauses = append(clauses, fmt.Sprintf("model = %s", b.Add(*u.Model)))
+	if update.Model != nil {
+		n++
+		args = append(args, *update.Model)
+		clauses = append(clauses, fmt.Sprintf("model = $%d", n))
 	}
-	if u.Year != nil {
-		clauses = append(clauses, fmt.Sprintf("year = %s", b.Add(*u.Year)))
+	if update.Year != nil {
+		n++
+		args = append(args, *update.Year)
+		clauses = append(clauses, fmt.Sprintf("year = $%d", n))
 	}
-	if u.FuelType != nil {
-		clauses = append(clauses, fmt.Sprintf("fuel_type = %s", b.Add(string(*u.FuelType))))
+	if update.FuelType != nil {
+		n++
+		args = append(args, string(*update.FuelType))
+		clauses = append(clauses, fmt.Sprintf("fuel_type = $%d", n))
 	}
-	if u.Transmission != nil {
-		clauses = append(clauses, fmt.Sprintf("transmission = %s", b.Add(string(*u.Transmission))))
+	if update.Transmission != nil {
+		n++
+		args = append(args, string(*update.Transmission))
+		clauses = append(clauses, fmt.Sprintf("transmission = $%d", n))
 	}
-	if u.BodyType != nil {
-		clauses = append(clauses, fmt.Sprintf("body_type = %s", b.Add(string(*u.BodyType))))
+	if update.BodyType != nil {
+		n++
+		args = append(args, string(*update.BodyType))
+		clauses = append(clauses, fmt.Sprintf("body_type = $%d", n))
 	}
-	if u.Class != nil {
-		clauses = append(clauses, fmt.Sprintf("class = %s", b.Add(string(*u.Class))))
+	if update.Class != nil {
+		n++
+		args = append(args, string(*update.Class))
+		clauses = append(clauses, fmt.Sprintf("class = $%d", n))
 	}
-	if u.Seats != nil {
-		clauses = append(clauses, fmt.Sprintf("seats = %s", b.Add(*u.Seats)))
+	if update.Seats != nil {
+		n++
+		args = append(args, *update.Seats)
+		clauses = append(clauses, fmt.Sprintf("seats = $%d", n))
 	}
-	if u.EngineVolume != nil {
-		clauses = append(clauses, fmt.Sprintf("engine_volume = %s", b.Add(*u.EngineVolume)))
+	if update.EngineVolume != nil {
+		n++
+		args = append(args, *update.EngineVolume)
+		clauses = append(clauses, fmt.Sprintf("engine_volume = $%d", n))
 	}
-	if u.RangeKM != nil {
-		clauses = append(clauses, fmt.Sprintf("range_km = %s", b.Add(*u.RangeKM)))
+	if update.RangeKM != nil {
+		n++
+		args = append(args, *update.RangeKM)
+		clauses = append(clauses, fmt.Sprintf("range_km = $%d", n))
 	}
-	if u.Features != nil {
-		clauses = append(clauses, fmt.Sprintf("features = %s", b.Add(u.Features)))
+	if update.Features != nil {
+		n++
+		args = append(args, update.Features)
+		clauses = append(clauses, fmt.Sprintf("features = $%d", n))
 	}
-	if u.ImageKeys != nil {
-		clauses = append(clauses, fmt.Sprintf("image_keys = %s", b.Add(u.ImageKeys)))
+	if update.ImageKeys != nil {
+		n++
+		args = append(args, update.ImageKeys)
+		clauses = append(clauses, fmt.Sprintf("image_keys = $%d", n))
 	}
 
-	clauses = append(clauses, fmt.Sprintf("updated_at = %s", b.Add(u.UpdatedAt)))
+	n++
+	args = append(args, update.UpdatedAt)
+	clauses = append(clauses, fmt.Sprintf("updated_at = $%d", n))
 
-	return clauses
+	return clauses, args, n
 }

@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"strings"
 
@@ -15,97 +16,87 @@ import (
 )
 
 type CarInsuranceRepository struct {
-	pool *pgxpool.Pool
 	log  *slog.Logger
+	pool *pgxpool.Pool
 }
 
-func NewCarInsuranceRepository(pool *pgxpool.Pool, log *slog.Logger) *CarInsuranceRepository {
+func NewCarInsuranceRepository(log *slog.Logger, pool *pgxpool.Pool) *CarInsuranceRepository {
 	return &CarInsuranceRepository{
+		log:  pkglog.WithComponent(log, "adapter.postgres.CarInsuranceRepository"),
 		pool: pool,
-		log:  pkglog.WithComponent(log, "repo.CarInsuranceRepo"),
 	}
 }
 
 func (r *CarInsuranceRepository) Insert(ctx context.Context, ins model.CarInsurance) (string, error) {
-	logger := pkglog.WithMethod(r.log, "Insert")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Insert"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	q := `
-		INSERT INTO car_insurances
+	args := []any{
+		ins.CarID, string(ins.Type), ins.Provider, ins.PolicyNum,
+		ins.StartsAt, ins.ExpiresAt, ins.CostTenge, string(ins.Status),
+		ins.Notes, dto.ImagesToKeys(ins.Images), ins.CreatedAt, ins.UpdatedAt,
+	}
+	q := `INSERT INTO car_insurances
 			(car_id, type, provider, policy_num, starts_at, expires_at,
 			 cost_tenge, status, notes, image_keys, created_at, updated_at)
-		VALUES (` + strings.Join([]string{
-		b.Add(ins.CarID),
-		b.Add(string(ins.Type)),
-		b.Add(ins.Provider),
-		b.Add(ins.PolicyNum),
-		b.Add(ins.StartsAt),
-		b.Add(ins.ExpiresAt),
-		b.Add(ins.CostTenge),
-		b.Add(string(ins.Status)),
-		b.Add(ins.Notes),
-		b.Add(dto.ImagesToKeys(ins.Images)),
-		b.Add(ins.CreatedAt),
-		b.Add(ins.UpdatedAt),
-	}, ", ") + `) RETURNING id`
+		  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+		  RETURNING id`
 
 	var id string
-
-	err := r.pool.QueryRow(ctx, q, b.Args...).Scan(&id)
-	if err != nil {
-		logger.Error("failed to insert car insurance", pkglog.Err(err))
-		return "", ErrSql
+	if err := r.pool.QueryRow(ctx, q, args...).Scan(&id); err != nil {
+		log.Error("failed to insert car insurance", pkglog.Err(err))
+		return "", model.ErrSql
 	}
 
 	return id, nil
 }
 
 func (r *CarInsuranceRepository) FindByID(ctx context.Context, id string) (model.CarInsurance, error) {
-	logger := pkglog.WithMethod(r.log, "FindByID")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
-
-	b := &dto.ArgsBuilder{}
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindByID"), utils.MetadataFromCtx(ctx))
 
 	q := `SELECT id, car_id, type, provider, policy_num, starts_at, expires_at,
 		cost_tenge, status, notes, image_keys, created_at, updated_at
-		FROM car_insurances WHERE id = ` + b.Add(id) + ` LIMIT 1`
+		FROM car_insurances WHERE id = $1 LIMIT 1`
 
-	row := r.pool.QueryRow(ctx, q, b.Args...)
+	row := r.pool.QueryRow(ctx, q, id)
 
 	ins, err := dto.ScanCarInsuranceRow(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return model.CarInsurance{}, ErrNotFound
+			return model.CarInsurance{}, model.ErrNotFound
 		}
-		logger.Error("failed to find car insurance by id", pkglog.Err(err))
-		return model.CarInsurance{}, ErrSql
+		log.Error("failed to find car insurance by id", pkglog.Err(err))
+		return model.CarInsurance{}, model.ErrSql
 	}
 
 	return ins, nil
 }
 
 func (r *CarInsuranceRepository) Find(ctx context.Context, filter model.CarInsuranceFilter) ([]model.CarInsurance, error) {
-	logger := pkglog.WithMethod(r.log, "Find")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Find"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	clauses := dto.BuildCarInsuranceWhereClauses(filter, b)
+	whereClauses, args, n := dto.WhereClausesFromCarInsuranceFilter(filter, make([]any, 0), 0)
 	where := ""
-	if len(clauses) > 0 {
-		where = " WHERE " + strings.Join(clauses, " AND ")
+	if len(whereClauses) > 0 {
+		where = " WHERE " + strings.Join(whereClauses, " AND ")
 	}
 
 	q := `SELECT id, car_id, type, provider, policy_num, starts_at, expires_at,
 		cost_tenge, status, notes, image_keys, created_at, updated_at
-		FROM car_insurances` + where + dto.BuildPagination(b, filter.Pagination)
+		FROM car_insurances` + where
 
-	rows, err := r.pool.Query(ctx, q, b.Args...)
+	if filter.Pagination != nil {
+		n++
+		args = append(args, filter.Pagination.Limit)
+		q += fmt.Sprintf(" LIMIT $%d", n)
+		n++
+		args = append(args, filter.Pagination.Offset)
+		q += fmt.Sprintf(" OFFSET $%d", n)
+	}
+
+	rows, err := r.pool.Query(ctx, q, args...)
 	if err != nil {
-		logger.Error("failed to query car insurances", pkglog.Err(err))
-		return nil, ErrSql
+		log.Error("failed to query car insurances", pkglog.Err(err))
+		return nil, model.ErrSql
 	}
 	defer rows.Close()
 
@@ -113,62 +104,56 @@ func (r *CarInsuranceRepository) Find(ctx context.Context, filter model.CarInsur
 	for rows.Next() {
 		ins, err := dto.ScanCarInsuranceRow(rows)
 		if err != nil {
-			logger.Error("failed to scan car insurance row", pkglog.Err(err))
-			return nil, ErrSql
+			log.Error("failed to scan car insurance row", pkglog.Err(err))
+			return nil, model.ErrSql
 		}
 		result = append(result, ins)
 	}
 
 	if err = rows.Err(); err != nil {
-		logger.Error("rows iteration error", pkglog.Err(err))
-		return nil, ErrSql
+		log.Error("rows iteration error", pkglog.Err(err))
+		return nil, model.ErrSql
 	}
 
 	return result, nil
 }
 
 func (r *CarInsuranceRepository) Update(ctx context.Context, id string, update model.CarInsuranceUpdate) error {
-	logger := pkglog.WithMethod(r.log, "Update")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Update"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	setClauses := dto.BuildCarInsuranceSetClauses(update, b)
+	setClauses, args, n := dto.SetClausesFromCarInsuranceUpdate(update)
 	if len(setClauses) <= 1 {
 		return nil
 	}
 
-	q := `UPDATE car_insurances SET ` + strings.Join(setClauses, ", ") + ` WHERE id = ` + b.Add(id)
+	n++
+	args = append(args, id)
+	q := `UPDATE car_insurances SET ` + strings.Join(setClauses, ", ") + fmt.Sprintf(" WHERE id = $%d", n)
 
-	tag, err := r.pool.Exec(ctx, q, b.Args...)
+	tag, err := r.pool.Exec(ctx, q, args...)
 	if err != nil {
-		logger.Error("failed to update car insurance", pkglog.Err(err))
-		return ErrSql
+		log.Error("failed to update car insurance", pkglog.Err(err))
+		return model.ErrSql
 	}
 
 	if tag.RowsAffected() == 0 {
-		return ErrNotFound
+		return model.ErrNotFound
 	}
 
 	return nil
 }
 
 func (r *CarInsuranceRepository) Delete(ctx context.Context, id string) error {
-	logger := pkglog.WithMethod(r.log, "Delete")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Delete"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	q := `DELETE FROM car_insurances WHERE id = ` + b.Add(id)
-
-	tag, err := r.pool.Exec(ctx, q, b.Args...)
+	tag, err := r.pool.Exec(ctx, `DELETE FROM car_insurances WHERE id = $1`, id)
 	if err != nil {
-		logger.Error("failed to delete car insurance", pkglog.Err(err))
-		return ErrSql
+		log.Error("failed to delete car insurance", pkglog.Err(err))
+		return model.ErrSql
 	}
 
 	if tag.RowsAffected() == 0 {
-		return ErrNotFound
+		return model.ErrNotFound
 	}
 
 	return nil

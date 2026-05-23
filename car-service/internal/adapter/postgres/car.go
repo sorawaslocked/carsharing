@@ -12,107 +12,100 @@ import (
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type CarRepository struct {
-	pool *pgxpool.Pool
 	log  *slog.Logger
+	pool *pgxpool.Pool
 }
 
-func NewCarRepository(pool *pgxpool.Pool, log *slog.Logger) *CarRepository {
+func NewCarRepository(log *slog.Logger, pool *pgxpool.Pool) *CarRepository {
 	return &CarRepository{
+		log:  pkglog.WithComponent(log, "adapter.postgres.CarRepository"),
 		pool: pool,
-		log:  pkglog.WithComponent(log, "repo.CarRepo"),
 	}
 }
 
+func (r *CarRepository) handlePGErr(err error) error {
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+		return model.ErrAlreadyExists
+	}
+	return model.ErrSql
+}
+
 func (r *CarRepository) Insert(ctx context.Context, car model.Car) (string, error) {
-	logger := pkglog.WithMethod(r.log, "Insert")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Insert"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	q := `
-		INSERT INTO cars
+	args := []any{
+		car.ModelID, car.VIN, car.LicensePlate, car.Color,
+		car.YearManufactured, string(car.Status),
+		car.MileageKM, car.FuelLevel, car.BatteryLevel,
+		car.Location.Latitude, car.Location.Longitude,
+		car.Notes, dto.ImagesToKeys(car.Images), car.LastSeenAt,
+		car.CreatedAt, car.UpdatedAt,
+	}
+	q := `INSERT INTO cars
 			(model_id, vin, license_plate, color, year_manufactured, status,
 			 mileage_km, fuel_level, battery_level, latitude, longitude,
 			 notes, image_keys, last_seen_at, created_at, updated_at)
-		VALUES
-			(` + strings.Join([]string{
-		b.Add(car.ModelID),
-		b.Add(car.VIN),
-		b.Add(car.LicensePlate),
-		b.Add(car.Color),
-		b.Add(car.YearManufactured),
-		b.Add(string(car.Status)),
-		b.Add(car.MileageKM),
-		b.Add(car.FuelLevel),
-		b.Add(car.BatteryLevel),
-		b.Add(car.Location.Latitude),
-		b.Add(car.Location.Longitude),
-		b.Add(car.Notes),
-		b.Add(dto.ImagesToKeys(car.Images)),
-		b.Add(car.LastSeenAt),
-		b.Add(car.CreatedAt),
-		b.Add(car.UpdatedAt),
-	}, ", ") + `)
-		RETURNING id`
+		  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+		  RETURNING id`
 
 	var id string
-
-	err := r.pool.QueryRow(ctx, q, b.Args...).Scan(&id)
-	if err != nil {
-		if isUniqueViolation(err) {
-			return "", ErrAlreadyExists
-		}
-		logger.Error("failed to insert car", pkglog.Err(err))
-		return "", ErrSql
+	if err := r.pool.QueryRow(ctx, q, args...).Scan(&id); err != nil {
+		log.Error("failed to insert car", pkglog.Err(err))
+		return "", r.handlePGErr(err)
 	}
 
 	return id, nil
 }
 
 func (r *CarRepository) FindByID(ctx context.Context, id string) (model.Car, error) {
-	logger := pkglog.WithMethod(r.log, "FindByID")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
-
-	b := &dto.ArgsBuilder{}
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindByID"), utils.MetadataFromCtx(ctx))
 
 	q := `SELECT id, model_id, vin, license_plate, color, year_manufactured, status,
 		mileage_km, fuel_level, battery_level, latitude, longitude, notes, image_keys,
-		last_seen_at, created_at, updated_at FROM cars WHERE id = ` + b.Add(id) + ` LIMIT 1`
+		last_seen_at, created_at, updated_at FROM cars WHERE id = $1 LIMIT 1`
 
-	row := r.pool.QueryRow(ctx, q, b.Args...)
+	row := r.pool.QueryRow(ctx, q, id)
 
 	car, err := dto.ScanCarRow(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return model.Car{}, ErrNotFound
+			return model.Car{}, model.ErrNotFound
 		}
-		logger.Error("failed to find car by id", pkglog.Err(err))
-		return model.Car{}, ErrSql
+		log.Error("failed to find car by id", pkglog.Err(err))
+		return model.Car{}, model.ErrSql
 	}
 
 	return car, nil
 }
 
 func (r *CarRepository) Find(ctx context.Context, filter model.CarFilter) ([]model.Car, error) {
-	logger := pkglog.WithMethod(r.log, "Find")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Find"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	join, where := buildCarWhere(filter, b)
+	join, where, args, n := buildCarFilter(filter, make([]any, 0), 0)
 
 	q := `SELECT c.id, c.model_id, c.vin, c.license_plate, c.color, c.year_manufactured, c.status,
 		c.mileage_km, c.fuel_level, c.battery_level, c.latitude, c.longitude, c.notes, c.image_keys,
-		c.last_seen_at, c.created_at, c.updated_at FROM cars c` + join + where + dto.BuildPagination(b, filter.Pagination)
+		c.last_seen_at, c.created_at, c.updated_at FROM cars c` + join + where
 
-	rows, err := r.pool.Query(ctx, q, b.Args...)
+	if filter.Pagination != nil {
+		n++
+		args = append(args, filter.Pagination.Limit)
+		q += fmt.Sprintf(" LIMIT $%d", n)
+		n++
+		args = append(args, filter.Pagination.Offset)
+		q += fmt.Sprintf(" OFFSET $%d", n)
+	}
+
+	rows, err := r.pool.Query(ctx, q, args...)
 	if err != nil {
-		logger.Error("failed to query cars", pkglog.Err(err))
-		return nil, ErrSql
+		log.Error("failed to query cars", pkglog.Err(err))
+		return nil, model.ErrSql
 	}
 	defer rows.Close()
 
@@ -120,93 +113,94 @@ func (r *CarRepository) Find(ctx context.Context, filter model.CarFilter) ([]mod
 	for rows.Next() {
 		car, err := dto.ScanCarRow(rows)
 		if err != nil {
-			logger.Error("failed to scan car row", pkglog.Err(err))
-			return nil, ErrSql
+			log.Error("failed to scan car row", pkglog.Err(err))
+			return nil, model.ErrSql
 		}
 		result = append(result, car)
 	}
 
 	if err = rows.Err(); err != nil {
-		logger.Error("rows iteration error", pkglog.Err(err))
-		return nil, ErrSql
+		log.Error("rows iteration error", pkglog.Err(err))
+		return nil, model.ErrSql
 	}
 
 	return result, nil
 }
 
 func (r *CarRepository) Update(ctx context.Context, id string, update model.CarUpdate) error {
-	logger := pkglog.WithMethod(r.log, "Update")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Update"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	setClauses := dto.BuildCarSetClauses(update, b)
+	setClauses, args, n := dto.SetClausesFromCarUpdate(update)
 	if len(setClauses) <= 1 {
 		return nil
 	}
 
-	q := `UPDATE cars SET ` + strings.Join(setClauses, ", ") + ` WHERE id = ` + b.Add(id)
+	n++
+	args = append(args, id)
+	q := `UPDATE cars SET ` + strings.Join(setClauses, ", ") + fmt.Sprintf(" WHERE id = $%d", n)
 
-	tag, err := r.pool.Exec(ctx, q, b.Args...)
+	tag, err := r.pool.Exec(ctx, q, args...)
 	if err != nil {
-		if isUniqueViolation(err) {
-			return ErrAlreadyExists
-		}
-		logger.Error("failed to update car", pkglog.Err(err))
-		return ErrSql
+		log.Error("failed to update car", pkglog.Err(err))
+		return r.handlePGErr(err)
 	}
 
 	if tag.RowsAffected() == 0 {
-		return ErrNotFound
+		return model.ErrNotFound
 	}
 
 	return nil
 }
 
 func (r *CarRepository) Delete(ctx context.Context, id string) error {
-	logger := pkglog.WithMethod(r.log, "Delete")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Delete"), utils.MetadataFromCtx(ctx))
 
-	b := &dto.ArgsBuilder{}
-
-	q := `DELETE FROM cars WHERE id = ` + b.Add(id)
-
-	tag, err := r.pool.Exec(ctx, q, b.Args...)
+	tag, err := r.pool.Exec(ctx, `DELETE FROM cars WHERE id = $1`, id)
 	if err != nil {
-		logger.Error("failed to delete car", pkglog.Err(err))
-		return ErrSql
+		log.Error("failed to delete car", pkglog.Err(err))
+		return model.ErrSql
 	}
 
 	if tag.RowsAffected() == 0 {
-		return ErrNotFound
+		return model.ErrNotFound
 	}
 
 	return nil
 }
 
-func buildCarWhere(f model.CarFilter, b *dto.ArgsBuilder) (join string, where string) {
+func buildCarFilter(f model.CarFilter, args []any, n int) (join, where string, outArgs []any, outN int) {
 	var joins []string
 	var clauses []string
 
 	if f.ID != nil {
-		clauses = append(clauses, fmt.Sprintf("c.id = %s", b.Add(*f.ID)))
+		n++
+		args = append(args, *f.ID)
+		clauses = append(clauses, fmt.Sprintf("c.id = $%d", n))
 	}
 	if f.Status != nil {
-		clauses = append(clauses, fmt.Sprintf("c.status = %s", b.Add(string(*f.Status))))
+		n++
+		args = append(args, string(*f.Status))
+		clauses = append(clauses, fmt.Sprintf("c.status = $%d", n))
 	}
 
 	if f.ModelFilter != nil {
 		joins = append(joins, "JOIN car_models cm ON cm.id = c.model_id")
-		subClauses := dto.BuildCarModelWhereClauses(b, *f.ModelFilter, "cm")
-		clauses = append(clauses, subClauses...)
+		var modelClauses []string
+		modelClauses, args, n = dto.WhereClausesFromCarModelFilter(*f.ModelFilter, args, n, "cm")
+		clauses = append(clauses, modelClauses...)
 	}
 
 	if f.LocationFilter != nil {
 		lf := f.LocationFilter
-		// earth_box performs a bounding-cube pre-filter satisfied by the GiST index.
-		p1 := b.Add(lf.Location.Latitude)
-		p2 := b.Add(lf.Location.Longitude)
-		p3 := b.Add(lf.RadiusKM * 1000) // km → metres
+		n++
+		args = append(args, lf.Location.Latitude)
+		p1 := fmt.Sprintf("$%d", n)
+		n++
+		args = append(args, lf.Location.Longitude)
+		p2 := fmt.Sprintf("$%d", n)
+		n++
+		args = append(args, lf.RadiusKM*1000)
+		p3 := fmt.Sprintf("$%d", n)
 		clauses = append(clauses, fmt.Sprintf(
 			"earth_box(ll_to_earth(%s, %s), %s) @> ll_to_earth(c.latitude, c.longitude)",
 			p1, p2, p3,
@@ -220,5 +214,5 @@ func buildCarWhere(f model.CarFilter, b *dto.ArgsBuilder) (join string, where st
 		where = " WHERE " + strings.Join(clauses, " AND ")
 	}
 
-	return join, where
+	return join, where, args, n
 }

@@ -7,7 +7,7 @@ import "base/common.proto";
 import "google/protobuf/empty.proto";
 import "service/common.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/user";
+option go_package = "carsharing/protos/gen/service/user";
 
 service UserService {
   rpc Health(google.protobuf.Empty) returns (ServiceHealthResponse);

@@ -4,7 +4,7 @@ package service.user;
 
 import "google/protobuf/empty.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/user";
+option go_package = "carsharing/protos/gen/service/user";
 
 service DocumentAnalyzerService {
   rpc Analyze(AnalyzeRequest) returns (google.protobuf.Empty);

@@ -6,7 +6,7 @@ import "base/common.proto";
 import "base/car/car.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/car";
+option go_package = "carsharing/protos/gen/service/car";
 
 service CarStreamService {
   rpc StreamCarsWithFilter(StreamCarsWithFilterRequest) returns (stream StreamCarsWithFilterResponse);

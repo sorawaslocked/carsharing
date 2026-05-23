@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package event.car;
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/event/car";
+option go_package = "carsharing/protos/gen/event/car";
 
 message CarStatusUpdatedEvent {
   string car_id      = 1;

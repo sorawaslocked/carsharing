@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package service.trip;
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/trip";
+option go_package = "carsharing/protos/gen/service/trip";
 
 service TripStreamService {
   rpc StreamTripLiveFeed(StreamTripLiveFeedRequest) returns (stream StreamTripLiveFeedResponse);

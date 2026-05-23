@@ -6,7 +6,7 @@ import "base/booking/pricing_rule.proto";
 import "base/common.proto";
 import "google/protobuf/empty.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/booking";
+option go_package = "carsharing/protos/gen/service/booking";
 
 service PricingRuleService {
   rpc CreatePricingRule(CreatePricingRuleRequest) returns (CreatePricingRuleResponse);

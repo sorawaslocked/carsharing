@@ -5,7 +5,7 @@ package base.booking;
 import "base/common.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base/booking";
+option go_package = "carsharing/protos/gen/base/booking";
 
 message Booking {
   string id = 1;

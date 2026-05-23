@@ -4,7 +4,7 @@ package base.booking;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base/booking";
+option go_package = "carsharing/protos/gen/base/booking";
 
 message PricingRule {
   string id = 1;

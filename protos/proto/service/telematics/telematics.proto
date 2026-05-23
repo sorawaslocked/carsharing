@@ -1,26 +1,28 @@
 syntax = "proto3";
 
-package service.telematics;
+package service.telemetry;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/telematics";
+option go_package = "carsharing/protos/gen/service/telemetry";
 
-service CarTelematicsStreamService {
-  rpc StreamCarTelematicsEvents(StreamCarTelematicsEventsRequest)
-      returns (stream StreamCarTelematicsEventsResponse);
+service CarTelemetryStreamService {
+  rpc StreamCarTelemetryEvents(StreamCarTelemetryEventsRequest)
+      returns (stream StreamCarTelemetryEventsResponse);
 }
 
-message StreamCarTelematicsEventsRequest {
-  string car_id                     = 1;
+message StreamCarTelemetryEventsRequest {
+  string car_id = 1;
 }
 
-message StreamCarTelematicsEventsResponse {
-  string         car_id        = 1;
-  double         latitude      = 2;
-  double         longitude     = 3;
+message StreamCarTelemetryEventsResponse {
+  string car_id    = 1;
+  double latitude  = 2;
+  double longitude = 3;
+
   optional float fuel_level    = 4;
   optional float battery_level = 5;
-  int64          odometer_km   = 6;
+  int64          mileage_km    = 6;
+
   google.protobuf.Timestamp recorded_at = 7;
 }

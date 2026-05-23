@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package event.user;
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/event/user";
+option go_package = "carsharing/protos/gen/event/user";
 
 message DocumentAnalyzedEvent {
   string          document_id = 1;

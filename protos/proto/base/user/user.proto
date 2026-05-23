@@ -4,7 +4,7 @@ package base.user;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base/user";
+option go_package = "carsharing/protos/gen/base/user";
 
 message User {
   string id = 1;

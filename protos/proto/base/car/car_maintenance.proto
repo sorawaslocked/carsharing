@@ -4,34 +4,34 @@ package base.car;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base/car";
+option go_package = "carsharing/protos/gen/base/car";
 
 message CarMaintenanceTemplate {
-  string id = 1;
+  string id   = 1;
   string name = 2;
 
-  optional int32 km_interval = 3;
+  optional int32 km_interval  = 3;
   optional int32 day_interval = 4;
 
-  bool is_mandatory = 5;
-  double warn_pct = 6;
-  double pull_pct = 7;
+  bool   is_mandatory = 5;
+  double warn_pct     = 6;
+  double pull_pct     = 7;
 }
 
 message CarMaintenanceRecord {
-  string id = 1;
-  string car_id = 2;
+  string id          = 1;
+  string car_id      = 2;
   string template_id = 3;
 
-  string status = 4;
-  int32 odometer_at_warning_km = 5;
-  optional int32 odometer_at_completion_km = 6;
-  optional int32 cost_tenge = 7;
-  optional string assigned_to = 8;
-  repeated string receipt_image_urls = 9;
-  optional string notes = 10;
+  string          status                   = 4;
+  int32           mileage_at_warning_km    = 5;
+  optional int32  mileage_at_completion_km = 6;
+  optional int32  cost_tenge               = 7;
+  optional string assigned_to              = 8;
+  repeated string receipt_image_urls       = 9;
+  optional string notes                    = 10;
 
-  google.protobuf.Timestamp due_by = 11;
+  google.protobuf.Timestamp due_by       = 11;
   google.protobuf.Timestamp completed_at = 12;
-  google.protobuf.Timestamp created_at = 13;
+  google.protobuf.Timestamp created_at   = 13;
 }

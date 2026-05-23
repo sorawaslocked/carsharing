@@ -5,7 +5,7 @@ package base.trip;
 import "base/common.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base/trip";
+option go_package = "carsharing/protos/gen/base/trip";
 
 message Trip {
   string id = 1;

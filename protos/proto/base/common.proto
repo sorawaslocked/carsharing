@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package base;
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base";
+option go_package = "carsharing/protos/gen/base";
 
 message ImageUploadData {
   string presigned_put_url = 1;

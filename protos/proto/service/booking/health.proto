@@ -5,7 +5,7 @@ package service.booking;
 import "service/common.proto";
 import "google/protobuf/empty.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/booking";
+option go_package = "carsharing/protos/gen/service/booking";
 
 service HealthService {
   rpc Health(google.protobuf.Empty) returns (ServiceHealthResponse);

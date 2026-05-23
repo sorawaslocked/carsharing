@@ -6,33 +6,33 @@ import "base/common.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/struct.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/base/car";
+option go_package = "carsharing/protos/gen/base/car";
 
 message Car {
-  string id = 1;
-  string model_id = 2;
-  string vin = 3;
-  string license_plate = 4;
-  string color = 5;
-  int32 year_manufactured = 6;
+  string id              = 1;
+  string model_id        = 2;
+  string vin             = 3;
+  string license_plate   = 4;
+  string color           = 5;
+  int32  year_manufactured = 6;
 
-  int64 mileage_km = 7;
-  optional float fuel_level = 8;
+  int64          mileage_km    = 7;
+  optional float fuel_level    = 8;
   optional float battery_level = 9;
-  base.Location location = 10;
+  base.Location  location      = 10;
 
-  string telematics_id = 11;
-  optional string zone_id = 12;
-  string fuel_status = 13;
-  string status = 14;
-  bool is_retired = 15;
+  string          telemetry_id = 11;
+  optional string zone_id       = 12;
+  string          fuel_status   = 13;
+  string          status        = 14;
+  bool            is_retired    = 15;
 
-  optional string notes = 16;
+  optional string notes      = 16;
   repeated string image_urls = 17;
 
   google.protobuf.Timestamp last_seen_at = 18;
-  google.protobuf.Timestamp created_at = 19;
-  google.protobuf.Timestamp updated_at = 20;
+  google.protobuf.Timestamp created_at   = 19;
+  google.protobuf.Timestamp updated_at   = 20;
 }
 
 message SlimCar {
@@ -47,58 +47,32 @@ message SlimCar {
 }
 
 message CarStatusReading {
-  string id = 1;
-  string car_id = 2;
-  string from_status = 3;
-  string to_status = 4;
-  string actor_type = 5;
-  optional string actor_id = 6;
-  optional string reason = 7;
-  google.protobuf.Struct metadata = 8;
+  string          id          = 1;
+  string          car_id      = 2;
+  string          from_status = 3;
+  string          to_status   = 4;
+  string          actor_type  = 5;
+  optional string actor_id    = 6;
+  optional string reason      = 7;
+
+  google.protobuf.Struct    metadata    = 8;
   google.protobuf.Timestamp recorded_at = 9;
 }
 
-message CarFuelReading {
-  string id = 1;
+message CarTelemetryReading {
+  string id     = 1;
   string car_id = 2;
-  float fuel_pct = 3;
-  float raw_pct = 4;
-  string actor_type = 5;
-  optional string actor_id = 6;
-  optional string reason = 7;
-  google.protobuf.Struct metadata = 8;
-  google.protobuf.Timestamp recorded_at = 9;
-}
 
-message CarLocationReading {
-  string id = 1;
-  string car_id = 2;
-  Location location = 3;
-  string actor_type = 4;
-  optional string actor_id = 5;
-  optional string reason = 6;
-  google.protobuf.Struct metadata = 7;
-  google.protobuf.Timestamp recorded_at = 8;
-}
+  optional float         fuel_pct      = 3;
+  optional float         fuel_raw_pct  = 4;
+  optional float         battery_level = 5;
+  optional int64         mileage_km    = 6;
+  optional base.Location location      = 7;
 
-message CarBatteryReading {
-  string id = 1;
-  string car_id = 2;
-  float battery_level = 3;
-  string actor_type = 4;
-  optional string actor_id = 5;
-  optional string reason = 6;
-  google.protobuf.Struct metadata = 7;
-  google.protobuf.Timestamp recorded_at = 8;
-}
+  string          actor_type = 8;
+  optional string actor_id   = 9;
+  optional string reason     = 10;
 
-message CarMileageReading {
-  string id = 1;
-  string car_id = 2;
-  int64 mileage_km = 3;
-  string actor_type = 4;
-  optional string actor_id = 5;
-  optional string reason = 6;
-  google.protobuf.Struct metadata = 7;
-  google.protobuf.Timestamp recorded_at = 8;
+  google.protobuf.Struct    metadata    = 11;
+  google.protobuf.Timestamp recorded_at = 12;
 }

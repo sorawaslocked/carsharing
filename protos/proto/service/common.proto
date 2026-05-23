@@ -4,7 +4,7 @@ package service;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service";
+option go_package = "carsharing/protos/gen/service";
 
 message ServiceHealthResponse {
   string name = 1;

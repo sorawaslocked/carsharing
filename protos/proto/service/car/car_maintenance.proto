@@ -6,7 +6,7 @@ import "base/car/car_maintenance.proto";
 import "base/common.proto";
 import "google/protobuf/empty.proto";
 
-option go_package = "github.com/sorawaslocked/car-rental-protos/gen/service/car";
+option go_package = "carsharing/protos/gen/service/car";
 
 service CarMaintenanceService {
   rpc CreateMaintenanceTemplate(CreateMaintenanceTemplateRequest) returns (CreateMaintenanceTemplateResponse);
@@ -23,11 +23,13 @@ service CarMaintenanceService {
 
 message CreateMaintenanceTemplateRequest {
   string name = 1;
-  optional int32 km_interval = 2;
+
+  optional int32 km_interval  = 2;
   optional int32 day_interval = 3;
-  bool is_mandatory = 4;
-  double warn_pct = 5;
-  double pull_pct = 6;
+
+  bool   is_mandatory = 4;
+  double warn_pct     = 5;
+  double pull_pct     = 6;
 }
 
 message CreateMaintenanceTemplateResponse {
@@ -52,12 +54,13 @@ message ListMaintenanceTemplatesResponse {
 
 message UpdateMaintenanceTemplateRequest {
   string id = 1;
-  optional string name = 2;
-  optional int32 km_interval = 3;
-  optional int32 day_interval = 4;
-  optional bool is_mandatory = 5;
-  optional double warn_pct = 6;
-  optional double pull_pct = 7;
+
+  optional string name         = 2;
+  optional int32  km_interval  = 3;
+  optional int32  day_interval = 4;
+  optional bool   is_mandatory = 5;
+  optional double warn_pct     = 6;
+  optional double pull_pct     = 7;
 }
 
 message DeleteMaintenanceTemplateRequest {
@@ -65,10 +68,10 @@ message DeleteMaintenanceTemplateRequest {
 }
 
 message ListMaintenanceRecordsRequest {
-  optional string car_id = 1;
-  optional string template_id = 2;
-  optional string status = 3;
-  optional base.Pagination pagination = 4;
+  optional string          car_id      = 1;
+  optional string          template_id = 2;
+  optional string          status      = 3;
+  optional base.Pagination pagination  = 4;
 }
 
 message ListMaintenanceRecordsResponse {
@@ -77,10 +80,11 @@ message ListMaintenanceRecordsResponse {
 
 message CompleteMaintenanceRecordRequest {
   string record_id = 1;
-  int32 odometer_at_completion_km = 2;
-  int32 cost_tenge = 3;
-  repeated string receipt_image_keys = 4;
-  optional string notes = 5;
+
+  int32           mileage_at_completion_km = 2;
+  int32           cost_tenge               = 3;
+  repeated string receipt_image_keys       = 4;
+  optional string notes                    = 5;
 }
 
 message GetMaintenanceReceiptImageUploadDataResponse {

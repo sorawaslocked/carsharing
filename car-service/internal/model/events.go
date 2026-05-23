@@ -22,12 +22,11 @@ type BookingCreatedEvent struct {
 	EndsAt    time.Time
 }
 
-type TripStartedEvent struct {
-	TripID    string
-	BookingID string
-	CarID     string
-	UserID    string
-	StartedAt time.Time
+type BookingCompletedEvent struct {
+	BookingID   string
+	CarID       string
+	UserID      string
+	CompletedAt time.Time
 }
 
 type BookingCancelledEvent struct {
@@ -37,14 +36,6 @@ type BookingCancelledEvent struct {
 	Reason    string
 }
 
-type TripEndedEvent struct {
-	TripID    string
-	BookingID string
-	CarID     string
-	UserID    string
-	EndedAt   time.Time
-}
-
 type BookingExpiredEvent struct {
 	BookingID string
 	CarID     string
@@ -52,11 +43,20 @@ type BookingExpiredEvent struct {
 	ExpiredAt time.Time
 }
 
-type BookingCompletedEvent struct {
-	BookingID   string
-	CarID       string
-	UserID      string
-	CompletedAt time.Time
+type TripStartedEvent struct {
+	TripID    string
+	BookingID string
+	CarID     string
+	UserID    string
+	StartedAt time.Time
+}
+
+type TripEndedEvent struct {
+	TripID    string
+	BookingID string
+	CarID     string
+	UserID    string
+	EndedAt   time.Time
 }
 
 type TripCancelledEvent struct {

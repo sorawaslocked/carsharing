@@ -25,7 +25,7 @@ func isCarStatusTransitionAllowed(from, to model.CarStatus) bool {
 
 func transitionCarStatus(from, to model.CarStatus) error {
 	if !isCarStatusTransitionAllowed(from, to) {
-		return ErrInvalidStatusTransition{
+		return model.ErrInvalidStatusTransition{
 			From: from,
 			To:   to,
 		}

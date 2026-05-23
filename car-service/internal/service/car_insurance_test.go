@@ -15,7 +15,7 @@ import (
 
 func newTestCarInsuranceService(t *testing.T, insuranceRepo CarInsuranceRepository, objectStorage ObjectStorage) *CarInsuranceService {
 	t.Helper()
-	return NewCarInsuranceService(insuranceRepo, objectStorage, newTestValidator(t), discardLogger())
+	return NewCarInsuranceService(discardLogger(), newTestValidator(t), insuranceRepo, objectStorage)
 }
 
 var (
@@ -69,7 +69,7 @@ func TestCarInsuranceServiceCreate(t *testing.T) {
 		repo := mocks.NewMockCarInsuranceRepository(t)
 		svc := newTestCarInsuranceService(t, repo, nil)
 
-		repo.EXPECT().Insert(ctx, mock.Anything).Return("", model.ErrInternalServerError)
+		repo.EXPECT().Insert(ctx, mock.Anything).Return("", model.ErrSql)
 
 		_, err := svc.Create(ctx, validInsuranceCreateInput())
 		assert.Error(t, err)
@@ -88,7 +88,7 @@ func TestCarInsuranceServiceCreate(t *testing.T) {
 
 func TestCarInsuranceServiceGet(t *testing.T) {
 	ctx := context.Background()
-	insID := "ins-123"
+	insID := "d0000000-0000-4000-8000-000000000001"
 
 	t.Run("returns insurance with no images", func(t *testing.T) {
 		repo := mocks.NewMockCarInsuranceRepository(t)
@@ -142,7 +142,7 @@ func TestCarInsuranceServiceGetAll(t *testing.T) {
 
 		repo.EXPECT().Find(ctx, mock.Anything).Return(nil, nil)
 
-		got, err := svc.GetAll(ctx, validation.CarInsuranceFilter{})
+		got, err := svc.List(ctx, validation.CarInsuranceFilter{})
 		assert.NoError(t, err)
 		assert.Empty(t, got)
 	})
@@ -156,7 +156,7 @@ func TestCarInsuranceServiceGetAll(t *testing.T) {
 			return f.CarID != nil && *f.CarID == testCarID
 		})).Return(nil, nil)
 
-		got, err := svc.GetAll(ctx, validation.CarInsuranceFilter{CarID: &testCarID})
+		got, err := svc.List(ctx, validation.CarInsuranceFilter{CarID: &testCarID})
 		assert.NoError(t, err)
 		assert.Empty(t, got)
 	})
@@ -166,16 +166,16 @@ func TestCarInsuranceServiceGetAll(t *testing.T) {
 		storage := mocks.NewMockObjectStorage(t)
 		svc := newTestCarInsuranceService(t, repo, storage)
 
-		repo.EXPECT().Find(ctx, mock.Anything).Return(nil, model.ErrInternalServerError)
+		repo.EXPECT().Find(ctx, mock.Anything).Return(nil, model.ErrSql)
 
-		_, err := svc.GetAll(ctx, validation.CarInsuranceFilter{})
+		_, err := svc.List(ctx, validation.CarInsuranceFilter{})
 		assert.Error(t, err)
 	})
 }
 
 func TestCarInsuranceServiceUpdate(t *testing.T) {
 	ctx := context.Background()
-	insID := "ins-123"
+	insID := "d0000000-0000-4000-8000-000000000001"
 
 	t.Run("happy path delegates to repo", func(t *testing.T) {
 		repo := mocks.NewMockCarInsuranceRepository(t)
@@ -210,7 +210,7 @@ func TestCarInsuranceServiceUpdate(t *testing.T) {
 
 func TestCarInsuranceServiceDelete(t *testing.T) {
 	ctx := context.Background()
-	insID := "ins-123"
+	insID := "d0000000-0000-4000-8000-000000000001"
 
 	t.Run("happy path delegates to repo", func(t *testing.T) {
 		repo := mocks.NewMockCarInsuranceRepository(t)
@@ -252,7 +252,7 @@ func TestCarInsuranceServiceGetImageUploadData(t *testing.T) {
 		storage := mocks.NewMockObjectStorage(t)
 		svc := newTestCarInsuranceService(t, repo, storage)
 
-		storage.EXPECT().GetInsuranceImageUploadData(ctx).Return(sharedmodel.ImageUploadData{}, model.ErrInternalServerError)
+		storage.EXPECT().GetInsuranceImageUploadData(ctx).Return(sharedmodel.ImageUploadData{}, model.ErrSql)
 
 		_, err := svc.GetImageUploadData(ctx)
 		assert.Error(t, err)

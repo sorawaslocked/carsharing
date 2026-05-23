@@ -23,9 +23,9 @@ type CarRepository interface {
 	Delete(ctx context.Context, id string) error
 }
 
-type CarStatusLogRepository interface {
-	Insert(ctx context.Context, entry model.CarStatusLogEntry) error
-	Find(ctx context.Context, filter model.CarStatusLogFilter) ([]model.CarStatusLogEntry, error)
+type CarStatusReadingRepository interface {
+	Insert(ctx context.Context, entry model.CarStatusReading) error
+	Find(ctx context.Context, filter model.CarStatusReadingFilter) ([]model.CarStatusReading, error)
 }
 
 type ZoneRepository interface {
@@ -64,13 +64,13 @@ type CarServiceStateRepository interface {
 	FindAll(ctx context.Context, filter model.CarServiceStateFilter) ([]model.CarServiceState, error)
 }
 
-type TelematicsRepository interface {
-	InsertEvent(ctx context.Context, event model.CarTelematicsEvent) error
-	FindEvents(ctx context.Context, filter model.TelematicsEventFilter) ([]model.CarTelematicsEvent, error)
+type TelemetryReadingRepository interface {
+	Insert(ctx context.Context, reading model.TelemetryReading) error
+	Find(ctx context.Context, filter model.TelemetryReadingFilter) ([]model.TelemetryReading, error)
 }
 
-type TelematicsStreamClient interface {
-	Subscribe(ctx context.Context, car model.Car) (<-chan model.TelematicsUpdate, error)
+type TelemetryStreamClient interface {
+	Subscribe(ctx context.Context, car model.Car) (<-chan model.TelemetryUpdate, error)
 }
 
 type CarCreatedNotifier interface {

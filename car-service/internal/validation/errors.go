@@ -23,6 +23,7 @@ func (e Errors) Error() string {
 // General
 var (
 	ErrRequiredField = errors.New("required")
+	ErrInvalidID     = errors.New("must be a valid UUID")
 )
 
 // Car
@@ -32,11 +33,4 @@ var (
 	ErrInvalidCarBodyType     = errors.New("must be a valid car body type")
 	ErrInvalidCarClass        = errors.New("must be a valid car class")
 	ErrInvalidCarStatus       = errors.New("must be a valid car status")
-)
-
-// Location
-var (
-	ErrInvalidLatitudeRange  = errors.New("latitude must be between -90 and 90")
-	ErrInvalidLongitudeRange = errors.New("longitude must be between -180 and 180")
-	ErrInvalidRadiusRange    = fmt.Errorf("radius must be between %f and %f km", minRadiusKM, maxRadiusKM)
 )

@@ -6,7 +6,7 @@ import (
 	sharedmodel "carsharing/shared/model"
 )
 
-type CarTelemetryEvent struct {
+type TelemetryReading struct {
 	ID           string
 	CarID        string
 	Location     *sharedmodel.Location
@@ -15,7 +15,7 @@ type CarTelemetryEvent struct {
 	BatteryLevel *float32
 	MileageKM    *int64
 	ActorID      *string
-	ActorType    string
+	ActorType    sharedmodel.ActorType
 	Reason       *string
 	Metadata     map[string]any
 	RecordedAt   time.Time
@@ -31,14 +31,7 @@ type TelemetryUpdate struct {
 	RecordedAt   time.Time
 }
 
-type CarTelemetryUpdateInput struct {
-	MileageKM    int64
-	FuelLevel    *float32
-	BatteryLevel *float32
-	Location     *sharedmodel.Location
-}
-
-type TelemetryEventFilter struct {
+type TelemetryReadingFilter struct {
 	CarID *string
 	From  *time.Time
 	To    *time.Time

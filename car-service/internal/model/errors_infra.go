@@ -3,6 +3,8 @@ package model
 import "errors"
 
 var (
-	ErrInternalServerError = errors.New("internal server error")
-	ErrObjectStorage       = errors.New("object storage error")
+	ErrNats           = errors.New("nats error")
+	ErrSqlTransaction = errors.New("sql transaction error")
+	ErrSql            = errors.New("sql error")
+	ErrObjectStorage  = errors.New("object storage error")
 )

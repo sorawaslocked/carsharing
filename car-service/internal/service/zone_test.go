@@ -13,7 +13,7 @@ import (
 
 func newTestZoneService(t *testing.T, zoneRepo ZoneRepository) *ZoneService {
 	t.Helper()
-	return NewZoneService(zoneRepo, newTestValidator(t), discardLogger())
+	return NewZoneService(discardLogger(), newTestValidator(t), zoneRepo)
 }
 
 func TestZoneServiceCreate(t *testing.T) {
@@ -54,7 +54,7 @@ func TestZoneServiceCreate(t *testing.T) {
 		repo := mocks.NewMockZoneRepository(t)
 		svc := newTestZoneService(t, repo)
 
-		repo.EXPECT().Insert(ctx, mock.Anything).Return("", model.ErrInternalServerError)
+		repo.EXPECT().Insert(ctx, mock.Anything).Return("", model.ErrSql)
 
 		_, err := svc.Create(ctx, validInput)
 		assert.Error(t, err)
@@ -73,7 +73,7 @@ func TestZoneServiceCreate(t *testing.T) {
 
 func TestZoneServiceGet(t *testing.T) {
 	ctx := context.Background()
-	zoneID := "zone-123"
+	zoneID := "b0000000-0000-4000-8000-000000000001"
 
 	t.Run("returns zone", func(t *testing.T) {
 		repo := mocks.NewMockZoneRepository(t)
@@ -106,7 +106,7 @@ func TestZoneServiceGetAll(t *testing.T) {
 
 		repo.EXPECT().Find(ctx, mock.Anything).Return(nil, nil)
 
-		got, err := svc.GetAll(ctx, validation.ZoneFilter{})
+		got, err := svc.List(ctx, validation.ZoneFilter{})
 		assert.NoError(t, err)
 		assert.Empty(t, got)
 	})
@@ -120,7 +120,7 @@ func TestZoneServiceGetAll(t *testing.T) {
 			return f.IsActive != nil && *f.IsActive
 		})).Return([]model.Zone{{ID: "zone-1"}}, nil)
 
-		got, err := svc.GetAll(ctx, validation.ZoneFilter{IsActive: &active})
+		got, err := svc.List(ctx, validation.ZoneFilter{IsActive: &active})
 		assert.NoError(t, err)
 		assert.Len(t, got, 1)
 	})
@@ -129,16 +129,16 @@ func TestZoneServiceGetAll(t *testing.T) {
 		repo := mocks.NewMockZoneRepository(t)
 		svc := newTestZoneService(t, repo)
 
-		repo.EXPECT().Find(ctx, mock.Anything).Return(nil, model.ErrInternalServerError)
+		repo.EXPECT().Find(ctx, mock.Anything).Return(nil, model.ErrSql)
 
-		_, err := svc.GetAll(ctx, validation.ZoneFilter{})
+		_, err := svc.List(ctx, validation.ZoneFilter{})
 		assert.Error(t, err)
 	})
 }
 
 func TestZoneServiceUpdate(t *testing.T) {
 	ctx := context.Background()
-	zoneID := "zone-123"
+	zoneID := "b0000000-0000-4000-8000-000000000001"
 
 	t.Run("happy path delegates to repo", func(t *testing.T) {
 		repo := mocks.NewMockZoneRepository(t)
@@ -176,7 +176,7 @@ func TestZoneServiceUpdate(t *testing.T) {
 
 func TestZoneServiceDelete(t *testing.T) {
 	ctx := context.Background()
-	zoneID := "zone-123"
+	zoneID := "b0000000-0000-4000-8000-000000000001"
 
 	t.Run("happy path delegates to repo", func(t *testing.T) {
 		repo := mocks.NewMockZoneRepository(t)

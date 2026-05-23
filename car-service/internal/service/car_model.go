@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -10,93 +11,89 @@ import (
 	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
+	sharedvalidation "carsharing/shared/validation"
 
 	"github.com/go-playground/validator/v10"
 )
 
 type CarModelService struct {
+	log      *slog.Logger
+	validate *validator.Validate
+
 	carModelRepo  CarModelRepository
 	objectStorage ObjectStorage
-
-	validate *validator.Validate
-	log      *slog.Logger
 }
 
 func NewCarModelService(
+	log *slog.Logger,
+	validate *validator.Validate,
 	carModelRepo CarModelRepository,
 	objectStorage ObjectStorage,
-	validate *validator.Validate,
-	log *slog.Logger,
 ) *CarModelService {
-	s := &CarModelService{
+	return &CarModelService{
+		log:           pkglog.WithComponent(log, "service.CarModelService"),
+		validate:      validate,
 		carModelRepo:  carModelRepo,
 		objectStorage: objectStorage,
-		validate:      validate,
 	}
-
-	s.log = pkglog.WithComponent(log, "service.CarModelService")
-
-	return s
 }
 
-func (s *CarModelService) Create(ctx context.Context, createInput validation.CarModelCreate) (string, error) {
-	const method = "Create"
-	logger := pkglog.WithMethod(s.log, method)
+func (s *CarModelService) Create(ctx context.Context, data validation.CarModelCreate) (string, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Create"), utils.MetadataFromCtx(ctx))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
-
-	err := validation.ValidateInput(s.validate, createInput)
-	if err != nil {
-		return "", handleError(logger, err)
+	if err := validation.ValidateInput(s.validate, data); err != nil {
+		return "", err
 	}
 
-	fuelType, _ := model.ParseCarFuelType(createInput.FuelType)
-	transmission, _ := model.ParseCarTransmission(createInput.Transmission)
-	bodyType, _ := model.ParseCarBodyType(createInput.BodyType)
-	class, _ := model.ParseCarClass(createInput.Class)
+	fuelType, _ := model.CarFuelTypeFromString(data.FuelType)
+	transmission, _ := model.CarTransmissionFromString(data.Transmission)
+	bodyType, _ := model.CarBodyTypeFromString(data.BodyType)
+	class, _ := model.CarClassFromString(data.Class)
 	now := time.Now()
 
-	cm := model.CarModel{
-		Brand:        createInput.Brand,
-		Model:        createInput.Model,
-		Year:         createInput.Year,
+	id, err := s.carModelRepo.Insert(ctx, model.CarModel{
+		Brand:        data.Brand,
+		Model:        data.Model,
+		Year:         data.Year,
 		FuelType:     fuelType,
 		Transmission: transmission,
 		BodyType:     bodyType,
 		Class:        class,
-		Seats:        createInput.Seats,
-		EngineVolume: createInput.EngineVolume,
-		RangeKM:      createInput.RangeKM,
-		Features:     createInput.Features,
+		Seats:        data.Seats,
+		EngineVolume: data.EngineVolume,
+		RangeKM:      data.RangeKM,
+		Features:     data.Features,
 		CreatedAt:    now,
 		UpdatedAt:    now,
-	}
-
-	id, err := s.carModelRepo.Insert(ctx, cm)
+	})
 	if err != nil {
-		return "", handleError(logger, err)
+		log.Error("repo: inserting car model", pkglog.Err(err))
+		return "", err
 	}
 
 	return id, nil
 }
 
 func (s *CarModelService) Get(ctx context.Context, id string) (model.CarModel, error) {
-	const method = "Get"
-	logger := pkglog.WithMethod(s.log, method)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Get"), utils.MetadataFromCtx(ctx))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
+	if err := validation.ValidateID(s.validate, id); err != nil {
+		return model.CarModel{}, err
+	}
 
 	carModel, err := s.carModelRepo.FindByID(ctx, id)
 	if err != nil {
-		return model.CarModel{}, handleError(logger, err)
+		if !errors.Is(err, model.ErrNotFound) {
+			log.Error("repo: finding car model by id", pkglog.Err(err))
+		}
+		return model.CarModel{}, err
 	}
 
 	for i := range carModel.Images {
 		url, err := s.objectStorage.GetPresignedURL(ctx, carModel.Images[i].Key)
 		if err != nil {
-			return model.CarModel{}, handleError(logger, err)
+			log.Error("object storage: getting presigned url", pkglog.Err(err))
+			return model.CarModel{}, err
 		}
 		carModel.Images[i].URL = url
 	}
@@ -104,28 +101,25 @@ func (s *CarModelService) Get(ctx context.Context, id string) (model.CarModel, e
 	return carModel, nil
 }
 
-func (s *CarModelService) GetAll(ctx context.Context, filterInput validation.CarModelFilter) ([]model.CarModel, error) {
-	const method = "GetAll"
-	logger := pkglog.WithMethod(s.log, method)
+func (s *CarModelService) List(ctx context.Context, filter validation.CarModelFilter) ([]model.CarModel, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "List"), utils.MetadataFromCtx(ctx))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
-
-	if err := validation.ValidateInput(s.validate, filterInput); err != nil {
-		return nil, handleError(logger, err)
+	if err := validation.ValidateInput(s.validate, filter); err != nil {
+		return nil, err
 	}
-	filter := carModelFilterFromInput(filterInput)
 
-	carModels, err := s.carModelRepo.Find(ctx, filter)
+	carModels, err := s.carModelRepo.Find(ctx, carModelFilter(filter))
 	if err != nil {
-		return nil, handleError(logger, err)
+		log.Error("repo: listing car models", pkglog.Err(err))
+		return nil, err
 	}
 
 	for i := range carModels {
 		for j := range carModels[i].Images {
 			url, err := s.objectStorage.GetPresignedURL(ctx, carModels[i].Images[j].Key)
 			if err != nil {
-				return nil, handleError(logger, err)
+				log.Error("object storage: getting presigned url", pkglog.Err(err))
+				return nil, err
 			}
 			carModels[i].Images[j].URL = url
 		}
@@ -134,78 +128,110 @@ func (s *CarModelService) GetAll(ctx context.Context, filterInput validation.Car
 	return carModels, nil
 }
 
-func (s *CarModelService) Update(ctx context.Context, id string, updateInput validation.CarModelUpdate) error {
-	const method = "Update"
-	logger := pkglog.WithMethod(s.log, method)
+func (s *CarModelService) Update(ctx context.Context, id string, data validation.CarModelUpdate) error {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Update"), utils.MetadataFromCtx(ctx))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
+	if err := validation.ValidateID(s.validate, id); err != nil {
+		return err
+	}
 
-	if err := validation.ValidateInput(s.validate, updateInput); err != nil {
-		return handleError(logger, err)
+	if err := validation.ValidateInput(s.validate, data); err != nil {
+		return err
 	}
 
 	update := model.CarModelUpdate{
-		Brand:        updateInput.Brand,
-		Model:        updateInput.Model,
-		Year:         updateInput.Year,
-		Seats:        updateInput.Seats,
-		EngineVolume: updateInput.EngineVolume,
-		RangeKM:      updateInput.RangeKM,
-		Features:     updateInput.Features,
-		ImageKeys:    updateInput.ImageKeys,
+		Brand:        data.Brand,
+		Model:        data.Model,
+		Year:         data.Year,
+		Seats:        data.Seats,
+		EngineVolume: data.EngineVolume,
+		RangeKM:      data.RangeKM,
+		Features:     data.Features,
+		ImageKeys:    data.ImageKeys,
 		UpdatedAt:    time.Now(),
 	}
 
-	if updateInput.FuelType != nil {
-		fuelType, _ := model.ParseCarFuelType(*updateInput.FuelType)
+	if data.FuelType != nil {
+		fuelType, _ := model.CarFuelTypeFromString(*data.FuelType)
 		update.FuelType = &fuelType
 	}
-	if updateInput.Transmission != nil {
-		transmission, _ := model.ParseCarTransmission(*updateInput.Transmission)
+	if data.Transmission != nil {
+		transmission, _ := model.CarTransmissionFromString(*data.Transmission)
 		update.Transmission = &transmission
 	}
-	if updateInput.BodyType != nil {
-		bodyType, _ := model.ParseCarBodyType(*updateInput.BodyType)
+	if data.BodyType != nil {
+		bodyType, _ := model.CarBodyTypeFromString(*data.BodyType)
 		update.BodyType = &bodyType
 	}
-	if updateInput.Class != nil {
-		class, _ := model.ParseCarClass(*updateInput.Class)
+	if data.Class != nil {
+		class, _ := model.CarClassFromString(*data.Class)
 		update.Class = &class
 	}
 
 	if err := s.carModelRepo.Update(ctx, id, update); err != nil {
-		return handleError(logger, err)
+		if !errors.Is(err, model.ErrNotFound) {
+			log.Error("repo: updating car model", pkglog.Err(err))
+		}
+		return err
 	}
 
 	return nil
 }
 
 func (s *CarModelService) Delete(ctx context.Context, id string) error {
-	const method = "Delete"
-	logger := pkglog.WithMethod(s.log, method)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Delete"), utils.MetadataFromCtx(ctx))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
+	if err := validation.ValidateID(s.validate, id); err != nil {
+		return err
+	}
 
 	if err := s.carModelRepo.Delete(ctx, id); err != nil {
-		return handleError(logger, err)
+		if !errors.Is(err, model.ErrNotFound) {
+			log.Error("repo: deleting car model", pkglog.Err(err))
+		}
+		return err
 	}
 
 	return nil
 }
 
 func (s *CarModelService) GetImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
-	const method = "GetImageUploadData"
-	logger := pkglog.WithMethod(s.log, method)
-
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetImageUploadData"), utils.MetadataFromCtx(ctx))
 
 	data, err := s.objectStorage.GetCarModelImageUploadData(ctx)
 	if err != nil {
-		return sharedmodel.ImageUploadData{}, handleError(logger, err)
+		log.Error("object storage: getting upload data", pkglog.Err(err))
+		return sharedmodel.ImageUploadData{}, err
 	}
 
 	return data, nil
+}
+
+func carModelFilter(filter validation.CarModelFilter) model.CarModelFilter {
+	repoFilter := model.CarModelFilter{
+		Brand:    filter.Brand,
+		Model:    filter.Model,
+		MinSeats: filter.MinSeats,
+	}
+	if filter.FuelType != nil {
+		ft, _ := model.CarFuelTypeFromString(*filter.FuelType)
+		repoFilter.FuelType = &ft
+	}
+	if filter.Transmission != nil {
+		tr, _ := model.CarTransmissionFromString(*filter.Transmission)
+		repoFilter.Transmission = &tr
+	}
+	if filter.BodyType != nil {
+		bt, _ := model.CarBodyTypeFromString(*filter.BodyType)
+		repoFilter.BodyType = &bt
+	}
+	if filter.Class != nil {
+		cl, _ := model.CarClassFromString(*filter.Class)
+		repoFilter.Class = &cl
+	}
+	if filter.Pagination == nil {
+		filter.Pagination = sharedvalidation.DefaultPagination()
+	}
+	repoFilter.Pagination = &sharedmodel.Pagination{Limit: filter.Pagination.Limit, Offset: filter.Pagination.Offset}
+	return repoFilter
 }

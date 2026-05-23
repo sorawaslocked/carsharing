@@ -1,11 +1,11 @@
 package validation
 
-import sharedmodel "carsharing/shared/model"
+import sharedvalidation "carsharing/shared/validation"
 
 type ZoneFilter struct {
 	Type       *string `validate:"omitempty,zonetype"`
 	IsActive   *bool   `validate:"omitempty"`
-	Pagination *sharedmodel.Pagination
+	Pagination *sharedvalidation.Pagination
 }
 
 type ZoneCreate struct {

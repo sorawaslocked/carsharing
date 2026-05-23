@@ -2,6 +2,7 @@ package dto
 
 import (
 	"carsharing/car-service/internal/model"
+	sharedmodel "carsharing/shared/model"
 	"fmt"
 	"time"
 )

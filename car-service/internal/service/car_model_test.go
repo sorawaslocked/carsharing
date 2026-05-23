@@ -14,7 +14,7 @@ import (
 
 func newTestCarModelService(t *testing.T, carModelRepo CarModelRepository, objectStorage ObjectStorage) *CarModelService {
 	t.Helper()
-	return NewCarModelService(carModelRepo, objectStorage, newTestValidator(t), discardLogger())
+	return NewCarModelService(discardLogger(), newTestValidator(t), carModelRepo, objectStorage)
 }
 
 func TestCarModelServiceCreate(t *testing.T) {
@@ -46,7 +46,7 @@ func TestCarModelServiceCreate(t *testing.T) {
 		repo := mocks.NewMockCarModelRepository(t)
 		svc := newTestCarModelService(t, repo, nil)
 
-		repo.EXPECT().Insert(ctx, mock.Anything).Return("", model.ErrInternalServerError)
+		repo.EXPECT().Insert(ctx, mock.Anything).Return("", model.ErrSql)
 
 		_, err := svc.Create(ctx, validInput)
 		assert.Error(t, err)
@@ -62,7 +62,7 @@ func TestCarModelServiceCreate(t *testing.T) {
 
 func TestCarModelServiceGet(t *testing.T) {
 	ctx := context.Background()
-	modelID := "model-123"
+	modelID := "a0000000-0000-4000-8000-000000000001"
 
 	t.Run("returns model with no images", func(t *testing.T) {
 		repo := mocks.NewMockCarModelRepository(t)
@@ -116,7 +116,7 @@ func TestCarModelServiceGet(t *testing.T) {
 		repo.EXPECT().FindByID(ctx, modelID).Return(model.CarModel{
 			Images: []sharedmodel.Image{{Key: key}},
 		}, nil)
-		storage.EXPECT().GetPresignedURL(ctx, key).Return("", model.ErrInternalServerError)
+		storage.EXPECT().GetPresignedURL(ctx, key).Return("", model.ErrSql)
 
 		_, err := svc.Get(ctx, modelID)
 		assert.Error(t, err)
@@ -133,7 +133,7 @@ func TestCarModelServiceGetAll(t *testing.T) {
 
 		repo.EXPECT().Find(ctx, mock.Anything).Return(nil, nil)
 
-		got, err := svc.GetAll(ctx, validation.CarModelFilter{})
+		got, err := svc.List(ctx, validation.CarModelFilter{})
 		assert.NoError(t, err)
 		assert.Empty(t, got)
 	})
@@ -150,7 +150,7 @@ func TestCarModelServiceGetAll(t *testing.T) {
 		)
 		storage.EXPECT().GetPresignedURL(ctx, key).Return(presigned, nil)
 
-		got, err := svc.GetAll(ctx, validation.CarModelFilter{})
+		got, err := svc.List(ctx, validation.CarModelFilter{})
 		assert.NoError(t, err)
 		assert.Equal(t, presigned, got[0].Images[0].URL)
 	})
@@ -160,16 +160,16 @@ func TestCarModelServiceGetAll(t *testing.T) {
 		storage := mocks.NewMockObjectStorage(t)
 		svc := newTestCarModelService(t, repo, storage)
 
-		repo.EXPECT().Find(ctx, mock.Anything).Return(nil, model.ErrInternalServerError)
+		repo.EXPECT().Find(ctx, mock.Anything).Return(nil, model.ErrSql)
 
-		_, err := svc.GetAll(ctx, validation.CarModelFilter{})
+		_, err := svc.List(ctx, validation.CarModelFilter{})
 		assert.Error(t, err)
 	})
 }
 
 func TestCarModelServiceUpdate(t *testing.T) {
 	ctx := context.Background()
-	modelID := "model-123"
+	modelID := "a0000000-0000-4000-8000-000000000001"
 
 	t.Run("happy path delegates to repo", func(t *testing.T) {
 		repo := mocks.NewMockCarModelRepository(t)
@@ -192,7 +192,7 @@ func TestCarModelServiceUpdate(t *testing.T) {
 
 func TestCarModelServiceDelete(t *testing.T) {
 	ctx := context.Background()
-	modelID := "model-123"
+	modelID := "a0000000-0000-4000-8000-000000000001"
 
 	t.Run("happy path delegates to repo", func(t *testing.T) {
 		repo := mocks.NewMockCarModelRepository(t)
@@ -234,7 +234,7 @@ func TestCarModelServiceGetImageUploadData(t *testing.T) {
 		storage := mocks.NewMockObjectStorage(t)
 		svc := newTestCarModelService(t, repo, storage)
 
-		storage.EXPECT().GetCarModelImageUploadData(ctx).Return(sharedmodel.ImageUploadData{}, model.ErrInternalServerError)
+		storage.EXPECT().GetCarModelImageUploadData(ctx).Return(sharedmodel.ImageUploadData{}, model.ErrSql)
 
 		_, err := svc.GetImageUploadData(ctx)
 		assert.Error(t, err)

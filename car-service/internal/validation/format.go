@@ -1,12 +1,22 @@
 package validation
 
 import (
-	"carsharing/shared/pkg/utils"
 	"errors"
 	"fmt"
 
+	"carsharing/shared/pkg/utils"
+	sharedvalidation "carsharing/shared/validation"
+
 	"github.com/go-playground/validator/v10"
 )
+
+type idValidation struct {
+	ID string `validate:"required,uuid4"`
+}
+
+func ValidateID(v *validator.Validate, id string) error {
+	return ValidateInput(v, idValidation{ID: id})
+}
 
 func ValidateInput(v *validator.Validate, input any) error {
 	err := v.Struct(input)
@@ -37,6 +47,8 @@ func validationError(fe validator.FieldError) error {
 	// General
 	case "required":
 		return ErrRequiredField
+	case "uuid4", "uuid":
+		return ErrInvalidID
 	case "min":
 		return fmt.Errorf("must be at least %s", fe.Param())
 	case "max":
@@ -54,11 +66,11 @@ func validationError(fe validator.FieldError) error {
 		return ErrInvalidCarStatus
 	// Location
 	case "latitude_range":
-		return ErrInvalidLatitudeRange
+		return sharedvalidation.ErrInvalidLatitudeRange
 	case "longitude_range":
-		return ErrInvalidLongitudeRange
+		return sharedvalidation.ErrInvalidLongitudeRange
 	case "radius_range":
-		return ErrInvalidRadiusRange
+		return sharedvalidation.ErrInvalidRadiusRange
 	default:
 		return fmt.Errorf("failed validation: %s", fe.Tag())
 	}

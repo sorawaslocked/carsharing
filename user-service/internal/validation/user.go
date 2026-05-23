@@ -1,8 +1,9 @@
 package validation
 
 import (
-	sharedmodel "carsharing/shared/model"
 	"time"
+
+	sharedvalidation "carsharing/shared/validation"
 )
 
 type UserCreate struct {
@@ -39,7 +40,7 @@ type UserFilter struct {
 	IsDocumentVerified *bool
 	IsEmailVerified    *bool
 	IsSuspended        *bool
-	Pagination         *sharedmodel.Pagination
+	Pagination         *sharedvalidation.Pagination
 }
 
 type Credentials struct {

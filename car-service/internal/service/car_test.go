@@ -14,12 +14,12 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func newTestCarService(t *testing.T, carRepo CarRepository, statusLogRepo CarStatusLogRepository, eventPub EventPublisher) *CarService {
+func newTestCarService(t *testing.T, carRepo CarRepository, statusLogRepo CarStatusReadingRepository, eventPub EventPublisher) *CarService {
 	t.Helper()
 	v := validator.New()
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))
 	_ = validation.RegisterCustomValidators(v, log)
-	return NewCarService(nil, carRepo, statusLogRepo, nil, nil, eventPub, v, log)
+	return NewCarService(log, v, nil, carRepo, statusLogRepo, nil, nil, eventPub)
 }
 
 func TestTransitionCarStatus(t *testing.T) {
@@ -66,12 +66,12 @@ func TestTransitionCarStatus(t *testing.T) {
 }
 
 func TestUpdateCarStatus(t *testing.T) {
-	carID := "car-123"
+	carID := "c0000000-0000-4000-8000-000000000001"
 	ctx := context.Background()
 
 	t.Run("valid transition updates car and emits log and event", func(t *testing.T) {
 		carRepo := mocks.NewMockCarRepository(t)
-		statusLogRepo := mocks.NewMockCarStatusLogRepository(t)
+		statusLogRepo := mocks.NewMockCarStatusReadingRepository(t)
 		eventPub := mocks.NewMockEventPublisher(t)
 		svc := newTestCarService(t, carRepo, statusLogRepo, eventPub)
 
@@ -84,7 +84,7 @@ func TestUpdateCarStatus(t *testing.T) {
 			})).
 			Return(nil)
 		statusLogRepo.EXPECT().
-			Insert(ctx, mock.MatchedBy(func(e model.CarStatusLogEntry) bool {
+			Insert(ctx, mock.MatchedBy(func(e model.CarStatusReading) bool {
 				return e.CarID == carID &&
 					e.FromStatus == model.CarStatusAvailable &&
 					e.ToStatus == model.CarStatusReserved
@@ -133,7 +133,7 @@ func TestUpdateCarStatus(t *testing.T) {
 
 	t.Run("status log insert failure is non-fatal", func(t *testing.T) {
 		carRepo := mocks.NewMockCarRepository(t)
-		statusLogRepo := mocks.NewMockCarStatusLogRepository(t)
+		statusLogRepo := mocks.NewMockCarStatusReadingRepository(t)
 		eventPub := mocks.NewMockEventPublisher(t)
 		svc := newTestCarService(t, carRepo, statusLogRepo, eventPub)
 
@@ -141,7 +141,7 @@ func TestUpdateCarStatus(t *testing.T) {
 			FindByID(ctx, carID).
 			Return(model.Car{ID: carID, Status: model.CarStatusReserved}, nil)
 		carRepo.EXPECT().Update(ctx, carID, mock.Anything).Return(nil)
-		statusLogRepo.EXPECT().Insert(ctx, mock.Anything).Return(model.ErrInternalServerError)
+		statusLogRepo.EXPECT().Insert(ctx, mock.Anything).Return(model.ErrSql)
 		eventPub.EXPECT().
 			PublishCarStatusUpdated(ctx, carID,
 				string(model.CarStatusReserved),
@@ -157,7 +157,7 @@ func TestUpdateCarStatus(t *testing.T) {
 
 	t.Run("event publish failure is non-fatal", func(t *testing.T) {
 		carRepo := mocks.NewMockCarRepository(t)
-		statusLogRepo := mocks.NewMockCarStatusLogRepository(t)
+		statusLogRepo := mocks.NewMockCarStatusReadingRepository(t)
 		eventPub := mocks.NewMockEventPublisher(t)
 		svc := newTestCarService(t, carRepo, statusLogRepo, eventPub)
 
@@ -168,7 +168,7 @@ func TestUpdateCarStatus(t *testing.T) {
 		statusLogRepo.EXPECT().Insert(ctx, mock.Anything).Return(nil)
 		eventPub.EXPECT().
 			PublishCarStatusUpdated(ctx, carID, mock.Anything, mock.Anything).
-			Return(model.ErrInternalServerError)
+			Return(model.ErrSql)
 
 		err := svc.UpdateCarStatus(ctx, carID, validation.CarStatusUpdate{
 			Status: string(model.CarStatusAvailable),
@@ -178,7 +178,7 @@ func TestUpdateCarStatus(t *testing.T) {
 }
 
 func TestEventHandlers(t *testing.T) {
-	carID := "car-123"
+	carID := "c0000000-0000-4000-8000-000000000001"
 	ctx := context.Background()
 
 	tests := []struct {
@@ -262,7 +262,7 @@ func TestEventHandlers(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			carRepo := mocks.NewMockCarRepository(t)
-			statusLogRepo := mocks.NewMockCarStatusLogRepository(t)
+			statusLogRepo := mocks.NewMockCarStatusReadingRepository(t)
 			eventPub := mocks.NewMockEventPublisher(t)
 			svc := newTestCarService(t, carRepo, statusLogRepo, eventPub)
 

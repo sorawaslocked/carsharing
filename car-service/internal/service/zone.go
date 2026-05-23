@@ -2,146 +2,159 @@ package service
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"time"
 
 	"carsharing/car-service/internal/model"
 	"carsharing/car-service/internal/validation"
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
+	sharedvalidation "carsharing/shared/validation"
 	"github.com/go-playground/validator/v10"
 )
 
 type ZoneService struct {
-	zoneRepo ZoneRepository
-
-	validate *validator.Validate
 	log      *slog.Logger
+	validate *validator.Validate
+
+	zoneRepo ZoneRepository
 }
 
 func NewZoneService(
-	zoneRepo ZoneRepository,
-	validate *validator.Validate,
 	log *slog.Logger,
+	validate *validator.Validate,
+	zoneRepo ZoneRepository,
 ) *ZoneService {
-	s := &ZoneService{
-		zoneRepo: zoneRepo,
+	return &ZoneService{
+		log:      pkglog.WithComponent(log, "service.ZoneService"),
 		validate: validate,
+		zoneRepo: zoneRepo,
 	}
-
-	s.log = pkglog.WithComponent(log, "service.ZoneService")
-
-	return s
 }
 
-func (s *ZoneService) Create(ctx context.Context, createInput validation.ZoneCreate) (string, error) {
-	const method = "Create"
-	logger := pkglog.WithMethod(s.log, method)
+func (s *ZoneService) Create(ctx context.Context, data validation.ZoneCreate) (string, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Create"), utils.MetadataFromCtx(ctx))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
-
-	if err := validation.ValidateInput(s.validate, createInput); err != nil {
-		return "", handleError(logger, err)
+	if err := validation.ValidateInput(s.validate, data); err != nil {
+		return "", err
 	}
 
-	zoneType, _ := model.ParseZoneType(createInput.Type)
+	zoneType, _ := model.ZoneTypeFromString(data.Type)
 	now := time.Now()
 
-	zone := model.Zone{
-		Name:            createInput.Name,
+	id, err := s.zoneRepo.Insert(ctx, model.Zone{
+		Name:            data.Name,
 		Type:            zoneType,
-		BoundaryGeoJSON: createInput.BoundaryGeoJSON,
-		FeeAdjustment:   createInput.FeeAdjustment,
+		BoundaryGeoJSON: data.BoundaryGeoJSON,
+		FeeAdjustment:   data.FeeAdjustment,
 		IsActive:        true,
 		CreatedAt:       now,
 		UpdatedAt:       now,
-	}
-
-	id, err := s.zoneRepo.Insert(ctx, zone)
+	})
 	if err != nil {
-		return "", handleError(logger, err)
+		log.Error("repo: inserting zone", pkglog.Err(err))
+		return "", err
 	}
 
 	return id, nil
 }
 
 func (s *ZoneService) Get(ctx context.Context, id string) (model.Zone, error) {
-	const method = "Get"
-	logger := pkglog.WithMethod(s.log, method)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Get"), utils.MetadataFromCtx(ctx))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
+	if err := validation.ValidateID(s.validate, id); err != nil {
+		return model.Zone{}, err
+	}
 
 	zone, err := s.zoneRepo.FindByID(ctx, id)
 	if err != nil {
-		return model.Zone{}, handleError(logger, err)
+		if !errors.Is(err, model.ErrNotFound) {
+			log.Error("repo: finding zone by id", pkglog.Err(err))
+		}
+		return model.Zone{}, err
 	}
 
 	return zone, nil
 }
 
-func (s *ZoneService) GetAll(ctx context.Context, filterInput validation.ZoneFilter) ([]model.Zone, error) {
-	const method = "GetAll"
-	logger := pkglog.WithMethod(s.log, method)
+func (s *ZoneService) List(ctx context.Context, filter validation.ZoneFilter) ([]model.Zone, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "List"), utils.MetadataFromCtx(ctx))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
-
-	if err := validation.ValidateInput(s.validate, filterInput); err != nil {
-		return nil, handleError(logger, err)
+	if err := validation.ValidateInput(s.validate, filter); err != nil {
+		return nil, err
 	}
-	filter := zoneFilterFromInput(filterInput)
 
-	zones, err := s.zoneRepo.Find(ctx, filter)
+	zones, err := s.zoneRepo.Find(ctx, zoneFilter(filter))
 	if err != nil {
-		return nil, handleError(logger, err)
+		log.Error("repo: listing zones", pkglog.Err(err))
+		return nil, err
 	}
 
 	return zones, nil
 }
 
-func (s *ZoneService) Update(ctx context.Context, id string, updateInput validation.ZoneUpdate) error {
-	const method = "Update"
-	logger := pkglog.WithMethod(s.log, method)
+func (s *ZoneService) Update(ctx context.Context, id string, data validation.ZoneUpdate) error {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Update"), utils.MetadataFromCtx(ctx))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
+	if err := validation.ValidateID(s.validate, id); err != nil {
+		return err
+	}
 
-	if err := validation.ValidateInput(s.validate, updateInput); err != nil {
-		return handleError(logger, err)
+	if err := validation.ValidateInput(s.validate, data); err != nil {
+		return err
 	}
 
 	update := model.ZoneUpdate{
-		Name:            updateInput.Name,
-		BoundaryGeoJSON: updateInput.BoundaryGeoJSON,
-		FeeAdjustment:   updateInput.FeeAdjustment,
-		IsActive:        updateInput.IsActive,
+		Name:            data.Name,
+		BoundaryGeoJSON: data.BoundaryGeoJSON,
+		FeeAdjustment:   data.FeeAdjustment,
+		IsActive:        data.IsActive,
 		UpdatedAt:       time.Now(),
 	}
 
-	if updateInput.Type != nil {
-		zoneType, _ := model.ParseZoneType(*updateInput.Type)
+	if data.Type != nil {
+		zoneType, _ := model.ZoneTypeFromString(*data.Type)
 		update.Type = &zoneType
 	}
 
 	if err := s.zoneRepo.Update(ctx, id, update); err != nil {
-		return handleError(logger, err)
+		if !errors.Is(err, model.ErrNotFound) {
+			log.Error("repo: updating zone", pkglog.Err(err))
+		}
+		return err
 	}
 
 	return nil
 }
 
 func (s *ZoneService) Delete(ctx context.Context, id string) error {
-	const method = "Delete"
-	logger := pkglog.WithMethod(s.log, method)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Delete"), utils.MetadataFromCtx(ctx))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
+	if err := validation.ValidateID(s.validate, id); err != nil {
+		return err
+	}
 
 	if err := s.zoneRepo.Delete(ctx, id); err != nil {
-		return handleError(logger, err)
+		if !errors.Is(err, model.ErrNotFound) {
+			log.Error("repo: deleting zone", pkglog.Err(err))
+		}
+		return err
 	}
 
 	return nil
+}
+
+func zoneFilter(filter validation.ZoneFilter) model.ZoneFilter {
+	repoFilter := model.ZoneFilter{IsActive: filter.IsActive}
+	if filter.Type != nil {
+		zt, _ := model.ZoneTypeFromString(*filter.Type)
+		repoFilter.Type = &zt
+	}
+	if filter.Pagination == nil {
+		filter.Pagination = sharedvalidation.DefaultPagination()
+	}
+	repoFilter.Pagination = &sharedmodel.Pagination{Limit: filter.Pagination.Limit, Offset: filter.Pagination.Offset}
+	return repoFilter
 }

@@ -3,7 +3,7 @@ package validation
 import (
 	"time"
 
-	sharedmodel "carsharing/shared/model"
+	sharedvalidation "carsharing/shared/validation"
 )
 
 type CarInsuranceFilter struct {
@@ -11,7 +11,7 @@ type CarInsuranceFilter struct {
 	Type               *string `validate:"omitempty,insurancetype"`
 	Status             *string `validate:"omitempty,insurancestatus"`
 	ExpiringWithinDays *int32  `validate:"omitempty,min=1,max=365"`
-	Pagination         *sharedmodel.Pagination
+	Pagination         *sharedvalidation.Pagination
 }
 
 type CarInsuranceCreate struct {

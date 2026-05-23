@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -10,172 +11,170 @@ import (
 	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
+	sharedvalidation "carsharing/shared/validation"
 	"github.com/go-playground/validator/v10"
 )
 
 type CarMaintenanceService struct {
+	log      *slog.Logger
+	validate *validator.Validate
+
 	templateRepo     CarMaintenanceTemplateRepository
 	recordRepo       CarMaintenanceRecordRepository
 	serviceStateRepo CarServiceStateRepository
 	carRepo          CarRepository
 	carService       *CarService
 	objectStorage    ObjectStorage
-
-	validate *validator.Validate
-	log      *slog.Logger
 }
 
 func NewCarMaintenanceService(
+	log *slog.Logger,
+	validate *validator.Validate,
 	templateRepo CarMaintenanceTemplateRepository,
 	recordRepo CarMaintenanceRecordRepository,
 	serviceStateRepo CarServiceStateRepository,
 	carRepo CarRepository,
 	carService *CarService,
 	objectStorage ObjectStorage,
-	validate *validator.Validate,
-	log *slog.Logger,
 ) *CarMaintenanceService {
-	s := &CarMaintenanceService{
+	return &CarMaintenanceService{
+		log:              pkglog.WithComponent(log, "service.CarMaintenanceService"),
+		validate:         validate,
 		templateRepo:     templateRepo,
 		recordRepo:       recordRepo,
 		serviceStateRepo: serviceStateRepo,
 		carRepo:          carRepo,
 		carService:       carService,
 		objectStorage:    objectStorage,
-		validate:         validate,
 	}
-
-	s.log = pkglog.WithComponent(log, "service.CarMaintenanceService")
-
-	return s
 }
 
-func (s *CarMaintenanceService) CreateTemplate(ctx context.Context, createInput validation.CarMaintenanceTemplateCreate) (string, error) {
-	const method = "CreateTemplate"
-	logger := pkglog.WithMethod(s.log, method)
+func (s *CarMaintenanceService) CreateTemplate(ctx context.Context, data validation.CarMaintenanceTemplateCreate) (string, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "CreateTemplate"), utils.MetadataFromCtx(ctx))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
-
-	if err := validation.ValidateInput(s.validate, createInput); err != nil {
-		return "", handleError(logger, err)
+	if err := validation.ValidateInput(s.validate, data); err != nil {
+		return "", err
 	}
 
 	now := time.Now()
-	template := model.CarMaintenanceTemplate{
-		Name:        createInput.Name,
-		KmInterval:  createInput.KmInterval,
-		DayInterval: createInput.DayInterval,
-		IsMandatory: createInput.IsMandatory,
-		WarnPct:     createInput.WarnPct,
-		PullPct:     createInput.PullPct,
+	id, err := s.templateRepo.Insert(ctx, model.CarMaintenanceTemplate{
+		Name:        data.Name,
+		KmInterval:  data.KmInterval,
+		DayInterval: data.DayInterval,
+		IsMandatory: data.IsMandatory,
+		WarnPct:     data.WarnPct,
+		PullPct:     data.PullPct,
 		CreatedAt:   now,
 		UpdatedAt:   now,
-	}
-
-	id, err := s.templateRepo.Insert(ctx, template)
+	})
 	if err != nil {
-		return "", handleError(logger, err)
+		log.Error("repo: inserting maintenance template", pkglog.Err(err))
+		return "", err
 	}
 
 	return id, nil
 }
 
 func (s *CarMaintenanceService) GetTemplate(ctx context.Context, id string) (model.CarMaintenanceTemplate, error) {
-	const method = "GetTemplate"
-	logger := pkglog.WithMethod(s.log, method)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetTemplate"), utils.MetadataFromCtx(ctx))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
+	if err := validation.ValidateID(s.validate, id); err != nil {
+		return model.CarMaintenanceTemplate{}, err
+	}
 
 	template, err := s.templateRepo.FindByID(ctx, id)
 	if err != nil {
-		return model.CarMaintenanceTemplate{}, handleError(logger, err)
+		if !errors.Is(err, model.ErrNotFound) {
+			log.Error("repo: finding maintenance template by id", pkglog.Err(err))
+		}
+		return model.CarMaintenanceTemplate{}, err
 	}
 
 	return template, nil
 }
 
-func (s *CarMaintenanceService) GetAllTemplates(ctx context.Context, filterInput validation.CarMaintenanceTemplateFilter) ([]model.CarMaintenanceTemplate, error) {
-	const method = "GetAllTemplates"
-	logger := pkglog.WithMethod(s.log, method)
+func (s *CarMaintenanceService) ListTemplates(ctx context.Context, filter validation.CarMaintenanceTemplateFilter) ([]model.CarMaintenanceTemplate, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "ListTemplates"), utils.MetadataFromCtx(ctx))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
-
-	err := validation.ValidateInput(s.validate, filterInput)
-	if err != nil {
-		return nil, handleError(logger, err)
+	if err := validation.ValidateInput(s.validate, filter); err != nil {
+		return nil, err
 	}
-	filter := maintenanceTemplateFilterFromInput(filterInput)
 
-	templates, err := s.templateRepo.Find(ctx, filter)
+	templates, err := s.templateRepo.Find(ctx, maintenanceTemplateFilter(filter))
 	if err != nil {
-		return nil, handleError(logger, err)
+		log.Error("repo: listing maintenance templates", pkglog.Err(err))
+		return nil, err
 	}
 
 	return templates, nil
 }
 
-func (s *CarMaintenanceService) UpdateTemplate(ctx context.Context, id string, updateInput validation.CarMaintenanceTemplateUpdate) error {
-	const method = "UpdateTemplate"
-	logger := pkglog.WithMethod(s.log, method)
+func (s *CarMaintenanceService) UpdateTemplate(ctx context.Context, id string, data validation.CarMaintenanceTemplateUpdate) error {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "UpdateTemplate"), utils.MetadataFromCtx(ctx))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
-
-	err := validation.ValidateInput(s.validate, updateInput)
-	if err != nil {
-		return handleError(logger, err)
+	if err := validation.ValidateID(s.validate, id); err != nil {
+		return err
 	}
 
-	err = s.templateRepo.Update(ctx, id, model.CarMaintenanceTemplateUpdate{
-		Name:        updateInput.Name,
-		KmInterval:  updateInput.KmInterval,
-		DayInterval: updateInput.DayInterval,
-		IsMandatory: updateInput.IsMandatory,
-		WarnPct:     updateInput.WarnPct,
-		PullPct:     updateInput.PullPct,
+	if err := validation.ValidateInput(s.validate, data); err != nil {
+		return err
+	}
+
+	if err := s.templateRepo.Update(ctx, id, model.CarMaintenanceTemplateUpdate{
+		Name:        data.Name,
+		KmInterval:  data.KmInterval,
+		DayInterval: data.DayInterval,
+		IsMandatory: data.IsMandatory,
+		WarnPct:     data.WarnPct,
+		PullPct:     data.PullPct,
 		UpdatedAt:   time.Now(),
-	})
-	if err != nil {
-		return handleError(logger, err)
+	}); err != nil {
+		if !errors.Is(err, model.ErrNotFound) {
+			log.Error("repo: updating maintenance template", pkglog.Err(err))
+		}
+		return err
 	}
 
 	return nil
 }
 
 func (s *CarMaintenanceService) DeleteTemplate(ctx context.Context, id string) error {
-	const method = "DeleteTemplate"
-	logger := pkglog.WithMethod(s.log, method)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "DeleteTemplate"), utils.MetadataFromCtx(ctx))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
+	if err := validation.ValidateID(s.validate, id); err != nil {
+		return err
+	}
 
-	err := s.templateRepo.Delete(ctx, id)
-	if err != nil {
-		return handleError(logger, err)
+	if err := s.templateRepo.Delete(ctx, id); err != nil {
+		if !errors.Is(err, model.ErrNotFound) {
+			log.Error("repo: deleting maintenance template", pkglog.Err(err))
+		}
+		return err
 	}
 
 	return nil
 }
 
 func (s *CarMaintenanceService) GetRecord(ctx context.Context, id string) (model.CarMaintenanceRecord, error) {
-	const method = "GetRecord"
-	logger := pkglog.WithMethod(s.log, method)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetRecord"), utils.MetadataFromCtx(ctx))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
+	if err := validation.ValidateID(s.validate, id); err != nil {
+		return model.CarMaintenanceRecord{}, err
+	}
 
 	record, err := s.recordRepo.FindByID(ctx, id)
 	if err != nil {
-		return model.CarMaintenanceRecord{}, handleError(logger, err)
+		if !errors.Is(err, model.ErrNotFound) {
+			log.Error("repo: finding maintenance record by id", pkglog.Err(err))
+		}
+		return model.CarMaintenanceRecord{}, err
 	}
 
 	for i := range record.ReceiptImages {
 		url, err := s.objectStorage.GetPresignedURL(ctx, record.ReceiptImages[i].Key)
 		if err != nil {
-			return model.CarMaintenanceRecord{}, handleError(logger, err)
+			log.Error("object storage: getting presigned url", pkglog.Err(err))
+			return model.CarMaintenanceRecord{}, err
 		}
 		record.ReceiptImages[i].URL = url
 	}
@@ -183,29 +182,25 @@ func (s *CarMaintenanceService) GetRecord(ctx context.Context, id string) (model
 	return record, nil
 }
 
-func (s *CarMaintenanceService) GetRecords(ctx context.Context, filterInput validation.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error) {
-	const method = "GetRecords"
-	logger := pkglog.WithMethod(s.log, method)
+func (s *CarMaintenanceService) ListRecords(ctx context.Context, filter validation.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "ListRecords"), utils.MetadataFromCtx(ctx))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
-
-	err := validation.ValidateInput(s.validate, filterInput)
-	if err != nil {
-		return nil, handleError(logger, err)
+	if err := validation.ValidateInput(s.validate, filter); err != nil {
+		return nil, err
 	}
-	filter := maintenanceRecordFilterFromInput(filterInput)
 
-	records, err := s.recordRepo.Find(ctx, filter)
+	records, err := s.recordRepo.Find(ctx, maintenanceRecordFilter(filter))
 	if err != nil {
-		return nil, handleError(logger, err)
+		log.Error("repo: listing maintenance records", pkglog.Err(err))
+		return nil, err
 	}
 
 	for i := range records {
 		for j := range records[i].ReceiptImages {
 			url, err := s.objectStorage.GetPresignedURL(ctx, records[i].ReceiptImages[j].Key)
 			if err != nil {
-				return nil, handleError(logger, err)
+				log.Error("object storage: getting presigned url", pkglog.Err(err))
+				return nil, err
 			}
 			records[i].ReceiptImages[j].URL = url
 		}
@@ -214,50 +209,56 @@ func (s *CarMaintenanceService) GetRecords(ctx context.Context, filterInput vali
 	return records, nil
 }
 
-func (s *CarMaintenanceService) CompleteRecord(ctx context.Context, id string, completeInput validation.CarMaintenanceRecordComplete) error {
-	const method = "CompleteRecord"
-	logger := pkglog.WithMethod(s.log, method)
+func (s *CarMaintenanceService) CompleteRecord(ctx context.Context, id string, data validation.CarMaintenanceRecordComplete) error {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "CompleteRecord"), utils.MetadataFromCtx(ctx))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
+	if err := validation.ValidateID(s.validate, id); err != nil {
+		return err
+	}
 
-	if err := validation.ValidateInput(s.validate, completeInput); err != nil {
-		return handleError(logger, err)
+	if err := validation.ValidateInput(s.validate, data); err != nil {
+		return err
 	}
 
 	record, err := s.recordRepo.FindByID(ctx, id)
 	if err != nil {
-		return handleError(logger, err)
+		if !errors.Is(err, model.ErrNotFound) {
+			log.Error("repo: finding maintenance record by id", pkglog.Err(err))
+		}
+		return err
 	}
 
 	template, err := s.templateRepo.FindByID(ctx, record.TemplateID)
 	if err != nil {
-		return handleError(logger, err)
+		if !errors.Is(err, model.ErrNotFound) {
+			log.Error("repo: finding maintenance template by id", pkglog.Err(err))
+		}
+		return err
 	}
 
 	now := time.Now()
 	completedStatus := model.MaintenanceRecordStatusCompleted
 	if err = s.recordRepo.Update(ctx, id, model.CarMaintenanceRecordUpdate{
 		Status:           &completedStatus,
-		CompletedKM:      &completeInput.CompletedKM,
-		CostTenge:        &completeInput.CostTenge,
+		CompletedKM:      &data.CompletedKM,
+		CostTenge:        &data.CostTenge,
 		CompletedAt:      &now,
-		Notes:            completeInput.Notes,
-		ReceiptImageKeys: completeInput.ReceiptImageKeys,
+		Notes:            data.Notes,
+		ReceiptImageKeys: data.ReceiptImageKeys,
 		UpdatedAt:        now,
 	}); err != nil {
-		return handleError(logger, err)
+		log.Error("repo: updating maintenance record", pkglog.Err(err))
+		return err
 	}
 
-	// Reset the service-state clock for this car-template pair.
 	state := model.CarServiceState{
 		CarID:      record.CarID,
 		TemplateID: record.TemplateID,
-		LastKM:     completeInput.CompletedKM,
+		LastKM:     data.CompletedKM,
 		LastDate:   &now,
 	}
 	if template.KmInterval != nil {
-		nextKM := completeInput.CompletedKM + *template.KmInterval
+		nextKM := data.CompletedKM + *template.KmInterval
 		state.NextDueKM = &nextKM
 	}
 	if template.DayInterval != nil {
@@ -266,64 +267,66 @@ func (s *CarMaintenanceService) CompleteRecord(ctx context.Context, id string, c
 	}
 
 	if err = s.serviceStateRepo.Upsert(ctx, state); err != nil {
-		return handleError(logger, err)
+		log.Error("repo: upserting car service state", pkglog.Err(err))
+		return err
 	}
 
 	if err = s.carService.UpdateCarStatus(
 		ctx, record.CarID,
 		validation.CarStatusUpdate{Status: string(model.CarStatusAvailable)},
 	); err != nil {
-		return handleError(logger, err)
+		return err
 	}
 
-	logger.Info("maintenance record completed",
+	log.Info("maintenance record completed",
 		slog.String("recordID", record.ID),
 		slog.String("carID", record.CarID),
-		slog.Int("completedKM", int(completeInput.CompletedKM)),
+		slog.Int("completedKM", int(data.CompletedKM)),
 	)
 
 	return nil
 }
 
 func (s *CarMaintenanceService) GetReceiptImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
-	const method = "GetReceiptImageUploadData"
-	logger := pkglog.WithMethod(s.log, method)
-
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetReceiptImageUploadData"), utils.MetadataFromCtx(ctx))
 
 	data, err := s.objectStorage.GetMaintenanceReceiptImageUploadData(ctx)
 	if err != nil {
-		return sharedmodel.ImageUploadData{}, handleError(logger, err)
+		log.Error("object storage: getting upload data", pkglog.Err(err))
+		return sharedmodel.ImageUploadData{}, err
 	}
 
 	return data, nil
 }
 
 func (s *CarMaintenanceService) EvaluateCarMaintenance(ctx context.Context, carID string) error {
-	const method = "EvaluateCarMaintenance"
-	logger := pkglog.WithMethod(s.log, method)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "EvaluateCarMaintenance"), utils.MetadataFromCtx(ctx))
+	log = log.With(slog.String("carID", carID))
 
-	md := utils.MetadataFromCtx(ctx)
-	logger = pkglog.WithMetadata(logger, md)
-	logger = logger.With(slog.String("carID", carID))
+	if err := validation.ValidateID(s.validate, carID); err != nil {
+		return err
+	}
 
 	car, err := s.carRepo.FindByID(ctx, carID)
 	if err != nil {
-		return handleError(logger, err)
+		if !errors.Is(err, model.ErrNotFound) {
+			log.Error("repo: finding car by id", pkglog.Err(err))
+		}
+		return err
 	}
 
 	states, err := s.serviceStateRepo.FindAll(ctx, model.CarServiceStateFilter{CarID: &carID})
 	if err != nil {
-		return handleError(logger, err)
+		log.Error("repo: finding car service states", pkglog.Err(err))
+		return err
 	}
 
 	for _, state := range states {
 		template, err := s.templateRepo.FindByID(ctx, state.TemplateID)
 		if err != nil {
-			logger.Error("failed to load template",
+			log.Error("repo: finding maintenance template",
 				slog.String("templateID", state.TemplateID),
-				slog.String("error", err.Error()),
+				pkglog.Err(err),
 			)
 			continue
 		}
@@ -333,9 +336,9 @@ func (s *CarMaintenanceService) EvaluateCarMaintenance(ctx context.Context, carI
 		switch {
 		case pct >= template.PullPct:
 			if err = s.createWorkOrder(ctx, car, template, "urgent"); err != nil {
-				logger.Error("failed to create urgent work order",
+				log.Error("failed to create urgent work order",
 					slog.String("templateName", template.Name),
-					slog.String("error", err.Error()),
+					pkglog.Err(err),
 				)
 				continue
 			}
@@ -344,17 +347,17 @@ func (s *CarMaintenanceService) EvaluateCarMaintenance(ctx context.Context, carI
 				ctx, carID,
 				validation.CarStatusUpdate{Status: string(model.CarStatusMaintenance)},
 			); err != nil {
-				logger.Error("failed to transition car to maintenance",
+				log.Error("failed to transition car to maintenance",
 					slog.String("templateName", template.Name),
-					slog.String("error", err.Error()),
+					pkglog.Err(err),
 				)
 			}
 
 		case pct >= template.WarnPct:
 			if err = s.createWorkOrder(ctx, car, template, "scheduled"); err != nil {
-				logger.Error("failed to create scheduled work order",
+				log.Error("failed to create scheduled work order",
 					slog.String("templateName", template.Name),
-					slog.String("error", err.Error()),
+					pkglog.Err(err),
 				)
 			}
 		}
@@ -391,6 +394,32 @@ func (s *CarMaintenanceService) createWorkOrder(ctx context.Context, car model.C
 	)
 
 	return nil
+}
+
+func maintenanceTemplateFilter(filter validation.CarMaintenanceTemplateFilter) model.CarMaintenanceTemplateFilter {
+	if filter.Pagination == nil {
+		filter.Pagination = sharedvalidation.DefaultPagination()
+	}
+	return model.CarMaintenanceTemplateFilter{
+		IsMandatory: filter.IsMandatory,
+		Pagination:  &sharedmodel.Pagination{Limit: filter.Pagination.Limit, Offset: filter.Pagination.Offset},
+	}
+}
+
+func maintenanceRecordFilter(filter validation.CarMaintenanceRecordFilter) model.CarMaintenanceRecordFilter {
+	repoFilter := model.CarMaintenanceRecordFilter{
+		CarID:      filter.CarID,
+		TemplateID: filter.TemplateID,
+	}
+	if filter.Status != nil {
+		st, _ := model.MaintenanceRecordStatusFromString(*filter.Status)
+		repoFilter.Status = &st
+	}
+	if filter.Pagination == nil {
+		filter.Pagination = sharedvalidation.DefaultPagination()
+	}
+	repoFilter.Pagination = &sharedmodel.Pagination{Limit: filter.Pagination.Limit, Offset: filter.Pagination.Offset}
+	return repoFilter
 }
 
 func maintenancePct(currentMileageKM int64, state model.CarServiceState, template model.CarMaintenanceTemplate) float64 {

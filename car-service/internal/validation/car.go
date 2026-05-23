@@ -1,26 +1,31 @@
 package validation
 
-import sharedmodel "carsharing/shared/model"
+import (
+	"time"
+
+	sharedvalidation "carsharing/shared/validation"
+)
 
 type CarFilter struct {
-	ID             *string         `validate:"omitempty,uuid"`
-	ModelFilter    *CarModelFilter `validate:"omitempty"`
-	Status         *string         `validate:"omitempty,carstatus"`
-	LocationFilter *LocationFilter `validate:"omitempty"`
-	Pagination     *sharedmodel.Pagination
+	ID             *string                          `validate:"omitempty,uuid"`
+	ModelFilter    *CarModelFilter                  `validate:"omitempty"`
+	Status         *string                          `validate:"omitempty,carstatus"`
+	LocationFilter *sharedvalidation.LocationFilter `validate:"omitempty"`
+	Pagination     *sharedvalidation.Pagination
 }
 
 type CarCreate struct {
-	ModelID          string   `validate:"required"`
-	VIN              string   `validate:"required,min=17,max=17,alphanum"`
-	LicensePlate     string   `validate:"required,min=1,max=20"`
-	Color            string   `validate:"required,min=1,max=50"`
-	YearManufactured int16    `validate:"required,min=1886"`
-	TelemetryID      string   `validate:"required"`
-	MileageKM        *int64   `validate:"omitempty,min=0"`
-	FuelLevel        *float32 `validate:"omitempty,min=0,max=100"`
-	BatteryLevel     *float32 `validate:"omitempty,min=0,max=100"`
-	Notes            *string  `validate:"omitempty,min=1,max=500"`
+	ModelID          string                     `validate:"required"`
+	VIN              string                     `validate:"required,min=17,max=17,alphanum"`
+	LicensePlate     string                     `validate:"required,min=1,max=20"`
+	Color            string                     `validate:"required,min=1,max=50"`
+	YearManufactured int16                      `validate:"required,min=1886"`
+	TelemetryID      string                     `validate:"required"`
+	MileageKM        *int64                     `validate:"omitempty,min=0"`
+	FuelLevel        *float32                   `validate:"omitempty,min=0,max=100"`
+	BatteryLevel     *float32                   `validate:"omitempty,min=0,max=100"`
+	Location         *sharedvalidation.Location `validate:"omitempty"`
+	Notes            *string                    `validate:"omitempty,min=1,max=500"`
 }
 
 type CarUpdate struct {
@@ -36,4 +41,23 @@ type CarUpdate struct {
 
 type CarStatusUpdate struct {
 	Status string `validate:"required,carstatus"`
+}
+
+type CarStatusReadingFilter struct {
+	CarID      *string `validate:"omitempty,uuid"`
+	Pagination *sharedvalidation.Pagination
+}
+
+type CarTelemetryUpdate struct {
+	MileageKM    int64    `validate:"min=0"`
+	FuelLevel    *float32 `validate:"omitempty,min=0,max=100"`
+	BatteryLevel *float32 `validate:"omitempty,min=0,max=100"`
+	Location     *sharedvalidation.Location
+}
+
+type TelemetryReadingFilter struct {
+	CarID      *string `validate:"omitempty,uuid"`
+	From       *time.Time
+	To         *time.Time
+	Pagination *sharedvalidation.Pagination
 }

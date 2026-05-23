@@ -1,17 +1,17 @@
 package validation
 
-import sharedmodel "carsharing/shared/model"
+import sharedvalidation "carsharing/shared/validation"
 
 type CarMaintenanceTemplateFilter struct {
 	IsMandatory *bool `validate:"omitempty"`
-	Pagination  *sharedmodel.Pagination
+	Pagination  *sharedvalidation.Pagination
 }
 
 type CarMaintenanceRecordFilter struct {
 	CarID      *string `validate:"omitempty,uuid"`
 	TemplateID *string `validate:"omitempty,uuid"`
 	Status     *string `validate:"omitempty,maintenancerecordstatus"`
-	Pagination *sharedmodel.Pagination
+	Pagination *sharedvalidation.Pagination
 }
 
 type CarMaintenanceTemplateCreate struct {

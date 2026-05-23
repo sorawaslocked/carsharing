@@ -149,11 +149,11 @@ func (s *UserService) CheckDocument(ctx context.Context, docID string, data vali
 }
 
 func (s *UserService) HandleDocumentAnalyzed(ctx context.Context, event model.DocumentAnalyzedEvent) error {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "HandleDocumentAnalyzed"), utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "HandleDocumentAnalyzed"), utils.MetadataFromCtx(ctx))
 
 	doc, err := s.docRepo.FindByID(ctx, event.DocumentID)
 	if err != nil {
-		logger.Error("repo: finding document", pkglog.Err(err))
+		log.Error("repo: finding document", pkglog.Err(err))
 
 		return err
 	}
@@ -173,7 +173,7 @@ func (s *UserService) HandleDocumentAnalyzed(ctx context.Context, event model.Do
 		Error:     docError,
 		UpdatedAt: time.Now(),
 	}); err != nil {
-		logger.Error("repo: updating document status", pkglog.Err(err))
+		log.Error("repo: updating document status", pkglog.Err(err))
 
 		return err
 	}

@@ -9,6 +9,7 @@ import (
 	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
+	sharedvalidation "carsharing/shared/validation"
 	"carsharing/user-service/internal/model"
 	"carsharing/user-service/internal/pkg/security"
 	"carsharing/user-service/internal/validation"
@@ -53,7 +54,7 @@ func NewUserService(
 }
 
 func (s *UserService) SignIn(ctx context.Context, creds validation.Credentials) (string, error) {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "SignIn"), utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "SignIn"), utils.MetadataFromCtx(ctx))
 
 	if err := validation.ValidateInput(s.validate, creds); err != nil {
 		return "", err
@@ -69,13 +70,13 @@ func (s *UserService) SignIn(ctx context.Context, creds validation.Credentials) 
 	user, err := s.userRepo.FindOne(ctx, filter)
 	if err != nil {
 		if !errors.Is(err, model.ErrNotFound) {
-			logger.Error("repo: finding user by id", pkglog.Err(err))
+			log.Error("repo: finding user by id", pkglog.Err(err))
 		}
 		return "", err
 	}
 
 	if err := security.CheckStringHash(creds.Password, user.PasswordHash); err != nil {
-		logger.Warn("invalid user password hash", pkglog.Err(model.ErrBcrypt))
+		log.Warn("invalid user password hash", pkglog.Err(model.ErrBcrypt))
 
 		return "", model.ErrUnauthenticated
 	}
@@ -156,39 +157,21 @@ func (s *UserService) Get(ctx context.Context, id string) (model.User, error) {
 }
 
 func (s *UserService) List(ctx context.Context, filter validation.UserFilter) ([]model.User, error) {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "List"), utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "List"), utils.MetadataFromCtx(ctx))
 
 	if err := validation.ValidateInput(s.validate, filter); err != nil {
 		return nil, err
 	}
 
-	if filter.Pagination == nil {
-		filter.Pagination = &sharedmodel.Pagination{
-			Limit:  sharedmodel.DefaultPaginationLimit,
-			Offset: sharedmodel.DefaultPaginationOffset,
-		}
-	}
-
-	repoFilter := model.UserFilter{
-		Email:              filter.Email,
-		PhoneNumber:        filter.PhoneNumber,
-		FirstName:          filter.FirstName,
-		LastName:           filter.LastName,
-		IsDocumentVerified: filter.IsDocumentVerified,
-		IsEmailVerified:    filter.IsEmailVerified,
-		IsSuspended:        filter.IsSuspended,
-		Pagination:         filter.Pagination,
-	}
-
-	users, err := s.userRepo.Find(ctx, repoFilter)
+	users, err := s.userRepo.Find(ctx, userFilter(filter))
 	if err != nil {
-		logger.Error("repo: listing users", pkglog.Err(err))
+		log.Error("repo: listing users", pkglog.Err(err))
 
 		return nil, err
 	}
 
 	for i := range users {
-		if err := s.resolveProfileImageURL(ctx, logger, &users[i]); err != nil {
+		if err := s.resolveProfileImageURL(ctx, log, &users[i]); err != nil {
 			return nil, err
 		}
 	}
@@ -197,7 +180,7 @@ func (s *UserService) List(ctx context.Context, filter validation.UserFilter) ([
 }
 
 func (s *UserService) Update(ctx context.Context, id string, data validation.UserUpdate) error {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Update"), utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Update"), utils.MetadataFromCtx(ctx))
 
 	if err := validation.ValidateID(s.validate, id); err != nil {
 		return err
@@ -230,7 +213,7 @@ func (s *UserService) Update(ctx context.Context, id string, data validation.Use
 	if data.Password != nil {
 		hash, err := security.HashString(*data.Password)
 		if err != nil {
-			logger.Error("hashing password", pkglog.Err(err))
+			log.Error("hashing password", pkglog.Err(err))
 
 			return model.ErrBcrypt
 		}
@@ -239,21 +222,21 @@ func (s *UserService) Update(ctx context.Context, id string, data validation.Use
 
 	if err := s.userRepo.Update(ctx, id, repoUpdate); err != nil {
 		if !errors.Is(err, model.ErrNotFound) {
-			logger.Error("repo: updating user", pkglog.Err(err))
+			log.Error("repo: updating user", pkglog.Err(err))
 		}
 		return err
 	}
 
 	isSecurityUpdate := data.Password != nil || len(data.Roles) > 0 || data.IsSuspended != nil
 	if err := s.publisher.PublishUserUpdated(ctx, id, isSecurityUpdate); err != nil {
-		logger.Error("event: publishing user updated", pkglog.Err(err))
+		log.Error("event: publishing user updated", pkglog.Err(err))
 	}
 
 	return nil
 }
 
 func (s *UserService) Delete(ctx context.Context, id string) error {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Delete"), utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Delete"), utils.MetadataFromCtx(ctx))
 
 	if err := validation.ValidateID(s.validate, id); err != nil {
 		return err
@@ -261,24 +244,24 @@ func (s *UserService) Delete(ctx context.Context, id string) error {
 
 	if err := s.userRepo.Delete(ctx, id); err != nil {
 		if !errors.Is(err, model.ErrNotFound) {
-			logger.Error("repo: deleting user", pkglog.Err(err))
+			log.Error("repo: deleting user", pkglog.Err(err))
 		}
 		return err
 	}
 
 	if err := s.publisher.PublishUserDeleted(ctx, id); err != nil {
-		logger.Error("event: publishing user deleted", pkglog.Err(err))
+		log.Error("event: publishing user deleted", pkglog.Err(err))
 	}
 
 	return nil
 }
 
 func (s *UserService) GetUserProfileImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
-	logger := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetUserProfileImageUploadData"), utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetUserProfileImageUploadData"), utils.MetadataFromCtx(ctx))
 
 	data, err := s.objectStorage.GetUserProfileImageUploadData(ctx)
 	if err != nil {
-		logger.Error("object storage: getting upload data", pkglog.Err(err))
+		log.Error("object storage: getting upload data", pkglog.Err(err))
 
 		return sharedmodel.ImageUploadData{}, err
 	}
@@ -300,4 +283,20 @@ func (s *UserService) resolveProfileImageURL(ctx context.Context, log *slog.Logg
 	user.ProfileImage.URL = imageURL
 
 	return nil
+}
+
+func userFilter(filter validation.UserFilter) model.UserFilter {
+	if filter.Pagination == nil {
+		filter.Pagination = sharedvalidation.DefaultPagination()
+	}
+	return model.UserFilter{
+		Email:              filter.Email,
+		PhoneNumber:        filter.PhoneNumber,
+		FirstName:          filter.FirstName,
+		LastName:           filter.LastName,
+		IsDocumentVerified: filter.IsDocumentVerified,
+		IsEmailVerified:    filter.IsEmailVerified,
+		IsSuspended:        filter.IsSuspended,
+		Pagination:         &sharedmodel.Pagination{Limit: filter.Pagination.Limit, Offset: filter.Pagination.Offset},
+	}
 }

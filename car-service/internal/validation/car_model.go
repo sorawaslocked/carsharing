@@ -1,6 +1,6 @@
 package validation
 
-import sharedmodel "carsharing/shared/model"
+import sharedvalidation "carsharing/shared/validation"
 
 type CarModelFilter struct {
 	ID           *string `validate:"omitempty,uuid"`
@@ -11,7 +11,7 @@ type CarModelFilter struct {
 	BodyType     *string `validate:"omitempty,carbodytype"`
 	Class        *string `validate:"omitempty,carclass"`
 	MinSeats     *int8   `validate:"omitempty,min=1,max=9"`
-	Pagination   *sharedmodel.Pagination
+	Pagination   *sharedvalidation.Pagination
 }
 
 type CarModelCreate struct {

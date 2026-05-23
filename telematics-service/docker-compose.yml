@@ -1,7 +1,7 @@
 services:
   telematics:
     image: ghcr.io/sorawaslocked/carsharing/telematics-service:latest
-    container_name: telematics
+    container_name: telemetry
     build: .
     environment:
       DB_URL: "postgres://carsharing:carsharing@car-service-postgres:5432/carsharing?sslmode=disable"

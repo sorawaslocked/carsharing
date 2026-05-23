@@ -7,7 +7,7 @@ CREATE TABLE car_telematics_events (
     battery_level NUMERIC(5, 2),
     odometer_km   BIGINT           NOT NULL DEFAULT 0,
     actor_id      VARCHAR(100),
-    actor_type    VARCHAR(50)      NOT NULL DEFAULT 'telematics',
+    actor_type    VARCHAR(50)      NOT NULL DEFAULT 'telemetry',
     metadata      JSONB,
     recorded_at   TIMESTAMPTZ      NOT NULL,
     received_at   TIMESTAMPTZ      NOT NULL

@@ -200,7 +200,7 @@ func TestTripService_StartTrip_TelemetryFails(t *testing.T) {
 	d := newDeps(t)
 	ctx := ctxOwner(testUserID)
 	booking := sampleBooking()
-	infraErr := errors.New("telematics unavailable")
+	infraErr := errors.New("telemetry unavailable")
 
 	d.booking.EXPECT().GetBooking(mock.Anything, testBookingID).Return(booking, nil)
 	d.telematics.EXPECT().GetLatestTelemetry(mock.Anything, testCarID).Return(model.CarTelemetry{}, infraErr)
@@ -392,7 +392,7 @@ func TestTripService_EndTrip_TelemetryFails(t *testing.T) {
 	d := newDeps(t)
 	ctx := ctxOwner(testUserID)
 	trip := sampleActiveTrip()
-	infraErr := errors.New("telematics down")
+	infraErr := errors.New("telemetry down")
 
 	d.tripRepo.EXPECT().GetByID(mock.Anything, testTripID).Return(trip, nil)
 	d.telematics.EXPECT().GetLatestTelemetry(mock.Anything, testCarID).Return(model.CarTelemetry{}, infraErr)

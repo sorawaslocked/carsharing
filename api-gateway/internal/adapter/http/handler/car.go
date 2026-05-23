@@ -15,7 +15,7 @@ func NewCarHandler(svc CarService) *CarHandler {
 
 // Create (Car) godoc
 // @Summary      Register a car in the fleet
-// @Description  Creates a new physical car record linked to a car model and telematics device.
+// @Description  Creates a new physical car record linked to a car model and telemetry device.
 // @Tags         cars
 // @Accept       json
 // @Produce      json

@@ -28,9 +28,9 @@ jobs:
           - service: trip-service
             context: .
             dockerfile: trip-service/Dockerfile
-          - service: telematics-service
-            context: telematics-service
-            dockerfile: telematics-service/Dockerfile
+          - service: telemetry-service
+            context: telemetry-service
+            dockerfile: telemetry-service/Dockerfile
           - service: document-analyzer
             context: document-analyzer
             dockerfile: document-analyzer/Dockerfile

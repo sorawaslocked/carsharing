@@ -1924,7 +1924,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Creates a new physical car record linked to a car model and telematics device.",
+                "description": "Creates a new physical car record linked to a car model and telemetry device.",
                 "consumes": [
                     "application/json"
                 ],

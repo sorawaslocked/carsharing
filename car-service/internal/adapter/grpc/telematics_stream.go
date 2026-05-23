@@ -41,7 +41,7 @@ func (c *TelematicsStreamClient) Subscribe(ctx context.Context, car model.Car) (
 			resp, err := stream.Recv()
 			if err != nil {
 				if ctx.Err() == nil {
-					c.log.Error("telematics stream recv error",
+					c.log.Error("telemetry stream recv error",
 						pkglog.Err(err),
 						slog.String("carID", car.ID),
 					)

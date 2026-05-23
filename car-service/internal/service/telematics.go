@@ -41,7 +41,7 @@ func NewTelematicsService(
 	return s
 }
 
-// Start loads all cars and subscribes to each car's telematics stream in a
+// Start loads all cars and subscribes to each car's telemetry stream in a
 // dedicated goroutine. Goroutines run until ctx is cancelled.
 func (s *TelematicsService) Start(ctx context.Context) error {
 	logger := pkglog.WithMethod(s.log, "Start")
@@ -55,7 +55,7 @@ func (s *TelematicsService) Start(ctx context.Context) error {
 	s.ctx = ctx
 	s.mu.Unlock()
 
-	logger.Info("subscribing to telematics streams", slog.Int("cars", len(cars)))
+	logger.Info("subscribing to telemetry streams", slog.Int("cars", len(cars)))
 
 	for _, car := range cars {
 		s.wg.Add(1)
@@ -68,12 +68,12 @@ func (s *TelematicsService) Start(ctx context.Context) error {
 	return nil
 }
 
-// Stop waits for all telematics goroutines to finish after the context is cancelled.
+// Stop waits for all telemetry goroutines to finish after the context is cancelled.
 func (s *TelematicsService) Stop() {
 	s.wg.Wait()
 }
 
-// OnCarCreated starts a telematics stream goroutine for a newly created car.
+// OnCarCreated starts a telemetry stream goroutine for a newly created car.
 func (s *TelematicsService) OnCarCreated(car model.Car) {
 	s.mu.Lock()
 	ctx := s.ctx
@@ -93,7 +93,7 @@ func (s *TelematicsService) OnCarCreated(car model.Car) {
 	}()
 }
 
-// SubscribeCarStream opens a live telematics stream for a single car and returns
+// SubscribeCarStream opens a live telemetry stream for a single car and returns
 // a channel of updates. Used by the gRPC streaming handler.
 func (s *TelematicsService) SubscribeCarStream(ctx context.Context, carID string) (<-chan model.TelematicsUpdate, error) {
 	logger := pkglog.WithMethod(s.log, "SubscribeCarStream")
@@ -116,7 +116,7 @@ func (s *TelematicsService) subscribeToCarStream(ctx context.Context, car model.
 			if ctx.Err() != nil {
 				return
 			}
-			logger.Error("failed to subscribe to telematics stream", pkglog.Err(err))
+			logger.Error("failed to subscribe to telemetry stream", pkglog.Err(err))
 			select {
 			case <-ctx.Done():
 				return
@@ -127,7 +127,7 @@ func (s *TelematicsService) subscribeToCarStream(ctx context.Context, car model.
 
 		for update := range ch {
 			if err := s.applyUpdate(ctx, logger, update); err != nil {
-				logger.Error("failed to apply telematics update", pkglog.Err(err))
+				logger.Error("failed to apply telemetry update", pkglog.Err(err))
 			}
 		}
 
@@ -135,7 +135,7 @@ func (s *TelematicsService) subscribeToCarStream(ctx context.Context, car model.
 			return
 		}
 
-		logger.Info("telematics stream closed, reconnecting",
+		logger.Info("telemetry stream closed, reconnecting",
 			slog.Duration("in", telematicsReconnectDelay),
 		)
 		select {
@@ -153,7 +153,7 @@ func (s *TelematicsService) applyUpdate(ctx context.Context, logger *slog.Logger
 	}
 
 	if update.OdometerKM < current.MileageKM {
-		logger.Info("rejected telematics update: odometer regression",
+		logger.Info("rejected telemetry update: odometer regression",
 			slog.Int64("current", current.MileageKM),
 			slog.Int64("incoming", update.OdometerKM),
 		)
@@ -192,7 +192,7 @@ func (s *TelematicsService) applyUpdate(ctx context.Context, logger *slog.Logger
 		return handleError(logger, err)
 	}
 
-	logger.Info("telematics update applied",
+	logger.Info("telemetry update applied",
 		slog.Int64("odometerKM", update.OdometerKM),
 		slog.Time("recordedAt", update.RecordedAt),
 	)

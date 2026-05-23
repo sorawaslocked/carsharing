@@ -75,7 +75,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	)
 	if err != nil {
 		cl.closeAll()
-		return nil, fmt.Errorf("telematics stream client: %w", err)
+		return nil, fmt.Errorf("telemetry stream client: %w", err)
 	}
 	cl.add(func() { _ = telematicsConn.Close() })
 
@@ -152,7 +152,7 @@ func (a *App) Run() error {
 
 	if err := a.telematicsService.Start(ctx); err != nil {
 		cancel()
-		return fmt.Errorf("telematics service start: %w", err)
+		return fmt.Errorf("telemetry service start: %w", err)
 	}
 
 	lis, err := net.Listen("tcp", a.grpcAddr)

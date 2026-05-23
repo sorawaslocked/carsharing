@@ -35,5 +35,5 @@ minio:
   use_ssl: false
 
 telematics_stream:
-  host: "telematics"
+  host: "telemetry"
   port: 50051

@@ -29,7 +29,7 @@ func (h *TelematicsHandler) StreamCarTelematicsEvents(
 	req *telematicspb.StreamCarTelematicsEventsRequest,
 	stream grpc.ServerStreamingServer[telematicspb.StreamCarTelematicsEventsResponse],
 ) error {
-	slog.Info("telematics stream opened", "car_id", req.CarId)
+	slog.Info("telemetry stream opened", "car_id", req.CarId)
 
 	telemetry, err := h.carRepo.GetCarTelemetry(req.CarId)
 	if err != nil {
@@ -79,6 +79,6 @@ func (h *TelematicsHandler) StreamCarTelematicsEvents(
 		}
 	}
 
-	slog.Info("telematics stream closed", "car_id", req.CarId)
+	slog.Info("telemetry stream closed", "car_id", req.CarId)
 	return nil
 }

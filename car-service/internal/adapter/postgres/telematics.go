@@ -36,7 +36,7 @@ func (r *TelematicsRepository) InsertEvent(ctx context.Context, event model.CarT
 		var err error
 		metadataJSON, err = json.Marshal(event.Metadata)
 		if err != nil {
-			logger.Error("failed to marshal telematics event metadata", pkglog.Err(err))
+			logger.Error("failed to marshal telemetry event metadata", pkglog.Err(err))
 			return ErrSql
 		}
 	}
@@ -61,7 +61,7 @@ func (r *TelematicsRepository) InsertEvent(ctx context.Context, event model.CarT
 
 	_, err := r.pool.Exec(ctx, q, b.Args...)
 	if err != nil {
-		logger.Error("failed to insert telematics event", pkglog.Err(err))
+		logger.Error("failed to insert telemetry event", pkglog.Err(err))
 		return ErrSql
 	}
 
@@ -96,7 +96,7 @@ func (r *TelematicsRepository) FindEvents(ctx context.Context, filter model.Tele
 
 	rows, err := r.pool.Query(ctx, q, b.Args...)
 	if err != nil {
-		logger.Error("failed to query telematics events", pkglog.Err(err))
+		logger.Error("failed to query telemetry events", pkglog.Err(err))
 		return nil, ErrSql
 	}
 	defer rows.Close()
@@ -114,7 +114,7 @@ func (r *TelematicsRepository) FindEvents(ctx context.Context, filter model.Tele
 			&actorID, &e.ActorType, &metadataRaw,
 			&e.RecordedAt, &e.ReceivedAt,
 		); err != nil {
-			logger.Error("failed to scan telematics event row", pkglog.Err(err))
+			logger.Error("failed to scan telemetry event row", pkglog.Err(err))
 			return nil, ErrSql
 		}
 
@@ -124,7 +124,7 @@ func (r *TelematicsRepository) FindEvents(ctx context.Context, filter model.Tele
 
 		if len(metadataRaw) > 0 {
 			if err = json.Unmarshal(metadataRaw, &e.Metadata); err != nil {
-				logger.Error("failed to unmarshal telematics event metadata", pkglog.Err(err))
+				logger.Error("failed to unmarshal telemetry event metadata", pkglog.Err(err))
 				return nil, ErrSql
 			}
 		}

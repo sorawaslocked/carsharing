@@ -169,5 +169,5 @@ const (
 	CarStatusActorOps        CarStatusActor = "ops"
 	CarStatusActorSystem     CarStatusActor = "system"
 	CarStatusActorScheduler  CarStatusActor = "scheduler"
-	CarStatusActorTelematics CarStatusActor = "telematics"
+	CarStatusActorTelematics CarStatusActor = "telemetry"
 )

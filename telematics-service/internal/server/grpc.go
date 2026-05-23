@@ -8,7 +8,7 @@ import (
 	telematicspb "github.com/sorawaslocked/car-rental-protos/gen/service/telematics"
 )
 
-// NewGRPCServer creates a gRPC server with the telematics streaming service registered.
+// NewGRPCServer creates a gRPC server with the telemetry streaming service registered.
 // Server reflection is enabled for tooling such as grpcurl.
 func NewGRPCServer(h *handler.TelematicsHandler) *grpc.Server {
 	srv := grpc.NewServer()

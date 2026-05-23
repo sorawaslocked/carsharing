@@ -44,7 +44,7 @@ type simEntry struct {
 	stopCh  chan struct{}
 }
 
-// SimulationService manages per-car telematics simulations.
+// SimulationService manages per-car telemetry simulations.
 type SimulationService struct {
 	osrmClient  *osrm.OSRM
 	osrmProfile string

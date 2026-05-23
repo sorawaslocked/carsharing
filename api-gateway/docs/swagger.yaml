@@ -2467,7 +2467,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Creates a new physical car record linked to a car model and telematics
+      description: Creates a new physical car record linked to a car model and telemetry
         device.
       parameters:
       - description: Car create payload

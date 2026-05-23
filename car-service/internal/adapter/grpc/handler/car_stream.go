@@ -12,6 +12,7 @@ import (
 	"carsharing/protos/gen/base"
 	basecar "carsharing/protos/gen/base/car"
 	carsvc "carsharing/protos/gen/service/car"
+
 	"google.golang.org/grpc"
 )
 
@@ -25,7 +26,7 @@ type CarStreamHandler struct {
 
 func NewCarStreamHandler(log *slog.Logger, carService CarService, telemetrySubscriber TelemetrySubscriber) *CarStreamHandler {
 	return &CarStreamHandler{
-		log:                 pkglog.WithComponent(log, "grpc.handler.CarStreamHandler"),
+		log:                 pkglog.WithComponent(log, "adapter.grpc.handler.CarStreamHandler"),
 		carService:          carService,
 		telemetrySubscriber: telemetrySubscriber,
 	}

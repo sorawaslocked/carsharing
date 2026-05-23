@@ -22,7 +22,7 @@ type UserHandler struct {
 
 func NewUserHandler(log *slog.Logger, userService UserService) *UserHandler {
 	return &UserHandler{
-		log:         pkglog.WithComponent(log, "grpc.handler.UserHandler"),
+		log:         pkglog.WithComponent(log, "adapter.grpc.handler.UserHandler"),
 		userService: userService,
 	}
 }

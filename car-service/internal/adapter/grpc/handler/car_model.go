@@ -8,6 +8,7 @@ import (
 	pkglog "carsharing/shared/pkg/log"
 
 	carsvc "carsharing/protos/gen/service/car"
+
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -20,7 +21,7 @@ type CarModelHandler struct {
 
 func NewCarModelHandler(log *slog.Logger, carModelService CarModelService) *CarModelHandler {
 	return &CarModelHandler{
-		log:             pkglog.WithComponent(log, "grpc.handler.CarModelHandler"),
+		log:             pkglog.WithComponent(log, "adapter.grpc.handler.CarModelHandler"),
 		carModelService: carModelService,
 	}
 }

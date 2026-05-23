@@ -1,6 +1,30 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	sharedmodel "carsharing/shared/model"
+)
+
+type PricingRuleType string
+
+const (
+	PricingRuleTypeTime     PricingRuleType = "time"
+	PricingRuleTypeDistance PricingRuleType = "distance"
+	PricingRuleTypeCombined PricingRuleType = "combined"
+)
+
+var validPricingRuleTypes = map[PricingRuleType]struct{}{
+	PricingRuleTypeTime:     {},
+	PricingRuleTypeDistance: {},
+	PricingRuleTypeCombined: {},
+}
+
+func PricingRuleTypeFromString(s string) (PricingRuleType, bool) {
+	t := PricingRuleType(s)
+	_, ok := validPricingRuleTypes[t]
+	return t, ok
+}
 
 type PricingSnapshot struct {
 	RateTenge         int32
@@ -61,5 +85,5 @@ type PricingRuleListFilter struct {
 	Class      *string
 	Type       *string
 	IsActive   *bool
-	Pagination Pagination
+	Pagination sharedmodel.Pagination
 }

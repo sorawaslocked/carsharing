@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	sharedmodel "carsharing/shared/model"
+)
 
 type BookingStatus string
 
@@ -64,5 +68,5 @@ type BookingListFilter struct {
 	CarID         *string
 	Status        *string
 	PricingRuleID *string
-	Pagination    Pagination
+	Pagination    sharedmodel.Pagination
 }

@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	sharedmodel "carsharing/shared/model"
+)
 
 type BookingStatusReading struct {
 	ID         string
@@ -17,5 +21,5 @@ type BookingStatusHistoryFilter struct {
 	BookingID  string
 	From       *time.Time
 	To         *time.Time
-	Pagination Pagination
+	Pagination sharedmodel.Pagination
 }

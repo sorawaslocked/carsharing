@@ -3,8 +3,7 @@ package model
 import "errors"
 
 var (
-	ErrMissingMetadata = errors.New("missing metadata")
-
+	ErrMissingMetadata         = errors.New("missing metadata")
 	ErrInternalServerError     = errors.New("internal server error")
 	ErrUnauthorized            = errors.New("unauthorized")
 	ErrUnauthenticated         = errors.New("unauthenticated")
@@ -12,7 +11,6 @@ var (
 	ErrNotFound                = errors.New("not found")
 	ErrConflict                = errors.New("conflict")
 
-	ErrInvalidRole       = errors.New("must be a valid role")
 	ErrInvalidTransition = errors.New("invalid booking status transition")
 	ErrInvalidStatus     = errors.New("invalid booking status")
 )

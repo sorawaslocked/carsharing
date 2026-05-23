@@ -84,10 +84,18 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	loggerInterceptor := interceptor.NewLoggerInterceptor(log)
 	authInterceptor := interceptor.NewAuthInterceptor(log)
 
-	grpcSrv := grpcadapter.NewServer(
+	grpcSrv, err := grpcadapter.NewServer(
+		log, cfg.GRPC,
 		bookingHandler, ruleHandler, healthHandler,
 		baseInterceptor, loggerInterceptor, authInterceptor,
 	)
+	if err != nil {
+		cancel()
+		subscriberConn.Close()
+		publisherConn.Close()
+		pool.Close()
+		return nil, fmt.Errorf("grpc server: %w", err)
+	}
 
 	return &App{
 		log:            pkglog.WithComponent(log, "app"),

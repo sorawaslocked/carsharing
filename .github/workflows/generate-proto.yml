@@ -6,10 +6,10 @@ on:
       - main
       - develop
     paths:
-      - 'proto/**/*.proto'
+      - 'protos/proto/**/*.proto'
   pull_request:
     paths:
-      - 'proto/**/*.proto'
+      - 'protos/proto/**/*.proto'
   workflow_dispatch:
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
 
       - name: Set up Protocol Buffers
         run: |
-          PROTOC_VERSION=25.1
+          PROTOC_VERSION=29.3
           wget https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip
           unzip protoc-${PROTOC_VERSION}-linux-x86_64.zip -d $HOME/protoc
           echo "$HOME/protoc/bin" >> $GITHUB_PATH
@@ -30,7 +30,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24'
+          go-version: '1.26'
 
       - name: Install Go protobuf plugins
         run: |
@@ -38,19 +38,14 @@ jobs:
           go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
           echo "$HOME/go/bin" >> $GITHUB_PATH
 
-      - name: Create gen directory structure
+      - name: Generate Go protobuf files
+        working-directory: protos
         run: |
           mkdir -p gen
-
-      - name: Generate Go protobuf files
-        run: |
           find proto -name "*.proto" | while read proto_file; do
-            # Get the relative path from proto directory
             rel_path=${proto_file#proto/}
             dir_path=$(dirname "$rel_path")
-          
             mkdir -p "gen/$dir_path"
-          
             protoc \
               --proto_path=proto \
               --go_out=gen \
@@ -61,32 +56,30 @@ jobs:
           done
 
       - name: Tidy Go modules
-        run: |
-          go mod tidy
+        working-directory: protos
+        env:
+          GOWORK: 'off'
+        run: go mod tidy
 
-      - name: Commit generated files
+      - name: Check for uncommitted changes (PR)
+        if: github.event_name == 'pull_request'
+        run: |
+          if ! git diff --quiet; then
+            echo "Generated proto files are out of date. Regenerate locally and commit."
+            git diff --name-only
+            exit 1
+          fi
+
+      - name: Commit and push generated files
+        if: github.event_name != 'pull_request'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add gen/
-          git add go.mod go.sum
-          
-          echo "Files to be committed:"
-          git diff --staged --name-only
-          
+          git add protos/gen/
+          git add protos/go.mod protos/go.sum
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Regenerate protobuf files [skip ci]"
-            echo "Changes committed successfully"
-          fi
-
-      - name: Push changes
-        run: |
-          # Check if there are commits to push
-          if git diff origin/main --quiet; then
-            echo "No changes to push"
-          else
-            echo "Pushing changes..."
+            git commit -m "chore: regenerate protobuf files [skip ci]"
             git push
           fi

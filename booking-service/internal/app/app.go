@@ -11,7 +11,9 @@ import (
 	"time"
 
 	grpcadapter "carsharing/booking-service/internal/adapter/grpc"
+	grpcclient "carsharing/booking-service/internal/adapter/grpc/client"
 	"carsharing/booking-service/internal/adapter/grpc/handler"
+	"carsharing/booking-service/internal/adapter/grpc/interceptor"
 	natsadapter "carsharing/booking-service/internal/adapter/nats"
 	natspub "carsharing/booking-service/internal/adapter/nats/publisher"
 	natssub "carsharing/booking-service/internal/adapter/nats/subscriber"
@@ -19,6 +21,7 @@ import (
 	"carsharing/booking-service/internal/config"
 	"carsharing/booking-service/internal/service"
 	"carsharing/booking-service/internal/validation"
+	pkggrpc "carsharing/shared/pkg/grpc"
 	pkglog "carsharing/shared/pkg/log"
 	pkgnats "carsharing/shared/pkg/nats"
 	pkgpostgres "carsharing/shared/pkg/postgres"
@@ -63,12 +66,29 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 		return nil, fmt.Errorf("validator: %w", err)
 	}
 
+	baseClientInterceptor := interceptor.NewClientBaseInterceptor()
+	carServiceConn, err := pkggrpc.NewClientConn(
+		log,
+		cfg.CarService,
+		grpc.WithChainUnaryInterceptor(baseClientInterceptor.Unary),
+		grpc.WithChainStreamInterceptor(),
+	)
+	if err != nil {
+		cl.closeAll()
+		return nil, fmt.Errorf("car service client: %w", err)
+	}
+	cl.add(func() { _ = carServiceConn.Close() })
+
 	bookingRepo := postgresadapter.NewBookingRepository(log, pool)
 	ruleRepo := postgresadapter.NewPricingRuleRepository(log, pool)
 
 	publisher := natspub.NewBookingPublisher(log, publisherConn)
 
-	bookingSvc := service.NewBookingService(log, validate, bookingRepo, ruleRepo, publisher, nil, nil, nil)
+	carChecker := grpcclient.NewCarChecker(log, carServiceConn)
+	carModelChecker := grpcclient.NewCarModelChecker(log, carServiceConn)
+	zoneChecker := grpcclient.NewZoneChecker(log, carServiceConn)
+
+	bookingSvc := service.NewBookingService(log, validate, bookingRepo, ruleRepo, publisher, carChecker, carModelChecker, zoneChecker)
 	ruleSvc := service.NewPricingRuleService(log, validate, ruleRepo, nil, nil)
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -85,8 +105,9 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	bookingHandler := handler.NewBookingHandler(log, bookingSvc)
 	ruleHandler := handler.NewPricingRuleHandler(log, ruleSvc)
 	healthHandler := handler.NewHealthHandler(log, map[string]handler.Pinger{
-		"postgres": pool,
-		"nats":     natsadapter.NewPinger(log, publisherConn),
+		"postgres":    pool,
+		"nats":        natsadapter.NewPinger(log, publisherConn),
+		"car-service": grpcclient.NewPinger(log, carServiceConn),
 	}, cfg.Version)
 
 	grpcSrv, err := grpcadapter.NewServer(log, cfg.GRPC, bookingHandler, ruleHandler, healthHandler)

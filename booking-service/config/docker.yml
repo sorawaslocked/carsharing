@@ -25,3 +25,7 @@ nats_subscriber:
   name: "booking-service-subscriber"
   username: ""
   password: ""
+
+car_service:
+  host: "carsharing-car-service"
+  port: 9998

@@ -17,6 +17,7 @@ type Config struct {
 	PG             pkgpostgres.Config       `yaml:"postgres"`
 	NATSPublisher  pkgnats.PublisherConfig  `yaml:"nats_publisher"`
 	NATSSubscriber pkgnats.SubscriberConfig `yaml:"nats_subscriber"`
+	CarService     pkggrpc.ClientConfig     `yaml:"car_service"`
 }
 
 func MustLoad() Config {

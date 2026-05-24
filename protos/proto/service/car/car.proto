@@ -7,7 +7,6 @@ import "base/common.proto";
 import "service/common.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
-import "google/protobuf/timestamp.proto";
 
 option go_package = "carsharing/protos/gen/service/car";
 
@@ -115,12 +114,10 @@ message DeleteCarRequest {
 message GetCarStatusHistoryRequest {
   string car_id = 1;
 
-  optional google.protobuf.Timestamp from        = 2;
-  optional google.protobuf.Timestamp to          = 3;
-  optional base.Pagination           pagination  = 4;
-  optional string                    from_status = 5;
-  optional string                    to_status   = 6;
-  optional base.TimeRange            time_range  = 7;
+  optional base.Pagination pagination  = 2;
+  optional string          from_status = 3;
+  optional string          to_status   = 4;
+  optional base.TimeRange  time_range  = 5;
 }
 
 message GetCarStatusHistoryResponse {
@@ -130,10 +127,8 @@ message GetCarStatusHistoryResponse {
 message GetCarTelemetryHistoryRequest {
   string car_id = 1;
 
-  optional google.protobuf.Timestamp from        = 2;
-  optional google.protobuf.Timestamp to          = 3;
-  optional base.Pagination           pagination  = 4;
-  optional base.TimeRange            time_range  = 5;
+  optional base.Pagination pagination  = 2;
+  optional base.TimeRange  time_range  = 3;
 }
 
 message GetCarTelemetryHistoryResponse {

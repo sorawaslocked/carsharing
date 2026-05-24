@@ -2,7 +2,7 @@ package dto
 
 import (
 	"carsharing/api-gateway/internal/model"
-	svchelpers "github.com/sorawaslocked/car-rental-protos/gen/service"
+	svchelpers "carsharing/protos/gen/service"
 )
 
 func ServiceHealthFromProto(r *svchelpers.ServiceHealthResponse) model.ServiceHealth {

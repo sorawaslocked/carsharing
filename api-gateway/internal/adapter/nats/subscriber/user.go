@@ -1,13 +1,13 @@
-package handler
+package subscriber
 
 import (
 	"context"
 	"log/slog"
 
-	"carsharing/api-gateway/internal/adapter/nats/dto"
+	natsdto "carsharing/api-gateway/internal/adapter/nats/dto"
+	eventuserpb "carsharing/protos/gen/event/user"
 	pkglog "carsharing/shared/pkg/log"
 	nc "github.com/nats-io/nats.go"
-	eventuserpb "github.com/sorawaslocked/car-rental-protos/gen/event/user"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -54,7 +54,7 @@ func (s *UserSubscriber) Subscribe() error {
 				pkglog.Err(err),
 			)
 
-			return dto.ErrSubscribeFailed
+			return natsdto.ErrSubscribeFailed
 		}
 
 		s.subs = append(s.subs, sub)

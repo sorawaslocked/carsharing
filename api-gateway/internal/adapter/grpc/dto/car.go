@@ -2,7 +2,7 @@ package dto
 
 import (
 	"carsharing/api-gateway/internal/model"
-	basecarpb "github.com/sorawaslocked/car-rental-protos/gen/base/car"
+	basecarpb "carsharing/protos/gen/base/car"
 )
 
 func CarFromProto(c *basecarpb.Car) model.Car {
@@ -20,7 +20,7 @@ func CarFromProto(c *basecarpb.Car) model.Car {
 		FuelLevel:        c.FuelLevel,
 		BatteryLevel:     c.BatteryLevel,
 		Location:         LocationFromProto(c.GetLocation()),
-		TelematicsID:     c.GetTelematicsId(),
+		TelemetryID:      c.GetTelemetryId(),
 		ZoneID:           c.ZoneId,
 		FuelStatus:       c.GetFuelStatus(),
 		Status:           c.GetStatus(),
@@ -40,7 +40,7 @@ func CarFromProto(c *basecarpb.Car) model.Car {
 	return car
 }
 
-func CarStatusEntryFromProto(r *basecarpb.CarStatusReading) model.CarStatusReading {
+func CarStatusReadingFromProto(r *basecarpb.CarStatusReading) model.CarStatusReading {
 	return model.CarStatusReading{
 		ID:         r.GetId(),
 		CarID:      r.GetCarId(),
@@ -50,59 +50,29 @@ func CarStatusEntryFromProto(r *basecarpb.CarStatusReading) model.CarStatusReadi
 		ActorID:    r.ActorId,
 		Reason:     r.Reason,
 		Metadata:   structToMap(r.GetMetadata()),
-		ChangedAt:  r.GetRecordedAt().AsTime(),
-	}
-}
-
-func CarFuelReadingFromProto(r *basecarpb.CarFuelReading) model.CarFuelReading {
-	return model.CarFuelReading{
-		ID:         r.GetId(),
-		CarID:      r.GetCarId(),
-		FuelPct:    r.GetFuelPct(),
-		RawPct:     r.GetRawPct(),
-		ActorType:  r.GetActorType(),
-		ActorID:    r.ActorId,
-		Reason:     r.Reason,
-		Metadata:   structToMap(r.GetMetadata()),
 		RecordedAt: r.GetRecordedAt().AsTime(),
 	}
 }
 
-func CarLocationEntryFromProto(r *basecarpb.CarLocationReading) model.CarLocationReading {
-	return model.CarLocationReading{
-		ID:         r.GetId(),
-		CarID:      r.GetCarId(),
-		Location:   LocationFromProto(r.GetLocation()),
-		ActorType:  r.GetActorType(),
-		ActorID:    r.ActorId,
-		Reason:     r.Reason,
-		Metadata:   structToMap(r.GetMetadata()),
-		RecordedAt: r.GetRecordedAt().AsTime(),
-	}
-}
-
-func CarBatteryReadingFromProto(r *basecarpb.CarBatteryReading) model.CarBatteryReading {
-	return model.CarBatteryReading{
+func CarTelemetryReadingFromProto(r *basecarpb.CarTelemetryReading) model.CarTelemetryReading {
+	reading := model.CarTelemetryReading{
 		ID:           r.GetId(),
 		CarID:        r.GetCarId(),
-		BatteryLevel: r.GetBatteryLevel(),
+		FuelPct:      r.FuelPct,
+		FuelRawPct:   r.FuelRawPct,
+		BatteryLevel: r.BatteryLevel,
+		MileageKM:    r.MileageKm,
 		ActorType:    r.GetActorType(),
 		ActorID:      r.ActorId,
 		Reason:       r.Reason,
 		Metadata:     structToMap(r.GetMetadata()),
-		RecordedAt:   r.GetRecordedAt().AsTime(),
 	}
-}
-
-func CarMileageEntryFromProto(r *basecarpb.CarMileageReading) model.CarMileageReading {
-	return model.CarMileageReading{
-		ID:         r.GetId(),
-		CarID:      r.GetCarId(),
-		MileageKM:  r.GetMileageKm(),
-		ActorType:  r.GetActorType(),
-		ActorID:    r.ActorId,
-		Reason:     r.Reason,
-		Metadata:   structToMap(r.GetMetadata()),
-		RecordedAt: r.GetRecordedAt().AsTime(),
+	if r.GetLocation() != nil {
+		loc := LocationFromProto(r.GetLocation())
+		reading.Location = &loc
 	}
+	if r.GetRecordedAt() != nil {
+		reading.RecordedAt = r.GetRecordedAt().AsTime()
+	}
+	return reading
 }

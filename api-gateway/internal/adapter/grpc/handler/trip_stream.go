@@ -7,9 +7,9 @@ import (
 
 	"carsharing/api-gateway/internal/adapter/grpc/dto"
 	"carsharing/api-gateway/internal/model"
+	tripsvc "carsharing/protos/gen/service/trip"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
-	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
 )
 
 func (h *TripHandler) StreamTripLiveFeed(ctx context.Context, tripID string, send func(model.TripLiveFeed) error) error {

@@ -1,5 +1,7 @@
 package model
 
+import sharedmodel "carsharing/shared/model"
+
 import "time"
 
 type CarMaintenanceTemplate struct {
@@ -19,13 +21,13 @@ type CarMaintenanceRecord struct {
 	CarID      string
 	TemplateID string
 
-	Status                 string
-	OdometerAtWarningKM    int32
-	OdometerAtCompletionKM *int32
-	CostTenge              *int32
-	AssignedTo             *string
-	ReceiptImageURLs       []string
-	Notes                  *string
+	Status                string
+	MileageAtWarningKM    int32
+	MileageAtCompletionKM *int32
+	CostTenge             *int32
+	AssignedTo            *string
+	ReceiptImageURLs      []string
+	Notes                 *string
 
 	DueBy       *time.Time
 	CompletedAt *time.Time
@@ -33,7 +35,7 @@ type CarMaintenanceRecord struct {
 }
 
 type CarMaintenanceTemplateFilter struct {
-	Pagination *Pagination
+	Pagination *sharedmodel.Pagination
 }
 
 type CarMaintenanceRecordFilter struct {
@@ -41,7 +43,7 @@ type CarMaintenanceRecordFilter struct {
 	TemplateID *string
 	Status     *string
 
-	Pagination *Pagination
+	Pagination *sharedmodel.Pagination
 }
 
 type CarMaintenanceTemplateCreate struct {
@@ -67,8 +69,8 @@ type CarMaintenanceTemplateUpdate struct {
 }
 
 type CarMaintenanceRecordComplete struct {
-	OdometerAtCompletionKM int32
-	CostTenge              int32
-	ReceiptImageKeys       []string
-	Notes                  *string
+	MileageAtCompletionKM int32
+	CostTenge             int32
+	ReceiptImageKeys      []string
+	Notes                 *string
 }

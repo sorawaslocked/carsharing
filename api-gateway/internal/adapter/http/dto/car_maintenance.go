@@ -34,7 +34,7 @@ type CarMaintenanceRecord struct {
 	CarID                   string     `json:"carID"`
 	TemplateID              string     `json:"templateID"`
 	Status                  string     `json:"status"`
-	OdometerAt              int32      `json:"odometerAt"`
+	MileageAtWarningKM      int32      `json:"mileageAtWarningKm"`
 	CompletedKm             *int32     `json:"completedKm,omitempty"`
 	CostTenge               *int32     `json:"costTenge,omitempty"`
 	AssignedTo              *string    `json:"assignedTo,omitempty"`
@@ -109,10 +109,10 @@ func FromCarMaintenanceRecordCompleteRequest(ctx *gin.Context) (model.CarMainten
 	}
 
 	return model.CarMaintenanceRecordComplete{
-		OdometerAtCompletionKM: req.CompletedKm,
-		CostTenge:              req.CostTenge,
-		ReceiptImageKeys:       req.ReceiptImageStorageKeys,
-		Notes:                  req.Notes,
+		MileageAtCompletionKM: req.CompletedKm,
+		CostTenge:             req.CostTenge,
+		ReceiptImageKeys:      req.ReceiptImageStorageKeys,
+		Notes:                 req.Notes,
 	}, nil
 }
 
@@ -170,8 +170,8 @@ func ToCarMaintenanceRecordResponse(m model.CarMaintenanceRecord) CarMaintenance
 		CarID:                   m.CarID,
 		TemplateID:              m.TemplateID,
 		Status:                  m.Status,
-		OdometerAt:              m.OdometerAtWarningKM,
-		CompletedKm:             m.OdometerAtCompletionKM,
+		MileageAtWarningKM:      m.MileageAtWarningKM,
+		CompletedKm:             m.MileageAtCompletionKM,
 		CostTenge:               m.CostTenge,
 		Notes:                   m.Notes,
 		AssignedTo:              m.AssignedTo,

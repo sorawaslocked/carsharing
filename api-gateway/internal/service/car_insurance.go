@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"carsharing/api-gateway/internal/model"
+	sharedmodel "carsharing/shared/model"
 )
 
 type CarInsuranceService struct {
@@ -34,6 +35,6 @@ func (s *CarInsuranceService) Delete(ctx context.Context, id string) error {
 	return s.presenter.Delete(ctx, id)
 }
 
-func (s *CarInsuranceService) GetImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (s *CarInsuranceService) GetImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	return s.presenter.GetImageUploadData(ctx)
 }

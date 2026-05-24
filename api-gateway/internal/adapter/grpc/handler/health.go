@@ -6,9 +6,9 @@ import (
 
 	"carsharing/api-gateway/internal/adapter/grpc/dto"
 	"carsharing/api-gateway/internal/model"
+	svchelpers "carsharing/protos/gen/service"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
-	svchelpers "github.com/sorawaslocked/car-rental-protos/gen/service"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 )

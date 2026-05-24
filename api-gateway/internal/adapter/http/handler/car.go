@@ -316,9 +316,9 @@ func (h *CarHandler) GetCarStatusHistory(ctx *gin.Context) {
 	dto.Ok(ctx, gin.H{"statusHistory": response})
 }
 
-// GetCarFuelHistory godoc
-// @Summary      Get car fuel reading history
-// @Description  Returns time-series fuel readings for a car.
+// GetCarTelemetryHistory godoc
+// @Summary      Get car telemetry history
+// @Description  Returns time-series telemetry readings for a car.
 // @Tags         cars
 // @Produce      json
 // @Security     BearerAuth
@@ -327,13 +327,13 @@ func (h *CarHandler) GetCarStatusHistory(ctx *gin.Context) {
 // @Param        to      query     string   false  "End date (YYYY-MM-DD)"
 // @Param        limit   query     integer  false  "Pagination limit"
 // @Param        offset  query     integer  false  "Pagination offset"
-// @Success      200     {object}  dto.CarFuelHistoryResponse
+// @Success      200     {object}  dto.CarTelemetryHistoryResponse
 // @Failure      400     {object}  dto.ErrorResponse
 // @Failure      401     {object}  dto.ErrorResponse
 // @Failure      404     {object}  dto.ErrorResponse
 // @Failure      500     {object}  dto.ErrorResponse
-// @Router       /cars/{id}/fuel-history [get]
-func (h *CarHandler) GetCarFuelHistory(ctx *gin.Context) {
+// @Router       /cars/{id}/telemetry-history [get]
+func (h *CarHandler) GetCarTelemetryHistory(ctx *gin.Context) {
 	carID, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -341,167 +341,26 @@ func (h *CarHandler) GetCarFuelHistory(ctx *gin.Context) {
 		return
 	}
 
-	filter, err := dto.CarFuelReadingFilterFromCtx(ctx)
+	filter, err := dto.CarTelemetryReadingFilterFromCtx(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
 
 		return
 	}
 
-	history, err := h.svc.GetCarFuelHistory(ctx, carID, filter)
+	history, err := h.svc.GetCarTelemetryHistory(ctx, carID, filter)
 	if err != nil {
 		dto.FromError(ctx, err)
 
 		return
 	}
 
-	response := make([]dto.CarFuelReading, len(history))
+	response := make([]dto.CarTelemetryReading, len(history))
 	for i, r := range history {
-		response[i] = dto.ToCarFuelReadingResponse(r)
+		response[i] = dto.ToCarTelemetryReadingResponse(r)
 	}
 
-	dto.Ok(ctx, gin.H{"fuelHistory": response})
-}
-
-// GetCarLocationHistory godoc
-// @Summary      Get car location history
-// @Description  Returns time-series GPS location readings for a car.
-// @Tags         cars
-// @Produce      json
-// @Security     BearerAuth
-// @Param        id      path      string   true   "Car UUID"
-// @Param        from    query     string   false  "Start date (YYYY-MM-DD)"
-// @Param        to      query     string   false  "End date (YYYY-MM-DD)"
-// @Param        limit   query     integer  false  "Pagination limit"
-// @Param        offset  query     integer  false  "Pagination offset"
-// @Success      200     {object}  dto.CarLocationHistoryResponse
-// @Failure      400     {object}  dto.ErrorResponse
-// @Failure      401     {object}  dto.ErrorResponse
-// @Failure      404     {object}  dto.ErrorResponse
-// @Failure      500     {object}  dto.ErrorResponse
-// @Router       /cars/{id}/location-history [get]
-func (h *CarHandler) GetCarLocationHistory(ctx *gin.Context) {
-	carID, err := dto.IDParam(ctx)
-	if err != nil {
-		dto.FromError(ctx, err)
-
-		return
-	}
-
-	filter, err := dto.CarLocationReadingFilterFromCtx(ctx)
-	if err != nil {
-		dto.FromError(ctx, err)
-
-		return
-	}
-
-	history, err := h.svc.GetCarLocationHistory(ctx, carID, filter)
-	if err != nil {
-		dto.FromError(ctx, err)
-
-		return
-	}
-
-	response := make([]dto.CarLocationReading, len(history))
-	for i, r := range history {
-		response[i] = dto.ToCarLocationReadingResponse(r)
-	}
-
-	dto.Ok(ctx, gin.H{"locationHistory": response})
-}
-
-// GetCarBatteryHistory godoc
-// @Summary      Get car battery level history
-// @Description  Returns time-series battery readings for an EV or hybrid car.
-// @Tags         cars
-// @Produce      json
-// @Security     BearerAuth
-// @Param        id      path      string   true   "Car UUID"
-// @Param        from    query     string   false  "Start date (YYYY-MM-DD)"
-// @Param        to      query     string   false  "End date (YYYY-MM-DD)"
-// @Param        limit   query     integer  false  "Pagination limit"
-// @Param        offset  query     integer  false  "Pagination offset"
-// @Success      200     {object}  dto.CarBatteryHistoryResponse
-// @Failure      400     {object}  dto.ErrorResponse
-// @Failure      401     {object}  dto.ErrorResponse
-// @Failure      404     {object}  dto.ErrorResponse
-// @Failure      500     {object}  dto.ErrorResponse
-// @Router       /cars/{id}/battery-history [get]
-func (h *CarHandler) GetCarBatteryHistory(ctx *gin.Context) {
-	carID, err := dto.IDParam(ctx)
-	if err != nil {
-		dto.FromError(ctx, err)
-
-		return
-	}
-
-	filter, err := dto.CarBatteryReadingFilterFromCtx(ctx)
-	if err != nil {
-		dto.FromError(ctx, err)
-
-		return
-	}
-
-	history, err := h.svc.GetCarBatteryHistory(ctx, carID, filter)
-	if err != nil {
-		dto.FromError(ctx, err)
-
-		return
-	}
-
-	response := make([]dto.CarBatteryReading, len(history))
-	for i, r := range history {
-		response[i] = dto.ToCarBatteryReadingResponse(r)
-	}
-
-	dto.Ok(ctx, gin.H{"batteryHistory": response})
-}
-
-// GetCarMileageHistory godoc
-// @Summary      Get car mileage history
-// @Description  Returns time-series mileage readings for a car.
-// @Tags         cars
-// @Produce      json
-// @Security     BearerAuth
-// @Param        id      path      string   true   "Car UUID"
-// @Param        from    query     string   false  "Start date (YYYY-MM-DD)"
-// @Param        to      query     string   false  "End date (YYYY-MM-DD)"
-// @Param        limit   query     integer  false  "Pagination limit"
-// @Param        offset  query     integer  false  "Pagination offset"
-// @Success      200     {object}  dto.CarMileageHistoryResponse
-// @Failure      400     {object}  dto.ErrorResponse
-// @Failure      401     {object}  dto.ErrorResponse
-// @Failure      404     {object}  dto.ErrorResponse
-// @Failure      500     {object}  dto.ErrorResponse
-// @Router       /cars/{id}/mileage-history [get]
-func (h *CarHandler) GetCarMileageHistory(ctx *gin.Context) {
-	carID, err := dto.IDParam(ctx)
-	if err != nil {
-		dto.FromError(ctx, err)
-
-		return
-	}
-
-	filter, err := dto.CarMileageReadingFilterFromCtx(ctx)
-	if err != nil {
-		dto.FromError(ctx, err)
-
-		return
-	}
-
-	history, err := h.svc.GetCarMileageHistory(ctx, carID, filter)
-	if err != nil {
-		dto.FromError(ctx, err)
-
-		return
-	}
-
-	response := make([]dto.CarMileageReading, len(history))
-	for i, r := range history {
-		response[i] = dto.ToCarMileageReadingResponse(r)
-	}
-
-	dto.Ok(ctx, gin.H{"mileageHistory": response})
+	dto.Ok(ctx, gin.H{"telemetryHistory": response})
 }
 
 // GetImageUploadUrl (Car) godoc

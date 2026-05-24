@@ -1,4 +1,4 @@
-package handler
+package subscriber
 
 import (
 	"context"
@@ -17,5 +17,5 @@ type DocumentEventHandler interface {
 }
 
 type CarStatusEventHandler interface {
-	OnCarStatusUpdated(ctx context.Context, event model.CarStatusUpdated) error
+	OnCarStatusUpdated(ctx context.Context, event model.CarStatusUpdatedEvent) error
 }

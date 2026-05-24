@@ -1,5 +1,7 @@
 package model
 
+import sharedmodel "carsharing/shared/model"
+
 import "time"
 
 type Booking struct {
@@ -24,7 +26,7 @@ type BookingFilter struct {
 	Status        *string
 	PricingRuleID *string
 
-	Pagination *Pagination
+	Pagination *sharedmodel.Pagination
 }
 
 type BookingCreate struct {
@@ -54,5 +56,5 @@ type BookingStatusReading struct {
 type BookingStatusReadingFilter struct {
 	From       *time.Time
 	To         *time.Time
-	Pagination *Pagination
+	Pagination *sharedmodel.Pagination
 }

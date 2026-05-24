@@ -4,17 +4,18 @@ import (
 	"context"
 
 	"carsharing/api-gateway/internal/model"
+	sharedmodel "carsharing/shared/model"
 )
 
 func (s *UserService) CreateDocument(ctx context.Context, objectKey, imageType string) (string, error) {
 	return s.presenter.CreateDocument(ctx, objectKey, imageType)
 }
 
-func (s *UserService) GetUploadDocumentData(ctx context.Context, imageType string) (model.ImageUploadData, error) {
+func (s *UserService) GetUploadDocumentData(ctx context.Context, imageType string) (sharedmodel.ImageUploadData, error) {
 	return s.presenter.GetDocumentImageUploadData(ctx, imageType)
 }
 
-func (s *UserService) GetProfileImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (s *UserService) GetProfileImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	return s.presenter.GetProfileImageUploadData(ctx)
 }
 

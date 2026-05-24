@@ -7,10 +7,10 @@ import (
 
 	"carsharing/api-gateway/internal/adapter/grpc/dto"
 	"carsharing/api-gateway/internal/model"
+	basepb "carsharing/protos/gen/base"
+	carsvc "carsharing/protos/gen/service/car"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
-	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 )
 
 func (h *CarHandler) StreamCarsWithFilter(ctx context.Context, filter model.CarFilter, send func([]model.SlimCar) error) error {

@@ -6,9 +6,9 @@ import (
 
 	"carsharing/api-gateway/internal/adapter/grpc/dto"
 	"carsharing/api-gateway/internal/model"
+	carsvc "carsharing/protos/gen/service/car"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 )
 
 type ZoneHandler struct {

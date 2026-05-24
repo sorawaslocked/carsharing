@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"carsharing/api-gateway/internal/model"
+	sharedmodel "carsharing/shared/model"
 )
 
 type CarService struct {
@@ -46,22 +47,10 @@ func (s *CarService) GetCarStatusHistory(ctx context.Context, carID string, filt
 	return s.presenter.GetCarStatusHistory(ctx, carID, filter)
 }
 
-func (s *CarService) GetCarFuelHistory(ctx context.Context, carID string, filter model.CarFuelReadingFilter) ([]model.CarFuelReading, error) {
-	return s.presenter.GetCarFuelHistory(ctx, carID, filter)
+func (s *CarService) GetCarTelemetryHistory(ctx context.Context, carID string, filter model.CarTelemetryReadingFilter) ([]model.CarTelemetryReading, error) {
+	return s.presenter.GetCarTelemetryHistory(ctx, carID, filter)
 }
 
-func (s *CarService) GetCarLocationHistory(ctx context.Context, carID string, filter model.CarLocationReadingFilter) ([]model.CarLocationReading, error) {
-	return s.presenter.GetCarLocationHistory(ctx, carID, filter)
-}
-
-func (s *CarService) GetCarBatteryHistory(ctx context.Context, carID string, filter model.CarBatteryReadingFilter) ([]model.CarBatteryReading, error) {
-	return s.presenter.GetCarBatteryHistory(ctx, carID, filter)
-}
-
-func (s *CarService) GetCarMileageHistory(ctx context.Context, carID string, filter model.CarMileageReadingFilter) ([]model.CarMileageReading, error) {
-	return s.presenter.GetCarMileageHistory(ctx, carID, filter)
-}
-
-func (s *CarService) GetImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (s *CarService) GetImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	return s.presenter.GetImageUploadData(ctx)
 }

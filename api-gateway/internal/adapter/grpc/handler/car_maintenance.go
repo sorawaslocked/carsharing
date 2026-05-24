@@ -6,10 +6,11 @@ import (
 
 	"carsharing/api-gateway/internal/adapter/grpc/dto"
 	"carsharing/api-gateway/internal/model"
+	basepb "carsharing/protos/gen/base"
+	carsvc "carsharing/protos/gen/service/car"
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
-	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -171,11 +172,11 @@ func (h *CarMaintenanceHandler) CompleteRecord(ctx context.Context, recordID str
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.CompleteMaintenanceRecord(ctx, &carsvc.CompleteMaintenanceRecordRequest{
-		RecordId:               recordID,
-		OdometerAtCompletionKm: data.OdometerAtCompletionKM,
-		CostTenge:              data.CostTenge,
-		ReceiptImageKeys:       data.ReceiptImageKeys,
-		Notes:                  data.Notes,
+		RecordId:              recordID,
+		MileageAtCompletionKm: data.MileageAtCompletionKM,
+		CostTenge:             data.CostTenge,
+		ReceiptImageKeys:      data.ReceiptImageKeys,
+		Notes:                 data.Notes,
 	})
 	if err != nil {
 		if dto.IsSystemErr(err) {
@@ -188,7 +189,7 @@ func (h *CarMaintenanceHandler) CompleteRecord(ctx context.Context, recordID str
 	return nil
 }
 
-func (h *CarMaintenanceHandler) GetReceiptImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (h *CarMaintenanceHandler) GetReceiptImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	logger := pkglog.WithMethod(h.log, "GetReceiptImageUploadData")
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
@@ -198,7 +199,7 @@ func (h *CarMaintenanceHandler) GetReceiptImageUploadData(ctx context.Context) (
 			logger.Error("grpc call failed", pkglog.Err(err))
 		}
 
-		return model.ImageUploadData{}, dto.FromGrpcErr(err)
+		return sharedmodel.ImageUploadData{}, dto.FromGrpcErr(err)
 	}
 
 	return dto.ImageUploadDataFromProto(res.GetUploadData()), nil

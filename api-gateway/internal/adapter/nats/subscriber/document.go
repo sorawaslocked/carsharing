@@ -1,14 +1,13 @@
-package handler
+package subscriber
 
 import (
 	"context"
 	"log/slog"
 
-	"carsharing/api-gateway/internal/adapter/nats/dto"
-	"carsharing/api-gateway/internal/model"
+	natsdto "carsharing/api-gateway/internal/adapter/nats/dto"
+	eventuserpb "carsharing/protos/gen/event/user"
 	pkglog "carsharing/shared/pkg/log"
 	nc "github.com/nats-io/nats.go"
-	eventuserpb "github.com/sorawaslocked/car-rental-protos/gen/event/user"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -39,7 +38,7 @@ func (s *DocumentSubscriber) Subscribe() error {
 			pkglog.Err(err),
 		)
 
-		return dto.ErrSubscribeFailed
+		return natsdto.ErrSubscribeFailed
 	}
 
 	s.subs = append(s.subs, sub)
@@ -70,21 +69,7 @@ func (s *DocumentSubscriber) handleDocumentAnalyzed(msg *nc.Msg) {
 		return
 	}
 
-	defects := make([]model.DocumentDefect, len(event.GetDefects()))
-	for i, d := range event.GetDefects() {
-		defects[i] = model.DocumentDefect{
-			Type:        d.GetType(),
-			Description: d.GetDescription(),
-		}
-	}
-
-	analyzed := model.DocumentAnalyzedEvent{
-		DocumentID: event.GetDocumentId(),
-		Passed:     event.GetPassed(),
-		Defects:    defects,
-	}
-
-	if err := s.handler.OnDocumentAnalyzed(context.Background(), analyzed); err != nil {
+	if err := s.handler.OnDocumentAnalyzed(context.Background(), natsdto.DocumentAnalyzedEventFromProto(&event)); err != nil {
 		logger.Error("handling event",
 			slog.String("documentID", event.GetDocumentId()),
 			pkglog.Err(err),

@@ -1,5 +1,7 @@
 package model
 
+import sharedmodel "carsharing/shared/model"
+
 import "time"
 
 type CarInsurance struct {
@@ -29,7 +31,7 @@ type CarInsuranceFilter struct {
 
 	ExpiringWithinDays *int32
 
-	Pagination *Pagination
+	Pagination *sharedmodel.Pagination
 }
 
 type CarInsuranceCreate struct {

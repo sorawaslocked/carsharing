@@ -5,9 +5,10 @@ import (
 
 	"carsharing/api-gateway/internal/adapter/grpc/dto"
 	"carsharing/api-gateway/internal/model"
+	usersvc "carsharing/protos/gen/service/user"
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
-	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -30,7 +31,7 @@ func (h *UserHandler) CreateDocument(ctx context.Context, objectKey, imageType s
 	return res.GetId(), nil
 }
 
-func (h *UserHandler) GetDocumentImageUploadData(ctx context.Context, imageType string) (model.ImageUploadData, error) {
+func (h *UserHandler) GetDocumentImageUploadData(ctx context.Context, imageType string) (sharedmodel.ImageUploadData, error) {
 	logger := pkglog.WithMethod(h.log, "GetDocumentImageUploadData")
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
@@ -40,13 +41,13 @@ func (h *UserHandler) GetDocumentImageUploadData(ctx context.Context, imageType 
 			logger.Error("grpc call failed", pkglog.Err(err))
 		}
 
-		return model.ImageUploadData{}, dto.FromGrpcErr(err)
+		return sharedmodel.ImageUploadData{}, dto.FromGrpcErr(err)
 	}
 
 	return dto.ImageUploadDataFromProto(res.GetUploadData()), nil
 }
 
-func (h *UserHandler) GetProfileImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (h *UserHandler) GetProfileImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	logger := pkglog.WithMethod(h.log, "GetProfileImageUploadData")
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
@@ -56,7 +57,7 @@ func (h *UserHandler) GetProfileImageUploadData(ctx context.Context) (model.Imag
 			logger.Error("grpc call failed", pkglog.Err(err))
 		}
 
-		return model.ImageUploadData{}, dto.FromGrpcErr(err)
+		return sharedmodel.ImageUploadData{}, dto.FromGrpcErr(err)
 	}
 
 	return dto.ImageUploadDataFromProto(res.GetUploadData()), nil

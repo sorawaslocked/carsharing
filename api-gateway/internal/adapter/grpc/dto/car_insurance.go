@@ -2,7 +2,7 @@ package dto
 
 import (
 	"carsharing/api-gateway/internal/model"
-	basecarpb "github.com/sorawaslocked/car-rental-protos/gen/base/car"
+	basecarpb "carsharing/protos/gen/base/car"
 )
 
 func CarInsuranceFromProto(i *basecarpb.CarInsurance) model.CarInsurance {

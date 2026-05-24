@@ -2,7 +2,8 @@ package dto
 
 import (
 	"carsharing/api-gateway/internal/model"
-	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
+	basepb "carsharing/protos/gen/base"
+	sharedmodel "carsharing/shared/model"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
@@ -17,17 +18,17 @@ func PricingSnapshotFromProto(s *basepb.PricingSnapshot) model.PricingSnapshot {
 	}
 }
 
-func LocationFromProto(l *basepb.Location) model.Location {
+func LocationFromProto(l *basepb.Location) sharedmodel.Location {
 	if l == nil {
-		return model.Location{}
+		return sharedmodel.Location{}
 	}
-	return model.Location{
+	return sharedmodel.Location{
 		Latitude:  l.GetLatitude(),
 		Longitude: l.GetLongitude(),
 	}
 }
 
-func LocationToProto(l model.Location) *basepb.Location {
+func LocationToProto(l sharedmodel.Location) *basepb.Location {
 	return &basepb.Location{
 		Latitude:  l.Latitude,
 		Longitude: l.Longitude,
@@ -42,11 +43,11 @@ func structToMap(s *structpb.Struct) map[string]any {
 	return s.AsMap()
 }
 
-func ImageUploadDataFromProto(u *basepb.ImageUploadData) model.ImageUploadData {
+func ImageUploadDataFromProto(u *basepb.ImageUploadData) sharedmodel.ImageUploadData {
 	if u == nil {
-		return model.ImageUploadData{}
+		return sharedmodel.ImageUploadData{}
 	}
-	return model.ImageUploadData{
+	return sharedmodel.ImageUploadData{
 		PresignedPutURL: u.GetPresignedPutUrl(),
 		ObjectKey:       u.GetObjectKey(),
 	}

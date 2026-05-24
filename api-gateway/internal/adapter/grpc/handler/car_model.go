@@ -6,10 +6,11 @@ import (
 
 	"carsharing/api-gateway/internal/adapter/grpc/dto"
 	"carsharing/api-gateway/internal/model"
+	basepb "carsharing/protos/gen/base"
+	carsvc "carsharing/protos/gen/service/car"
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
-	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -163,7 +164,7 @@ func (h *CarModelHandler) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (h *CarModelHandler) GetImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (h *CarModelHandler) GetImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	logger := pkglog.WithMethod(h.log, "GetImageUploadData")
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
@@ -173,7 +174,7 @@ func (h *CarModelHandler) GetImageUploadData(ctx context.Context) (model.ImageUp
 			logger.Error("grpc call failed", pkglog.Err(err))
 		}
 
-		return model.ImageUploadData{}, dto.FromGrpcErr(err)
+		return sharedmodel.ImageUploadData{}, dto.FromGrpcErr(err)
 	}
 
 	return dto.ImageUploadDataFromProto(res.GetUploadData()), nil

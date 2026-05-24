@@ -6,10 +6,10 @@ import (
 
 	"carsharing/api-gateway/internal/adapter/grpc/dto"
 	"carsharing/api-gateway/internal/model"
+	basepb "carsharing/protos/gen/base"
+	bookingsvc "carsharing/protos/gen/service/booking"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
-	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
-	bookingsvc "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 )
 
 type PricingRuleHandler struct {

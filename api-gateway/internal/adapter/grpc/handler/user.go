@@ -6,10 +6,10 @@ import (
 
 	"carsharing/api-gateway/internal/adapter/grpc/dto"
 	"carsharing/api-gateway/internal/model"
+	basepb "carsharing/protos/gen/base"
+	usersvc "carsharing/protos/gen/service/user"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
-	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
-	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 

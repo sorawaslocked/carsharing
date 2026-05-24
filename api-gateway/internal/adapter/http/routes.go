@@ -90,10 +90,7 @@ func (s *Server) setupRoutes(
 				cars.PATCH("/:id/telemetry", s.carHandler.UpdateTelemetry)
 				cars.PATCH("/:id/status", s.carHandler.UpdateStatus)
 				cars.GET("/:id/status-history", s.carHandler.GetCarStatusHistory)
-				cars.GET("/:id/fuel-history", s.carHandler.GetCarFuelHistory)
-				cars.GET("/:id/location-history", s.carHandler.GetCarLocationHistory)
-				cars.GET("/:id/battery-history", s.carHandler.GetCarBatteryHistory)
-				cars.GET("/:id/mileage-history", s.carHandler.GetCarMileageHistory)
+				cars.GET("/:id/telemetry-history", s.carHandler.GetCarTelemetryHistory)
 				cars.GET("/image-upload", s.carHandler.GetImageUploadUrl)
 			}
 

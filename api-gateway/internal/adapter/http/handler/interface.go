@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"carsharing/api-gateway/internal/model"
+	sharedmodel "carsharing/shared/model"
 )
 
 type HealthChecker interface {
@@ -28,8 +29,8 @@ type UserService interface {
 	CheckActivationCode(ctx context.Context, code string) error
 
 	CreateDocument(ctx context.Context, objectKey, imageType string) (string, error)
-	GetUploadDocumentData(ctx context.Context, imageType string) (model.ImageUploadData, error)
-	GetProfileImageUploadData(ctx context.Context) (model.ImageUploadData, error)
+	GetUploadDocumentData(ctx context.Context, imageType string) (sharedmodel.ImageUploadData, error)
+	GetProfileImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error)
 	GetProcessedDocumentsForUser(ctx context.Context, userID string) ([]model.Document, error)
 	CheckDocument(ctx context.Context, docID string, status string, documentError *string) error
 }
@@ -41,7 +42,7 @@ type CarModelService interface {
 	Update(ctx context.Context, id string, data model.CarModelUpdate) error
 	Delete(ctx context.Context, id string) error
 
-	GetImageUploadData(ctx context.Context) (model.ImageUploadData, error)
+	GetImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error)
 }
 
 type CarService interface {
@@ -55,12 +56,9 @@ type CarService interface {
 	UpdateStatus(ctx context.Context, carID string, data model.CarStatusUpdate) error
 
 	GetCarStatusHistory(ctx context.Context, carID string, filter model.CarStatusReadingFilter) ([]model.CarStatusReading, error)
-	GetCarFuelHistory(ctx context.Context, carID string, filter model.CarFuelReadingFilter) ([]model.CarFuelReading, error)
-	GetCarLocationHistory(ctx context.Context, carID string, filter model.CarLocationReadingFilter) ([]model.CarLocationReading, error)
-	GetCarBatteryHistory(ctx context.Context, carID string, filter model.CarBatteryReadingFilter) ([]model.CarBatteryReading, error)
-	GetCarMileageHistory(ctx context.Context, carID string, filter model.CarMileageReadingFilter) ([]model.CarMileageReading, error)
+	GetCarTelemetryHistory(ctx context.Context, carID string, filter model.CarTelemetryReadingFilter) ([]model.CarTelemetryReading, error)
 
-	GetImageUploadData(ctx context.Context) (model.ImageUploadData, error)
+	GetImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error)
 }
 
 type CarInsuranceService interface {
@@ -70,7 +68,7 @@ type CarInsuranceService interface {
 	Update(ctx context.Context, id string, data model.CarInsuranceUpdate) error
 	Delete(ctx context.Context, id string) error
 
-	GetImageUploadData(ctx context.Context) (model.ImageUploadData, error)
+	GetImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error)
 }
 
 type ZoneService interface {
@@ -118,5 +116,5 @@ type CarMaintenanceService interface {
 	ListRecords(ctx context.Context, filter model.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error)
 	CompleteRecord(ctx context.Context, recordID string, data model.CarMaintenanceRecordComplete) error
 
-	GetReceiptImageUploadData(ctx context.Context) (model.ImageUploadData, error)
+	GetReceiptImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error)
 }

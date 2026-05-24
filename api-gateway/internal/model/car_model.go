@@ -1,5 +1,7 @@
 package model
 
+import sharedmodel "carsharing/shared/model"
+
 import "time"
 
 type CarModel struct {
@@ -35,7 +37,7 @@ type CarModelFilter struct {
 
 	MinSeats *int8
 
-	Pagination *Pagination
+	Pagination *sharedmodel.Pagination
 }
 
 type CarModelCreate struct {

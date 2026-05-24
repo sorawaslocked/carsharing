@@ -1,5 +1,7 @@
 package model
 
+import sharedmodel "carsharing/shared/model"
+
 import "time"
 
 type User struct {
@@ -31,7 +33,7 @@ type UserFilter struct {
 	IsEmailVerified    *bool
 	IsSuspended        *bool
 
-	Pagination *Pagination
+	Pagination *sharedmodel.Pagination
 }
 
 type UserCreate struct {

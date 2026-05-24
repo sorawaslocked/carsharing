@@ -2,7 +2,7 @@ package dto
 
 import (
 	"carsharing/api-gateway/internal/model"
-	baseuser "github.com/sorawaslocked/car-rental-protos/gen/base/user"
+	baseuser "carsharing/protos/gen/base/user"
 )
 
 func DocumentFromProto(d *baseuser.Document) model.Document {

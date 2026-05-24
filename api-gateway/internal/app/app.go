@@ -12,20 +12,20 @@ import (
 	"carsharing/api-gateway/internal/adapter/grpc/interceptor"
 	httpserver "carsharing/api-gateway/internal/adapter/http"
 	httphandler "carsharing/api-gateway/internal/adapter/http/handler"
-	natshandler "carsharing/api-gateway/internal/adapter/nats/handler"
+	natssub "carsharing/api-gateway/internal/adapter/nats/subscriber"
 	redisadapter "carsharing/api-gateway/internal/adapter/redis"
 	wshandler "carsharing/api-gateway/internal/adapter/websocket/handler"
 	"carsharing/api-gateway/internal/config"
 	"carsharing/api-gateway/internal/service"
+	bookingsvc "carsharing/protos/gen/service/booking"
+	carsvc "carsharing/protos/gen/service/car"
+	tripsvc "carsharing/protos/gen/service/trip"
+	usersvc "carsharing/protos/gen/service/user"
 	pkggrpc "carsharing/shared/pkg/grpc"
 	pkgjwt "carsharing/shared/pkg/jwt"
 	pkglog "carsharing/shared/pkg/log"
 	pkgnats "carsharing/shared/pkg/nats"
 	pkgredis "carsharing/shared/pkg/redis"
-	bookingsvc "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
-	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
-	usersvc "github.com/sorawaslocked/car-rental-protos/gen/service/user"
 	"google.golang.org/grpc"
 )
 
@@ -48,9 +48,9 @@ type App struct {
 	cfg                    config.Config
 	log                    *slog.Logger
 	httpServer             *httpserver.Server
-	natsUserSubscriber     *natshandler.UserSubscriber
-	natsDocumentSubscriber *natshandler.DocumentSubscriber
-	natsCarSubscriber      *natshandler.CarSubscriber
+	natsUserSubscriber     *natssub.UserSubscriber
+	natsDocumentSubscriber *natssub.DocumentSubscriber
+	natsCarSubscriber      *natssub.CarSubscriber
 }
 
 func New(cfg config.Config, log *slog.Logger) *App {
@@ -162,7 +162,7 @@ func New(cfg config.Config, log *slog.Logger) *App {
 		return nil
 	}
 
-	natsUserSub := natshandler.NewUserSubscriber(natsConn, userCache, log)
+	natsUserSub := natssub.NewUserSubscriber(natsConn, userCache, log)
 	if err = natsUserSub.Subscribe(); err != nil {
 		return nil
 	}
@@ -170,12 +170,12 @@ func New(cfg config.Config, log *slog.Logger) *App {
 	documentHub := wshandler.NewDocumentHub()
 	carStatusHub := wshandler.NewCarStatusHub()
 
-	natsDocumentSub := natshandler.NewDocumentSubscriber(natsConn, documentHub, log)
+	natsDocumentSub := natssub.NewDocumentSubscriber(natsConn, documentHub, log)
 	if err = natsDocumentSub.Subscribe(); err != nil {
 		return nil
 	}
 
-	natsCarSub := natshandler.NewCarSubscriber(natsConn, carStatusHub, log)
+	natsCarSub := natssub.NewCarSubscriber(natsConn, carStatusHub, log)
 	if err = natsCarSub.Subscribe(); err != nil {
 		return nil
 	}

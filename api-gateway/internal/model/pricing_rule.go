@@ -1,5 +1,7 @@
 package model
 
+import sharedmodel "carsharing/shared/model"
+
 import "time"
 
 type PricingRule struct {
@@ -32,7 +34,7 @@ type PricingRuleFilter struct {
 	Type     *string
 	IsActive *bool
 
-	Pagination *Pagination
+	Pagination *sharedmodel.Pagination
 }
 
 type PricingRuleCreate struct {

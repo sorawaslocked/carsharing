@@ -2,7 +2,7 @@ package dto
 
 import (
 	"carsharing/api-gateway/internal/model"
-	basebookingpb "github.com/sorawaslocked/car-rental-protos/gen/base/booking"
+	basebookingpb "carsharing/protos/gen/base/booking"
 )
 
 func PricingRuleFromProto(r *basebookingpb.PricingRule) model.PricingRule {

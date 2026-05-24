@@ -2,7 +2,7 @@ package dto
 
 import (
 	"carsharing/api-gateway/internal/model"
-	basetripb "github.com/sorawaslocked/car-rental-protos/gen/base/trip"
+	basetripb "carsharing/protos/gen/base/trip"
 )
 
 func TripFromProto(t *basetripb.Trip) model.Trip {

@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"carsharing/api-gateway/internal/model"
+	sharedmodel "carsharing/shared/model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,15 +22,15 @@ type ImageUploadResponse struct {
 	UploadData ImageUploadData `json:"uploadData"`
 }
 
-func ToImageUploadDataResponse(m model.ImageUploadData) ImageUploadData {
+func ToImageUploadDataResponse(m sharedmodel.ImageUploadData) ImageUploadData {
 	return ImageUploadData{
 		PresignedPutURL: m.PresignedPutURL,
 		ObjectKey:       m.ObjectKey,
 	}
 }
 
-func pagination(c *gin.Context) (*model.Pagination, error) {
-	var p model.Pagination
+func pagination(c *gin.Context) (*sharedmodel.Pagination, error) {
+	var p sharedmodel.Pagination
 	paginationEmpty := true
 
 	if v := c.Query("limit"); v != "" {

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"carsharing/api-gateway/internal/model"
+	sharedmodel "carsharing/shared/model"
 )
 
 type CarMaintenanceService struct {
@@ -42,6 +43,6 @@ func (s *CarMaintenanceService) CompleteRecord(ctx context.Context, recordID str
 	return s.presenter.CompleteRecord(ctx, recordID, data)
 }
 
-func (s *CarMaintenanceService) GetReceiptImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (s *CarMaintenanceService) GetReceiptImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	return s.presenter.GetReceiptImageUploadData(ctx)
 }

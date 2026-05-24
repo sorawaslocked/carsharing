@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	sharedmodel "carsharing/shared/model"
+)
 
 type Car struct {
 	ID               string
@@ -13,13 +17,13 @@ type Car struct {
 	MileageKM    int64
 	FuelLevel    *float32
 	BatteryLevel *float32
-	Location     Location
+	Location     sharedmodel.Location
 
-	TelematicsID string
-	ZoneID       *string
-	FuelStatus   string
-	Status       string
-	IsRetired    bool
+	TelemetryID string
+	ZoneID      *string
+	FuelStatus  string
+	Status      string
+	IsRetired   bool
 
 	Notes     *string
 	ImageURLs []string
@@ -38,7 +42,7 @@ type CarFilter struct {
 	Class        *string
 	MinSeats     *int8
 
-	Location     *Location
+	Location     *sharedmodel.Location
 	RadiusM      *int32
 	MinFuelLevel *float32
 
@@ -46,7 +50,7 @@ type CarFilter struct {
 	Status    *string
 	IsRetired *bool
 
-	Pagination *Pagination
+	Pagination *sharedmodel.Pagination
 }
 
 type CarCreate struct {
@@ -56,7 +60,8 @@ type CarCreate struct {
 	Color            string
 	YearManufactured int16
 
-	TelematicsID string
+	TelemetryID string
+	ZoneID      *string
 
 	Notes *string
 }
@@ -66,8 +71,8 @@ type CarUpdate struct {
 	LicensePlate *string
 	Color        *string
 
-	TelematicsID *string
-	ZoneID       *string
+	TelemetryID *string
+	ZoneID      *string
 
 	IsRetired *bool
 	Notes     *string
@@ -86,54 +91,22 @@ type CarStatusReading struct {
 	Reason    *string
 	Metadata  map[string]any
 
-	ChangedAt time.Time
+	RecordedAt time.Time
 }
 
 type CarStatusReadingFilter struct {
-	From       *time.Time
-	To         *time.Time
-	Pagination *Pagination
+	TimeRange  *sharedmodel.TimeRange
+	Pagination *sharedmodel.Pagination
 }
 
-type CarFuelReading struct {
-	ID         string
-	CarID      string
-	FuelPct    float32
-	RawPct     float32
-	ActorType  string
-	ActorID    *string
-	Reason     *string
-	Metadata   map[string]any
-	RecordedAt time.Time
-}
-
-type CarFuelReadingFilter struct {
-	From       *time.Time
-	To         *time.Time
-	Pagination *Pagination
-}
-
-type CarLocationReading struct {
-	ID         string
-	CarID      string
-	Location   Location
-	ActorType  string
-	ActorID    *string
-	Reason     *string
-	Metadata   map[string]any
-	RecordedAt time.Time
-}
-
-type CarLocationReadingFilter struct {
-	From       *time.Time
-	To         *time.Time
-	Pagination *Pagination
-}
-
-type CarBatteryReading struct {
+type CarTelemetryReading struct {
 	ID           string
 	CarID        string
-	BatteryLevel float32
+	FuelPct      *float32
+	FuelRawPct   *float32
+	BatteryLevel *float32
+	MileageKM    *int64
+	Location     *sharedmodel.Location
 	ActorType    string
 	ActorID      *string
 	Reason       *string
@@ -141,34 +114,16 @@ type CarBatteryReading struct {
 	RecordedAt   time.Time
 }
 
-type CarBatteryReadingFilter struct {
-	From       *time.Time
-	To         *time.Time
-	Pagination *Pagination
-}
-
-type CarMileageReading struct {
-	ID         string
-	CarID      string
-	MileageKM  int64
-	ActorType  string
-	ActorID    *string
-	Reason     *string
-	Metadata   map[string]any
-	RecordedAt time.Time
-}
-
-type CarMileageReadingFilter struct {
-	From       *time.Time
-	To         *time.Time
-	Pagination *Pagination
+type CarTelemetryReadingFilter struct {
+	TimeRange  *sharedmodel.TimeRange
+	Pagination *sharedmodel.Pagination
 }
 
 type CarTelemetryUpdate struct {
 	MileageKM    *int64
 	FuelLevel    *float32
 	BatteryLevel *float32
-	Location     *Location
+	Location     *sharedmodel.Location
 
 	Reason   string
 	Metadata map[string]any
@@ -186,7 +141,7 @@ type SlimCar struct {
 	ModelID      string
 	LicensePlate string
 	Color        string
-	Location     Location
+	Location     sharedmodel.Location
 	FuelLevel    float32
 	Status       string
 }
@@ -195,11 +150,11 @@ type CarTelemetryEvent struct {
 	FuelLevel    float32
 	BatteryLevel float32
 	MileageKM    int64
-	Location     Location
+	Location     sharedmodel.Location
 	RecordedAt   time.Time
 }
 
-type CarStatusUpdated struct {
+type CarStatusUpdatedEvent struct {
 	CarID      string
 	FromStatus string
 	ToStatus   string

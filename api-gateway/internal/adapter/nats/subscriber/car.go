@@ -1,14 +1,13 @@
-package handler
+package subscriber
 
 import (
 	"context"
 	"log/slog"
 
-	"carsharing/api-gateway/internal/adapter/nats/dto"
-	"carsharing/api-gateway/internal/model"
+	natsdto "carsharing/api-gateway/internal/adapter/nats/dto"
+	eventcarpb "carsharing/protos/gen/event/car"
 	pkglog "carsharing/shared/pkg/log"
 	nc "github.com/nats-io/nats.go"
-	eventcarpb "github.com/sorawaslocked/car-rental-protos/gen/event/car"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -39,7 +38,7 @@ func (s *CarSubscriber) Subscribe() error {
 			pkglog.Err(err),
 		)
 
-		return dto.ErrSubscribeFailed
+		return natsdto.ErrSubscribeFailed
 	}
 
 	s.subs = append(s.subs, sub)
@@ -70,13 +69,7 @@ func (s *CarSubscriber) handleCarStatusUpdated(msg *nc.Msg) {
 		return
 	}
 
-	updated := model.CarStatusUpdated{
-		CarID:      event.GetCarId(),
-		FromStatus: event.GetFromStatus(),
-		ToStatus:   event.GetToStatus(),
-	}
-
-	if err := s.handler.OnCarStatusUpdated(context.Background(), updated); err != nil {
+	if err := s.handler.OnCarStatusUpdated(context.Background(), natsdto.CarStatusUpdatedFromProto(&event)); err != nil {
 		logger.Error("handling event",
 			slog.String("carID", event.GetCarId()),
 			pkglog.Err(err),

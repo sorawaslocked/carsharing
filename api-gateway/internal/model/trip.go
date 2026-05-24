@@ -1,5 +1,7 @@
 package model
 
+import sharedmodel "carsharing/shared/model"
+
 import "time"
 
 type Trip struct {
@@ -10,12 +12,12 @@ type Trip struct {
 	Status    string
 
 	StartedAt      time.Time
-	StartLocation  Location
+	StartLocation  sharedmodel.Location
 	StartMileageKM int64
 	StartFuelLevel *float32
 
 	EndedAt      *time.Time
-	EndLocation  *Location
+	EndLocation  *sharedmodel.Location
 	EndMileageKM *int64
 	EndFuelLevel *float32
 
@@ -35,7 +37,7 @@ type TripFilter struct {
 	Status        *string
 	StartedAfter  *time.Time
 	StartedBefore *time.Time
-	Pagination    *Pagination
+	Pagination    *sharedmodel.Pagination
 }
 
 type TripSummary struct {
@@ -68,7 +70,7 @@ type TripStatusReading struct {
 type TripStatusReadingFilter struct {
 	From       *time.Time
 	To         *time.Time
-	Pagination *Pagination
+	Pagination *sharedmodel.Pagination
 }
 
 type TripLiveFeed struct {

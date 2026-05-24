@@ -6,10 +6,11 @@ import (
 
 	"carsharing/api-gateway/internal/adapter/grpc/dto"
 	"carsharing/api-gateway/internal/model"
+	basepb "carsharing/protos/gen/base"
+	carsvc "carsharing/protos/gen/service/car"
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
-	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
-	carsvc "github.com/sorawaslocked/car-rental-protos/gen/service/car"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -39,7 +40,7 @@ func (h *CarHandler) Create(ctx context.Context, data model.CarCreate) (string, 
 		LicensePlate:     data.LicensePlate,
 		Color:            data.Color,
 		YearManufactured: int32(data.YearManufactured),
-		TelematicsId:     data.TelematicsID,
+		TelemetryId:      data.TelemetryID,
 		Notes:            data.Notes,
 	})
 	if err != nil {
@@ -126,7 +127,7 @@ func (h *CarHandler) Update(ctx context.Context, id string, data model.CarUpdate
 		ModelId:      data.ModelID,
 		LicensePlate: data.LicensePlate,
 		Color:        data.Color,
-		TelematicsId: data.TelematicsID,
+		TelemetryId:  data.TelemetryID,
 		ZoneId:       data.ZoneID,
 		IsRetired:    data.IsRetired,
 		Notes:        data.Notes,
@@ -227,11 +228,15 @@ func (h *CarHandler) GetCarStatusHistory(ctx context.Context, carID string, filt
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.GetCarStatusHistoryRequest{CarId: carID}
-	if filter.From != nil {
-		req.From = timestamppb.New(*filter.From)
-	}
-	if filter.To != nil {
-		req.To = timestamppb.New(*filter.To)
+	if filter.TimeRange != nil {
+		tr := &basepb.TimeRange{}
+		if !filter.TimeRange.From.IsZero() {
+			tr.From = timestamppb.New(filter.TimeRange.From)
+		}
+		if !filter.TimeRange.To.IsZero() {
+			tr.To = timestamppb.New(filter.TimeRange.To)
+		}
+		req.TimeRange = tr
 	}
 	if filter.Pagination != nil {
 		req.Pagination = &basepb.Pagination{
@@ -251,22 +256,26 @@ func (h *CarHandler) GetCarStatusHistory(ctx context.Context, carID string, filt
 
 	entries := make([]model.CarStatusReading, len(res.GetReadings()))
 	for i, r := range res.GetReadings() {
-		entries[i] = dto.CarStatusEntryFromProto(r)
+		entries[i] = dto.CarStatusReadingFromProto(r)
 	}
 
 	return entries, nil
 }
 
-func (h *CarHandler) GetCarFuelHistory(ctx context.Context, carID string, filter model.CarFuelReadingFilter) ([]model.CarFuelReading, error) {
-	logger := pkglog.WithMethod(h.log, "GetCarFuelHistory")
+func (h *CarHandler) GetCarTelemetryHistory(ctx context.Context, carID string, filter model.CarTelemetryReadingFilter) ([]model.CarTelemetryReading, error) {
+	logger := pkglog.WithMethod(h.log, "GetCarTelemetryHistory")
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
-	req := &carsvc.GetCarFuelHistoryRequest{CarId: carID}
-	if filter.From != nil {
-		req.From = timestamppb.New(*filter.From)
-	}
-	if filter.To != nil {
-		req.To = timestamppb.New(*filter.To)
+	req := &carsvc.GetCarTelemetryHistoryRequest{CarId: carID}
+	if filter.TimeRange != nil {
+		tr := &basepb.TimeRange{}
+		if !filter.TimeRange.From.IsZero() {
+			tr.From = timestamppb.New(filter.TimeRange.From)
+		}
+		if !filter.TimeRange.To.IsZero() {
+			tr.To = timestamppb.New(filter.TimeRange.To)
+		}
+		req.TimeRange = tr
 	}
 	if filter.Pagination != nil {
 		req.Pagination = &basepb.Pagination{
@@ -275,42 +284,7 @@ func (h *CarHandler) GetCarFuelHistory(ctx context.Context, carID string, filter
 		}
 	}
 
-	res, err := h.client.GetCarFuelHistory(ctx, req)
-	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
-
-		return nil, dto.FromGrpcErr(err)
-	}
-
-	readings := make([]model.CarFuelReading, len(res.GetReadings()))
-	for i, r := range res.GetReadings() {
-		readings[i] = dto.CarFuelReadingFromProto(r)
-	}
-
-	return readings, nil
-}
-
-func (h *CarHandler) GetCarLocationHistory(ctx context.Context, carID string, filter model.CarLocationReadingFilter) ([]model.CarLocationReading, error) {
-	logger := pkglog.WithMethod(h.log, "GetCarLocationHistory")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
-
-	req := &carsvc.GetCarLocationHistoryRequest{CarId: carID}
-	if filter.From != nil {
-		req.From = timestamppb.New(*filter.From)
-	}
-	if filter.To != nil {
-		req.To = timestamppb.New(*filter.To)
-	}
-	if filter.Pagination != nil {
-		req.Pagination = &basepb.Pagination{
-			Limit:  filter.Pagination.Limit,
-			Offset: filter.Pagination.Offset,
-		}
-	}
-
-	res, err := h.client.GetCarLocationHistory(ctx, req)
+	res, err := h.client.GetCarTelemetryHistory(ctx, req)
 	if err != nil {
 		if dto.IsSystemErr(err) {
 			logger.Error("grpc call failed", pkglog.Err(err))
@@ -318,80 +292,14 @@ func (h *CarHandler) GetCarLocationHistory(ctx context.Context, carID string, fi
 		return nil, dto.FromGrpcErr(err)
 	}
 
-	entries := make([]model.CarLocationReading, len(res.GetReadings()))
+	readings := make([]model.CarTelemetryReading, len(res.GetReadings()))
 	for i, r := range res.GetReadings() {
-		entries[i] = dto.CarLocationEntryFromProto(r)
-	}
-	return entries, nil
-}
-
-func (h *CarHandler) GetCarBatteryHistory(ctx context.Context, carID string, filter model.CarBatteryReadingFilter) ([]model.CarBatteryReading, error) {
-	logger := pkglog.WithMethod(h.log, "GetCarBatteryHistory")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
-
-	req := &carsvc.GetCarBatteryHistoryRequest{CarId: carID}
-	if filter.From != nil {
-		req.From = timestamppb.New(*filter.From)
-	}
-	if filter.To != nil {
-		req.To = timestamppb.New(*filter.To)
-	}
-	if filter.Pagination != nil {
-		req.Pagination = &basepb.Pagination{
-			Limit:  filter.Pagination.Limit,
-			Offset: filter.Pagination.Offset,
-		}
-	}
-
-	res, err := h.client.GetCarBatteryHistory(ctx, req)
-	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
-		return nil, dto.FromGrpcErr(err)
-	}
-
-	readings := make([]model.CarBatteryReading, len(res.GetReadings()))
-	for i, r := range res.GetReadings() {
-		readings[i] = dto.CarBatteryReadingFromProto(r)
+		readings[i] = dto.CarTelemetryReadingFromProto(r)
 	}
 	return readings, nil
 }
 
-func (h *CarHandler) GetCarMileageHistory(ctx context.Context, carID string, filter model.CarMileageReadingFilter) ([]model.CarMileageReading, error) {
-	logger := pkglog.WithMethod(h.log, "GetCarMileageHistory")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
-
-	req := &carsvc.GetCarMileageHistoryRequest{CarId: carID}
-	if filter.From != nil {
-		req.From = timestamppb.New(*filter.From)
-	}
-	if filter.To != nil {
-		req.To = timestamppb.New(*filter.To)
-	}
-	if filter.Pagination != nil {
-		req.Pagination = &basepb.Pagination{
-			Limit:  filter.Pagination.Limit,
-			Offset: filter.Pagination.Offset,
-		}
-	}
-
-	res, err := h.client.GetCarMileageHistory(ctx, req)
-	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
-		return nil, dto.FromGrpcErr(err)
-	}
-
-	entries := make([]model.CarMileageReading, len(res.GetReadings()))
-	for i, r := range res.GetReadings() {
-		entries[i] = dto.CarMileageEntryFromProto(r)
-	}
-	return entries, nil
-}
-
-func (h *CarHandler) GetImageUploadData(ctx context.Context) (model.ImageUploadData, error) {
+func (h *CarHandler) GetImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	logger := pkglog.WithMethod(h.log, "GetImageUploadData")
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
@@ -400,7 +308,7 @@ func (h *CarHandler) GetImageUploadData(ctx context.Context) (model.ImageUploadD
 		if dto.IsSystemErr(err) {
 			logger.Error("grpc call failed", pkglog.Err(err))
 		}
-		return model.ImageUploadData{}, dto.FromGrpcErr(err)
+		return sharedmodel.ImageUploadData{}, dto.FromGrpcErr(err)
 	}
 
 	return dto.ImageUploadDataFromProto(res.GetUploadData()), nil

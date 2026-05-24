@@ -2,7 +2,7 @@ package dto
 
 import (
 	"carsharing/api-gateway/internal/model"
-	basecarpb "github.com/sorawaslocked/car-rental-protos/gen/base/car"
+	basecarpb "carsharing/protos/gen/base/car"
 )
 
 func CarMaintenanceTemplateFromProto(t *basecarpb.CarMaintenanceTemplate) model.CarMaintenanceTemplate {
@@ -19,16 +19,16 @@ func CarMaintenanceTemplateFromProto(t *basecarpb.CarMaintenanceTemplate) model.
 
 func CarMaintenanceRecordFromProto(r *basecarpb.CarMaintenanceRecord) model.CarMaintenanceRecord {
 	rec := model.CarMaintenanceRecord{
-		ID:                     r.GetId(),
-		CarID:                  r.GetCarId(),
-		TemplateID:             r.GetTemplateId(),
-		Status:                 r.GetStatus(),
-		OdometerAtWarningKM:    r.GetOdometerAtWarningKm(),
-		OdometerAtCompletionKM: r.OdometerAtCompletionKm,
-		CostTenge:              r.CostTenge,
-		AssignedTo:             r.AssignedTo,
-		ReceiptImageURLs:       r.GetReceiptImageUrls(),
-		Notes:                  r.Notes,
+		ID:                    r.GetId(),
+		CarID:                 r.GetCarId(),
+		TemplateID:            r.GetTemplateId(),
+		Status:                r.GetStatus(),
+		MileageAtWarningKM:    r.GetMileageAtWarningKm(),
+		MileageAtCompletionKM: r.MileageAtCompletionKm,
+		CostTenge:             r.CostTenge,
+		AssignedTo:            r.AssignedTo,
+		ReceiptImageURLs:      r.GetReceiptImageUrls(),
+		Notes:                 r.Notes,
 	}
 	if r.GetDueBy() != nil {
 		t := r.GetDueBy().AsTime()

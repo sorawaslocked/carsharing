@@ -7,21 +7,21 @@ import (
 	"carsharing/api-gateway/internal/model"
 )
 
-// CarStatusHub routes CarStatusUpdated events to waiting WebSocket connections
+// CarStatusHub routes CarStatusUpdatedEvent events to waiting WebSocket connections
 // keyed by car ID. Implements nats/handler.CarStatusEventHandler.
 type CarStatusHub struct {
 	mu   sync.RWMutex
-	subs map[string][]chan model.CarStatusUpdated
+	subs map[string][]chan model.CarStatusUpdatedEvent
 }
 
 func NewCarStatusHub() *CarStatusHub {
 	return &CarStatusHub{
-		subs: make(map[string][]chan model.CarStatusUpdated),
+		subs: make(map[string][]chan model.CarStatusUpdatedEvent),
 	}
 }
 
-func (h *CarStatusHub) Subscribe(carID string) (<-chan model.CarStatusUpdated, func()) {
-	ch := make(chan model.CarStatusUpdated, 1)
+func (h *CarStatusHub) Subscribe(carID string) (<-chan model.CarStatusUpdatedEvent, func()) {
+	ch := make(chan model.CarStatusUpdatedEvent, 1)
 
 	h.mu.Lock()
 	h.subs[carID] = append(h.subs[carID], ch)
@@ -46,7 +46,7 @@ func (h *CarStatusHub) Subscribe(carID string) (<-chan model.CarStatusUpdated, f
 }
 
 // OnCarStatusUpdated implements nats/handler.CarStatusEventHandler.
-func (h *CarStatusHub) OnCarStatusUpdated(_ context.Context, event model.CarStatusUpdated) error {
+func (h *CarStatusHub) OnCarStatusUpdated(_ context.Context, event model.CarStatusUpdatedEvent) error {
 	h.mu.RLock()
 	chans := h.subs[event.CarID]
 	h.mu.RUnlock()

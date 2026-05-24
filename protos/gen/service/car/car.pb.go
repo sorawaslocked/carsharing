@@ -39,6 +39,7 @@ type CreateCarRequest struct {
 	FuelLevel        *float32               `protobuf:"fixed32,9,opt,name=fuel_level,json=fuelLevel,proto3,oneof" json:"fuel_level,omitempty"`
 	BatteryLevel     *float32               `protobuf:"fixed32,10,opt,name=battery_level,json=batteryLevel,proto3,oneof" json:"battery_level,omitempty"`
 	Location         *base.Location         `protobuf:"bytes,11,opt,name=location,proto3,oneof" json:"location,omitempty"`
+	ZoneId           *string                `protobuf:"bytes,12,opt,name=zone_id,json=zoneId,proto3,oneof" json:"zone_id,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -148,6 +149,13 @@ func (x *CreateCarRequest) GetLocation() *base.Location {
 		return x.Location
 	}
 	return nil
+}
+
+func (x *CreateCarRequest) GetZoneId() string {
+	if x != nil && x.ZoneId != nil {
+		return *x.ZoneId
+	}
+	return ""
 }
 
 type CreateCarResponse struct {
@@ -1058,7 +1066,7 @@ var File_service_car_car_proto protoreflect.FileDescriptor
 
 const file_service_car_car_proto_rawDesc = "" +
 	"\n" +
-	"\x15service/car/car.proto\x12\vservice.car\x1a\x12base/car/car.proto\x1a\x11base/common.proto\x1a\x14service/common.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xcf\x03\n" +
+	"\x15service/car/car.proto\x12\vservice.car\x1a\x12base/car/car.proto\x1a\x11base/common.proto\x1a\x14service/common.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xf9\x03\n" +
 	"\x10CreateCarRequest\x12\x19\n" +
 	"\bmodel_id\x18\x01 \x01(\tR\amodelId\x12\x10\n" +
 	"\x03vin\x18\x02 \x01(\tR\x03vin\x12#\n" +
@@ -1073,12 +1081,15 @@ const file_service_car_car_proto_rawDesc = "" +
 	"fuel_level\x18\t \x01(\x02H\x02R\tfuelLevel\x88\x01\x01\x12(\n" +
 	"\rbattery_level\x18\n" +
 	" \x01(\x02H\x03R\fbatteryLevel\x88\x01\x01\x12/\n" +
-	"\blocation\x18\v \x01(\v2\x0e.base.LocationH\x04R\blocation\x88\x01\x01B\b\n" +
+	"\blocation\x18\v \x01(\v2\x0e.base.LocationH\x04R\blocation\x88\x01\x01\x12\x1c\n" +
+	"\azone_id\x18\f \x01(\tH\x05R\x06zoneId\x88\x01\x01B\b\n" +
 	"\x06_notesB\r\n" +
 	"\v_mileage_kmB\r\n" +
 	"\v_fuel_levelB\x10\n" +
 	"\x0e_battery_levelB\v\n" +
-	"\t_location\"#\n" +
+	"\t_locationB\n" +
+	"\n" +
+	"\b_zone_id\"#\n" +
 	"\x11CreateCarResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"\x1f\n" +
 	"\rGetCarRequest\x12\x0e\n" +

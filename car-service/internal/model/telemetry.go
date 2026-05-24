@@ -32,7 +32,7 @@ type TelemetryUpdate struct {
 }
 
 type TelemetryReadingFilter struct {
-	CarID *string
+	CarID string
 	From  *time.Time
 	To    *time.Time
 

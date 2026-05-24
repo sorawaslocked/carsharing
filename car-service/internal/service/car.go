@@ -317,17 +317,23 @@ func (s *CarService) ListCarStatusHistory(ctx context.Context, filter validation
 		return nil, err
 	}
 
-	if s.statusReadingRepo == nil {
-		return nil, nil
-	}
-
 	if filter.Pagination == nil {
 		filter.Pagination = sharedvalidation.DefaultPagination()
 	}
-	entries, err := s.statusReadingRepo.Find(ctx, model.CarStatusReadingFilter{
+	domainFilter := model.CarStatusReadingFilter{
 		CarID:      filter.CarID,
 		Pagination: &sharedmodel.Pagination{Limit: filter.Pagination.Limit, Offset: filter.Pagination.Offset},
-	})
+	}
+	if filter.FromStatus != nil {
+		s := model.CarStatus(*filter.FromStatus)
+		domainFilter.FromStatus = &s
+	}
+	if filter.ToStatus != nil {
+		s := model.CarStatus(*filter.ToStatus)
+		domainFilter.ToStatus = &s
+	}
+
+	entries, err := s.statusReadingRepo.Find(ctx, domainFilter)
 	if err != nil {
 		log.Error("repo: listing car status history", pkglog.Err(err))
 		return nil, err

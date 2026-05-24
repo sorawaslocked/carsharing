@@ -19,7 +19,9 @@ type CarStatusReading struct {
 }
 
 type CarStatusReadingFilter struct {
-	CarID *string
+	CarID      string
+	FromStatus *CarStatus
+	ToStatus   *CarStatus
 
 	Pagination *sharedmodel.Pagination
 }

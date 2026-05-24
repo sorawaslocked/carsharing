@@ -72,11 +72,9 @@ func (r *TelemetryReadingRepository) Find(ctx context.Context, filter model.Tele
 	var args []any
 	n := 0
 
-	if filter.CarID != nil {
-		n++
-		args = append(args, *filter.CarID)
-		clauses = append(clauses, fmt.Sprintf("car_id = $%d", n))
-	}
+	n++
+	args = append(args, filter.CarID)
+	clauses = append(clauses, fmt.Sprintf("car_id = $%d", n))
 	if filter.From != nil {
 		n++
 		args = append(args, *filter.From)

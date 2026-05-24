@@ -44,7 +44,9 @@ type CarStatusUpdate struct {
 }
 
 type CarStatusReadingFilter struct {
-	CarID      *string `validate:"omitempty,uuid"`
+	CarID      string  `validate:"required,uuid"`
+	FromStatus *string `validate:"omitempty,carstatus"`
+	ToStatus   *string `validate:"omitempty,carstatus"`
 	Pagination *sharedvalidation.Pagination
 }
 
@@ -56,7 +58,7 @@ type CarTelemetryUpdate struct {
 }
 
 type TelemetryReadingFilter struct {
-	CarID      *string `validate:"omitempty,uuid"`
+	CarID      string `validate:"required,uuid"`
 	From       *time.Time
 	To         *time.Time
 	Pagination *sharedvalidation.Pagination

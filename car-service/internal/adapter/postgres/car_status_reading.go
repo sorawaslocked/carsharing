@@ -64,10 +64,18 @@ func (r *CarStatusReadingRepository) Find(ctx context.Context, filter model.CarS
 	var args []any
 	n := 0
 
-	if filter.CarID != nil {
+	n++
+	args = append(args, filter.CarID)
+	clauses = append(clauses, fmt.Sprintf("car_id = $%d", n))
+	if filter.FromStatus != nil {
 		n++
-		args = append(args, *filter.CarID)
-		clauses = append(clauses, fmt.Sprintf("car_id = $%d", n))
+		args = append(args, string(*filter.FromStatus))
+		clauses = append(clauses, fmt.Sprintf("from_status = $%d", n))
+	}
+	if filter.ToStatus != nil {
+		n++
+		args = append(args, string(*filter.ToStatus))
+		clauses = append(clauses, fmt.Sprintf("to_status = $%d", n))
 	}
 
 	where := ""

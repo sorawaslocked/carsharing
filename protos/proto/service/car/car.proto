@@ -115,9 +115,11 @@ message DeleteCarRequest {
 message GetCarStatusHistoryRequest {
   string car_id = 1;
 
-  optional google.protobuf.Timestamp from       = 2;
-  optional google.protobuf.Timestamp to         = 3;
-  optional base.Pagination           pagination = 4;
+  optional google.protobuf.Timestamp from        = 2;
+  optional google.protobuf.Timestamp to          = 3;
+  optional base.Pagination           pagination  = 4;
+  optional string                    from_status = 5;
+  optional string                    to_status   = 6;
 }
 
 message GetCarStatusHistoryResponse {

@@ -125,11 +125,14 @@ func (h *BookingHandler) GetStatusHistory(ctx context.Context, id string, filter
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetStatusHistory"), utils.MetadataFromCtx(ctx))
 
 	req := &bookingsvc.GetBookingStatusHistoryRequest{Id: id}
-	if filter.From != nil {
-		req.From = timestamppb.New(*filter.From)
-	}
-	if filter.To != nil {
-		req.To = timestamppb.New(*filter.To)
+	if filter.From != nil || filter.To != nil {
+		req.TimeRange = &basepb.TimeRange{}
+		if filter.From != nil {
+			req.TimeRange.From = timestamppb.New(*filter.From)
+		}
+		if filter.To != nil {
+			req.TimeRange.To = timestamppb.New(*filter.To)
+		}
 	}
 	if filter.Pagination != nil {
 		req.Pagination = &basepb.Pagination{

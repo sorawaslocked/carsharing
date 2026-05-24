@@ -99,7 +99,7 @@ func (h *BookingHandler) Get(ctx *gin.Context) {
 // @Security     BearerAuth
 // @Param        userID         query     string   false  "Filter by user UUID"
 // @Param        carID          query     string   false  "Filter by car UUID"
-// @Param        status         query     string   false  "Filter by status"
+// @Param        status         query     string   false  "Filter by status"  Enums(created, expired, completed, cancelled)
 // @Param        pricingRuleID  query     string   false  "Filter by pricing rule UUID"
 // @Param        limit          query     integer  false  "Pagination limit"
 // @Param        offset         query     integer  false  "Pagination offset"

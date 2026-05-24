@@ -99,8 +99,8 @@ func (h *PricingRuleHandler) Get(ctx *gin.Context) {
 // @Security     BearerAuth
 // @Param        modelID   query     string   false  "Filter by car model UUID"
 // @Param        zoneID    query     string   false  "Filter by zone UUID"
-// @Param        class     query     string   false  "Filter by car class"
-// @Param        type      query     string   false  "Filter by pricing type"
+// @Param        class     query     string   false  "Filter by car class"   Enums(economy, compact, comfort, business, luxury)
+// @Param        type      query     string   false  "Filter by pricing type" Enums(by_minute, by_hour, by_day)
 // @Param        isActive  query     boolean  false  "Filter by active status"
 // @Param        limit     query     integer  false  "Pagination limit"
 // @Param        offset    query     integer  false  "Pagination offset"

@@ -10,7 +10,7 @@ type Booking struct {
 	CarID  string
 
 	CommittedPeriods *int32 // number of hours or days booked upfront; nil for per_minute
-	Status           string // "reserved" | "active" | "completed" | "cancelled"
+	Status           string // "created" | "expired" | "completed" | "cancelled"
 	PricingRuleID    string
 	PricingSnapshot  PricingSnapshot
 	ExpiresAt        *time.Time

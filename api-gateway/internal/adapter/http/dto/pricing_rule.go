@@ -19,17 +19,17 @@ type PricingRule struct {
 	ID      string  `json:"id"`
 	ModelID *string `json:"modelID,omitempty"`
 	ZoneID  *string `json:"zoneID,omitempty"`
-	Class   *string `json:"class,omitempty"`
+	Class   *string `json:"class,omitempty" validate:"omitempty,oneof=economy compact comfort business luxury"`
 
-	Type      string `json:"type"`
-	RateTenge int32  `json:"rateTenge"`
+	Type      string `json:"type" validate:"oneof=by_minute by_hour by_day"`
+	RateTenge int32  `json:"rateTenge" validate:"min=1"`
 
-	RatePerKMTenge *int32 `json:"ratePerKMTenge,omitempty"`
-	FreeMinutes    *int32 `json:"freeMinutes,omitempty"`
-	MinChargeTenge *int32 `json:"minChargeTenge,omitempty"`
+	RatePerKMTenge *int32 `json:"ratePerKMTenge,omitempty" validate:"omitempty,min=0"`
+	FreeMinutes    *int32 `json:"freeMinutes,omitempty" validate:"omitempty,min=0"`
+	MinChargeTenge *int32 `json:"minChargeTenge,omitempty" validate:"omitempty,min=0"`
 
 	OvertimePolicy    *string `json:"overtimePolicy,omitempty"`
-	OvertimeRateTenge *int32  `json:"overtimeRateTenge,omitempty"`
+	OvertimeRateTenge *int32  `json:"overtimeRateTenge,omitempty" validate:"omitempty,min=0"`
 
 	IsActive  bool      `json:"isActive"`
 	CreatedAt time.Time `json:"createdAt"`
@@ -39,33 +39,33 @@ type PricingRule struct {
 type PricingRuleCreateRequest struct {
 	ModelID *string `json:"modelID"`
 	ZoneID  *string `json:"zoneID"`
-	Class   *string `json:"class"`
+	Class   *string `json:"class" validate:"omitempty,oneof=economy compact comfort business luxury"`
 
-	Type      string `json:"type"`
-	RateTenge int32  `json:"rateTenge"`
+	Type      string `json:"type" binding:"required,oneof=by_minute by_hour by_day"`
+	RateTenge int32  `json:"rateTenge" binding:"required,min=1"`
 
-	RatePerKMTenge *int32 `json:"ratePerKMTenge"`
-	FreeMinutes    *int32 `json:"freeMinutes"`
-	MinChargeTenge *int32 `json:"minChargeTenge"`
+	RatePerKMTenge *int32 `json:"ratePerKMTenge" validate:"omitempty,min=0"`
+	FreeMinutes    *int32 `json:"freeMinutes" validate:"omitempty,min=0"`
+	MinChargeTenge *int32 `json:"minChargeTenge" validate:"omitempty,min=0"`
 
 	OvertimePolicy    *string `json:"overtimePolicy"`
-	OvertimeRateTenge *int32  `json:"overtimeRateTenge"`
+	OvertimeRateTenge *int32  `json:"overtimeRateTenge" validate:"omitempty,min=0"`
 }
 
 type PricingRuleUpdateRequest struct {
 	ModelID *string `json:"modelID"`
 	ZoneID  *string `json:"zoneID"`
-	Class   *string `json:"class"`
+	Class   *string `json:"class" validate:"omitempty,oneof=economy compact comfort business luxury"`
 
-	Type      *string `json:"type"`
-	RateTenge *int32  `json:"rateTenge"`
+	Type      *string `json:"type" validate:"omitempty,oneof=by_minute by_hour by_day"`
+	RateTenge *int32  `json:"rateTenge" validate:"omitempty,min=1"`
 
-	RatePerKMTenge *int32 `json:"ratePerKMTenge"`
-	FreeMinutes    *int32 `json:"freeMinutes"`
-	MinChargeTenge *int32 `json:"minChargeTenge"`
+	RatePerKMTenge *int32 `json:"ratePerKMTenge" validate:"omitempty,min=0"`
+	FreeMinutes    *int32 `json:"freeMinutes" validate:"omitempty,min=0"`
+	MinChargeTenge *int32 `json:"minChargeTenge" validate:"omitempty,min=0"`
 
 	OvertimePolicy    *string `json:"overtimePolicy"`
-	OvertimeRateTenge *int32  `json:"overtimeRateTenge"`
+	OvertimeRateTenge *int32  `json:"overtimeRateTenge" validate:"omitempty,min=0"`
 
 	IsActive *bool `json:"isActive"`
 }

@@ -221,6 +221,12 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "created",
+                            "expired",
+                            "completed",
+                            "cancelled"
+                        ],
                         "type": "string",
                         "description": "Filter by status",
                         "name": "status",
@@ -2537,12 +2543,24 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "economy",
+                            "compact",
+                            "comfort",
+                            "business",
+                            "luxury"
+                        ],
                         "type": "string",
                         "description": "Filter by car class",
                         "name": "class",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "by_minute",
+                            "by_hour",
+                            "by_day"
+                        ],
                         "type": "string",
                         "description": "Filter by pricing type",
                         "name": "type",
@@ -4717,7 +4735,13 @@ const docTemplate = `{
                     "$ref": "#/definitions/dto.PricingSnapshot"
                 },
                 "status": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "created",
+                        "expired",
+                        "completed",
+                        "cancelled"
+                    ]
                 },
                 "updatedAt": {
                     "type": "string"
@@ -4729,12 +4753,17 @@ const docTemplate = `{
         },
         "dto.BookingCreateRequest": {
             "type": "object",
+            "required": [
+                "carID",
+                "pricingRuleID"
+            ],
             "properties": {
                 "carID": {
                     "type": "string"
                 },
                 "committedPeriods": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1
                 },
                 "pricingRuleID": {
                     "type": "string"
@@ -4748,7 +4777,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "actorType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "user",
+                        "system",
+                        "telemetry"
+                    ]
                 },
                 "bookingID": {
                     "type": "string"
@@ -4757,7 +4791,13 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "fromStatus": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "created",
+                        "expired",
+                        "completed",
+                        "cancelled"
+                    ]
                 },
                 "id": {
                     "type": "string"
@@ -4766,18 +4806,35 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "toStatus": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "created",
+                        "expired",
+                        "completed",
+                        "cancelled"
+                    ]
                 }
             }
         },
         "dto.BookingStatusUpdateRequest": {
             "type": "object",
+            "required": [
+                "status"
+            ],
             "properties": {
                 "reason": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 500,
+                    "minLength": 1
                 },
                 "status": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "created",
+                        "expired",
+                        "completed",
+                        "cancelled"
+                    ]
                 }
             }
         },
@@ -5712,13 +5769,21 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "class": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "economy",
+                        "compact",
+                        "comfort",
+                        "business",
+                        "luxury"
+                    ]
                 },
                 "createdAt": {
                     "type": "string"
                 },
                 "freeMinutes": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "id": {
                     "type": "string"
@@ -5727,7 +5792,8 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "minChargeTenge": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "modelID": {
                     "type": "string"
@@ -5736,16 +5802,24 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "overtimeRateTenge": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "ratePerKMTenge": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "rateTenge": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1
                 },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "by_minute",
+                        "by_hour",
+                        "by_day"
+                    ]
                 },
                 "updatedAt": {
                     "type": "string"
@@ -5757,15 +5831,28 @@ const docTemplate = `{
         },
         "dto.PricingRuleCreateRequest": {
             "type": "object",
+            "required": [
+                "rateTenge",
+                "type"
+            ],
             "properties": {
                 "class": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "economy",
+                        "compact",
+                        "comfort",
+                        "business",
+                        "luxury"
+                    ]
                 },
                 "freeMinutes": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "minChargeTenge": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "modelID": {
                     "type": "string"
@@ -5774,16 +5861,24 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "overtimeRateTenge": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "ratePerKMTenge": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "rateTenge": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1
                 },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "by_minute",
+                        "by_hour",
+                        "by_day"
+                    ]
                 },
                 "zoneID": {
                     "type": "string"
@@ -5802,16 +5897,25 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "class": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "economy",
+                        "compact",
+                        "comfort",
+                        "business",
+                        "luxury"
+                    ]
                 },
                 "freeMinutes": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "isActive": {
                     "type": "boolean"
                 },
                 "minChargeTenge": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "modelID": {
                     "type": "string"
@@ -5820,16 +5924,24 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "overtimeRateTenge": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "ratePerKMTenge": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "rateTenge": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1
                 },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "by_minute",
+                        "by_hour",
+                        "by_day"
+                    ]
                 },
                 "zoneID": {
                     "type": "string"

@@ -21,7 +21,7 @@ type Booking struct {
 	UserID           string          `json:"userID"`
 	CarID            string          `json:"carID"`
 	CommittedPeriods *int32          `json:"committedPeriods,omitempty"`
-	Status           string          `json:"status"`
+	Status           string          `json:"status" validate:"oneof=created expired completed cancelled"`
 	PricingRuleID    string          `json:"pricingRuleID"`
 	PricingSnapshot  PricingSnapshot `json:"pricingSnapshot"`
 	ExpiresAt        *time.Time      `json:"expiresAt,omitempty"`
@@ -32,23 +32,23 @@ type Booking struct {
 type BookingStatusReading struct {
 	ID         string    `json:"id"`
 	BookingID  string    `json:"bookingID"`
-	FromStatus string    `json:"fromStatus"`
-	ToStatus   string    `json:"toStatus"`
-	ActorType  string    `json:"actorType"`
+	FromStatus string    `json:"fromStatus" validate:"oneof=created expired completed cancelled"`
+	ToStatus   string    `json:"toStatus" validate:"oneof=created expired completed cancelled"`
+	ActorType  string    `json:"actorType" validate:"oneof=user system telemetry"`
 	ActorID    *string   `json:"actorID,omitempty"`
 	Reason     *string   `json:"reason,omitempty"`
 	ChangedAt  time.Time `json:"changedAt"`
 }
 
 type BookingCreateRequest struct {
-	CarID            string `json:"carID"`
-	PricingRuleID    string `json:"pricingRuleID"`
-	CommittedPeriods *int32 `json:"committedPeriods"`
+	CarID            string `json:"carID" binding:"required"`
+	PricingRuleID    string `json:"pricingRuleID" binding:"required"`
+	CommittedPeriods *int32 `json:"committedPeriods" validate:"omitempty,min=1"`
 }
 
 type BookingStatusUpdateRequest struct {
-	Status string  `json:"status"`
-	Reason *string `json:"reason"`
+	Status string  `json:"status" binding:"required,oneof=created expired completed cancelled"`
+	Reason *string `json:"reason" validate:"omitempty,min=1,max=500"`
 }
 
 func FromBookingCreateRequest(ctx *gin.Context) (model.BookingCreate, error) {

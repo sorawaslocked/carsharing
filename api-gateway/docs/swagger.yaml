@@ -29,6 +29,11 @@ definitions:
       pricingSnapshot:
         $ref: '#/definitions/dto.PricingSnapshot'
       status:
+        enum:
+        - created
+        - expired
+        - completed
+        - cancelled
         type: string
       updatedAt:
         type: string
@@ -40,35 +45,62 @@ definitions:
       carID:
         type: string
       committedPeriods:
+        minimum: 1
         type: integer
       pricingRuleID:
         type: string
+    required:
+    - carID
+    - pricingRuleID
     type: object
   dto.BookingStatusReading:
     properties:
       actorID:
         type: string
       actorType:
+        enum:
+        - user
+        - system
+        - telemetry
         type: string
       bookingID:
         type: string
       changedAt:
         type: string
       fromStatus:
+        enum:
+        - created
+        - expired
+        - completed
+        - cancelled
         type: string
       id:
         type: string
       reason:
         type: string
       toStatus:
+        enum:
+        - created
+        - expired
+        - completed
+        - cancelled
         type: string
     type: object
   dto.BookingStatusUpdateRequest:
     properties:
       reason:
+        maxLength: 500
+        minLength: 1
         type: string
       status:
+        enum:
+        - created
+        - expired
+        - completed
+        - cancelled
         type: string
+    required:
+    - status
     type: object
   dto.Car:
     properties:
@@ -678,28 +710,43 @@ definitions:
   dto.PricingRule:
     properties:
       class:
+        enum:
+        - economy
+        - compact
+        - comfort
+        - business
+        - luxury
         type: string
       createdAt:
         type: string
       freeMinutes:
+        minimum: 0
         type: integer
       id:
         type: string
       isActive:
         type: boolean
       minChargeTenge:
+        minimum: 0
         type: integer
       modelID:
         type: string
       overtimePolicy:
         type: string
       overtimeRateTenge:
+        minimum: 0
         type: integer
       ratePerKMTenge:
+        minimum: 0
         type: integer
       rateTenge:
+        minimum: 1
         type: integer
       type:
+        enum:
+        - by_minute
+        - by_hour
+        - by_day
         type: string
       updatedAt:
         type: string
@@ -709,25 +756,43 @@ definitions:
   dto.PricingRuleCreateRequest:
     properties:
       class:
+        enum:
+        - economy
+        - compact
+        - comfort
+        - business
+        - luxury
         type: string
       freeMinutes:
+        minimum: 0
         type: integer
       minChargeTenge:
+        minimum: 0
         type: integer
       modelID:
         type: string
       overtimePolicy:
         type: string
       overtimeRateTenge:
+        minimum: 0
         type: integer
       ratePerKMTenge:
+        minimum: 0
         type: integer
       rateTenge:
+        minimum: 1
         type: integer
       type:
+        enum:
+        - by_minute
+        - by_hour
+        - by_day
         type: string
       zoneID:
         type: string
+    required:
+    - rateTenge
+    - type
     type: object
   dto.PricingRuleResponse:
     properties:
@@ -737,24 +802,39 @@ definitions:
   dto.PricingRuleUpdateRequest:
     properties:
       class:
+        enum:
+        - economy
+        - compact
+        - comfort
+        - business
+        - luxury
         type: string
       freeMinutes:
+        minimum: 0
         type: integer
       isActive:
         type: boolean
       minChargeTenge:
+        minimum: 0
         type: integer
       modelID:
         type: string
       overtimePolicy:
         type: string
       overtimeRateTenge:
+        minimum: 0
         type: integer
       ratePerKMTenge:
+        minimum: 0
         type: integer
       rateTenge:
+        minimum: 1
         type: integer
       type:
+        enum:
+        - by_minute
+        - by_hour
+        - by_day
         type: string
       zoneID:
         type: string
@@ -1297,6 +1377,11 @@ paths:
         name: carID
         type: string
       - description: Filter by status
+        enum:
+        - created
+        - expired
+        - completed
+        - cancelled
         in: query
         name: status
         type: string
@@ -2799,10 +2884,20 @@ paths:
         name: zoneID
         type: string
       - description: Filter by car class
+        enum:
+        - economy
+        - compact
+        - comfort
+        - business
+        - luxury
         in: query
         name: class
         type: string
       - description: Filter by pricing type
+        enum:
+        - by_minute
+        - by_hour
+        - by_day
         in: query
         name: type
         type: string

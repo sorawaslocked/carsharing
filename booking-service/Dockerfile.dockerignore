@@ -2,6 +2,9 @@
 !shared/go.mod
 !shared/go.sum
 !shared/**/*.go
+!protos/go.mod
+!protos/go.sum
+!protos/**/*.go
 !booking-service/
 booking-service/config/local.yml
 booking-service/.env

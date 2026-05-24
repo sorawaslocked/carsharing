@@ -2,6 +2,9 @@
 !shared/go.mod
 !shared/go.sum
 !shared/**/*.go
+!protos/go.mod
+!protos/go.sum
+!protos/**/*.go
 !trip-service/
 trip-service/config/local.yml
 trip-service/.env

@@ -793,6 +793,8 @@ type GetCarStatusHistoryRequest struct {
 	From          *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=from,proto3,oneof" json:"from,omitempty"`
 	To            *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=to,proto3,oneof" json:"to,omitempty"`
 	Pagination    *base.Pagination       `protobuf:"bytes,4,opt,name=pagination,proto3,oneof" json:"pagination,omitempty"`
+	FromStatus    *string                `protobuf:"bytes,5,opt,name=from_status,json=fromStatus,proto3,oneof" json:"from_status,omitempty"`
+	ToStatus      *string                `protobuf:"bytes,6,opt,name=to_status,json=toStatus,proto3,oneof" json:"to_status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -853,6 +855,20 @@ func (x *GetCarStatusHistoryRequest) GetPagination() *base.Pagination {
 		return x.Pagination
 	}
 	return nil
+}
+
+func (x *GetCarStatusHistoryRequest) GetFromStatus() string {
+	if x != nil && x.FromStatus != nil {
+		return *x.FromStatus
+	}
+	return ""
+}
+
+func (x *GetCarStatusHistoryRequest) GetToStatus() string {
+	if x != nil && x.ToStatus != nil {
+		return *x.ToStatus
+	}
+	return ""
 }
 
 type GetCarStatusHistoryResponse struct {
@@ -1166,17 +1182,23 @@ const file_service_car_car_proto_rawDesc = "" +
 	"\x06reason\x18\x03 \x01(\tR\x06reason\x123\n" +
 	"\bmetadata\x18\x04 \x01(\v2\x17.google.protobuf.StructR\bmetadata\"\"\n" +
 	"\x10DeleteCarRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\xef\x01\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\xd5\x02\n" +
 	"\x1aGetCarStatusHistoryRequest\x12\x15\n" +
 	"\x06car_id\x18\x01 \x01(\tR\x05carId\x123\n" +
 	"\x04from\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\x04from\x88\x01\x01\x12/\n" +
 	"\x02to\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampH\x01R\x02to\x88\x01\x01\x125\n" +
 	"\n" +
 	"pagination\x18\x04 \x01(\v2\x10.base.PaginationH\x02R\n" +
-	"pagination\x88\x01\x01B\a\n" +
+	"pagination\x88\x01\x01\x12$\n" +
+	"\vfrom_status\x18\x05 \x01(\tH\x03R\n" +
+	"fromStatus\x88\x01\x01\x12 \n" +
+	"\tto_status\x18\x06 \x01(\tH\x04R\btoStatus\x88\x01\x01B\a\n" +
 	"\x05_fromB\x05\n" +
 	"\x03_toB\r\n" +
-	"\v_pagination\"U\n" +
+	"\v_paginationB\x0e\n" +
+	"\f_from_statusB\f\n" +
+	"\n" +
+	"_to_status\"U\n" +
 	"\x1bGetCarStatusHistoryResponse\x126\n" +
 	"\breadings\x18\x01 \x03(\v2\x1a.base.car.CarStatusReadingR\breadings\"\xf2\x01\n" +
 	"\x1dGetCarTelemetryHistoryRequest\x12\x15\n" +

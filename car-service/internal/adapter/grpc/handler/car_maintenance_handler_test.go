@@ -68,7 +68,7 @@ func TestCarMaintenanceHandlerGetMaintenanceTemplate(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
 		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
-		svc.EXPECT().GetTemplate(ctx, tmplID).Return(model.CarMaintenanceTemplate{}, model.ErrNotFound)
+		svc.EXPECT().GetTemplate(ctx, tmplID).Return(model.CarMaintenanceTemplate{}, model.ErrCarMaintenanceTemplateNotFound)
 
 		_, err := h.GetMaintenanceTemplate(ctx, &carsvc.GetMaintenanceTemplateRequest{Id: tmplID})
 		assert.Equal(t, codes.NotFound, grpcCode(err))
@@ -113,7 +113,7 @@ func TestCarMaintenanceHandlerUpdateMaintenanceTemplate(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
 		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
-		svc.EXPECT().UpdateTemplate(ctx, tmplID, mock.Anything).Return(model.ErrNotFound)
+		svc.EXPECT().UpdateTemplate(ctx, tmplID, mock.Anything).Return(model.ErrCarMaintenanceTemplateNotFound)
 
 		_, err := h.UpdateMaintenanceTemplate(ctx, &carsvc.UpdateMaintenanceTemplateRequest{Id: tmplID})
 		assert.Equal(t, codes.NotFound, grpcCode(err))
@@ -139,7 +139,7 @@ func TestCarMaintenanceHandlerDeleteMaintenanceTemplate(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
 		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
-		svc.EXPECT().DeleteTemplate(ctx, tmplID).Return(model.ErrNotFound)
+		svc.EXPECT().DeleteTemplate(ctx, tmplID).Return(model.ErrCarMaintenanceTemplateNotFound)
 
 		_, err := h.DeleteMaintenanceTemplate(ctx, &carsvc.DeleteMaintenanceTemplateRequest{Id: tmplID})
 		assert.Equal(t, codes.NotFound, grpcCode(err))
@@ -203,7 +203,7 @@ func TestCarMaintenanceHandlerCompleteMaintenanceRecord(t *testing.T) {
 		svc := mocks.NewMockCarMaintenanceService(t)
 		h := NewCarMaintenanceHandler(discardLogger(), svc)
 
-		svc.EXPECT().CompleteRecord(ctx, recordID, mock.Anything).Return(model.ErrNotFound)
+		svc.EXPECT().CompleteRecord(ctx, recordID, mock.Anything).Return(model.ErrCarMaintenanceRecordNotFound)
 
 		_, err := h.CompleteMaintenanceRecord(ctx, &carsvc.CompleteMaintenanceRecordRequest{RecordId: recordID})
 		assert.Equal(t, codes.NotFound, grpcCode(err))

@@ -12,13 +12,11 @@ import (
 )
 
 func FromErrorToStatusCode(err error) error {
-	ve, ok := errors.AsType[validation.Errors](err)
-	if ok {
+	if ve, ok := errors.AsType[validation.Errors](err); ok {
 		return validationError(ve)
 	}
 
-	var errTransition model.ErrInvalidStatusTransition
-	if errors.As(err, &errTransition) {
+	if _, ok := errors.AsType[model.ErrInvalidStatusTransition](err); ok {
 		return status.Error(codes.FailedPrecondition, err.Error())
 	}
 

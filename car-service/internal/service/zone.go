@@ -70,7 +70,7 @@ func (s *ZoneService) Get(ctx context.Context, id string) (model.Zone, error) {
 
 	zone, err := s.zoneRepo.FindByID(ctx, id)
 	if err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrZoneNotFound) {
 			log.Error("repo: finding zone by id", pkglog.Err(err))
 		}
 		return model.Zone{}, err
@@ -120,7 +120,7 @@ func (s *ZoneService) Update(ctx context.Context, id string, data validation.Zon
 	}
 
 	if err := s.zoneRepo.Update(ctx, id, update); err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrZoneNotFound) {
 			log.Error("repo: updating zone", pkglog.Err(err))
 		}
 		return err
@@ -137,7 +137,7 @@ func (s *ZoneService) Delete(ctx context.Context, id string) error {
 	}
 
 	if err := s.zoneRepo.Delete(ctx, id); err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrZoneNotFound) {
 			log.Error("repo: deleting zone", pkglog.Err(err))
 		}
 		return err

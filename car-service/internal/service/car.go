@@ -66,7 +66,7 @@ func (s *CarService) Create(ctx context.Context, data validation.CarCreate) (str
 	}
 
 	if _, err := s.carModelRepo.FindByID(ctx, data.ModelID); err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarModelNotFound) {
 			log.Error("repo: finding car model by id", pkglog.Err(err))
 		}
 		return "", err
@@ -74,7 +74,7 @@ func (s *CarService) Create(ctx context.Context, data validation.CarCreate) (str
 
 	if data.ZoneID != nil {
 		if _, err := s.zoneRepo.FindByID(ctx, *data.ZoneID); err != nil {
-			if !errors.Is(err, model.ErrNotFound) {
+			if !errors.Is(err, model.ErrZoneNotFound) {
 				log.Error("repo: finding zone by id", pkglog.Err(err))
 			}
 			return "", err
@@ -133,7 +133,7 @@ func (s *CarService) Get(ctx context.Context, id string) (model.Car, error) {
 
 	car, err := s.carRepo.FindByID(ctx, id)
 	if err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarNotFound) {
 			log.Error("repo: finding car by id", pkglog.Err(err))
 		}
 		return model.Car{}, err
@@ -191,7 +191,7 @@ func (s *CarService) Update(ctx context.Context, id string, data validation.CarU
 
 	if data.ZoneID != nil {
 		if _, err := s.zoneRepo.FindByID(ctx, *data.ZoneID); err != nil {
-			if !errors.Is(err, model.ErrNotFound) {
+			if !errors.Is(err, model.ErrZoneNotFound) {
 				log.Error("repo: finding zone by id", pkglog.Err(err))
 			}
 			return err
@@ -209,7 +209,7 @@ func (s *CarService) Update(ctx context.Context, id string, data validation.CarU
 		ImageKeys:    data.ImageKeys,
 		UpdatedAt:    time.Now(),
 	}); err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarNotFound) {
 			log.Error("repo: updating car", pkglog.Err(err))
 		}
 		return err
@@ -234,7 +234,7 @@ func (s *CarService) UpdateCarStatus(ctx context.Context, id string, data valida
 
 	current, err := s.carRepo.FindByID(ctx, id)
 	if err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarNotFound) {
 			log.Error("repo: finding car by id", pkglog.Err(err))
 		}
 		return err
@@ -323,7 +323,7 @@ func (s *CarService) UpdateCarTelemetry(ctx context.Context, id string, update v
 		carUpdate.Location = &loc
 	}
 	if err := s.carRepo.Update(ctx, id, carUpdate); err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarNotFound) {
 			log.Error("repo: updating car telemetry", pkglog.Err(err))
 		}
 		return err
@@ -419,7 +419,7 @@ func (s *CarService) Delete(ctx context.Context, id string) error {
 	}
 
 	if err := s.carRepo.Delete(ctx, id); err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarNotFound) {
 			log.Error("repo: deleting car", pkglog.Err(err))
 		}
 		return err

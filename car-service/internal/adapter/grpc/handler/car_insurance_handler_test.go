@@ -80,7 +80,7 @@ func TestCarInsuranceHandlerGetCarInsurance(t *testing.T) {
 		svc := mocks.NewMockCarInsuranceService(t)
 		h := NewCarInsuranceHandler(discardLogger(), svc)
 
-		svc.EXPECT().Get(ctx, insID).Return(model.CarInsurance{}, model.ErrNotFound)
+		svc.EXPECT().Get(ctx, insID).Return(model.CarInsurance{}, model.ErrCarInsuranceNotFound)
 
 		_, err := h.GetCarInsurance(ctx, &carsvc.GetCarInsuranceRequest{Id: insID})
 		assert.Equal(t, codes.NotFound, grpcCode(err))
@@ -133,7 +133,7 @@ func TestCarInsuranceHandlerUpdateCarInsurance(t *testing.T) {
 		svc := mocks.NewMockCarInsuranceService(t)
 		h := NewCarInsuranceHandler(discardLogger(), svc)
 
-		svc.EXPECT().Update(ctx, insID, mock.Anything).Return(model.ErrNotFound)
+		svc.EXPECT().Update(ctx, insID, mock.Anything).Return(model.ErrCarInsuranceNotFound)
 
 		_, err := h.UpdateCarInsurance(ctx, &carsvc.UpdateCarInsuranceRequest{Id: insID})
 		assert.Equal(t, codes.NotFound, grpcCode(err))
@@ -159,7 +159,7 @@ func TestCarInsuranceHandlerDeleteCarInsurance(t *testing.T) {
 		svc := mocks.NewMockCarInsuranceService(t)
 		h := NewCarInsuranceHandler(discardLogger(), svc)
 
-		svc.EXPECT().Delete(ctx, insID).Return(model.ErrNotFound)
+		svc.EXPECT().Delete(ctx, insID).Return(model.ErrCarInsuranceNotFound)
 
 		_, err := h.DeleteCarInsurance(ctx, &carsvc.DeleteCarInsuranceRequest{Id: insID})
 		assert.Equal(t, codes.NotFound, grpcCode(err))

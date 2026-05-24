@@ -84,7 +84,7 @@ func (s *CarMaintenanceService) GetTemplate(ctx context.Context, id string) (mod
 
 	template, err := s.templateRepo.FindByID(ctx, id)
 	if err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarMaintenanceTemplateNotFound) {
 			log.Error("repo: finding maintenance template by id", pkglog.Err(err))
 		}
 		return model.CarMaintenanceTemplate{}, err
@@ -129,7 +129,7 @@ func (s *CarMaintenanceService) UpdateTemplate(ctx context.Context, id string, d
 		PullPct:     data.PullPct,
 		UpdatedAt:   time.Now(),
 	}); err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarMaintenanceTemplateNotFound) {
 			log.Error("repo: updating maintenance template", pkglog.Err(err))
 		}
 		return err
@@ -146,7 +146,7 @@ func (s *CarMaintenanceService) DeleteTemplate(ctx context.Context, id string) e
 	}
 
 	if err := s.templateRepo.Delete(ctx, id); err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarMaintenanceTemplateNotFound) {
 			log.Error("repo: deleting maintenance template", pkglog.Err(err))
 		}
 		return err
@@ -164,7 +164,7 @@ func (s *CarMaintenanceService) GetRecord(ctx context.Context, id string) (model
 
 	record, err := s.recordRepo.FindByID(ctx, id)
 	if err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarMaintenanceRecordNotFound) {
 			log.Error("repo: finding maintenance record by id", pkglog.Err(err))
 		}
 		return model.CarMaintenanceRecord{}, err
@@ -222,7 +222,7 @@ func (s *CarMaintenanceService) CompleteRecord(ctx context.Context, id string, d
 
 	record, err := s.recordRepo.FindByID(ctx, id)
 	if err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarMaintenanceRecordNotFound) {
 			log.Error("repo: finding maintenance record by id", pkglog.Err(err))
 		}
 		return err
@@ -230,7 +230,7 @@ func (s *CarMaintenanceService) CompleteRecord(ctx context.Context, id string, d
 
 	template, err := s.templateRepo.FindByID(ctx, record.TemplateID)
 	if err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarMaintenanceTemplateNotFound) {
 			log.Error("repo: finding maintenance template by id", pkglog.Err(err))
 		}
 		return err
@@ -309,7 +309,7 @@ func (s *CarMaintenanceService) EvaluateCarMaintenance(ctx context.Context, carI
 
 	car, err := s.carRepo.FindByID(ctx, carID)
 	if err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarNotFound) {
 			log.Error("repo: finding car by id", pkglog.Err(err))
 		}
 		return err

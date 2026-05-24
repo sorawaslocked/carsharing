@@ -83,7 +83,7 @@ func (s *CarModelService) Get(ctx context.Context, id string) (model.CarModel, e
 
 	carModel, err := s.carModelRepo.FindByID(ctx, id)
 	if err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarModelNotFound) {
 			log.Error("repo: finding car model by id", pkglog.Err(err))
 		}
 		return model.CarModel{}, err
@@ -169,7 +169,7 @@ func (s *CarModelService) Update(ctx context.Context, id string, data validation
 	}
 
 	if err := s.carModelRepo.Update(ctx, id, update); err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarModelNotFound) {
 			log.Error("repo: updating car model", pkglog.Err(err))
 		}
 		return err
@@ -186,7 +186,7 @@ func (s *CarModelService) Delete(ctx context.Context, id string) error {
 	}
 
 	if err := s.carModelRepo.Delete(ctx, id); err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarModelNotFound) {
 			log.Error("repo: deleting car model", pkglog.Err(err))
 		}
 		return err

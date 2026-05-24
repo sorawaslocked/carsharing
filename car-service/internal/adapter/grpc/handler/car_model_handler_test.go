@@ -65,7 +65,7 @@ func TestCarModelHandlerGetCarModel(t *testing.T) {
 		svc := mocks.NewMockCarModelService(t)
 		h := NewCarModelHandler(discardLogger(), svc)
 
-		svc.EXPECT().Get(ctx, modelID).Return(model.CarModel{}, model.ErrNotFound)
+		svc.EXPECT().Get(ctx, modelID).Return(model.CarModel{}, model.ErrCarModelNotFound)
 
 		_, err := h.GetCarModel(ctx, &carsvc.GetCarModelRequest{Id: modelID})
 		assert.Equal(t, codes.NotFound, grpcCode(err))
@@ -120,7 +120,7 @@ func TestCarModelHandlerUpdateCarModel(t *testing.T) {
 		svc := mocks.NewMockCarModelService(t)
 		h := NewCarModelHandler(discardLogger(), svc)
 
-		svc.EXPECT().Update(ctx, modelID, mock.Anything).Return(model.ErrNotFound)
+		svc.EXPECT().Update(ctx, modelID, mock.Anything).Return(model.ErrCarModelNotFound)
 
 		_, err := h.UpdateCarModel(ctx, &carsvc.UpdateCarModelRequest{Id: modelID})
 		assert.Equal(t, codes.NotFound, grpcCode(err))
@@ -146,7 +146,7 @@ func TestCarModelHandlerDeleteCarModel(t *testing.T) {
 		svc := mocks.NewMockCarModelService(t)
 		h := NewCarModelHandler(discardLogger(), svc)
 
-		svc.EXPECT().Delete(ctx, modelID).Return(model.ErrNotFound)
+		svc.EXPECT().Delete(ctx, modelID).Return(model.ErrCarModelNotFound)
 
 		_, err := h.DeleteCarModel(ctx, &carsvc.DeleteCarModelRequest{Id: modelID})
 		assert.Equal(t, codes.NotFound, grpcCode(err))

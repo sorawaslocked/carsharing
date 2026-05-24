@@ -66,7 +66,7 @@ func TestZoneHandlerGetZone(t *testing.T) {
 		svc := mocks.NewMockZoneService(t)
 		h := NewZoneHandler(discardLogger(), svc)
 
-		svc.EXPECT().Get(ctx, zoneID).Return(model.Zone{}, model.ErrNotFound)
+		svc.EXPECT().Get(ctx, zoneID).Return(model.Zone{}, model.ErrZoneNotFound)
 
 		_, err := h.GetZone(ctx, &carsvc.GetZoneRequest{Id: zoneID})
 		assert.Equal(t, codes.NotFound, grpcCode(err))
@@ -121,7 +121,7 @@ func TestZoneHandlerUpdateZone(t *testing.T) {
 		svc := mocks.NewMockZoneService(t)
 		h := NewZoneHandler(discardLogger(), svc)
 
-		svc.EXPECT().Update(ctx, zoneID, mock.Anything).Return(model.ErrNotFound)
+		svc.EXPECT().Update(ctx, zoneID, mock.Anything).Return(model.ErrZoneNotFound)
 
 		_, err := h.UpdateZone(ctx, &carsvc.UpdateZoneRequest{Id: zoneID})
 		assert.Equal(t, codes.NotFound, grpcCode(err))
@@ -147,7 +147,7 @@ func TestZoneHandlerDeleteZone(t *testing.T) {
 		svc := mocks.NewMockZoneService(t)
 		h := NewZoneHandler(discardLogger(), svc)
 
-		svc.EXPECT().Delete(ctx, zoneID).Return(model.ErrNotFound)
+		svc.EXPECT().Delete(ctx, zoneID).Return(model.ErrZoneNotFound)
 
 		_, err := h.DeleteZone(ctx, &carsvc.DeleteZoneRequest{Id: zoneID})
 		assert.Equal(t, codes.NotFound, grpcCode(err))

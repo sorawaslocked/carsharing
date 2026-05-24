@@ -78,7 +78,7 @@ func (s *CarInsuranceService) Get(ctx context.Context, id string) (model.CarInsu
 
 	insurance, err := s.insuranceRepo.FindByID(ctx, id)
 	if err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarInsuranceNotFound) {
 			log.Error("repo: finding car insurance by id", pkglog.Err(err))
 		}
 		return model.CarInsurance{}, err
@@ -151,7 +151,7 @@ func (s *CarInsuranceService) Update(ctx context.Context, id string, data valida
 	}
 
 	if err := s.insuranceRepo.Update(ctx, id, update); err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarInsuranceNotFound) {
 			log.Error("repo: updating car insurance", pkglog.Err(err))
 		}
 		return err
@@ -168,7 +168,7 @@ func (s *CarInsuranceService) Delete(ctx context.Context, id string) error {
 	}
 
 	if err := s.insuranceRepo.Delete(ctx, id); err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrCarInsuranceNotFound) {
 			log.Error("repo: deleting car insurance", pkglog.Err(err))
 		}
 		return err

@@ -32,13 +32,14 @@ message CreateCarRequest {
   string license_plate     = 3;
   string color             = 4;
   int32  year_manufactured = 5;
-  string telemetry_id     = 6;
+  string telemetry_id      = 6;
   optional string notes    = 7;
 
   optional int64         mileage_km    = 8;
   optional float         fuel_level    = 9;
   optional float         battery_level = 10;
   optional base.Location location      = 11;
+  optional string        zone_id       = 12;
 }
 
 message CreateCarResponse {

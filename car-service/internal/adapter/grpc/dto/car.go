@@ -22,6 +22,7 @@ func FromCreateCarRequest(req *carsvc.CreateCarRequest) validation.CarCreate {
 		Color:            req.Color,
 		YearManufactured: int16(req.YearManufactured),
 		TelemetryID:      req.TelemetryId,
+		ZoneID:           req.ZoneId,
 		MileageKM:        req.MileageKm,
 		FuelLevel:        req.FuelLevel,
 		BatteryLevel:     req.BatteryLevel,

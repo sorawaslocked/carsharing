@@ -19,6 +19,7 @@ type CarCreate struct {
 	Color            string                     `validate:"required,min=1,max=50"`
 	YearManufactured int16                      `validate:"required,min=1886"`
 	TelemetryID      string                     `validate:"required"`
+	ZoneID           *string                    `validate:"omitempty,uuid"`
 	MileageKM        *int64                     `validate:"omitempty,min=0"`
 	FuelLevel        *float32                   `validate:"omitempty,min=0,max=100"`
 	BatteryLevel     *float32                   `validate:"omitempty,min=0,max=100"`

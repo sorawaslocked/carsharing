@@ -109,7 +109,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	telemetryService := service.NewTelemetryService(log, validate, telemetryStreamClient, telemetryReadingRepo, carRepo, cfg.Telemetry.StalenessThreshold)
 
 	carModelService := service.NewCarModelService(log, validate, carModelRepo, objectStorage)
-	carService := service.NewCarService(log, validate, carModelRepo, carRepo, statusReadingRepo, telemetryReadingRepo, objectStorage, carPublisher)
+	carService := service.NewCarService(log, validate, carModelRepo, carRepo, zoneRepo, statusReadingRepo, telemetryReadingRepo, objectStorage, carPublisher)
 	carService.SetCarCreatedNotifier(telemetryService)
 
 	carInsuranceService := service.NewCarInsuranceService(log, validate, carInsuranceRepo, objectStorage)

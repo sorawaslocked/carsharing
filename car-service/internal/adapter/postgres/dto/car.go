@@ -21,6 +21,7 @@ type carRow struct {
 	BatteryLevel     *float32
 	Latitude         float64
 	Longitude        float64
+	ZoneID           *string
 	Notes            *string
 	ImageKeys        []string
 	LastSeenAt       time.Time
@@ -44,6 +45,7 @@ func (r carRow) toDomain() model.Car {
 			Latitude:  r.Latitude,
 			Longitude: r.Longitude,
 		},
+		ZoneID:     r.ZoneID,
 		Notes:      r.Notes,
 		Images:     ImageKeysToImages(r.ImageKeys),
 		LastSeenAt: r.LastSeenAt,
@@ -59,7 +61,7 @@ func ScanCarRow(s scanner) (model.Car, error) {
 		&r.ID, &r.ModelID, &r.VIN, &r.LicensePlate, &r.Color,
 		&r.YearManufactured, &r.Status, &r.MileageKM,
 		&r.FuelLevel, &r.BatteryLevel,
-		&r.Latitude, &r.Longitude,
+		&r.Latitude, &r.Longitude, &r.ZoneID,
 		&r.Notes, &r.ImageKeys, &r.LastSeenAt, &r.CreatedAt, &r.UpdatedAt,
 	)
 	if err != nil {
@@ -116,6 +118,11 @@ func SetClausesFromCarUpdate(update model.CarUpdate) ([]string, []any, int) {
 		n++
 		args = append(args, string(*update.Status))
 		clauses = append(clauses, fmt.Sprintf("status = $%d", n))
+	}
+	if update.ZoneID != nil {
+		n++
+		args = append(args, *update.ZoneID)
+		clauses = append(clauses, fmt.Sprintf("zone_id = $%d", n))
 	}
 	if update.Notes != nil {
 		n++

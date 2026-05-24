@@ -135,7 +135,7 @@ func TestStreamCarTelemetry(t *testing.T) {
 		h := NewCarStreamHandler(discardLogger(), svc, nil)
 		stream := newStream[carsvc.StreamCarTelemetryResponse](ctx)
 
-		svc.EXPECT().Get(mock.Anything, carID).Return(model.Car{}, model.ErrNotFound)
+		svc.EXPECT().Get(mock.Anything, carID).Return(model.Car{}, model.ErrCarNotFound)
 
 		err := h.StreamCarTelemetry(&carsvc.StreamCarTelemetryRequest{CarId: carID}, stream)
 		assert.Equal(t, codes.NotFound, grpcCode(err))

@@ -46,5 +46,5 @@ func WithMetadata(log *slog.Logger, md utils.Metadata) *slog.Logger {
 		args = append(args, slog.Group("user", userArgs...))
 	}
 
-	return log.With(args)
+	return log.With(args...)
 }

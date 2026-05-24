@@ -6,10 +6,11 @@ services:
       - ./migrations:/migrations
     command:
       - "-path=/migrations"
-      - "-database=postgres://carsharing:${POSTGRES_PASSWORD}@postgres:5432/carsharing?sslmode=disable"
+      - "-database=postgres://carsharing:${POSTGRES_PASSWORD}@postgres:5432/carsharing?sslmode=disable&x-migrations-table=car_service_migrations"
       - "up"
     networks:
       - carsharing-net
+    restart: on-failure
 
   car-service:
     image: ghcr.io/sorawaslocked/carsharing/car-service:latest

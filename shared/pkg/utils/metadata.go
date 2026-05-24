@@ -32,8 +32,12 @@ func MetadataFromCtx(ctx context.Context) Metadata {
 	if userID, ok := ctx.Value(ctxRequestUserIDKey).(string); ok {
 		md.UserID = &userID
 	}
-	if userRoles, ok := ctx.Value(ctxRequestUserRolesKey).([]sharedmodel.Role); ok {
-		md.UserRoles = userRoles
+	if rawRoles, ok := ctx.Value(ctxRequestUserRolesKey).([]string); ok {
+		roles := make([]sharedmodel.Role, len(rawRoles))
+		for i, r := range rawRoles {
+			roles[i] = sharedmodel.Role(r)
+		}
+		md.UserRoles = roles
 	}
 
 	return md

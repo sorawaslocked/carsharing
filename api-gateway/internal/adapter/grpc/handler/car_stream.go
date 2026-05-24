@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"time"
 
 	"carsharing/api-gateway/internal/adapter/grpc/dto"
 	"carsharing/api-gateway/internal/model"
@@ -85,6 +86,12 @@ func (h *CarHandler) StreamCarsWithFilter(ctx context.Context, filter model.CarF
 				return err
 			}
 		}
+
+		select {
+		case <-time.After(5 * time.Second):
+		case <-ctx.Done():
+			return nil
+		}
 	}
 }
 
@@ -135,6 +142,12 @@ func (h *CarHandler) StreamCarTelemetry(ctx context.Context, carID string, send 
 			if err = send(event); err != nil {
 				return err
 			}
+		}
+
+		select {
+		case <-time.After(5 * time.Second):
+		case <-ctx.Done():
+			return nil
 		}
 	}
 }

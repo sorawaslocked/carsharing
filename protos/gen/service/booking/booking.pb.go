@@ -12,7 +12,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -452,9 +451,8 @@ func (x *UpdateBookingStatusRequest) GetReason() string {
 type GetBookingStatusHistoryRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	From          *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=from,proto3,oneof" json:"from,omitempty"`
-	To            *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=to,proto3,oneof" json:"to,omitempty"`
-	Pagination    *base.Pagination       `protobuf:"bytes,4,opt,name=pagination,proto3,oneof" json:"pagination,omitempty"`
+	TimeRange     *base.TimeRange        `protobuf:"bytes,2,opt,name=time_range,json=timeRange,proto3,oneof" json:"time_range,omitempty"`
+	Pagination    *base.Pagination       `protobuf:"bytes,3,opt,name=pagination,proto3,oneof" json:"pagination,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -496,16 +494,9 @@ func (x *GetBookingStatusHistoryRequest) GetId() string {
 	return ""
 }
 
-func (x *GetBookingStatusHistoryRequest) GetFrom() *timestamppb.Timestamp {
+func (x *GetBookingStatusHistoryRequest) GetTimeRange() *base.TimeRange {
 	if x != nil {
-		return x.From
-	}
-	return nil
-}
-
-func (x *GetBookingStatusHistoryRequest) GetTo() *timestamppb.Timestamp {
-	if x != nil {
-		return x.To
+		return x.TimeRange
 	}
 	return nil
 }
@@ -565,7 +556,7 @@ var File_service_booking_booking_proto protoreflect.FileDescriptor
 
 const file_service_booking_booking_proto_rawDesc = "" +
 	"\n" +
-	"\x1dservice/booking/booking.proto\x12\x0fservice.booking\x1a\x1abase/booking/booking.proto\x1a\x11base/common.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb6\x01\n" +
+	"\x1dservice/booking/booking.proto\x12\x0fservice.booking\x1a\x1abase/booking/booking.proto\x1a\x11base/common.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xb6\x01\n" +
 	"\x14CreateBookingRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x15\n" +
 	"\x06car_id\x18\x02 \x01(\tR\x05carId\x120\n" +
@@ -600,16 +591,15 @@ const file_service_booking_booking_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
 	"\x06status\x18\x02 \x01(\tR\x06status\x12\x1b\n" +
 	"\x06reason\x18\x03 \x01(\tH\x00R\x06reason\x88\x01\x01B\t\n" +
-	"\a_reason\"\xec\x01\n" +
+	"\a_reason\"\xba\x01\n" +
 	"\x1eGetBookingStatusHistoryRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x123\n" +
-	"\x04from\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\x04from\x88\x01\x01\x12/\n" +
-	"\x02to\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampH\x01R\x02to\x88\x01\x01\x125\n" +
 	"\n" +
-	"pagination\x18\x04 \x01(\v2\x10.base.PaginationH\x02R\n" +
-	"pagination\x88\x01\x01B\a\n" +
-	"\x05_fromB\x05\n" +
-	"\x03_toB\r\n" +
+	"time_range\x18\x02 \x01(\v2\x0f.base.TimeRangeH\x00R\ttimeRange\x88\x01\x01\x125\n" +
+	"\n" +
+	"pagination\x18\x03 \x01(\v2\x10.base.PaginationH\x01R\n" +
+	"pagination\x88\x01\x01B\r\n" +
+	"\v_time_rangeB\r\n" +
 	"\v_pagination\"l\n" +
 	"\x1fGetBookingStatusHistoryResponse\x12I\n" +
 	"\x0estatus_history\x18\x01 \x03(\v2\".base.booking.BookingStatusReadingR\rstatusHistory2\xce\x04\n" +
@@ -648,7 +638,7 @@ var file_service_booking_booking_proto_goTypes = []any{
 	(*GetBookingStatusHistoryResponse)(nil), // 9: service.booking.GetBookingStatusHistoryResponse
 	(*booking.Booking)(nil),                 // 10: base.booking.Booking
 	(*base.Pagination)(nil),                 // 11: base.Pagination
-	(*timestamppb.Timestamp)(nil),           // 12: google.protobuf.Timestamp
+	(*base.TimeRange)(nil),                  // 12: base.TimeRange
 	(*booking.BookingStatusReading)(nil),    // 13: base.booking.BookingStatusReading
 	(*emptypb.Empty)(nil),                   // 14: google.protobuf.Empty
 }
@@ -656,27 +646,26 @@ var file_service_booking_booking_proto_depIdxs = []int32{
 	10, // 0: service.booking.GetBookingResponse.booking:type_name -> base.booking.Booking
 	11, // 1: service.booking.ListBookingsRequest.pagination:type_name -> base.Pagination
 	10, // 2: service.booking.ListBookingsResponse.bookings:type_name -> base.booking.Booking
-	12, // 3: service.booking.GetBookingStatusHistoryRequest.from:type_name -> google.protobuf.Timestamp
-	12, // 4: service.booking.GetBookingStatusHistoryRequest.to:type_name -> google.protobuf.Timestamp
-	11, // 5: service.booking.GetBookingStatusHistoryRequest.pagination:type_name -> base.Pagination
-	13, // 6: service.booking.GetBookingStatusHistoryResponse.status_history:type_name -> base.booking.BookingStatusReading
-	0,  // 7: service.booking.BookingService.CreateBooking:input_type -> service.booking.CreateBookingRequest
-	2,  // 8: service.booking.BookingService.GetBooking:input_type -> service.booking.GetBookingRequest
-	4,  // 9: service.booking.BookingService.ListBookings:input_type -> service.booking.ListBookingsRequest
-	6,  // 10: service.booking.BookingService.CancelBooking:input_type -> service.booking.CancelBookingRequest
-	7,  // 11: service.booking.BookingService.UpdateBookingStatus:input_type -> service.booking.UpdateBookingStatusRequest
-	8,  // 12: service.booking.BookingService.GetBookingStatusHistory:input_type -> service.booking.GetBookingStatusHistoryRequest
-	1,  // 13: service.booking.BookingService.CreateBooking:output_type -> service.booking.CreateBookingResponse
-	3,  // 14: service.booking.BookingService.GetBooking:output_type -> service.booking.GetBookingResponse
-	5,  // 15: service.booking.BookingService.ListBookings:output_type -> service.booking.ListBookingsResponse
-	14, // 16: service.booking.BookingService.CancelBooking:output_type -> google.protobuf.Empty
-	14, // 17: service.booking.BookingService.UpdateBookingStatus:output_type -> google.protobuf.Empty
-	9,  // 18: service.booking.BookingService.GetBookingStatusHistory:output_type -> service.booking.GetBookingStatusHistoryResponse
-	13, // [13:19] is the sub-list for method output_type
-	7,  // [7:13] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	12, // 3: service.booking.GetBookingStatusHistoryRequest.time_range:type_name -> base.TimeRange
+	11, // 4: service.booking.GetBookingStatusHistoryRequest.pagination:type_name -> base.Pagination
+	13, // 5: service.booking.GetBookingStatusHistoryResponse.status_history:type_name -> base.booking.BookingStatusReading
+	0,  // 6: service.booking.BookingService.CreateBooking:input_type -> service.booking.CreateBookingRequest
+	2,  // 7: service.booking.BookingService.GetBooking:input_type -> service.booking.GetBookingRequest
+	4,  // 8: service.booking.BookingService.ListBookings:input_type -> service.booking.ListBookingsRequest
+	6,  // 9: service.booking.BookingService.CancelBooking:input_type -> service.booking.CancelBookingRequest
+	7,  // 10: service.booking.BookingService.UpdateBookingStatus:input_type -> service.booking.UpdateBookingStatusRequest
+	8,  // 11: service.booking.BookingService.GetBookingStatusHistory:input_type -> service.booking.GetBookingStatusHistoryRequest
+	1,  // 12: service.booking.BookingService.CreateBooking:output_type -> service.booking.CreateBookingResponse
+	3,  // 13: service.booking.BookingService.GetBooking:output_type -> service.booking.GetBookingResponse
+	5,  // 14: service.booking.BookingService.ListBookings:output_type -> service.booking.ListBookingsResponse
+	14, // 15: service.booking.BookingService.CancelBooking:output_type -> google.protobuf.Empty
+	14, // 16: service.booking.BookingService.UpdateBookingStatus:output_type -> google.protobuf.Empty
+	9,  // 17: service.booking.BookingService.GetBookingStatusHistory:output_type -> service.booking.GetBookingStatusHistoryResponse
+	12, // [12:18] is the sub-list for method output_type
+	6,  // [6:12] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_service_booking_booking_proto_init() }

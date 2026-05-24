@@ -10,6 +10,8 @@ CREATE TABLE cars (
       color             VARCHAR(50)      NOT NULL,
       year_manufactured SMALLINT         NOT NULL,
       status            car_status       NOT NULL,
+      telemetry_id      VARCHAR(100)     NOT NULL DEFAULT '',
+      is_retired        BOOLEAN          NOT NULL DEFAULT false,
       mileage_km        BIGINT           NOT NULL,
       fuel_level        NUMERIC(5, 2),
       battery_level     NUMERIC(5, 2),

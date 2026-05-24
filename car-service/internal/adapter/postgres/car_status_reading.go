@@ -40,14 +40,14 @@ func (r *CarStatusReadingRepository) Insert(ctx context.Context, entry model.Car
 	}
 
 	args := []any{
-		entry.ID, entry.CarID,
+		entry.CarID,
 		string(entry.FromStatus), string(entry.ToStatus),
 		string(entry.ActorType), entry.ActorID, entry.Reason,
 		metadataJSON, entry.RecordedAt,
 	}
 	q := `INSERT INTO car_status_readings
-			(id, car_id, from_status, to_status, actor_type, actor_id, reason, metadata, recorded_at)
-		  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+			(car_id, from_status, to_status, actor_type, actor_id, reason, metadata, recorded_at)
+		  VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 	if _, err := r.pool.Exec(ctx, q, args...); err != nil {
 		log.Error("failed to insert car status reading", pkglog.Err(err))

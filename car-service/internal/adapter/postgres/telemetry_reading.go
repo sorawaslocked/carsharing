@@ -46,16 +46,16 @@ func (r *TelemetryReadingRepository) Insert(ctx context.Context, reading model.T
 	}
 
 	args := []any{
-		reading.ID, reading.CarID,
+		reading.CarID,
 		lat, lon,
 		reading.FuelPct, reading.FuelRawPct, reading.BatteryLevel, reading.MileageKM,
 		reading.ActorID, string(reading.ActorType), reading.Reason,
 		metadataJSON, reading.RecordedAt,
 	}
 	q := `INSERT INTO car_telemetry_readings
-			(id, car_id, latitude, longitude, fuel_pct, fuel_raw_pct,
+			(car_id, latitude, longitude, fuel_pct, fuel_raw_pct,
 			 battery_level, mileage_km, actor_id, actor_type, reason, metadata, recorded_at)
-		  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`
+		  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`
 
 	if _, err := r.pool.Exec(ctx, q, args...); err != nil {
 		log.Error("failed to insert telemetry reading", pkglog.Err(err))

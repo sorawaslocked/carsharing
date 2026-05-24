@@ -141,7 +141,9 @@ func FromUpdateCarTelemetryRequest(req *carsvc.UpdateCarTelemetryRequest) valida
 
 func FromGetCarStatusHistoryRequest(req *carsvc.GetCarStatusHistoryRequest) validation.CarStatusReadingFilter {
 	filter := validation.CarStatusReadingFilter{
-		CarID: req.CarId,
+		CarID:      req.CarId,
+		FromStatus: req.FromStatus,
+		ToStatus:   req.ToStatus,
 	}
 	if req.Pagination != nil {
 		filter.Pagination = &sharedvalidation.Pagination{

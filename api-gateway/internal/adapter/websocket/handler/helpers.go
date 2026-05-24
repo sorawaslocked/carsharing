@@ -1,7 +1,10 @@
 package handler
 
 import (
+	"bufio"
 	"context"
+	"fmt"
+	"net"
 	"net/http"
 	"time"
 
@@ -29,20 +32,30 @@ func tokenDeadlineCtx(c *gin.Context) (context.Context, context.CancelFunc) {
 	return context.WithDeadline(c, expTime)
 }
 
-// acceptWebSocket upgrades the HTTP connection to a WebSocket.
-// It works around a gin v1.11+ incompatibility with coder/websocket: gin's
-// Hijack() now rejects calls when Written() is true, but coder/websocket
-// calls WriteHeaderNow() (which sets Written) before hijacking. Passing the
-// unwrapped http.ResponseWriter bypasses gin's guard while keeping gin's
-// status tracking intact for the request logger.
-func acceptWebSocket(c *gin.Context, opts *websocket.AcceptOptions) (*websocket.Conn, error) {
+// wsResponseWriter wraps gin's ResponseWriter and overrides Hijack() to bypass
+// the Written() guard introduced in gin v1.11. coder/websocket calls
+// WriteHeaderNow() before Hijack(), which sets Written=true; gin v1.11 then
+// rejects Hijack(). Our Hijack() skips that check and delegates directly to
+// the underlying net/http hijacker, while gin retains full ownership of headers
+// and its post-handler WriteHeaderNow() becomes a no-op (already Written=true).
+type wsResponseWriter struct {
+	gin.ResponseWriter
+}
+
+func (w wsResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 	type ginUnwrapper interface {
 		Unwrap() http.ResponseWriter
 	}
-	w := http.ResponseWriter(c.Writer)
-	if uw, ok := c.Writer.(ginUnwrapper); ok {
-		w = uw.Unwrap()
+	if uw, ok := w.ResponseWriter.(ginUnwrapper); ok {
+		if hj, ok := uw.Unwrap().(http.Hijacker); ok {
+			return hj.Hijack()
+		}
 	}
-	c.Status(http.StatusSwitchingProtocols)
-	return websocket.Accept(w, c.Request, opts)
+	return nil, nil, fmt.Errorf("websocket: underlying http.ResponseWriter does not support hijacking")
+}
+
+// acceptWebSocket upgrades the HTTP connection to a WebSocket using a wrapper
+// that fixes the gin v1.11 / coder/websocket incompatibility.
+func acceptWebSocket(c *gin.Context, opts *websocket.AcceptOptions) (*websocket.Conn, error) {
+	return websocket.Accept(wsResponseWriter{c.Writer}, c.Request, opts)
 }

@@ -77,6 +77,18 @@ func (r *CarStatusReadingRepository) Find(ctx context.Context, filter model.CarS
 		args = append(args, string(*filter.ToStatus))
 		clauses = append(clauses, fmt.Sprintf("to_status = $%d", n))
 	}
+	if filter.TimeRange != nil {
+		if !filter.TimeRange.From.IsZero() {
+			n++
+			args = append(args, filter.TimeRange.From)
+			clauses = append(clauses, fmt.Sprintf("recorded_at >= $%d", n))
+		}
+		if !filter.TimeRange.To.IsZero() {
+			n++
+			args = append(args, filter.TimeRange.To)
+			clauses = append(clauses, fmt.Sprintf("recorded_at <= $%d", n))
+		}
+	}
 
 	where := ""
 	if len(clauses) > 0 {

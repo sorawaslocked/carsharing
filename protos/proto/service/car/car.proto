@@ -120,6 +120,7 @@ message GetCarStatusHistoryRequest {
   optional base.Pagination           pagination  = 4;
   optional string                    from_status = 5;
   optional string                    to_status   = 6;
+  optional base.TimeRange            time_range  = 7;
 }
 
 message GetCarStatusHistoryResponse {
@@ -129,9 +130,10 @@ message GetCarStatusHistoryResponse {
 message GetCarTelemetryHistoryRequest {
   string car_id = 1;
 
-  optional google.protobuf.Timestamp from       = 2;
-  optional google.protobuf.Timestamp to         = 3;
-  optional base.Pagination           pagination = 4;
+  optional google.protobuf.Timestamp from        = 2;
+  optional google.protobuf.Timestamp to          = 3;
+  optional base.Pagination           pagination  = 4;
+  optional base.TimeRange            time_range  = 5;
 }
 
 message GetCarTelemetryHistoryResponse {

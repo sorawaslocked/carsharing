@@ -332,6 +332,16 @@ func (s *CarService) ListCarStatusHistory(ctx context.Context, filter validation
 		s := model.CarStatus(*filter.ToStatus)
 		domainFilter.ToStatus = &s
 	}
+	if filter.TimeRange != nil {
+		tr := sharedmodel.TimeRange{}
+		if filter.TimeRange.From != nil {
+			tr.From = *filter.TimeRange.From
+		}
+		if filter.TimeRange.To != nil {
+			tr.To = *filter.TimeRange.To
+		}
+		domainFilter.TimeRange = &tr
+	}
 
 	entries, err := s.statusReadingRepo.Find(ctx, domainFilter)
 	if err != nil {
@@ -356,12 +366,21 @@ func (s *CarService) ListCarTelemetryHistory(ctx context.Context, filter validat
 	if filter.Pagination == nil {
 		filter.Pagination = sharedvalidation.DefaultPagination()
 	}
-	events, err := s.telemetryReadingRepo.Find(ctx, model.TelemetryReadingFilter{
+	domainTelemetryFilter := model.TelemetryReadingFilter{
 		CarID:      filter.CarID,
-		From:       filter.From,
-		To:         filter.To,
 		Pagination: &sharedmodel.Pagination{Limit: filter.Pagination.Limit, Offset: filter.Pagination.Offset},
-	})
+	}
+	if filter.TimeRange != nil {
+		tr := sharedmodel.TimeRange{}
+		if filter.TimeRange.From != nil {
+			tr.From = *filter.TimeRange.From
+		}
+		if filter.TimeRange.To != nil {
+			tr.To = *filter.TimeRange.To
+		}
+		domainTelemetryFilter.TimeRange = &tr
+	}
+	events, err := s.telemetryReadingRepo.Find(ctx, domainTelemetryFilter)
 	if err != nil {
 		log.Error("repo: listing car telemetry history", pkglog.Err(err))
 		return nil, err

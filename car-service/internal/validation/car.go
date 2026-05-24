@@ -1,8 +1,6 @@
 package validation
 
 import (
-	"time"
-
 	sharedvalidation "carsharing/shared/validation"
 )
 
@@ -47,6 +45,7 @@ type CarStatusReadingFilter struct {
 	CarID      string  `validate:"required,uuid"`
 	FromStatus *string `validate:"omitempty,carstatus"`
 	ToStatus   *string `validate:"omitempty,carstatus"`
+	TimeRange  *sharedvalidation.TimeRange
 	Pagination *sharedvalidation.Pagination
 }
 
@@ -59,7 +58,6 @@ type CarTelemetryUpdate struct {
 
 type TelemetryReadingFilter struct {
 	CarID      string `validate:"required,uuid"`
-	From       *time.Time
-	To         *time.Time
+	TimeRange  *sharedvalidation.TimeRange
 	Pagination *sharedvalidation.Pagination
 }

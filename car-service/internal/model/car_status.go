@@ -22,6 +22,7 @@ type CarStatusReadingFilter struct {
 	CarID      string
 	FromStatus *CarStatus
 	ToStatus   *CarStatus
+	TimeRange  *sharedmodel.TimeRange
 
 	Pagination *sharedmodel.Pagination
 }

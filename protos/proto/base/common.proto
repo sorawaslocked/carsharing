@@ -2,7 +2,14 @@ syntax = "proto3";
 
 package base;
 
+import "google/protobuf/timestamp.proto";
+
 option go_package = "carsharing/protos/gen/base";
+
+message TimeRange {
+  optional google.protobuf.Timestamp from = 1;
+  optional google.protobuf.Timestamp to   = 2;
+}
 
 message ImageUploadData {
   string presigned_put_url = 1;

@@ -75,15 +75,17 @@ func (r *TelemetryReadingRepository) Find(ctx context.Context, filter model.Tele
 	n++
 	args = append(args, filter.CarID)
 	clauses = append(clauses, fmt.Sprintf("car_id = $%d", n))
-	if filter.From != nil {
-		n++
-		args = append(args, *filter.From)
-		clauses = append(clauses, fmt.Sprintf("recorded_at >= $%d", n))
-	}
-	if filter.To != nil {
-		n++
-		args = append(args, *filter.To)
-		clauses = append(clauses, fmt.Sprintf("recorded_at <= $%d", n))
+	if filter.TimeRange != nil {
+		if !filter.TimeRange.From.IsZero() {
+			n++
+			args = append(args, filter.TimeRange.From)
+			clauses = append(clauses, fmt.Sprintf("recorded_at >= $%d", n))
+		}
+		if !filter.TimeRange.To.IsZero() {
+			n++
+			args = append(args, filter.TimeRange.To)
+			clauses = append(clauses, fmt.Sprintf("recorded_at <= $%d", n))
+		}
 	}
 
 	where := ""

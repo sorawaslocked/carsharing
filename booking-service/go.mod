@@ -2,14 +2,18 @@ module carsharing/booking-service
 
 go 1.26
 
-replace carsharing/shared v0.0.0 => ../shared
+replace (
+	carsharing/protos v0.0.0 => ../protos
+	carsharing/shared v0.0.0 => ../shared
+)
 
 require (
+	carsharing/protos v0.0.0
 	carsharing/shared v0.0.0
+	github.com/go-playground/validator/v10 v10.30.2
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jackc/pgx/v5 v5.9.2
 	github.com/nats-io/nats.go v1.52.0
-	github.com/sorawaslocked/car-rental-protos v0.0.33
 	github.com/stretchr/testify v1.11.1
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260226221140-a57be14db171
 	google.golang.org/grpc v1.81.1
@@ -23,7 +27,6 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.30.2 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect

@@ -485,7 +485,7 @@ func (h *UserHandler) setRefreshCookies(c *gin.Context, refreshToken string, exp
 	maxAge := int(expiresIn)
 	const httpOnly = true
 
-	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetSameSite(http.SameSiteNoneMode)
 	c.SetCookie("refresh_token", refreshToken, maxAge, path, h.cookie.Domain, h.cookie.Secure, httpOnly)
 }
 
@@ -493,7 +493,7 @@ func (h *UserHandler) clearRefreshCookies(c *gin.Context) {
 	const path = "/api/v1/auth"
 	const httpOnly = true
 
-	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetSameSite(http.SameSiteNoneMode)
 	c.SetCookie("refresh_token", "", -1, path, h.cookie.Domain, h.cookie.Secure, httpOnly)
 }
 

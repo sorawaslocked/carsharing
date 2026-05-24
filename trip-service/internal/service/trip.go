@@ -6,16 +6,20 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
+
 	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	pkgutils "carsharing/shared/pkg/utils"
+	sharedvalidation "carsharing/shared/validation"
 	"carsharing/trip-service/internal/model"
-
-	"github.com/google/uuid"
+	"carsharing/trip-service/internal/validation"
 )
 
 type TripService struct {
 	log         *slog.Logger
+	validate    *validator.Validate
 	tripRepo    TripRepository
 	summaryRepo TripSummaryRepository
 	statusRepo  TripStatusReadingRepository
@@ -26,6 +30,7 @@ type TripService struct {
 
 func NewTripService(
 	log *slog.Logger,
+	validate *validator.Validate,
 	tripRepo TripRepository,
 	summaryRepo TripSummaryRepository,
 	statusRepo TripStatusReadingRepository,
@@ -35,6 +40,7 @@ func NewTripService(
 ) *TripService {
 	return &TripService{
 		log:         pkglog.WithComponent(log, "service.TripService"),
+		validate:    validate,
 		tripRepo:    tripRepo,
 		summaryRepo: summaryRepo,
 		statusRepo:  statusRepo,
@@ -46,15 +52,18 @@ func NewTripService(
 
 func (s *TripService) StartTrip(ctx context.Context, bookingID string) (string, error) {
 	md := pkgutils.MetadataFromCtx(ctx)
-	log := pkglog.WithMethod(s.log, "StartTrip")
-	log = pkglog.WithMetadata(log, md)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "StartTrip"), md)
+
+	if err := validation.ValidateID(s.validate, bookingID); err != nil {
+		return "", err
+	}
 
 	booking, err := s.booking.GetBooking(ctx, bookingID)
 	if err != nil {
 		return "", err
 	}
 
-	if !canAccess(md, booking.UserID) {
+	if !isPrivileged(md.UserRoles) && (md.UserID == nil || booking.UserID != *md.UserID) {
 		return "", model.ErrInsufficientPermissions
 	}
 
@@ -64,7 +73,7 @@ func (s *TripService) StartTrip(ctx context.Context, bookingID string) (string, 
 
 	telemetry, err := s.telematics.GetLatestTelemetry(ctx, booking.CarID)
 	if err != nil {
-		log.Error("failed to get telemetry", pkglog.Err(err))
+		log.Error("telematics: getting latest telemetry", pkglog.Err(err))
 		return "", err
 	}
 
@@ -78,7 +87,7 @@ func (s *TripService) StartTrip(ctx context.Context, bookingID string) (string, 
 		CarID:     booking.CarID,
 		Status:    model.TripStatusActive,
 		StartedAt: now,
-		StartLocation: model.Location{
+		StartLocation: sharedmodel.Location{
 			Latitude:  telemetry.Location.Latitude,
 			Longitude: telemetry.Location.Longitude,
 		},
@@ -86,7 +95,7 @@ func (s *TripService) StartTrip(ctx context.Context, bookingID string) (string, 
 		StartFuelLevel: telemetry.FuelLevel,
 	})
 	if err != nil {
-		log.Error("failed to create trip", pkglog.Err(err))
+		log.Error("repo: creating trip", pkglog.Err(err))
 		return "", err
 	}
 
@@ -95,71 +104,101 @@ func (s *TripService) StartTrip(ctx context.Context, bookingID string) (string, 
 		TripID:     tripID,
 		FromStatus: model.TripStatus(""),
 		ToStatus:   model.TripStatusActive,
-		ActorType:  model.ActorTypeUser,
+		ActorType:  sharedmodel.ActorTypeUser,
 		ActorID:    &actorID,
 		ChangedAt:  now,
 	})
 	if err != nil {
-		log.Error("failed to create status reading", pkglog.Err(err))
+		log.Error("repo: creating status reading", pkglog.Err(err))
 		return "", err
 	}
 
 	if err = s.publisher.PublishTripStarted(ctx, trip); err != nil {
-		log.Error("failed to publish trip started event", pkglog.Err(err))
+		log.Error("event: publishing trip started", pkglog.Err(err))
 	}
 
 	return tripID, nil
 }
 
 func (s *TripService) GetTrip(ctx context.Context, id string) (model.Trip, error) {
-	trip, err := s.tripRepo.GetByID(ctx, id)
-	if err != nil {
+	md := pkgutils.MetadataFromCtx(ctx)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetTrip"), md)
+
+	if err := validation.ValidateID(s.validate, id); err != nil {
 		return model.Trip{}, err
 	}
-	if !canAccess(pkgutils.MetadataFromCtx(ctx), trip.UserID) {
+
+	trip, err := s.tripRepo.GetByID(ctx, id)
+	if err != nil {
+		if err != model.ErrNotFound {
+			log.Error("repo: getting trip", pkglog.Err(err))
+		}
+		return model.Trip{}, err
+	}
+
+	if !isPrivileged(md.UserRoles) && (md.UserID == nil || trip.UserID != *md.UserID) {
 		return model.Trip{}, model.ErrInsufficientPermissions
 	}
+
 	return trip, nil
 }
 
-func (s *TripService) ListTrips(ctx context.Context, filter model.TripFilter) ([]model.Trip, error) {
+func (s *TripService) ListTrips(ctx context.Context, filter validation.TripFilter) ([]model.Trip, error) {
 	md := pkgutils.MetadataFromCtx(ctx)
-	for _, r := range md.UserRoles {
-		if r == sharedmodel.RoleAdmin || r == sharedmodel.RoleBookingManager {
-			return s.tripRepo.List(ctx, filter)
-		}
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "ListTrips"), md)
+
+	if err := validation.ValidateInput(s.validate, filter); err != nil {
+		return nil, err
 	}
-	filter.UserID = md.UserID
-	return s.tripRepo.List(ctx, filter)
+
+	mf := tripFilter(filter)
+
+	if !isPrivileged(md.UserRoles) {
+		mf.UserID = md.UserID
+	}
+
+	trips, err := s.tripRepo.List(ctx, mf)
+	if err != nil {
+		log.Error("repo: listing trips", pkglog.Err(err))
+		return nil, err
+	}
+
+	return trips, nil
 }
 
 func (s *TripService) EndTrip(ctx context.Context, id string) error {
 	md := pkgutils.MetadataFromCtx(ctx)
-	log := pkglog.WithMethod(s.log, "EndTrip")
-	log = pkglog.WithMetadata(log, md)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "EndTrip"), md)
 
-	trip, err := s.tripRepo.GetByID(ctx, id)
-	if err != nil {
+	if err := validation.ValidateID(s.validate, id); err != nil {
 		return err
 	}
 
-	if !canAccess(md, trip.UserID) {
+	trip, err := s.tripRepo.GetByID(ctx, id)
+	if err != nil {
+		if err != model.ErrNotFound {
+			log.Error("repo: getting trip", pkglog.Err(err))
+		}
+		return err
+	}
+
+	if !isPrivileged(md.UserRoles) && (md.UserID == nil || trip.UserID != *md.UserID) {
 		return model.ErrInsufficientPermissions
 	}
 
 	if !trip.Status.CanTransitionTo(model.TripStatusCompleted) {
-		return model.ErrInvalidStatusTransition
+		return model.ErrInvalidTripStatusTransition
 	}
 
 	telemetry, err := s.telematics.GetLatestTelemetry(ctx, trip.CarID)
 	if err != nil {
-		log.Error("failed to get telemetry", pkglog.Err(err))
+		log.Error("telematics: getting latest telemetry", pkglog.Err(err))
 		return err
 	}
 
 	booking, err := s.booking.GetBooking(ctx, trip.BookingID)
 	if err != nil {
-		log.Error("failed to get booking", pkglog.Err(err))
+		log.Error("grpc: getting booking", pkglog.Err(err))
 		return err
 	}
 
@@ -170,7 +209,7 @@ func (s *TripService) EndTrip(ctx context.Context, id string) error {
 	baseCost, distCost, overtimeCost := calculateCosts(booking.PricingSnapshot, booking.CommittedPeriods, durationSeconds, distanceKM)
 	totalCost := baseCost + distCost + overtimeCost
 
-	endLocation := model.Location{
+	endLocation := sharedmodel.Location{
 		Latitude:  telemetry.Location.Latitude,
 		Longitude: telemetry.Location.Longitude,
 	}
@@ -188,7 +227,7 @@ func (s *TripService) EndTrip(ctx context.Context, id string) error {
 		UpdatedAt:          now,
 	})
 	if err != nil {
-		log.Error("failed to update trip", pkglog.Err(err))
+		log.Error("repo: updating trip", pkglog.Err(err))
 		return err
 	}
 
@@ -197,12 +236,12 @@ func (s *TripService) EndTrip(ctx context.Context, id string) error {
 		TripID:     id,
 		FromStatus: model.TripStatusActive,
 		ToStatus:   model.TripStatusCompleted,
-		ActorType:  model.ActorTypeUser,
+		ActorType:  sharedmodel.ActorTypeUser,
 		ActorID:    &actorID,
 		ChangedAt:  now,
 	})
 	if err != nil {
-		log.Error("failed to create status reading", pkglog.Err(err))
+		log.Error("repo: creating status reading", pkglog.Err(err))
 		return err
 	}
 
@@ -220,12 +259,12 @@ func (s *TripService) EndTrip(ctx context.Context, id string) error {
 		TotalCostTenge:     totalCost,
 	})
 	if err != nil {
-		log.Error("failed to create trip summary", pkglog.Err(err))
+		log.Error("repo: creating trip summary", pkglog.Err(err))
 		return err
 	}
 
 	if err = s.publisher.PublishTripEnded(ctx, updatedTrip); err != nil {
-		log.Error("failed to publish trip ended event", pkglog.Err(err))
+		log.Error("event: publishing trip ended", pkglog.Err(err))
 	}
 
 	return nil
@@ -233,20 +272,26 @@ func (s *TripService) EndTrip(ctx context.Context, id string) error {
 
 func (s *TripService) CancelTrip(ctx context.Context, id string, reason *string) error {
 	md := pkgutils.MetadataFromCtx(ctx)
-	log := pkglog.WithMethod(s.log, "CancelTrip")
-	log = pkglog.WithMetadata(log, md)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "CancelTrip"), md)
 
-	trip, err := s.tripRepo.GetByID(ctx, id)
-	if err != nil {
+	if err := validation.ValidateID(s.validate, id); err != nil {
 		return err
 	}
 
-	if !canAccess(md, trip.UserID) {
+	trip, err := s.tripRepo.GetByID(ctx, id)
+	if err != nil {
+		if err != model.ErrNotFound {
+			log.Error("repo: getting trip", pkglog.Err(err))
+		}
+		return err
+	}
+
+	if !isPrivileged(md.UserRoles) && (md.UserID == nil || trip.UserID != *md.UserID) {
 		return model.ErrInsufficientPermissions
 	}
 
 	if !trip.Status.CanTransitionTo(model.TripStatusCancelled) {
-		return model.ErrInvalidStatusTransition
+		return model.ErrInvalidTripStatusTransition
 	}
 
 	now := time.Now()
@@ -257,7 +302,7 @@ func (s *TripService) CancelTrip(ctx context.Context, id string, reason *string)
 		UpdatedAt:    now,
 	})
 	if err != nil {
-		log.Error("failed to update trip", pkglog.Err(err))
+		log.Error("repo: updating trip", pkglog.Err(err))
 		return err
 	}
 
@@ -266,59 +311,87 @@ func (s *TripService) CancelTrip(ctx context.Context, id string, reason *string)
 		TripID:     id,
 		FromStatus: model.TripStatusActive,
 		ToStatus:   model.TripStatusCancelled,
-		ActorType:  model.ActorTypeUser,
+		ActorType:  sharedmodel.ActorTypeUser,
 		ActorID:    &actorID,
 		Reason:     reason,
 		ChangedAt:  now,
 	})
 	if err != nil {
-		log.Error("failed to create status reading", pkglog.Err(err))
+		log.Error("repo: creating status reading", pkglog.Err(err))
 		return err
 	}
 
 	if err = s.publisher.PublishTripCancelled(ctx, updatedTrip); err != nil {
-		log.Error("failed to publish trip cancelled event", pkglog.Err(err))
+		log.Error("event: publishing trip cancelled", pkglog.Err(err))
 	}
 
 	return nil
 }
 
 func (s *TripService) GetTripSummary(ctx context.Context, tripID string) (model.TripSummary, error) {
-	trip, err := s.tripRepo.GetByID(ctx, tripID)
-	if err != nil {
+	md := pkgutils.MetadataFromCtx(ctx)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetTripSummary"), md)
+
+	if err := validation.ValidateID(s.validate, tripID); err != nil {
 		return model.TripSummary{}, err
 	}
-	if !canAccess(pkgutils.MetadataFromCtx(ctx), trip.UserID) {
+
+	trip, err := s.tripRepo.GetByID(ctx, tripID)
+	if err != nil {
+		if err != model.ErrNotFound {
+			log.Error("repo: getting trip", pkglog.Err(err))
+		}
+		return model.TripSummary{}, err
+	}
+
+	if !isPrivileged(md.UserRoles) && (md.UserID == nil || trip.UserID != *md.UserID) {
 		return model.TripSummary{}, model.ErrInsufficientPermissions
 	}
+
 	return s.summaryRepo.GetByTripID(ctx, tripID)
 }
 
-func (s *TripService) GetTripStatusHistory(ctx context.Context, filter model.TripStatusReadingFilter) ([]model.TripStatusReading, error) {
-	trip, err := s.tripRepo.GetByID(ctx, filter.TripID)
-	if err != nil {
+func (s *TripService) GetTripStatusHistory(ctx context.Context, filter validation.TripStatusHistoryFilter) ([]model.TripStatusReading, error) {
+	md := pkgutils.MetadataFromCtx(ctx)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetTripStatusHistory"), md)
+
+	if err := validation.ValidateInput(s.validate, filter); err != nil {
 		return nil, err
 	}
-	if !canAccess(pkgutils.MetadataFromCtx(ctx), trip.UserID) {
+
+	trip, err := s.tripRepo.GetByID(ctx, filter.TripID)
+	if err != nil {
+		if err != model.ErrNotFound {
+			log.Error("repo: getting trip", pkglog.Err(err))
+		}
+		return nil, err
+	}
+
+	if !isPrivileged(md.UserRoles) && (md.UserID == nil || trip.UserID != *md.UserID) {
 		return nil, model.ErrInsufficientPermissions
 	}
-	return s.statusRepo.List(ctx, filter)
+
+	return s.statusRepo.List(ctx, tripStatusHistoryFilter(filter))
 }
 
-// StreamTripLiveFeed calls send for each telemetry event while the trip remains active.
-// It returns io.EOF when the trip ends normally; any other error indicates a failure.
 func (s *TripService) StreamTripLiveFeed(ctx context.Context, tripID string, send func(model.TripLiveFeed) error) error {
-	log := pkglog.WithMethod(s.log, "StreamTripLiveFeed")
-	log = pkglog.WithMetadata(log, pkgutils.MetadataFromCtx(ctx))
+	md := pkgutils.MetadataFromCtx(ctx)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "StreamTripLiveFeed"), md)
+
+	if err := validation.ValidateID(s.validate, tripID); err != nil {
+		return err
+	}
 
 	trip, err := s.tripRepo.GetByID(ctx, tripID)
 	if err != nil {
 		return err
 	}
+
 	if trip.Status != model.TripStatusActive {
 		return model.ErrTripNotActive
 	}
-	if !canAccess(pkgutils.MetadataFromCtx(ctx), trip.UserID) {
+
+	if !isPrivileged(md.UserRoles) && (md.UserID == nil || trip.UserID != *md.UserID) {
 		return model.ErrInsufficientPermissions
 	}
 
@@ -330,7 +403,7 @@ func (s *TripService) StreamTripLiveFeed(ctx context.Context, tripID string, sen
 	return s.telematics.StreamTelemetry(ctx, trip.CarID, func(t model.CarTelemetry) error {
 		current, err := s.tripRepo.GetByID(ctx, tripID)
 		if err != nil {
-			log.Error("failed to poll trip status", pkglog.Err(err))
+			log.Error("repo: polling trip status", pkglog.Err(err))
 			return err
 		}
 		if current.Status != model.TripStatusActive {
@@ -349,16 +422,50 @@ func (s *TripService) StreamTripLiveFeed(ctx context.Context, tripID string, sen
 	})
 }
 
-func canAccess(md pkgutils.Metadata, ownerID string) bool {
-	if md.UserID != nil && *md.UserID == ownerID {
-		return true
-	}
-	for _, r := range md.UserRoles {
+func isPrivileged(roles []sharedmodel.Role) bool {
+	for _, r := range roles {
 		if r == sharedmodel.RoleAdmin || r == sharedmodel.RoleBookingManager {
 			return true
 		}
 	}
 	return false
+}
+
+func tripFilter(filter validation.TripFilter) model.TripFilter {
+	if filter.Pagination == nil {
+		filter.Pagination = sharedvalidation.DefaultPagination()
+	}
+	mf := model.TripFilter{
+		UserID: filter.UserID,
+		CarID:  filter.CarID,
+	}
+	if filter.Status != nil {
+		s := model.TripStatus(*filter.Status)
+		mf.Status = &s
+	}
+	if filter.TimeRange != nil {
+		mf.StartedAfter = filter.TimeRange.From
+		mf.StartedBefore = filter.TimeRange.To
+	}
+	mf.Pagination = &sharedmodel.Pagination{
+		Limit:  filter.Pagination.Limit,
+		Offset: filter.Pagination.Offset,
+	}
+	return mf
+}
+
+func tripStatusHistoryFilter(f validation.TripStatusHistoryFilter) model.TripStatusReadingFilter {
+	if f.Pagination == nil {
+		f.Pagination = sharedvalidation.DefaultPagination()
+	}
+	filter := model.TripStatusReadingFilter{
+		TripID:     f.TripID,
+		Pagination: &sharedmodel.Pagination{Limit: f.Pagination.Limit, Offset: f.Pagination.Offset},
+	}
+	if f.TimeRange != nil && f.TimeRange.From != nil && f.TimeRange.To != nil {
+		filter.TimeRange = &sharedmodel.TimeRange{From: *f.TimeRange.From, To: *f.TimeRange.To}
+	}
+	return filter
 }
 
 func ptr[T any](v T) *T {

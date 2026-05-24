@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	sharedmodel "carsharing/shared/model"
+)
 
 type TripStatus string
 
@@ -38,12 +42,12 @@ type Trip struct {
 	Status    TripStatus
 
 	StartedAt      time.Time
-	StartLocation  Location
+	StartLocation  sharedmodel.Location
 	StartMileageKM int64
 	StartFuelLevel *float32
 
 	EndedAt      *time.Time
-	EndLocation  *Location
+	EndLocation  *sharedmodel.Location
 	EndMileageKM *int64
 	EndFuelLevel *float32
 
@@ -63,7 +67,7 @@ type TripCreate struct {
 	CarID          string
 	Status         TripStatus
 	StartedAt      time.Time
-	StartLocation  Location
+	StartLocation  sharedmodel.Location
 	StartMileageKM int64
 	StartFuelLevel *float32
 }
@@ -71,7 +75,7 @@ type TripCreate struct {
 type TripUpdate struct {
 	Status             *TripStatus
 	EndedAt            *time.Time
-	EndLocation        *Location
+	EndLocation        *sharedmodel.Location
 	EndMileageKM       *int64
 	EndFuelLevel       *float32
 	DistanceTraveledKM *float64
@@ -81,12 +85,11 @@ type TripUpdate struct {
 	UpdatedAt          time.Time
 }
 
-// TripFilter is used by ListTrips to narrow results.
 type TripFilter struct {
 	UserID        *string
 	CarID         *string
 	Status        *TripStatus
 	StartedAfter  *time.Time
 	StartedBefore *time.Time
-	Pagination    *Pagination
+	Pagination    *sharedmodel.Pagination
 }

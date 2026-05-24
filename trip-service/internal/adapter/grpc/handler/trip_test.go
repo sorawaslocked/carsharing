@@ -154,7 +154,7 @@ func TestTripHandler_EndTrip_InvalidTransition(t *testing.T) {
 	svc := handlermocks.NewMockTripService(t)
 	h := handler.NewTripHandler(discardLogger(), svc)
 
-	svc.EXPECT().EndTrip(mock.Anything, "trip-1").Return(model.ErrInvalidStatusTransition)
+	svc.EXPECT().EndTrip(mock.Anything, "trip-1").Return(model.ErrInvalidTripStatusTransition)
 
 	_, err := h.EndTrip(context.Background(), &tripsvc.EndTripRequest{Id: "trip-1"})
 

@@ -22,18 +22,17 @@ type BookingClient struct {
 
 func NewBookingClient(log *slog.Logger, conn *grpc.ClientConn) *BookingClient {
 	return &BookingClient{
-		log:    pkglog.WithComponent(log, "client.BookingClient"),
+		log:    pkglog.WithComponent(log, "adapter.grpc.client.BookingClient"),
 		client: bookingsvc.NewBookingServiceClient(conn),
 	}
 }
 
 func (c *BookingClient) GetBooking(ctx context.Context, id string) (model.Booking, error) {
-	log := pkglog.WithMethod(c.log, "GetBooking")
-	log = pkglog.WithMetadata(log, pkgutils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(c.log, "GetBooking"), pkgutils.MetadataFromCtx(ctx))
 
 	resp, err := c.client.GetBooking(ctx, &bookingsvc.GetBookingRequest{Id: id})
 	if err != nil {
-		log.Error("failed to get booking", pkglog.Err(err))
+		log.Error("grpc: getting booking", slog.String("id", id), pkglog.Err(err))
 		return model.Booking{}, err
 	}
 	return bookingFromProto(resp.Booking), nil

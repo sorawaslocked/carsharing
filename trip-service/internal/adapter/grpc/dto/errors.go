@@ -7,10 +7,11 @@ import (
 	"google.golang.org/grpc/status"
 
 	"carsharing/trip-service/internal/model"
+	"carsharing/trip-service/internal/validation"
 )
 
 func ToStatusError(err error) error {
-	var ve model.ValidationErrors
+	var ve validation.Errors
 	if errors.As(err, &ve) {
 		return status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -24,7 +25,7 @@ func ToStatusError(err error) error {
 	case errors.Is(err, model.ErrInsufficientPermissions):
 		return status.Error(codes.PermissionDenied, err.Error())
 	case errors.Is(err, model.ErrBookingNotCreated),
-		errors.Is(err, model.ErrInvalidStatusTransition),
+		errors.Is(err, model.ErrInvalidTripStatusTransition),
 		errors.Is(err, model.ErrTripNotActive):
 		return status.Error(codes.FailedPrecondition, err.Error())
 	default:

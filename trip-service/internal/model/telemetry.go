@@ -1,10 +1,14 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	sharedmodel "carsharing/shared/model"
+)
 
 type CarTelemetry struct {
 	CarID      string
-	Location   Location
+	Location   sharedmodel.Location
 	FuelLevel  *float32
 	MileageKM  int64
 	RecordedAt time.Time

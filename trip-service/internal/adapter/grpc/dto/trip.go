@@ -9,7 +9,9 @@ import (
 	basetripmb "carsharing/protos/gen/base/trip"
 	tripsvc "carsharing/protos/gen/service/trip"
 
+	sharedvalidation "carsharing/shared/validation"
 	"carsharing/trip-service/internal/model"
+	"carsharing/trip-service/internal/validation"
 )
 
 func TripToProto(t model.Trip) *basetripmb.Trip {
@@ -42,25 +44,29 @@ func TripToProto(t model.Trip) *basetripmb.Trip {
 	return proto
 }
 
-func FilterFromProto(req *tripsvc.ListTripsRequest) model.TripFilter {
-	f := model.TripFilter{
+func FilterFromProto(req *tripsvc.ListTripsRequest) validation.TripFilter {
+	f := validation.TripFilter{
 		UserID: req.UserId,
 		CarID:  req.CarId,
 	}
 	if req.Status != nil {
-		s := model.TripStatus(*req.Status)
+		s := *req.Status
 		f.Status = &s
 	}
-	if req.StartedAfter != nil {
-		t := req.StartedAfter.AsTime()
-		f.StartedAfter = &t
-	}
-	if req.StartedBefore != nil {
-		t := req.StartedBefore.AsTime()
-		f.StartedBefore = &t
+	if req.StartedAfter != nil || req.StartedBefore != nil {
+		tr := &sharedvalidation.TimeRange{}
+		if req.StartedAfter != nil {
+			t := req.StartedAfter.AsTime()
+			tr.From = &t
+		}
+		if req.StartedBefore != nil {
+			t := req.StartedBefore.AsTime()
+			tr.To = &t
+		}
+		f.TimeRange = tr
 	}
 	if req.Pagination != nil {
-		f.Pagination = &model.Pagination{
+		f.Pagination = &sharedvalidation.Pagination{
 			Limit:  req.Pagination.Limit,
 			Offset: req.Pagination.Offset,
 		}
@@ -68,18 +74,22 @@ func FilterFromProto(req *tripsvc.ListTripsRequest) model.TripFilter {
 	return f
 }
 
-func StatusHistoryFilterFromProto(req *tripsvc.GetTripStatusHistoryRequest) model.TripStatusReadingFilter {
-	f := model.TripStatusReadingFilter{TripID: req.Id}
-	if req.From != nil {
-		t := req.From.AsTime()
-		f.From = &t
-	}
-	if req.To != nil {
-		t := req.To.AsTime()
-		f.To = &t
+func StatusHistoryFilterFromProto(req *tripsvc.GetTripStatusHistoryRequest) validation.TripStatusHistoryFilter {
+	f := validation.TripStatusHistoryFilter{TripID: req.Id}
+	if req.From != nil || req.To != nil {
+		tr := &sharedvalidation.TimeRange{}
+		if req.From != nil {
+			t := req.From.AsTime()
+			tr.From = &t
+		}
+		if req.To != nil {
+			t := req.To.AsTime()
+			tr.To = &t
+		}
+		f.TimeRange = tr
 	}
 	if req.Pagination != nil {
-		f.Pagination = &model.Pagination{
+		f.Pagination = &sharedvalidation.Pagination{
 			Limit:  req.Pagination.Limit,
 			Offset: req.Pagination.Offset,
 		}

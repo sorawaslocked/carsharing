@@ -10,6 +10,7 @@ import (
 
 	carsvc "carsharing/protos/gen/service/car"
 
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	pkgutils "carsharing/shared/pkg/utils"
 	"carsharing/trip-service/internal/model"
@@ -23,19 +24,18 @@ type TelematicsClient struct {
 
 func NewTelematicsClient(log *slog.Logger, carConn, streamConn *grpc.ClientConn) *TelematicsClient {
 	return &TelematicsClient{
-		log:          pkglog.WithComponent(log, "client.TelematicsClient"),
+		log:          pkglog.WithComponent(log, "adapter.grpc.client.TelematicsClient"),
 		carClient:    carsvc.NewCarServiceClient(carConn),
 		streamClient: carsvc.NewCarStreamServiceClient(streamConn),
 	}
 }
 
 func (c *TelematicsClient) GetLatestTelemetry(ctx context.Context, carID string) (model.CarTelemetry, error) {
-	log := pkglog.WithMethod(c.log, "GetLatestTelemetry")
-	log = pkglog.WithMetadata(log, pkgutils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(c.log, "GetLatestTelemetry"), pkgutils.MetadataFromCtx(ctx))
 
 	resp, err := c.carClient.GetCar(ctx, &carsvc.GetCarRequest{Id: carID})
 	if err != nil {
-		log.Error("failed to get car", pkglog.Err(err))
+		log.Error("grpc: getting car", slog.String("carID", carID), pkglog.Err(err))
 		return model.CarTelemetry{}, err
 	}
 
@@ -47,7 +47,7 @@ func (c *TelematicsClient) GetLatestTelemetry(ctx context.Context, carID string)
 		RecordedAt: time.Now(),
 	}
 	if car.Location != nil {
-		t.Location = model.Location{
+		t.Location = sharedmodel.Location{
 			Latitude:  car.Location.Latitude,
 			Longitude: car.Location.Longitude,
 		}
@@ -59,12 +59,11 @@ func (c *TelematicsClient) GetLatestTelemetry(ctx context.Context, carID string)
 }
 
 func (c *TelematicsClient) StreamTelemetry(ctx context.Context, carID string, fn func(model.CarTelemetry) error) error {
-	log := pkglog.WithMethod(c.log, "StreamTelemetry")
-	log = pkglog.WithMetadata(log, pkgutils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(c.log, "StreamTelemetry"), pkgutils.MetadataFromCtx(ctx))
 
 	stream, err := c.streamClient.StreamCarTelemetry(ctx, &carsvc.StreamCarTelemetryRequest{CarId: carID})
 	if err != nil {
-		log.Error("failed to open telemetry stream", pkglog.Err(err))
+		log.Error("grpc: opening telemetry stream", slog.String("carID", carID), pkglog.Err(err))
 		return err
 	}
 
@@ -74,7 +73,7 @@ func (c *TelematicsClient) StreamTelemetry(ctx context.Context, carID string, fn
 			return io.EOF
 		}
 		if err != nil {
-			log.Error("telemetry stream error", pkglog.Err(err))
+			log.Error("grpc: receiving telemetry", slog.String("carID", carID), pkglog.Err(err))
 			return err
 		}
 
@@ -84,7 +83,7 @@ func (c *TelematicsClient) StreamTelemetry(ctx context.Context, carID string, fn
 			FuelLevel: resp.FuelLevel,
 		}
 		if resp.Location != nil {
-			t.Location = model.Location{
+			t.Location = sharedmodel.Location{
 				Latitude:  resp.Location.Latitude,
 				Longitude: resp.Location.Longitude,
 			}

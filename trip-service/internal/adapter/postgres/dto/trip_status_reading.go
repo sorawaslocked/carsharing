@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	sharedmodel "carsharing/shared/model"
 	"carsharing/trip-service/internal/model"
 )
 
@@ -33,7 +34,7 @@ func ScanTripStatusReading(s scanner) (model.TripStatusReading, error) {
 		TripID:     r.TripID,
 		FromStatus: model.TripStatus(r.FromStatus),
 		ToStatus:   model.TripStatus(r.ToStatus),
-		ActorType:  model.ActorType(r.ActorType),
+		ActorType:  sharedmodel.ActorType(r.ActorType),
 		ActorID:    r.ActorID,
 		Reason:     r.Reason,
 		ChangedAt:  r.ChangedAt,
@@ -42,11 +43,9 @@ func ScanTripStatusReading(s scanner) (model.TripStatusReading, error) {
 
 func BuildStatusReadingWhereClauses(f model.TripStatusReadingFilter, b *ArgsBuilder) []string {
 	clauses := []string{fmt.Sprintf("trip_id = %s", b.Add(f.TripID))}
-	if f.From != nil {
-		clauses = append(clauses, fmt.Sprintf("changed_at >= %s", b.Add(*f.From)))
-	}
-	if f.To != nil {
-		clauses = append(clauses, fmt.Sprintf("changed_at <= %s", b.Add(*f.To)))
+	if f.TimeRange != nil {
+		clauses = append(clauses, fmt.Sprintf("changed_at >= %s", b.Add(f.TimeRange.From)))
+		clauses = append(clauses, fmt.Sprintf("changed_at <= %s", b.Add(f.TimeRange.To)))
 	}
 	return clauses
 }

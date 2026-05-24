@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	sharedmodel "carsharing/shared/model"
 	"carsharing/trip-service/internal/model"
 )
 
@@ -51,7 +52,7 @@ func (r tripRow) toDomain() model.Trip {
 		CarID:     r.CarID,
 		Status:    model.TripStatus(r.Status),
 		StartedAt: r.StartedAt,
-		StartLocation: model.Location{
+		StartLocation: sharedmodel.Location{
 			Latitude:  r.StartLatitude,
 			Longitude: r.StartLongitude,
 		},
@@ -62,7 +63,7 @@ func (r tripRow) toDomain() model.Trip {
 	}
 	t.EndedAt = r.EndedAt
 	if r.EndLatitude != nil && r.EndLongitude != nil {
-		loc := model.Location{Latitude: *r.EndLatitude, Longitude: *r.EndLongitude}
+		loc := sharedmodel.Location{Latitude: *r.EndLatitude, Longitude: *r.EndLongitude}
 		t.EndLocation = &loc
 	}
 	t.EndMileageKM = r.EndMileageKM

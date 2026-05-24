@@ -3,7 +3,7 @@ package dto
 import (
 	"fmt"
 
-	"carsharing/trip-service/internal/model"
+	sharedmodel "carsharing/shared/model"
 )
 
 type ArgsBuilder struct {
@@ -15,7 +15,7 @@ func (b *ArgsBuilder) Add(arg any) string {
 	return fmt.Sprintf("$%d", len(b.Args))
 }
 
-func BuildPagination(p *model.Pagination, b *ArgsBuilder) string {
+func BuildPagination(p *sharedmodel.Pagination, b *ArgsBuilder) string {
 	if p == nil {
 		return ""
 	}

@@ -9,8 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgxpool"
-	natsio "github.com/nats-io/nats.go"
+	"github.com/go-playground/validator/v10"
 	"google.golang.org/grpc"
 
 	pkggrpc "carsharing/shared/pkg/grpc"
@@ -25,57 +24,61 @@ import (
 	"carsharing/trip-service/internal/adapter/postgres"
 	"carsharing/trip-service/internal/config"
 	"carsharing/trip-service/internal/service"
+	"carsharing/trip-service/internal/validation"
 )
 
 type App struct {
-	log         *slog.Logger
-	grpcServer  *grpc.Server
-	grpcAddr    string
-	pool        *pgxpool.Pool
-	natsConn    *natsio.Conn
-	carConn     *grpc.ClientConn
-	streamConn  *grpc.ClientConn
-	bookingConn *grpc.ClientConn
+	log        *slog.Logger
+	grpcServer *grpc.Server
+	grpcAddr   string
+	closer     closer
 }
 
 func New(log *slog.Logger, cfg config.Config) (*App, error) {
+	var cl closer
+
 	pool, err := pkgpostgres.NewPool(log, cfg.PG)
 	if err != nil {
 		return nil, fmt.Errorf("postgres: %w", err)
 	}
+	cl.add(pool.Close)
+
+	validate := validator.New()
+	if err := validation.RegisterCustomValidators(validate, log); err != nil {
+		cl.closeAll()
+		return nil, fmt.Errorf("validator: %w", err)
+	}
 
 	nc, err := pkgnats.NewPublisher(log, cfg.NATS)
 	if err != nil {
-		pool.Close()
+		cl.closeAll()
 		return nil, fmt.Errorf("nats: %w", err)
 	}
+	cl.add(nc.Close)
 
 	unaryInterceptors := grpc.WithChainUnaryInterceptor(interceptor.MetadataForwardingUnaryInterceptor)
 	streamInterceptors := grpc.WithChainStreamInterceptor(interceptor.MetadataForwardingStreamInterceptor)
 
 	carConn, err := pkggrpc.NewClientConn(log, cfg.CarService, unaryInterceptors, streamInterceptors)
 	if err != nil {
-		pool.Close()
-		nc.Close()
+		cl.closeAll()
 		return nil, fmt.Errorf("car service client: %w", err)
 	}
+	cl.add(func() { _ = carConn.Close() })
 
 	streamConn, err := pkggrpc.NewClientConn(log, cfg.CarStreamService, unaryInterceptors, streamInterceptors)
 	if err != nil {
-		pool.Close()
-		nc.Close()
-		_ = carConn.Close()
+		cl.closeAll()
 		return nil, fmt.Errorf("car stream service client: %w", err)
 	}
+	cl.add(func() { _ = streamConn.Close() })
 
 	bookingConn, err := pkggrpc.NewClientConn(log, cfg.BookingService, unaryInterceptors, streamInterceptors)
 	if err != nil {
-		pool.Close()
-		nc.Close()
-		_ = carConn.Close()
-		_ = streamConn.Close()
+		cl.closeAll()
 		return nil, fmt.Errorf("booking service client: %w", err)
 	}
+	cl.add(func() { _ = bookingConn.Close() })
 
 	tripRepo := postgres.NewTripRepo(log, pool)
 	summaryRepo := postgres.NewTripSummaryRepo(log, pool)
@@ -85,7 +88,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	telematicsClient := client.NewTelematicsClient(log, carConn, streamConn)
 	publisher := natspub.NewPublisher(log, nc)
 
-	tripSvc := service.NewTripService(log, tripRepo, summaryRepo, statusRepo, bookingClient, telematicsClient, publisher)
+	tripSvc := service.NewTripService(log, validate, tripRepo, summaryRepo, statusRepo, bookingClient, telematicsClient, publisher)
 
 	tripHandler := handler.NewTripHandler(log, tripSvc)
 	streamHandler := handler.NewTripStreamHandler(log, tripSvc)
@@ -94,14 +97,10 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	srv := grpcserver.NewServer(log, tripHandler, streamHandler, healthHandler)
 
 	return &App{
-		log:         pkglog.WithComponent(log, "app"),
-		grpcServer:  srv,
-		grpcAddr:    fmt.Sprintf("%s:%d", cfg.GRPC.Host, cfg.GRPC.Port),
-		pool:        pool,
-		natsConn:    nc,
-		carConn:     carConn,
-		streamConn:  streamConn,
-		bookingConn: bookingConn,
+		log:        pkglog.WithComponent(log, "app"),
+		grpcServer: srv,
+		grpcAddr:   fmt.Sprintf("%s:%d", cfg.GRPC.Host, cfg.GRPC.Port),
+		closer:     cl,
 	}, nil
 }
 
@@ -143,15 +142,11 @@ func (a *App) stop() {
 
 	select {
 	case <-stopped:
-		a.log.Info("grpc server stopped gracefully")
+		a.log.Info("gRPC server stopped gracefully")
 	case <-time.After(15 * time.Second):
 		a.log.Warn("graceful stop timed out, forcing stop")
 		a.grpcServer.Stop()
 	}
 
-	a.pool.Close()
-	a.natsConn.Close()
-	_ = a.carConn.Close()
-	_ = a.streamConn.Close()
-	_ = a.bookingConn.Close()
+	a.closer.closeAll()
 }

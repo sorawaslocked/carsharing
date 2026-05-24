@@ -15,9 +15,9 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /app
 
-COPY --from=builder /telematics .
+COPY --from=builder /telemetry .
 COPY --from=builder /app/docker.yml .
 
 EXPOSE 50051
 
-ENTRYPOINT ["./telematics", "-config", "./docker.yml"]
+ENTRYPOINT ["./telemetry", "-config", "./docker.yml"]

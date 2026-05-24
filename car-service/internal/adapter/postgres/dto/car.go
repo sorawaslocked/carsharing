@@ -16,6 +16,8 @@ type carRow struct {
 	Color            string
 	YearManufactured int16
 	Status           string
+	TelemetryID      string
+	IsRetired        bool
 	MileageKM        int64
 	FuelLevel        *float32
 	BatteryLevel     *float32
@@ -38,6 +40,8 @@ func (r carRow) toDomain() model.Car {
 		Color:            r.Color,
 		YearManufactured: r.YearManufactured,
 		Status:           model.CarStatus(r.Status),
+		TelemetryID:      r.TelemetryID,
+		IsRetired:        r.IsRetired,
 		MileageKM:        r.MileageKM,
 		FuelLevel:        r.FuelLevel,
 		BatteryLevel:     r.BatteryLevel,
@@ -59,7 +63,7 @@ func ScanCarRow(s scanner) (model.Car, error) {
 
 	err := s.Scan(
 		&r.ID, &r.ModelID, &r.VIN, &r.LicensePlate, &r.Color,
-		&r.YearManufactured, &r.Status, &r.MileageKM,
+		&r.YearManufactured, &r.Status, &r.TelemetryID, &r.IsRetired, &r.MileageKM,
 		&r.FuelLevel, &r.BatteryLevel,
 		&r.Latitude, &r.Longitude, &r.ZoneID,
 		&r.Notes, &r.ImageKeys, &r.LastSeenAt, &r.CreatedAt, &r.UpdatedAt,
@@ -119,10 +123,20 @@ func SetClausesFromCarUpdate(update model.CarUpdate) ([]string, []any, int) {
 		args = append(args, string(*update.Status))
 		clauses = append(clauses, fmt.Sprintf("status = $%d", n))
 	}
+	if update.TelemetryID != nil {
+		n++
+		args = append(args, *update.TelemetryID)
+		clauses = append(clauses, fmt.Sprintf("telemetry_id = $%d", n))
+	}
 	if update.ZoneID != nil {
 		n++
 		args = append(args, *update.ZoneID)
 		clauses = append(clauses, fmt.Sprintf("zone_id = $%d", n))
+	}
+	if update.IsRetired != nil {
+		n++
+		args = append(args, *update.IsRetired)
+		clauses = append(clauses, fmt.Sprintf("is_retired = $%d", n))
 	}
 	if update.Notes != nil {
 		n++

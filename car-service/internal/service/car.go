@@ -189,6 +189,15 @@ func (s *CarService) Update(ctx context.Context, id string, data validation.CarU
 		return err
 	}
 
+	if data.ZoneID != nil {
+		if _, err := s.zoneRepo.FindByID(ctx, *data.ZoneID); err != nil {
+			if !errors.Is(err, model.ErrNotFound) {
+				log.Error("repo: finding zone by id", pkglog.Err(err))
+			}
+			return err
+		}
+	}
+
 	if err := s.carRepo.Update(ctx, id, model.CarUpdate{
 		ModelID:      data.ModelID,
 		LicensePlate: data.LicensePlate,

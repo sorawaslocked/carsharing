@@ -19,7 +19,7 @@ func newTestCarService(t *testing.T, carRepo CarRepository, statusLogRepo CarSta
 	v := validator.New()
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))
 	_ = validation.RegisterCustomValidators(v, log)
-	return NewCarService(log, v, nil, carRepo, statusLogRepo, nil, nil, eventPub)
+	return NewCarService(log, v, nil, carRepo, nil, statusLogRepo, nil, nil, eventPub)
 }
 
 func TestTransitionCarStatus(t *testing.T) {

@@ -33,7 +33,7 @@ func newTestCarMaintenanceService(
 // with no status-log repo and no event publisher (both are nil-safe in UpdateCarStatus).
 func newTestCarServiceForMaintenance(t *testing.T, carRepo CarRepository) *CarService {
 	t.Helper()
-	return NewCarService(discardLogger(), newTestValidator(t), nil, carRepo, nil, nil, nil, nil)
+	return NewCarService(discardLogger(), newTestValidator(t), nil, carRepo, nil, nil, nil, nil, nil)
 }
 
 // ── maintenancePct ────────────────────────────────────────────────────────────

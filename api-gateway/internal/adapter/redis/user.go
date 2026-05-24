@@ -8,8 +8,10 @@ import (
 
 	"carsharing/api-gateway/internal/config"
 	"carsharing/api-gateway/internal/model"
+	sharedmodel "carsharing/shared/model"
 	"carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
+
 	"github.com/redis/go-redis/v9"
 )
 
@@ -286,7 +288,7 @@ func (c *UserCache) getBool(
 
 func (c *UserCache) restore(ctx context.Context, userID string) (model.User, error) {
 	ctx = context.WithValue(ctx, "x-user-id", userID)
-	ctx = context.WithValue(ctx, "x-user-roles", []string{"user"})
+	ctx = context.WithValue(ctx, "x-user-roles", []sharedmodel.Role{sharedmodel.RoleUser})
 
 	user, err := c.userProvider.Get(ctx, userID)
 	if err != nil {

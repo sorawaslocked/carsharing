@@ -6,6 +6,8 @@ import (
 
 	"carsharing/api-gateway/internal/adapter/http/dto"
 	"carsharing/api-gateway/internal/model"
+	sharedmodel "carsharing/shared/model"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -70,12 +72,16 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 			return
 		}
 
-		roles, err := a.userPermissionsCache.GetRoles(c, userID)
+		rawRoles, err := a.userPermissionsCache.GetRoles(c, userID)
 		if err != nil {
 			dto.FromError(c, model.ErrInternalServerError)
 			c.Abort()
 
 			return
+		}
+		roles := make([]sharedmodel.Role, len(rawRoles))
+		for i, r := range rawRoles {
+			roles[i] = sharedmodel.Role(r)
 		}
 
 		isDocumentVerified, err := a.userPermissionsCache.IsDocumentVerified(c, userID)

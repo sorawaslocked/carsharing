@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	sharedmodel "carsharing/shared/model"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -45,8 +46,12 @@ func (i *BaseClientInterceptor) appendMetadata(ctx context.Context) context.Cont
 	if v := ctx.Value(ctxUserID); v != nil {
 		ctx = metadata.AppendToOutgoingContext(ctx, ctxUserID, v.(string))
 	}
-	if v := ctx.Value(ctxUserRoles); v != nil {
-		ctx = metadata.AppendToOutgoingContext(ctx, ctxUserRoles, strings.Join(v.([]string), ","))
+	if v, ok := ctx.Value(ctxUserRoles).([]sharedmodel.Role); ok && len(v) > 0 {
+		strs := make([]string, len(v))
+		for i, r := range v {
+			strs[i] = r.String()
+		}
+		ctx = metadata.AppendToOutgoingContext(ctx, ctxUserRoles, strings.Join(strs, ","))
 	}
 	return ctx
 }

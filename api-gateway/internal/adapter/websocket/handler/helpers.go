@@ -14,13 +14,13 @@ const ctxTokenExpKey = "x-token-exp"
 func tokenDeadlineCtx(c *gin.Context) (context.Context, context.CancelFunc) {
 	exp, exists := c.Get(ctxTokenExpKey)
 	if !exists {
-		return context.WithCancel(c.Request.Context())
+		return context.WithCancel(c)
 	}
 
 	expTime, ok := exp.(time.Time)
 	if !ok {
-		return context.WithCancel(c.Request.Context())
+		return context.WithCancel(c)
 	}
 
-	return context.WithDeadline(c.Request.Context(), expTime)
+	return context.WithDeadline(c, expTime)
 }

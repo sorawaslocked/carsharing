@@ -29,7 +29,7 @@ jobs:
             context: .
             dockerfile: trip-service/Dockerfile
           - service: telemetry-service
-            context: telemetry-service
+            context: .
             dockerfile: telemetry-service/Dockerfile
           - service: document-analyzer
             context: document-analyzer

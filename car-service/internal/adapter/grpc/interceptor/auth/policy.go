@@ -17,6 +17,8 @@ func buildPolicies() map[string]methodPolicy {
 	return map[string]methodPolicy{
 		// HealthService — public.
 		carsvc.HealthService_Health_FullMethodName: {public: true},
+		// Standard gRPC health protocol — public.
+		"/grpc.health.v1.Health/Check": {public: true},
 
 		// CarModelService — reads open to any authenticated caller; writes restricted to fleet roles.
 		carsvc.CarModelService_CreateCarModel_FullMethodName:             {allowedRoles: fleetRoles},

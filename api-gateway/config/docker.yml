@@ -21,6 +21,7 @@ http_server:
       - "Content-Type"
       - "Accept"
       - "Authorization"
+      - "X-Device-Id"
     expose_headers:
       - "Content-Length"
     allow_credentials: true

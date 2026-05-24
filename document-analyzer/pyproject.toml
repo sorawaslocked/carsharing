@@ -9,6 +9,7 @@ requires-python = ">=3.10"
 dependencies = [
     # gRPC + Protobuf  (must match versions used to generate the vendored stubs)
     "grpcio>=1.80.0",
+    "grpcio-health-checking>=1.80.0",
     "protobuf>=5.0.0,<7.0.0",
     # Document analysis
     "python-doctr[torch]>=0.10.0",

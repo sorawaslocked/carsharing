@@ -17,6 +17,9 @@ func Base() gin.HandlerFunc {
 		c.Set(ctxClientIPKey, c.ClientIP())
 
 		deviceID := c.GetHeader("x-device-id")
+		if deviceID == "" {
+			deviceID = c.Query("x-device-id")
+		}
 		if deviceID != "" {
 			c.Set(ctxDeviceIDKey, deviceID)
 		}

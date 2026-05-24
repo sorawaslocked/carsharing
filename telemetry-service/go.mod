@@ -3,15 +3,17 @@ module carsharing/telematics-service
 go 1.26
 
 require (
+	carsharing/protos v0.0.0
 	github.com/gojuno/go.osrm v0.1.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/lib/pq v1.12.3
 	github.com/nats-io/nats.go v1.52.0
 	github.com/paulmach/go.geo v0.0.0-20180829195134-22b514266d33
-	github.com/sorawaslocked/car-rental-protos v0.0.33
 	google.golang.org/grpc v1.81.1
 	google.golang.org/protobuf v1.36.11
 )
+
+replace carsharing/protos v0.0.0 => ../protos
 
 require (
 	github.com/BurntSushi/toml v1.6.0 // indirect

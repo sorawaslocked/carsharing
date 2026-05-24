@@ -13,17 +13,14 @@ import (
 )
 
 func (h *UserHandler) CreateDocument(ctx context.Context, objectKey, imageType string) (string, error) {
-	logger := pkglog.WithMethod(h.log, "CreateDocument")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CreateDocument"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.CreateDocument(ctx, &usersvc.CreateDocumentRequest{
 		ObjectKey: objectKey,
 		ImageType: imageType,
 	})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("creating document", pkglog.Err(err))
 
 		return "", dto.FromGrpcErr(err)
 	}
@@ -32,14 +29,11 @@ func (h *UserHandler) CreateDocument(ctx context.Context, objectKey, imageType s
 }
 
 func (h *UserHandler) GetDocumentImageUploadData(ctx context.Context, imageType string) (sharedmodel.ImageUploadData, error) {
-	logger := pkglog.WithMethod(h.log, "GetDocumentImageUploadData")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetDocumentImageUploadData"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetUploadDocumentData(ctx, &usersvc.GetUploadDocumentDataRequest{ImageType: imageType})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("getting document image upload data", pkglog.Err(err))
 
 		return sharedmodel.ImageUploadData{}, dto.FromGrpcErr(err)
 	}
@@ -48,14 +42,11 @@ func (h *UserHandler) GetDocumentImageUploadData(ctx context.Context, imageType 
 }
 
 func (h *UserHandler) GetProfileImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
-	logger := pkglog.WithMethod(h.log, "GetProfileImageUploadData")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetProfileImageUploadData"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetProfileImageUploadData(ctx, &emptypb.Empty{})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("getting profile image upload data", pkglog.Err(err))
 
 		return sharedmodel.ImageUploadData{}, dto.FromGrpcErr(err)
 	}
@@ -64,14 +55,11 @@ func (h *UserHandler) GetProfileImageUploadData(ctx context.Context) (sharedmode
 }
 
 func (h *UserHandler) GetProcessedDocumentsForUser(ctx context.Context, userID string) ([]model.Document, error) {
-	logger := pkglog.WithMethod(h.log, "GetProcessedDocumentsForUser")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetProcessedDocumentsForUser"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetProcessedDocumentsForUser(ctx, &usersvc.GetProcessedDocumentsForUserRequest{UserId: userID})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("getting processed documents for user", pkglog.Err(err))
 
 		return nil, dto.FromGrpcErr(err)
 	}
@@ -85,8 +73,7 @@ func (h *UserHandler) GetProcessedDocumentsForUser(ctx context.Context, userID s
 }
 
 func (h *UserHandler) CheckDocument(ctx context.Context, docID, status string, reason *string) error {
-	logger := pkglog.WithMethod(h.log, "CheckDocument")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CheckDocument"), utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.CheckDocument(ctx, &usersvc.CheckDocumentRequest{
 		DocId:  docID,
@@ -94,9 +81,7 @@ func (h *UserHandler) CheckDocument(ctx context.Context, docID, status string, r
 		Error:  reason,
 	})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("checking document", pkglog.Err(err))
 
 		return dto.FromGrpcErr(err)
 	}

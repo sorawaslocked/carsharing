@@ -13,14 +13,12 @@ import (
 )
 
 func (h *TripHandler) StreamTripLiveFeed(ctx context.Context, tripID string, send func(model.TripLiveFeed) error) error {
-	logger := pkglog.WithMethod(h.log, "StreamTripLiveFeed")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "StreamTripLiveFeed"), utils.MetadataFromCtx(ctx))
 
 	stream, err := h.streamClient.StreamTripLiveFeed(ctx, &tripsvc.StreamTripLiveFeedRequest{TripId: tripID})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("streaming trip live feed", pkglog.Err(err))
+
 		return dto.FromGrpcErr(err)
 	}
 
@@ -33,9 +31,8 @@ func (h *TripHandler) StreamTripLiveFeed(ctx context.Context, tripID string, sen
 			if ctx.Err() != nil {
 				return nil
 			}
-			if dto.IsSystemErr(err) {
-				logger.Error("stream recv failed", pkglog.Err(err))
-			}
+			log.Warn("receiving trip live feed stream", pkglog.Err(err))
+
 			return dto.FromGrpcErr(err)
 		}
 

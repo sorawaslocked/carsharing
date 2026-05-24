@@ -39,11 +39,6 @@ func wrapDomain(sentinel, cause error) error {
 	return &domainErr{sentinel: sentinel, cause: cause}
 }
 
-func IsSystemErr(err error) bool {
-	st, ok := status.FromError(err)
-	return !ok || st.Code() == codes.Internal
-}
-
 func FromGrpcErr(err error) error {
 	st, ok := status.FromError(err)
 	if !ok {

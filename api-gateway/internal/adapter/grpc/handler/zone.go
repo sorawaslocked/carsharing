@@ -24,8 +24,7 @@ func NewZoneHandler(client carsvc.ZoneServiceClient, logger *slog.Logger) *ZoneH
 }
 
 func (h *ZoneHandler) Create(ctx context.Context, data model.ZoneCreate) (string, error) {
-	logger := pkglog.WithMethod(h.log, "Create")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.CreateZone(ctx, &carsvc.CreateZoneRequest{
 		Name:            data.Name,
@@ -34,9 +33,7 @@ func (h *ZoneHandler) Create(ctx context.Context, data model.ZoneCreate) (string
 		FeeAdjustment:   data.FeeAdjustment,
 	})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("creating zone", pkglog.Err(err))
 
 		return "", dto.FromGrpcErr(err)
 	}
@@ -45,14 +42,11 @@ func (h *ZoneHandler) Create(ctx context.Context, data model.ZoneCreate) (string
 }
 
 func (h *ZoneHandler) Get(ctx context.Context, id string) (model.Zone, error) {
-	logger := pkglog.WithMethod(h.log, "Get")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetZone(ctx, &carsvc.GetZoneRequest{Id: id})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("getting zone", pkglog.Err(err))
 
 		return model.Zone{}, dto.FromGrpcErr(err)
 	}
@@ -61,17 +55,14 @@ func (h *ZoneHandler) Get(ctx context.Context, id string) (model.Zone, error) {
 }
 
 func (h *ZoneHandler) List(ctx context.Context, filter model.ZoneFilter) ([]model.Zone, error) {
-	logger := pkglog.WithMethod(h.log, "List")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.ListZones(ctx, &carsvc.ListZonesRequest{
 		Type:     filter.Type,
 		IsActive: filter.IsActive,
 	})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("listing zones", pkglog.Err(err))
 
 		return nil, dto.FromGrpcErr(err)
 	}
@@ -85,8 +76,7 @@ func (h *ZoneHandler) List(ctx context.Context, filter model.ZoneFilter) ([]mode
 }
 
 func (h *ZoneHandler) Update(ctx context.Context, id string, data model.ZoneUpdate) error {
-	logger := pkglog.WithMethod(h.log, "Update")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Update"), utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.UpdateZone(ctx, &carsvc.UpdateZoneRequest{
 		Id:              id,
@@ -97,9 +87,7 @@ func (h *ZoneHandler) Update(ctx context.Context, id string, data model.ZoneUpda
 		IsActive:        data.IsActive,
 	})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("updating zone", pkglog.Err(err))
 
 		return dto.FromGrpcErr(err)
 	}
@@ -108,14 +96,11 @@ func (h *ZoneHandler) Update(ctx context.Context, id string, data model.ZoneUpda
 }
 
 func (h *ZoneHandler) Delete(ctx context.Context, id string) error {
-	logger := pkglog.WithMethod(h.log, "Delete")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Delete"), utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.DeleteZone(ctx, &carsvc.DeleteZoneRequest{Id: id})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("deleting zone", pkglog.Err(err))
 
 		return dto.FromGrpcErr(err)
 	}

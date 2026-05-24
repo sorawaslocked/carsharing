@@ -63,16 +63,16 @@ func New(
 	router := gin.New()
 
 	// Handlers
-	userHandler := handler.NewUser(userService, cookieCfg)
-	healthHandler := handler.NewHealthHandler(healthCheckers)
-	carModelHandler := handler.NewCarModelHandler(carModelService)
-	carHandler := handler.NewCarHandler(carService)
-	carInsuranceHandler := handler.NewCarInsuranceHandler(carInsuranceService)
-	carMaintenanceHandler := handler.NewCarMaintenanceHandler(carMaintenanceService)
-	pricingRuleHandler := handler.NewPricingRuleHandler(pricingRuleService)
-	zoneHandler := handler.NewZoneHandler(zoneService)
-	bookingHandler := handler.NewBookingHandler(bookingService)
-	tripHandler := handler.NewTripHandler(tripService)
+	userHandler := handler.NewUser(userService, cookieCfg, log)
+	healthHandler := handler.NewHealthHandler(healthCheckers, log)
+	carModelHandler := handler.NewCarModelHandler(carModelService, log)
+	carHandler := handler.NewCarHandler(carService, log)
+	carInsuranceHandler := handler.NewCarInsuranceHandler(carInsuranceService, log)
+	carMaintenanceHandler := handler.NewCarMaintenanceHandler(carMaintenanceService, log)
+	pricingRuleHandler := handler.NewPricingRuleHandler(pricingRuleService, log)
+	zoneHandler := handler.NewZoneHandler(zoneService, log)
+	bookingHandler := handler.NewBookingHandler(bookingService, log)
+	tripHandler := handler.NewTripHandler(tripService, log)
 
 	// WebSocket handlers
 	userWsHandler := wshandler.NewUserWsHandler(documentHub, log)

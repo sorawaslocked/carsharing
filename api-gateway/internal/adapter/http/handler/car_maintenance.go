@@ -1,16 +1,24 @@
 package handler
 
 import (
+	"log/slog"
+
 	"carsharing/api-gateway/internal/adapter/http/dto"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 
 type CarMaintenanceHandler struct {
 	svc CarMaintenanceService
+	log *slog.Logger
 }
 
-func NewCarMaintenanceHandler(svc CarMaintenanceService) *CarMaintenanceHandler {
-	return &CarMaintenanceHandler{svc: svc}
+func NewCarMaintenanceHandler(svc CarMaintenanceService, log *slog.Logger) *CarMaintenanceHandler {
+	return &CarMaintenanceHandler{
+		svc: svc,
+		log: pkglog.WithComponent(log, "http.CarMaintenanceHandler"),
+	}
 }
 
 // CreateTemplate godoc
@@ -27,6 +35,8 @@ func NewCarMaintenanceHandler(svc CarMaintenanceService) *CarMaintenanceHandler 
 // @Failure      500   {object}  dto.ErrorResponse
 // @Router       /car-maintenance/template [post]
 func (h *CarMaintenanceHandler) CreateTemplate(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CreateTemplate"), utils.MetadataFromCtx(ctx))
+
 	data, err := dto.FromCarMaintenanceTemplateCreateRequest(ctx)
 	if err != nil {
 		dto.MalformedJson(ctx)
@@ -36,6 +46,8 @@ func (h *CarMaintenanceHandler) CreateTemplate(ctx *gin.Context) {
 
 	id, err := h.svc.CreateTemplate(ctx, data)
 	if err != nil {
+		log.Warn("creating maintenance template", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -57,6 +69,8 @@ func (h *CarMaintenanceHandler) CreateTemplate(ctx *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /car-maintenance/template/{id} [get]
 func (h *CarMaintenanceHandler) GetTemplate(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetTemplate"), utils.MetadataFromCtx(ctx))
+
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -66,6 +80,8 @@ func (h *CarMaintenanceHandler) GetTemplate(ctx *gin.Context) {
 
 	template, err := h.svc.GetTemplate(ctx, id)
 	if err != nil {
+		log.Warn("getting maintenance template", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -87,6 +103,8 @@ func (h *CarMaintenanceHandler) GetTemplate(ctx *gin.Context) {
 // @Failure      500     {object}  dto.ErrorResponse
 // @Router       /car-maintenance/template [get]
 func (h *CarMaintenanceHandler) ListTemplates(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "ListTemplates"), utils.MetadataFromCtx(ctx))
+
 	filter, err := dto.CarMaintenanceTemplateFilterFromCtx(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -96,6 +114,8 @@ func (h *CarMaintenanceHandler) ListTemplates(ctx *gin.Context) {
 
 	templates, err := h.svc.ListTemplates(ctx, filter)
 	if err != nil {
+		log.Warn("listing maintenance templates", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -124,6 +144,8 @@ func (h *CarMaintenanceHandler) ListTemplates(ctx *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /car-maintenance/template/{id} [patch]
 func (h *CarMaintenanceHandler) UpdateTemplate(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "UpdateTemplate"), utils.MetadataFromCtx(ctx))
+
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -138,8 +160,9 @@ func (h *CarMaintenanceHandler) UpdateTemplate(ctx *gin.Context) {
 		return
 	}
 
-	err = h.svc.UpdateTemplate(ctx, id, data)
-	if err != nil {
+	if err = h.svc.UpdateTemplate(ctx, id, data); err != nil {
+		log.Warn("updating maintenance template", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -161,6 +184,8 @@ func (h *CarMaintenanceHandler) UpdateTemplate(ctx *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /car-maintenance/template/{id} [delete]
 func (h *CarMaintenanceHandler) DeleteTemplate(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "DeleteTemplate"), utils.MetadataFromCtx(ctx))
+
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -168,8 +193,9 @@ func (h *CarMaintenanceHandler) DeleteTemplate(ctx *gin.Context) {
 		return
 	}
 
-	err = h.svc.DeleteTemplate(ctx, id)
-	if err != nil {
+	if err = h.svc.DeleteTemplate(ctx, id); err != nil {
+		log.Warn("deleting maintenance template", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -195,6 +221,8 @@ func (h *CarMaintenanceHandler) DeleteTemplate(ctx *gin.Context) {
 // @Failure      500         {object}  dto.ErrorResponse
 // @Router       /car-maintenance/records [get]
 func (h *CarMaintenanceHandler) GetRecords(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetRecords"), utils.MetadataFromCtx(ctx))
+
 	filter, err := dto.CarMaintenanceRecordFilterFromCtx(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -204,6 +232,8 @@ func (h *CarMaintenanceHandler) GetRecords(ctx *gin.Context) {
 
 	records, err := h.svc.ListRecords(ctx, filter)
 	if err != nil {
+		log.Warn("listing maintenance records", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -233,6 +263,8 @@ func (h *CarMaintenanceHandler) GetRecords(ctx *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /car-maintenance/records/complete/{id} [post]
 func (h *CarMaintenanceHandler) CompleteRecord(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CompleteRecord"), utils.MetadataFromCtx(ctx))
+
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -247,8 +279,9 @@ func (h *CarMaintenanceHandler) CompleteRecord(ctx *gin.Context) {
 		return
 	}
 
-	err = h.svc.CompleteRecord(ctx, id, data)
-	if err != nil {
+	if err = h.svc.CompleteRecord(ctx, id, data); err != nil {
+		log.Warn("completing maintenance record", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -267,8 +300,12 @@ func (h *CarMaintenanceHandler) CompleteRecord(ctx *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /car-maintenance/records/receipt-image-upload [get]
 func (h *CarMaintenanceHandler) GetReceiptImageUploadUrl(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetReceiptImageUploadUrl"), utils.MetadataFromCtx(ctx))
+
 	uploadData, err := h.svc.GetReceiptImageUploadData(ctx)
 	if err != nil {
+		log.Warn("getting maintenance receipt image upload data", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return

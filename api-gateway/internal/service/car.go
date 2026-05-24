@@ -2,55 +2,148 @@ package service
 
 import (
 	"context"
+	"log/slog"
 
 	"carsharing/api-gateway/internal/model"
 	sharedmodel "carsharing/shared/model"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 )
 
 type CarService struct {
 	presenter CarPresenter
+	log       *slog.Logger
 }
 
-func NewCarService(presenter CarPresenter) *CarService {
-	return &CarService{presenter: presenter}
+func NewCarService(presenter CarPresenter, log *slog.Logger) *CarService {
+	return &CarService{
+		presenter: presenter,
+		log:       pkglog.WithComponent(log, "service.CarService"),
+	}
 }
 
 func (s *CarService) Create(ctx context.Context, data model.CarCreate) (string, error) {
-	return s.presenter.Create(ctx, data)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Create"), utils.MetadataFromCtx(ctx))
+
+	id, err := s.presenter.Create(ctx, data)
+	if err != nil {
+		log.Warn("creating car", pkglog.Err(err))
+
+		return "", err
+	}
+
+	return id, nil
 }
 
 func (s *CarService) Get(ctx context.Context, id string) (model.Car, error) {
-	return s.presenter.Get(ctx, id)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Get"), utils.MetadataFromCtx(ctx))
+
+	car, err := s.presenter.Get(ctx, id)
+	if err != nil {
+		log.Warn("getting car", pkglog.Err(err))
+
+		return model.Car{}, err
+	}
+
+	return car, nil
 }
 
 func (s *CarService) List(ctx context.Context, filter model.CarFilter) ([]model.Car, error) {
-	return s.presenter.List(ctx, filter)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "List"), utils.MetadataFromCtx(ctx))
+
+	cars, err := s.presenter.List(ctx, filter)
+	if err != nil {
+		log.Warn("listing cars", pkglog.Err(err))
+
+		return nil, err
+	}
+
+	return cars, nil
 }
 
 func (s *CarService) Update(ctx context.Context, id string, data model.CarUpdate) error {
-	return s.presenter.Update(ctx, id, data)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Update"), utils.MetadataFromCtx(ctx))
+
+	if err := s.presenter.Update(ctx, id, data); err != nil {
+		log.Warn("updating car", pkglog.Err(err))
+
+		return err
+	}
+
+	return nil
 }
 
 func (s *CarService) Delete(ctx context.Context, id string) error {
-	return s.presenter.Delete(ctx, id)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Delete"), utils.MetadataFromCtx(ctx))
+
+	if err := s.presenter.Delete(ctx, id); err != nil {
+		log.Warn("deleting car", pkglog.Err(err))
+
+		return err
+	}
+
+	return nil
 }
 
 func (s *CarService) UpdateTelemetry(ctx context.Context, carID string, data model.CarTelemetryUpdate) error {
-	return s.presenter.UpdateTelemetry(ctx, carID, data)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "UpdateTelemetry"), utils.MetadataFromCtx(ctx))
+
+	if err := s.presenter.UpdateTelemetry(ctx, carID, data); err != nil {
+		log.Warn("updating car telemetry", pkglog.Err(err))
+
+		return err
+	}
+
+	return nil
 }
 
 func (s *CarService) UpdateStatus(ctx context.Context, carID string, data model.CarStatusUpdate) error {
-	return s.presenter.UpdateStatus(ctx, carID, data)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "UpdateStatus"), utils.MetadataFromCtx(ctx))
+
+	if err := s.presenter.UpdateStatus(ctx, carID, data); err != nil {
+		log.Warn("updating car status", pkglog.Err(err))
+
+		return err
+	}
+
+	return nil
 }
 
 func (s *CarService) GetCarStatusHistory(ctx context.Context, carID string, filter model.CarStatusReadingFilter) ([]model.CarStatusReading, error) {
-	return s.presenter.GetCarStatusHistory(ctx, carID, filter)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetCarStatusHistory"), utils.MetadataFromCtx(ctx))
+
+	history, err := s.presenter.GetCarStatusHistory(ctx, carID, filter)
+	if err != nil {
+		log.Warn("getting car status history", pkglog.Err(err))
+
+		return nil, err
+	}
+
+	return history, nil
 }
 
 func (s *CarService) GetCarTelemetryHistory(ctx context.Context, carID string, filter model.CarTelemetryReadingFilter) ([]model.CarTelemetryReading, error) {
-	return s.presenter.GetCarTelemetryHistory(ctx, carID, filter)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetCarTelemetryHistory"), utils.MetadataFromCtx(ctx))
+
+	history, err := s.presenter.GetCarTelemetryHistory(ctx, carID, filter)
+	if err != nil {
+		log.Warn("getting car telemetry history", pkglog.Err(err))
+
+		return nil, err
+	}
+
+	return history, nil
 }
 
 func (s *CarService) GetImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
-	return s.presenter.GetImageUploadData(ctx)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetImageUploadData"), utils.MetadataFromCtx(ctx))
+
+	data, err := s.presenter.GetImageUploadData(ctx)
+	if err != nil {
+		log.Warn("getting car image upload data", pkglog.Err(err))
+
+		return sharedmodel.ImageUploadData{}, err
+	}
+
+	return data, nil
 }

@@ -1,23 +1,28 @@
 package handler
 
 import (
+	"log/slog"
 	"net/http"
 
 	"carsharing/api-gateway/internal/adapter/http/dto"
 	"carsharing/api-gateway/internal/config"
 	"carsharing/api-gateway/internal/model"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 
 type UserHandler struct {
 	svc    UserService
 	cookie config.Cookie
+	log    *slog.Logger
 }
 
-func NewUser(svc UserService, cookie config.Cookie) *UserHandler {
+func NewUser(svc UserService, cookie config.Cookie, log *slog.Logger) *UserHandler {
 	return &UserHandler{
 		svc:    svc,
 		cookie: cookie,
+		log:    pkglog.WithComponent(log, "http.UserHandler"),
 	}
 }
 
@@ -36,6 +41,8 @@ func NewUser(svc UserService, cookie config.Cookie) *UserHandler {
 // @Failure      500   {object}  dto.ErrorResponse
 // @Router       /users [post]
 func (h *UserHandler) Create(c *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(c))
+
 	data, err := dto.FromCreateUserRequest(c)
 	if err != nil {
 		dto.MalformedJson(c)
@@ -45,6 +52,8 @@ func (h *UserHandler) Create(c *gin.Context) {
 
 	id, err := h.svc.Create(c, data)
 	if err != nil {
+		log.Warn("creating user", pkglog.Err(err))
+
 		dto.FromError(c, err)
 
 		return
@@ -67,10 +76,19 @@ func (h *UserHandler) Create(c *gin.Context) {
 // @Failure      500   {object}  dto.ErrorResponse
 // @Router       /users/{id} [get]
 func (h *UserHandler) Get(c *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(c))
+
 	id, err := dto.IDParam(c)
+	if err != nil {
+		dto.FromError(c, err)
+
+		return
+	}
 
 	user, err := h.svc.Get(c, id)
 	if err != nil {
+		log.Warn("getting user", pkglog.Err(err))
+
 		dto.FromError(c, err)
 
 		return
@@ -100,6 +118,8 @@ func (h *UserHandler) Get(c *gin.Context) {
 // @Failure      500   {object}  dto.ErrorResponse
 // @Router       /users [get]
 func (h *UserHandler) List(c *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(c))
+
 	filter, err := dto.UserFilterFromCtx(c)
 	if err != nil {
 		dto.FromError(c, err)
@@ -109,6 +129,8 @@ func (h *UserHandler) List(c *gin.Context) {
 
 	users, err := h.svc.List(c, filter)
 	if err != nil {
+		log.Warn("listing users", pkglog.Err(err))
+
 		dto.FromError(c, err)
 
 		return
@@ -138,6 +160,8 @@ func (h *UserHandler) List(c *gin.Context) {
 // @Failure      500   {object}  dto.ErrorResponse
 // @Router       /users/{id} [patch]
 func (h *UserHandler) Update(c *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Update"), utils.MetadataFromCtx(c))
+
 	id, err := dto.IDParam(c)
 	if err != nil {
 		dto.FromError(c, err)
@@ -152,8 +176,9 @@ func (h *UserHandler) Update(c *gin.Context) {
 		return
 	}
 
-	err = h.svc.Update(c, id, data)
-	if err != nil {
+	if err = h.svc.Update(c, id, data); err != nil {
+		log.Warn("updating user", pkglog.Err(err))
+
 		dto.FromError(c, err)
 
 		return
@@ -176,6 +201,8 @@ func (h *UserHandler) Update(c *gin.Context) {
 // @Failure      500   {object}  dto.ErrorResponse
 // @Router       /users/{id} [delete]
 func (h *UserHandler) Delete(c *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Delete"), utils.MetadataFromCtx(c))
+
 	id, err := dto.IDParam(c)
 	if err != nil {
 		dto.FromError(c, err)
@@ -183,8 +210,9 @@ func (h *UserHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	err = h.svc.Delete(c, id)
-	if err != nil {
+	if err = h.svc.Delete(c, id); err != nil {
+		log.Warn("deleting user", pkglog.Err(err))
+
 		dto.FromError(c, err)
 
 		return
@@ -206,6 +234,8 @@ func (h *UserHandler) Delete(c *gin.Context) {
 // @Failure      500   {object}  dto.ErrorResponse
 // @Router       /auth/register [post]
 func (h *UserHandler) Register(c *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Register"), utils.MetadataFromCtx(c))
+
 	data, err := dto.FromRegisterRequest(c)
 	if err != nil {
 		dto.MalformedJson(c)
@@ -215,6 +245,8 @@ func (h *UserHandler) Register(c *gin.Context) {
 
 	id, err := h.svc.Register(c, data)
 	if err != nil {
+		log.Warn("registering user", pkglog.Err(err))
+
 		dto.FromError(c, err)
 
 		return
@@ -236,6 +268,8 @@ func (h *UserHandler) Register(c *gin.Context) {
 // @Failure      500   {object}  dto.ErrorResponse
 // @Router       /auth/sign-in [post]
 func (h *UserHandler) SignIn(c *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "SignIn"), utils.MetadataFromCtx(c))
+
 	creds, err := dto.FromLoginRequest(c)
 	if err != nil {
 		dto.MalformedJson(c)
@@ -245,6 +279,8 @@ func (h *UserHandler) SignIn(c *gin.Context) {
 
 	accessToken, refreshToken, err := h.svc.SignIn(c, creds)
 	if err != nil {
+		log.Warn("signing in", pkglog.Err(err))
+
 		dto.FromError(c, err)
 
 		return
@@ -270,6 +306,8 @@ func (h *UserHandler) SignIn(c *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /auth/refresh-token [post]
 func (h *UserHandler) RefreshToken(c *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "RefreshToken"), utils.MetadataFromCtx(c))
+
 	refreshToken, err := h.getRefreshTokenFromRequest(c)
 	if err != nil {
 		dto.FromError(c, err)
@@ -279,6 +317,8 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 
 	newAccessToken, newRefreshToken, err := h.svc.RefreshToken(c, refreshToken)
 	if err != nil {
+		log.Warn("refreshing token", pkglog.Err(err))
+
 		dto.FromError(c, err)
 
 		h.clearRefreshCookies(c)
@@ -307,10 +347,13 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /auth/sign-out [post]
 func (h *UserHandler) SignOut(c *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "SignOut"), utils.MetadataFromCtx(c))
+
 	h.clearRefreshCookies(c)
 
-	err := h.svc.SignOut(c)
-	if err != nil {
+	if err := h.svc.SignOut(c); err != nil {
+		log.Warn("signing out", pkglog.Err(err))
+
 		dto.FromError(c, err)
 
 		return
@@ -330,8 +373,12 @@ func (h *UserHandler) SignOut(c *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /users/profile [get]
 func (h *UserHandler) GetProfile(c *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetProfile"), utils.MetadataFromCtx(c))
+
 	user, err := h.svc.GetProfile(c)
 	if err != nil {
+		log.Warn("getting profile", pkglog.Err(err))
+
 		dto.FromError(c, err)
 
 		return
@@ -355,6 +402,8 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /users/profile [patch]
 func (h *UserHandler) UpdateProfile(c *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "UpdateProfile"), utils.MetadataFromCtx(c))
+
 	data, err := dto.FromProfileUpdateRequest(c)
 	if err != nil {
 		dto.MalformedJson(c)
@@ -362,8 +411,9 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	err = h.svc.UpdateProfile(c, data)
-	if err != nil {
+	if err = h.svc.UpdateProfile(c, data); err != nil {
+		log.Warn("updating profile", pkglog.Err(err))
+
 		dto.FromError(c, err)
 
 		return
@@ -383,8 +433,11 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /users/activation-code/send [post]
 func (h *UserHandler) SendActivationCode(c *gin.Context) {
-	err := h.svc.SendActivationCode(c)
-	if err != nil {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "SendActivationCode"), utils.MetadataFromCtx(c))
+
+	if err := h.svc.SendActivationCode(c); err != nil {
+		log.Warn("sending activation code", pkglog.Err(err))
+
 		dto.FromError(c, err)
 
 		return
@@ -407,6 +460,8 @@ func (h *UserHandler) SendActivationCode(c *gin.Context) {
 // @Failure      500   {object}  dto.ErrorResponse
 // @Router       /users/activation-code/check [post]
 func (h *UserHandler) CheckActivationCode(c *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CheckActivationCode"), utils.MetadataFromCtx(c))
+
 	code, err := dto.FromCheckActivationCodeRequest(c)
 	if err != nil {
 		dto.FromError(c, err)
@@ -414,8 +469,9 @@ func (h *UserHandler) CheckActivationCode(c *gin.Context) {
 		return
 	}
 
-	err = h.svc.CheckActivationCode(c, code)
-	if err != nil {
+	if err = h.svc.CheckActivationCode(c, code); err != nil {
+		log.Warn("checking activation code", pkglog.Err(err))
+
 		dto.FromError(c, err)
 
 		return
@@ -443,7 +499,6 @@ func (h *UserHandler) clearRefreshCookies(c *gin.Context) {
 
 func (h *UserHandler) getRefreshTokenFromRequest(c *gin.Context) (string, error) {
 	refresh, err := c.Cookie("refresh_token")
-
 	if err != nil {
 		return "", model.ErrUnauthorized
 	}

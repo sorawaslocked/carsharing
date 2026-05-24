@@ -27,8 +27,7 @@ func NewCarModelHandler(client carsvc.CarModelServiceClient, logger *slog.Logger
 }
 
 func (h *CarModelHandler) Create(ctx context.Context, data model.CarModelCreate) (string, error) {
-	logger := pkglog.WithMethod(h.log, "Create")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.CreateCarModel(ctx, &carsvc.CreateCarModelRequest{
 		Brand:        data.Brand,
@@ -44,9 +43,7 @@ func (h *CarModelHandler) Create(ctx context.Context, data model.CarModelCreate)
 		Features:     data.Features,
 	})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("creating car model", pkglog.Err(err))
 
 		return "", dto.FromGrpcErr(err)
 	}
@@ -55,14 +52,11 @@ func (h *CarModelHandler) Create(ctx context.Context, data model.CarModelCreate)
 }
 
 func (h *CarModelHandler) Get(ctx context.Context, id string) (model.CarModel, error) {
-	logger := pkglog.WithMethod(h.log, "Get")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetCarModel(ctx, &carsvc.GetCarModelRequest{Id: id})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("getting car model", pkglog.Err(err))
 
 		return model.CarModel{}, dto.FromGrpcErr(err)
 	}
@@ -71,8 +65,7 @@ func (h *CarModelHandler) Get(ctx context.Context, id string) (model.CarModel, e
 }
 
 func (h *CarModelHandler) List(ctx context.Context, filter model.CarModelFilter) ([]model.CarModel, error) {
-	logger := pkglog.WithMethod(h.log, "List")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.ListCarModelsRequest{
 		Brand:        filter.Brand,
@@ -95,9 +88,7 @@ func (h *CarModelHandler) List(ctx context.Context, filter model.CarModelFilter)
 
 	res, err := h.client.ListCarModels(ctx, req)
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("listing car models", pkglog.Err(err))
 
 		return nil, dto.FromGrpcErr(err)
 	}
@@ -111,8 +102,7 @@ func (h *CarModelHandler) List(ctx context.Context, filter model.CarModelFilter)
 }
 
 func (h *CarModelHandler) Update(ctx context.Context, id string, data model.CarModelUpdate) error {
-	logger := pkglog.WithMethod(h.log, "Update")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Update"), utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.UpdateCarModelRequest{
 		Id:           id,
@@ -138,9 +128,7 @@ func (h *CarModelHandler) Update(ctx context.Context, id string, data model.CarM
 
 	_, err := h.client.UpdateCarModel(ctx, req)
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("updating car model", pkglog.Err(err))
 
 		return dto.FromGrpcErr(err)
 	}
@@ -149,14 +137,11 @@ func (h *CarModelHandler) Update(ctx context.Context, id string, data model.CarM
 }
 
 func (h *CarModelHandler) Delete(ctx context.Context, id string) error {
-	logger := pkglog.WithMethod(h.log, "Delete")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Delete"), utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.DeleteCarModel(ctx, &carsvc.DeleteCarModelRequest{Id: id})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("deleting car model", pkglog.Err(err))
 
 		return dto.FromGrpcErr(err)
 	}
@@ -165,14 +150,11 @@ func (h *CarModelHandler) Delete(ctx context.Context, id string) error {
 }
 
 func (h *CarModelHandler) GetImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
-	logger := pkglog.WithMethod(h.log, "GetImageUploadData")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetImageUploadData"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetCarModelImageUploadData(ctx, &emptypb.Empty{})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("getting car model image upload data", pkglog.Err(err))
 
 		return sharedmodel.ImageUploadData{}, dto.FromGrpcErr(err)
 	}

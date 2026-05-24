@@ -25,8 +25,7 @@ func NewPricingRuleHandler(client bookingsvc.PricingRuleServiceClient, logger *s
 }
 
 func (h *PricingRuleHandler) Create(ctx context.Context, data model.PricingRuleCreate) (string, error) {
-	logger := pkglog.WithMethod(h.log, "Create")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
 
 	req := &bookingsvc.CreatePricingRuleRequest{
 		ModelId:           data.ModelID,
@@ -43,9 +42,7 @@ func (h *PricingRuleHandler) Create(ctx context.Context, data model.PricingRuleC
 
 	res, err := h.client.CreatePricingRule(ctx, req)
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("creating pricing rule", pkglog.Err(err))
 
 		return "", dto.FromGrpcErr(err)
 	}
@@ -54,14 +51,11 @@ func (h *PricingRuleHandler) Create(ctx context.Context, data model.PricingRuleC
 }
 
 func (h *PricingRuleHandler) Get(ctx context.Context, id string) (model.PricingRule, error) {
-	logger := pkglog.WithMethod(h.log, "Get")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetPricingRule(ctx, &bookingsvc.GetPricingRuleRequest{Id: id})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("getting pricing rule", pkglog.Err(err))
 
 		return model.PricingRule{}, dto.FromGrpcErr(err)
 	}
@@ -70,8 +64,7 @@ func (h *PricingRuleHandler) Get(ctx context.Context, id string) (model.PricingR
 }
 
 func (h *PricingRuleHandler) List(ctx context.Context, filter model.PricingRuleFilter) ([]model.PricingRule, error) {
-	logger := pkglog.WithMethod(h.log, "List")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
 
 	req := &bookingsvc.ListPricingRulesRequest{
 		ModelId:  filter.ModelID,
@@ -89,9 +82,7 @@ func (h *PricingRuleHandler) List(ctx context.Context, filter model.PricingRuleF
 
 	res, err := h.client.ListPricingRules(ctx, req)
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("listing pricing rules", pkglog.Err(err))
 
 		return nil, dto.FromGrpcErr(err)
 	}
@@ -105,10 +96,9 @@ func (h *PricingRuleHandler) List(ctx context.Context, filter model.PricingRuleF
 }
 
 func (h *PricingRuleHandler) Update(ctx context.Context, id string, data model.PricingRuleUpdate) error {
-	logger := pkglog.WithMethod(h.log, "Update")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Update"), utils.MetadataFromCtx(ctx))
 
-	req := &bookingsvc.UpdatePricingRuleRequest{
+	_, err := h.client.UpdatePricingRule(ctx, &bookingsvc.UpdatePricingRuleRequest{
 		Id:                id,
 		ModelId:           data.ModelID,
 		ZoneId:            data.ZoneID,
@@ -121,13 +111,9 @@ func (h *PricingRuleHandler) Update(ctx context.Context, id string, data model.P
 		OvertimePolicy:    data.OvertimePolicy,
 		OvertimeRateTenge: data.OvertimeRateTenge,
 		IsActive:          data.IsActive,
-	}
-
-	_, err := h.client.UpdatePricingRule(ctx, req)
+	})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("updating pricing rule", pkglog.Err(err))
 
 		return dto.FromGrpcErr(err)
 	}
@@ -136,14 +122,11 @@ func (h *PricingRuleHandler) Update(ctx context.Context, id string, data model.P
 }
 
 func (h *PricingRuleHandler) Delete(ctx context.Context, id string) error {
-	logger := pkglog.WithMethod(h.log, "Delete")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Delete"), utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.DeletePricingRule(ctx, &bookingsvc.DeletePricingRuleRequest{Id: id})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("deleting pricing rule", pkglog.Err(err))
 
 		return dto.FromGrpcErr(err)
 	}

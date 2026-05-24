@@ -32,12 +32,12 @@ func NewHealthHandler(name string, client healthClient, logger *slog.Logger) *He
 }
 
 func (h *HealthHandler) Health(ctx context.Context) (model.ServiceHealth, error) {
-	logger := pkglog.WithMethod(h.log, "Health")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Health"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.Health(ctx, &emptypb.Empty{})
 	if err != nil {
-		logger.Error("grpc call failed", slog.String("service", h.name), pkglog.Err(err))
+		log.Warn("checking service health", slog.String("service", h.name), pkglog.Err(err))
+
 		return model.ServiceHealth{Name: h.name, Status: "degraded"}, nil
 	}
 

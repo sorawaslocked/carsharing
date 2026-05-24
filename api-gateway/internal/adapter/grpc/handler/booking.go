@@ -26,8 +26,7 @@ func NewBookingHandler(client bookingsvc.BookingServiceClient, logger *slog.Logg
 }
 
 func (h *BookingHandler) Create(ctx context.Context, data model.BookingCreate) (string, error) {
-	logger := pkglog.WithMethod(h.log, "Create")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
 
 	req := &bookingsvc.CreateBookingRequest{
 		UserId:        data.UserID,
@@ -40,9 +39,7 @@ func (h *BookingHandler) Create(ctx context.Context, data model.BookingCreate) (
 
 	res, err := h.client.CreateBooking(ctx, req)
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("creating booking", pkglog.Err(err))
 
 		return "", dto.FromGrpcErr(err)
 	}
@@ -51,14 +48,11 @@ func (h *BookingHandler) Create(ctx context.Context, data model.BookingCreate) (
 }
 
 func (h *BookingHandler) Get(ctx context.Context, id string) (model.Booking, error) {
-	logger := pkglog.WithMethod(h.log, "Get")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetBooking(ctx, &bookingsvc.GetBookingRequest{Id: id})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("getting booking", pkglog.Err(err))
 
 		return model.Booking{}, dto.FromGrpcErr(err)
 	}
@@ -67,8 +61,7 @@ func (h *BookingHandler) Get(ctx context.Context, id string) (model.Booking, err
 }
 
 func (h *BookingHandler) List(ctx context.Context, filter model.BookingFilter) ([]model.Booking, error) {
-	logger := pkglog.WithMethod(h.log, "List")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
 
 	req := &bookingsvc.ListBookingsRequest{
 		UserId:        filter.UserID,
@@ -85,9 +78,7 @@ func (h *BookingHandler) List(ctx context.Context, filter model.BookingFilter) (
 
 	res, err := h.client.ListBookings(ctx, req)
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("listing bookings", pkglog.Err(err))
 
 		return nil, dto.FromGrpcErr(err)
 	}
@@ -101,14 +92,11 @@ func (h *BookingHandler) List(ctx context.Context, filter model.BookingFilter) (
 }
 
 func (h *BookingHandler) Cancel(ctx context.Context, id string) error {
-	logger := pkglog.WithMethod(h.log, "Cancel")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Cancel"), utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.CancelBooking(ctx, &bookingsvc.CancelBookingRequest{Id: id})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("cancelling booking", pkglog.Err(err))
 
 		return dto.FromGrpcErr(err)
 	}
@@ -117,20 +105,15 @@ func (h *BookingHandler) Cancel(ctx context.Context, id string) error {
 }
 
 func (h *BookingHandler) UpdateStatus(ctx context.Context, id string, data model.BookingStatusUpdate) error {
-	logger := pkglog.WithMethod(h.log, "UpdateStatus")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "UpdateStatus"), utils.MetadataFromCtx(ctx))
 
-	req := &bookingsvc.UpdateBookingStatusRequest{
+	_, err := h.client.UpdateBookingStatus(ctx, &bookingsvc.UpdateBookingStatusRequest{
 		Id:     id,
 		Status: data.Status,
 		Reason: data.Reason,
-	}
-
-	_, err := h.client.UpdateBookingStatus(ctx, req)
+	})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("updating booking status", pkglog.Err(err))
 
 		return dto.FromGrpcErr(err)
 	}
@@ -139,8 +122,7 @@ func (h *BookingHandler) UpdateStatus(ctx context.Context, id string, data model
 }
 
 func (h *BookingHandler) GetStatusHistory(ctx context.Context, id string, filter model.BookingStatusReadingFilter) ([]model.BookingStatusReading, error) {
-	logger := pkglog.WithMethod(h.log, "GetStatusHistory")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetStatusHistory"), utils.MetadataFromCtx(ctx))
 
 	req := &bookingsvc.GetBookingStatusHistoryRequest{Id: id}
 	if filter.From != nil {
@@ -158,9 +140,7 @@ func (h *BookingHandler) GetStatusHistory(ctx context.Context, id string, filter
 
 	res, err := h.client.GetBookingStatusHistory(ctx, req)
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("getting booking status history", pkglog.Err(err))
 
 		return nil, dto.FromGrpcErr(err)
 	}

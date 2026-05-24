@@ -1,16 +1,24 @@
 package handler
 
 import (
+	"log/slog"
+
 	"carsharing/api-gateway/internal/adapter/http/dto"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 
 type PricingRuleHandler struct {
 	svc PricingRuleService
+	log *slog.Logger
 }
 
-func NewPricingRuleHandler(svc PricingRuleService) *PricingRuleHandler {
-	return &PricingRuleHandler{svc: svc}
+func NewPricingRuleHandler(svc PricingRuleService, log *slog.Logger) *PricingRuleHandler {
+	return &PricingRuleHandler{
+		svc: svc,
+		log: pkglog.WithComponent(log, "http.PricingRuleHandler"),
+	}
 }
 
 // Create (PricingRule) godoc
@@ -28,6 +36,8 @@ func NewPricingRuleHandler(svc PricingRuleService) *PricingRuleHandler {
 // @Failure      500   {object}  dto.ErrorResponse
 // @Router       /pricing-rules [post]
 func (h *PricingRuleHandler) Create(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
+
 	data, err := dto.FromPricingRuleCreateRequest(ctx)
 	if err != nil {
 		dto.MalformedJson(ctx)
@@ -37,6 +47,8 @@ func (h *PricingRuleHandler) Create(ctx *gin.Context) {
 
 	id, err := h.svc.Create(ctx, data)
 	if err != nil {
+		log.Warn("creating pricing rule", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -58,6 +70,8 @@ func (h *PricingRuleHandler) Create(ctx *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /pricing-rules/{id} [get]
 func (h *PricingRuleHandler) Get(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
+
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -67,6 +81,8 @@ func (h *PricingRuleHandler) Get(ctx *gin.Context) {
 
 	rule, err := h.svc.Get(ctx, id)
 	if err != nil {
+		log.Warn("getting pricing rule", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -94,6 +110,8 @@ func (h *PricingRuleHandler) Get(ctx *gin.Context) {
 // @Failure      500       {object}  dto.ErrorResponse
 // @Router       /pricing-rules [get]
 func (h *PricingRuleHandler) List(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
+
 	filter, err := dto.PricingRuleFilterFromCtx(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -103,6 +121,8 @@ func (h *PricingRuleHandler) List(ctx *gin.Context) {
 
 	rules, err := h.svc.List(ctx, filter)
 	if err != nil {
+		log.Warn("listing pricing rules", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -132,6 +152,8 @@ func (h *PricingRuleHandler) List(ctx *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /pricing-rules/{id} [patch]
 func (h *PricingRuleHandler) Update(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Update"), utils.MetadataFromCtx(ctx))
+
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -147,6 +169,8 @@ func (h *PricingRuleHandler) Update(ctx *gin.Context) {
 	}
 
 	if err = h.svc.Update(ctx, id, data); err != nil {
+		log.Warn("updating pricing rule", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -168,6 +192,8 @@ func (h *PricingRuleHandler) Update(ctx *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /pricing-rules/{id} [delete]
 func (h *PricingRuleHandler) Delete(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Delete"), utils.MetadataFromCtx(ctx))
+
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -176,6 +202,8 @@ func (h *PricingRuleHandler) Delete(ctx *gin.Context) {
 	}
 
 	if err = h.svc.Delete(ctx, id); err != nil {
+		log.Warn("deleting pricing rule", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return

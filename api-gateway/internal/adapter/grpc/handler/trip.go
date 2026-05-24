@@ -28,14 +28,11 @@ func NewTripHandler(client tripsvc.TripServiceClient, streamClient tripsvc.TripS
 }
 
 func (h *TripHandler) Start(ctx context.Context, bookingID string) (string, error) {
-	logger := pkglog.WithMethod(h.log, "Start")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Start"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.StartTrip(ctx, &tripsvc.StartTripRequest{BookingId: bookingID})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("starting trip", pkglog.Err(err))
 
 		return "", dto.FromGrpcErr(err)
 	}
@@ -44,14 +41,11 @@ func (h *TripHandler) Start(ctx context.Context, bookingID string) (string, erro
 }
 
 func (h *TripHandler) Get(ctx context.Context, id string) (model.Trip, error) {
-	logger := pkglog.WithMethod(h.log, "Get")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetTrip(ctx, &tripsvc.GetTripRequest{Id: id})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("getting trip", pkglog.Err(err))
 
 		return model.Trip{}, dto.FromGrpcErr(err)
 	}
@@ -60,8 +54,7 @@ func (h *TripHandler) Get(ctx context.Context, id string) (model.Trip, error) {
 }
 
 func (h *TripHandler) List(ctx context.Context, filter model.TripFilter) ([]model.Trip, error) {
-	logger := pkglog.WithMethod(h.log, "List")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
 
 	req := &tripsvc.ListTripsRequest{
 		UserId: filter.UserID,
@@ -83,9 +76,7 @@ func (h *TripHandler) List(ctx context.Context, filter model.TripFilter) ([]mode
 
 	res, err := h.client.ListTrips(ctx, req)
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("listing trips", pkglog.Err(err))
 
 		return nil, dto.FromGrpcErr(err)
 	}
@@ -99,14 +90,11 @@ func (h *TripHandler) List(ctx context.Context, filter model.TripFilter) ([]mode
 }
 
 func (h *TripHandler) End(ctx context.Context, id string) error {
-	logger := pkglog.WithMethod(h.log, "End")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "End"), utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.EndTrip(ctx, &tripsvc.EndTripRequest{Id: id})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("ending trip", pkglog.Err(err))
 
 		return dto.FromGrpcErr(err)
 	}
@@ -115,14 +103,11 @@ func (h *TripHandler) End(ctx context.Context, id string) error {
 }
 
 func (h *TripHandler) Cancel(ctx context.Context, id string, reason *string) error {
-	logger := pkglog.WithMethod(h.log, "Cancel")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Cancel"), utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.CancelTrip(ctx, &tripsvc.CancelTripRequest{Id: id, Reason: reason})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("cancelling trip", pkglog.Err(err))
 
 		return dto.FromGrpcErr(err)
 	}
@@ -131,14 +116,11 @@ func (h *TripHandler) Cancel(ctx context.Context, id string, reason *string) err
 }
 
 func (h *TripHandler) GetSummary(ctx context.Context, id string) (model.TripSummary, error) {
-	logger := pkglog.WithMethod(h.log, "GetSummary")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetSummary"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetTripSummary(ctx, &tripsvc.GetTripSummaryRequest{Id: id})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("getting trip summary", pkglog.Err(err))
 
 		return model.TripSummary{}, dto.FromGrpcErr(err)
 	}
@@ -147,8 +129,7 @@ func (h *TripHandler) GetSummary(ctx context.Context, id string) (model.TripSumm
 }
 
 func (h *TripHandler) GetStatusHistory(ctx context.Context, id string, filter model.TripStatusReadingFilter) ([]model.TripStatusReading, error) {
-	logger := pkglog.WithMethod(h.log, "GetStatusHistory")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetStatusHistory"), utils.MetadataFromCtx(ctx))
 
 	req := &tripsvc.GetTripStatusHistoryRequest{Id: id}
 	if filter.From != nil {
@@ -166,9 +147,7 @@ func (h *TripHandler) GetStatusHistory(ctx context.Context, id string, filter mo
 
 	res, err := h.client.GetTripStatusHistory(ctx, req)
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("getting trip status history", pkglog.Err(err))
 
 		return nil, dto.FromGrpcErr(err)
 	}

@@ -1,16 +1,24 @@
 package handler
 
 import (
+	"log/slog"
+
 	"carsharing/api-gateway/internal/adapter/http/dto"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 
 type CarModelHandler struct {
 	svc CarModelService
+	log *slog.Logger
 }
 
-func NewCarModelHandler(svc CarModelService) *CarModelHandler {
-	return &CarModelHandler{svc: svc}
+func NewCarModelHandler(svc CarModelService, log *slog.Logger) *CarModelHandler {
+	return &CarModelHandler{
+		svc: svc,
+		log: pkglog.WithComponent(log, "http.CarModelHandler"),
+	}
 }
 
 // Create (CarModel) godoc
@@ -28,6 +36,8 @@ func NewCarModelHandler(svc CarModelService) *CarModelHandler {
 // @Failure      500   {object}  dto.ErrorResponse
 // @Router       /car-models [post]
 func (h *CarModelHandler) Create(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
+
 	data, err := dto.FromCarModelCreateRequest(ctx)
 	if err != nil {
 		dto.MalformedJson(ctx)
@@ -37,6 +47,8 @@ func (h *CarModelHandler) Create(ctx *gin.Context) {
 
 	id, err := h.svc.Create(ctx, data)
 	if err != nil {
+		log.Warn("creating car model", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -58,6 +70,8 @@ func (h *CarModelHandler) Create(ctx *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /car-models/{id} [get]
 func (h *CarModelHandler) Get(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
+
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -67,6 +81,8 @@ func (h *CarModelHandler) Get(ctx *gin.Context) {
 
 	carModel, err := h.svc.Get(ctx, id)
 	if err != nil {
+		log.Warn("getting car model", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -96,6 +112,8 @@ func (h *CarModelHandler) Get(ctx *gin.Context) {
 // @Failure      500           {object}  dto.ErrorResponse
 // @Router       /car-models [get]
 func (h *CarModelHandler) List(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
+
 	filter, err := dto.CarModelFilterFromCtx(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -105,6 +123,8 @@ func (h *CarModelHandler) List(ctx *gin.Context) {
 
 	carModels, err := h.svc.List(ctx, filter)
 	if err != nil {
+		log.Warn("listing car models", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -133,6 +153,8 @@ func (h *CarModelHandler) List(ctx *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /car-models/{id} [patch]
 func (h *CarModelHandler) Update(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Update"), utils.MetadataFromCtx(ctx))
+
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -147,8 +169,9 @@ func (h *CarModelHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	err = h.svc.Update(ctx, id, data)
-	if err != nil {
+	if err = h.svc.Update(ctx, id, data); err != nil {
+		log.Warn("updating car model", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -170,6 +193,8 @@ func (h *CarModelHandler) Update(ctx *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /car-models/{id} [delete]
 func (h *CarModelHandler) Delete(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Delete"), utils.MetadataFromCtx(ctx))
+
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -177,8 +202,9 @@ func (h *CarModelHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	err = h.svc.Delete(ctx, id)
-	if err != nil {
+	if err = h.svc.Delete(ctx, id); err != nil {
+		log.Warn("deleting car model", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -198,8 +224,12 @@ func (h *CarModelHandler) Delete(ctx *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /car-models/image-upload [get]
 func (h *CarModelHandler) GetImageUploadUrl(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetImageUploadUrl"), utils.MetadataFromCtx(ctx))
+
 	uploadData, err := h.svc.GetImageUploadData(ctx)
 	if err != nil {
+		log.Warn("getting car model image upload data", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return

@@ -2,8 +2,11 @@ package service
 
 import (
 	"context"
+	"log/slog"
 
 	"carsharing/api-gateway/internal/model"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 )
 
 const (
@@ -12,13 +15,15 @@ const (
 )
 
 type UserService struct {
+	log          *slog.Logger
 	presenter    UserPresenter
 	tokenManager TokenManager
 	sessionCache UserSessionCache
 }
 
-func NewUserService(presenter UserPresenter, tokenManager TokenManager, sessionCache UserSessionCache) *UserService {
+func NewUserService(presenter UserPresenter, tokenManager TokenManager, sessionCache UserSessionCache, log *slog.Logger) *UserService {
 	return &UserService{
+		log:          pkglog.WithComponent(log, "service.UserService"),
 		presenter:    presenter,
 		tokenManager: tokenManager,
 		sessionCache: sessionCache,
@@ -26,30 +31,84 @@ func NewUserService(presenter UserPresenter, tokenManager TokenManager, sessionC
 }
 
 func (s *UserService) Create(ctx context.Context, data model.UserCreate) (string, error) {
-	return s.presenter.Create(ctx, data)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Create"), utils.MetadataFromCtx(ctx))
+
+	id, err := s.presenter.Create(ctx, data)
+	if err != nil {
+		log.Warn("creating user", pkglog.Err(err))
+
+		return "", err
+	}
+
+	return id, nil
 }
 
 func (s *UserService) Get(ctx context.Context, id string) (model.User, error) {
-	return s.presenter.Get(ctx, id)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Get"), utils.MetadataFromCtx(ctx))
+
+	user, err := s.presenter.Get(ctx, id)
+	if err != nil {
+		log.Warn("getting user", pkglog.Err(err))
+
+		return model.User{}, err
+	}
+
+	return user, nil
 }
 
 func (s *UserService) List(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
-	return s.presenter.List(ctx, filter)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "List"), utils.MetadataFromCtx(ctx))
+
+	users, err := s.presenter.List(ctx, filter)
+	if err != nil {
+		log.Warn("listing users", pkglog.Err(err))
+
+		return nil, err
+	}
+
+	return users, nil
 }
 
 func (s *UserService) Update(ctx context.Context, id string, data model.UserUpdate) error {
-	return s.presenter.Update(ctx, id, data)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Update"), utils.MetadataFromCtx(ctx))
+
+	if err := s.presenter.Update(ctx, id, data); err != nil {
+		log.Warn("updating user", pkglog.Err(err))
+
+		return err
+	}
+
+	return nil
 }
 
 func (s *UserService) Delete(ctx context.Context, id string) error {
-	return s.presenter.Delete(ctx, id)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Delete"), utils.MetadataFromCtx(ctx))
+
+	if err := s.presenter.Delete(ctx, id); err != nil {
+		log.Warn("deleting user", pkglog.Err(err))
+
+		return err
+	}
+
+	return nil
 }
 
 func (s *UserService) Register(ctx context.Context, data model.UserCreate) (string, error) {
-	return s.presenter.Register(ctx, data)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Register"), utils.MetadataFromCtx(ctx))
+
+	id, err := s.presenter.Register(ctx, data)
+	if err != nil {
+		log.Warn("registering user", pkglog.Err(err))
+
+		return "", err
+	}
+
+	return id, nil
 }
 
 func (s *UserService) SignIn(ctx context.Context, creds model.Credentials) (model.AccessToken, model.RefreshToken, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "SignIn"), utils.MetadataFromCtx(ctx))
+
 	deviceID := ctx.Value(ctxDeviceIDKey).(string)
 
 	id, err := s.presenter.SignIn(ctx, creds)
@@ -57,17 +116,23 @@ func (s *UserService) SignIn(ctx context.Context, creds model.Credentials) (mode
 		return model.AccessToken{}, model.RefreshToken{}, err
 	}
 
-	err = s.sessionCache.SetSignedIn(ctx, id, deviceID, true)
-	if err != nil {
+	if err = s.sessionCache.SetSignedIn(ctx, id, deviceID, true); err != nil {
+		log.Error("setting session", pkglog.Err(err))
+
 		return model.AccessToken{}, model.RefreshToken{}, err
 	}
 
 	accessToken, accessTokenExp, err := s.tokenManager.GenerateAccessToken(ctx, id)
 	if err != nil {
+		log.Error("generating access token", pkglog.Err(err))
+
 		return model.AccessToken{}, model.RefreshToken{}, err
 	}
+
 	refreshToken, refreshTokenExp, err := s.tokenManager.GenerateRefreshToken(ctx, id)
 	if err != nil {
+		log.Error("generating refresh token", pkglog.Err(err))
+
 		return model.AccessToken{}, model.RefreshToken{}, err
 	}
 
@@ -81,6 +146,8 @@ func (s *UserService) SignIn(ctx context.Context, creds model.Credentials) (mode
 }
 
 func (s *UserService) RefreshToken(ctx context.Context, refreshToken string) (model.AccessToken, model.RefreshToken, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "RefreshToken"), utils.MetadataFromCtx(ctx))
+
 	deviceID := ctx.Value(ctxDeviceIDKey).(string)
 
 	id, _, err := s.tokenManager.ParseToken(ctx, refreshToken)
@@ -90,23 +157,31 @@ func (s *UserService) RefreshToken(ctx context.Context, refreshToken string) (mo
 
 	isLoggedIn, err := s.sessionCache.IsSignedIn(ctx, id, deviceID)
 	if err != nil {
+		log.Error("checking session", pkglog.Err(err))
+
 		return model.AccessToken{}, model.RefreshToken{}, err
 	}
 	if !isLoggedIn {
 		return model.AccessToken{}, model.RefreshToken{}, model.ErrUnauthorized
 	}
 
-	err = s.sessionCache.SetSignedIn(ctx, id, deviceID, true)
-	if err != nil {
+	if err = s.sessionCache.SetSignedIn(ctx, id, deviceID, true); err != nil {
+		log.Error("setting session", pkglog.Err(err))
+
 		return model.AccessToken{}, model.RefreshToken{}, err
 	}
 
 	newAccessToken, newAccessTokenExp, err := s.tokenManager.GenerateAccessToken(ctx, id)
 	if err != nil {
+		log.Error("generating access token", pkglog.Err(err))
+
 		return model.AccessToken{}, model.RefreshToken{}, err
 	}
+
 	newRefreshToken, newRefreshTokenExp, err := s.tokenManager.GenerateRefreshToken(ctx, id)
 	if err != nil {
+		log.Error("generating refresh token", pkglog.Err(err))
+
 		return model.AccessToken{}, model.RefreshToken{}, err
 	}
 
@@ -120,12 +195,18 @@ func (s *UserService) RefreshToken(ctx context.Context, refreshToken string) (mo
 }
 
 func (s *UserService) SignOut(ctx context.Context) error {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "SignOut"), utils.MetadataFromCtx(ctx))
+
 	deviceID := ctx.Value(ctxDeviceIDKey).(string)
 	userID := ctx.Value(ctxUserIDKey).(string)
 
-	err := s.sessionCache.SetSignedIn(ctx, userID, deviceID, false)
+	if err := s.sessionCache.SetSignedIn(ctx, userID, deviceID, false); err != nil {
+		log.Error("clearing session", pkglog.Err(err))
 
-	return err
+		return err
+	}
+
+	return nil
 }
 
 func (s *UserService) GetProfile(ctx context.Context) (model.User, error) {
@@ -148,9 +229,25 @@ func (s *UserService) UpdateProfile(ctx context.Context, data model.UserProfileU
 }
 
 func (s *UserService) SendActivationCode(ctx context.Context) error {
-	return s.presenter.SendActivationCode(ctx)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "SendActivationCode"), utils.MetadataFromCtx(ctx))
+
+	if err := s.presenter.SendActivationCode(ctx); err != nil {
+		log.Warn("sending activation code", pkglog.Err(err))
+
+		return err
+	}
+
+	return nil
 }
 
 func (s *UserService) CheckActivationCode(ctx context.Context, code string) error {
-	return s.presenter.CheckActivationCode(ctx, code)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "CheckActivationCode"), utils.MetadataFromCtx(ctx))
+
+	if err := s.presenter.CheckActivationCode(ctx, code); err != nil {
+		log.Warn("checking activation code", pkglog.Err(err))
+
+		return err
+	}
+
+	return nil
 }

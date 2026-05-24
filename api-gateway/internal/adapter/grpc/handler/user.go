@@ -26,8 +26,7 @@ func NewUserHandler(client usersvc.UserServiceClient, logger *slog.Logger) *User
 }
 
 func (h *UserHandler) Create(ctx context.Context, data model.UserCreate) (string, error) {
-	logger := pkglog.WithMethod(h.log, "Create")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
 
 	req := &usersvc.CreateUserRequest{
 		Email:       data.Email,
@@ -45,9 +44,7 @@ func (h *UserHandler) Create(ctx context.Context, data model.UserCreate) (string
 
 	res, err := h.client.CreateUser(ctx, req)
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("creating user", pkglog.Err(err))
 
 		return "", dto.FromGrpcErr(err)
 	}
@@ -56,14 +53,11 @@ func (h *UserHandler) Create(ctx context.Context, data model.UserCreate) (string
 }
 
 func (h *UserHandler) Get(ctx context.Context, id string) (model.User, error) {
-	logger := pkglog.WithMethod(h.log, "Get")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetUser(ctx, &usersvc.GetUserRequest{Id: id})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("getting user", pkglog.Err(err))
 
 		return model.User{}, dto.FromGrpcErr(err)
 	}
@@ -72,8 +66,7 @@ func (h *UserHandler) Get(ctx context.Context, id string) (model.User, error) {
 }
 
 func (h *UserHandler) List(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
-	logger := pkglog.WithMethod(h.log, "List")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
 
 	req := &usersvc.ListUsersRequest{
 		Email:              filter.Email,
@@ -93,9 +86,7 @@ func (h *UserHandler) List(ctx context.Context, filter model.UserFilter) ([]mode
 
 	res, err := h.client.ListUsers(ctx, req)
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("listing users", pkglog.Err(err))
 
 		return nil, dto.FromGrpcErr(err)
 	}
@@ -109,8 +100,7 @@ func (h *UserHandler) List(ctx context.Context, filter model.UserFilter) ([]mode
 }
 
 func (h *UserHandler) Update(ctx context.Context, id string, data model.UserUpdate) error {
-	logger := pkglog.WithMethod(h.log, "Update")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Update"), utils.MetadataFromCtx(ctx))
 
 	req := &usersvc.UpdateUserRequest{
 		Id:                 id,
@@ -134,9 +124,7 @@ func (h *UserHandler) Update(ctx context.Context, id string, data model.UserUpda
 
 	_, err := h.client.UpdateUser(ctx, req)
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("updating user", pkglog.Err(err))
 
 		return dto.FromGrpcErr(err)
 	}
@@ -145,14 +133,11 @@ func (h *UserHandler) Update(ctx context.Context, id string, data model.UserUpda
 }
 
 func (h *UserHandler) Delete(ctx context.Context, id string) error {
-	logger := pkglog.WithMethod(h.log, "Delete")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Delete"), utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.DeleteUser(ctx, &usersvc.DeleteUserRequest{Id: id})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("deleting user", pkglog.Err(err))
 
 		return dto.FromGrpcErr(err)
 	}
@@ -161,8 +146,7 @@ func (h *UserHandler) Delete(ctx context.Context, id string) error {
 }
 
 func (h *UserHandler) Register(ctx context.Context, data model.UserCreate) (string, error) {
-	logger := pkglog.WithMethod(h.log, "Register")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Register"), utils.MetadataFromCtx(ctx))
 
 	req := &usersvc.RegisterRequest{
 		Email:       data.Email,
@@ -180,9 +164,7 @@ func (h *UserHandler) Register(ctx context.Context, data model.UserCreate) (stri
 
 	res, err := h.client.Register(ctx, req)
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("registering user", pkglog.Err(err))
 
 		return "", dto.FromGrpcErr(err)
 	}
@@ -191,8 +173,7 @@ func (h *UserHandler) Register(ctx context.Context, data model.UserCreate) (stri
 }
 
 func (h *UserHandler) SignIn(ctx context.Context, creds model.Credentials) (string, error) {
-	logger := pkglog.WithMethod(h.log, "SignIn")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "SignIn"), utils.MetadataFromCtx(ctx))
 
 	req := &usersvc.SignInRequest{
 		Email:       creds.Email,
@@ -204,9 +185,7 @@ func (h *UserHandler) SignIn(ctx context.Context, creds model.Credentials) (stri
 
 	res, err := h.client.SignIn(ctx, req)
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("signing in", pkglog.Err(err))
 
 		return "", dto.FromGrpcErr(err)
 	}
@@ -215,14 +194,11 @@ func (h *UserHandler) SignIn(ctx context.Context, creds model.Credentials) (stri
 }
 
 func (h *UserHandler) SendActivationCode(ctx context.Context) error {
-	logger := pkglog.WithMethod(h.log, "SendActivationCode")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "SendActivationCode"), utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.SendActivationCode(ctx, &emptypb.Empty{})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("sending activation code", pkglog.Err(err))
 
 		return dto.FromGrpcErr(err)
 	}
@@ -231,14 +207,11 @@ func (h *UserHandler) SendActivationCode(ctx context.Context) error {
 }
 
 func (h *UserHandler) CheckActivationCode(ctx context.Context, code string) error {
-	logger := pkglog.WithMethod(h.log, "CheckActivationCode")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CheckActivationCode"), utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.CheckActivationCode(ctx, &usersvc.CheckActivationCodeRequest{Code: code})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("checking activation code", pkglog.Err(err))
 
 		return dto.FromGrpcErr(err)
 	}

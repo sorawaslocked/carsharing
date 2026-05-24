@@ -5,24 +5,70 @@ import (
 
 	"carsharing/api-gateway/internal/model"
 	sharedmodel "carsharing/shared/model"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 )
 
 func (s *UserService) CreateDocument(ctx context.Context, objectKey, imageType string) (string, error) {
-	return s.presenter.CreateDocument(ctx, objectKey, imageType)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "CreateDocument"), utils.MetadataFromCtx(ctx))
+
+	id, err := s.presenter.CreateDocument(ctx, objectKey, imageType)
+	if err != nil {
+		log.Warn("creating document", pkglog.Err(err))
+
+		return "", err
+	}
+
+	return id, nil
 }
 
 func (s *UserService) GetUploadDocumentData(ctx context.Context, imageType string) (sharedmodel.ImageUploadData, error) {
-	return s.presenter.GetDocumentImageUploadData(ctx, imageType)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetUploadDocumentData"), utils.MetadataFromCtx(ctx))
+
+	data, err := s.presenter.GetDocumentImageUploadData(ctx, imageType)
+	if err != nil {
+		log.Warn("getting document upload data", pkglog.Err(err))
+
+		return sharedmodel.ImageUploadData{}, err
+	}
+
+	return data, nil
 }
 
 func (s *UserService) GetProfileImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
-	return s.presenter.GetProfileImageUploadData(ctx)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetProfileImageUploadData"), utils.MetadataFromCtx(ctx))
+
+	data, err := s.presenter.GetProfileImageUploadData(ctx)
+	if err != nil {
+		log.Warn("getting profile image upload data", pkglog.Err(err))
+
+		return sharedmodel.ImageUploadData{}, err
+	}
+
+	return data, nil
 }
 
 func (s *UserService) GetProcessedDocumentsForUser(ctx context.Context, userID string) ([]model.Document, error) {
-	return s.presenter.GetProcessedDocumentsForUser(ctx, userID)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetProcessedDocumentsForUser"), utils.MetadataFromCtx(ctx))
+
+	docs, err := s.presenter.GetProcessedDocumentsForUser(ctx, userID)
+	if err != nil {
+		log.Warn("getting processed documents for user", pkglog.Err(err))
+
+		return nil, err
+	}
+
+	return docs, nil
 }
 
 func (s *UserService) CheckDocument(ctx context.Context, docID, status string, documentError *string) error {
-	return s.presenter.CheckDocument(ctx, docID, status, documentError)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "CheckDocument"), utils.MetadataFromCtx(ctx))
+
+	if err := s.presenter.CheckDocument(ctx, docID, status, documentError); err != nil {
+		log.Warn("checking document", pkglog.Err(err))
+
+		return err
+	}
+
+	return nil
 }

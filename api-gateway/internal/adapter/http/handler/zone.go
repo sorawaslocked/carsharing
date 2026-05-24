@@ -1,16 +1,24 @@
 package handler
 
 import (
+	"log/slog"
+
 	"carsharing/api-gateway/internal/adapter/http/dto"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 
 type ZoneHandler struct {
 	svc ZoneService
+	log *slog.Logger
 }
 
-func NewZoneHandler(svc ZoneService) *ZoneHandler {
-	return &ZoneHandler{svc: svc}
+func NewZoneHandler(svc ZoneService, log *slog.Logger) *ZoneHandler {
+	return &ZoneHandler{
+		svc: svc,
+		log: pkglog.WithComponent(log, "http.ZoneHandler"),
+	}
 }
 
 // Create (Zone) godoc
@@ -28,6 +36,8 @@ func NewZoneHandler(svc ZoneService) *ZoneHandler {
 // @Failure      500   {object}  dto.ErrorResponse
 // @Router       /zones [post]
 func (h *ZoneHandler) Create(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
+
 	data, err := dto.FromZoneCreateRequest(ctx)
 	if err != nil {
 		dto.MalformedJson(ctx)
@@ -37,6 +47,8 @@ func (h *ZoneHandler) Create(ctx *gin.Context) {
 
 	id, err := h.svc.Create(ctx, data)
 	if err != nil {
+		log.Warn("creating zone", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -58,6 +70,8 @@ func (h *ZoneHandler) Create(ctx *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /zones/{id} [get]
 func (h *ZoneHandler) Get(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
+
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -67,6 +81,8 @@ func (h *ZoneHandler) Get(ctx *gin.Context) {
 
 	zone, err := h.svc.Get(ctx, id)
 	if err != nil {
+		log.Warn("getting zone", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -89,6 +105,8 @@ func (h *ZoneHandler) Get(ctx *gin.Context) {
 // @Failure      500       {object}  dto.ErrorResponse
 // @Router       /zones [get]
 func (h *ZoneHandler) List(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
+
 	filter, err := dto.ZoneFilterFromCtx(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -98,6 +116,8 @@ func (h *ZoneHandler) List(ctx *gin.Context) {
 
 	zones, err := h.svc.List(ctx, filter)
 	if err != nil {
+		log.Warn("listing zones", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -126,6 +146,8 @@ func (h *ZoneHandler) List(ctx *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /zones/{id} [patch]
 func (h *ZoneHandler) Update(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Update"), utils.MetadataFromCtx(ctx))
+
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -140,8 +162,9 @@ func (h *ZoneHandler) Update(ctx *gin.Context) {
 		return
 	}
 
-	err = h.svc.Update(ctx, id, data)
-	if err != nil {
+	if err = h.svc.Update(ctx, id, data); err != nil {
+		log.Warn("updating zone", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -163,6 +186,8 @@ func (h *ZoneHandler) Update(ctx *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /zones/{id} [delete]
 func (h *ZoneHandler) Delete(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Delete"), utils.MetadataFromCtx(ctx))
+
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -170,8 +195,9 @@ func (h *ZoneHandler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	err = h.svc.Delete(ctx, id)
-	if err != nil {
+	if err = h.svc.Delete(ctx, id); err != nil {
+		log.Warn("deleting zone", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return

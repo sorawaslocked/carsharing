@@ -2,6 +2,8 @@ package handler
 
 import (
 	"carsharing/api-gateway/internal/adapter/http/dto"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,6 +21,8 @@ import (
 // @Failure      500   {object}  dto.ErrorResponse
 // @Router       /users/documents [post]
 func (h *UserHandler) CreateDocument(c *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CreateDocument"), utils.MetadataFromCtx(c))
+
 	imageType, objectKey, err := dto.FromCreateDocumentRequest(c)
 	if err != nil {
 		dto.FromError(c, err)
@@ -28,6 +32,8 @@ func (h *UserHandler) CreateDocument(c *gin.Context) {
 
 	id, err := h.svc.CreateDocument(c, objectKey, imageType)
 	if err != nil {
+		log.Warn("creating document", pkglog.Err(err))
+
 		dto.FromError(c, err)
 
 		return
@@ -47,8 +53,12 @@ func (h *UserHandler) CreateDocument(c *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /users/profile/image-upload [get]
 func (h *UserHandler) GetProfileImageUploadData(c *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetProfileImageUploadData"), utils.MetadataFromCtx(c))
+
 	data, err := h.svc.GetProfileImageUploadData(c)
 	if err != nil {
+		log.Warn("getting profile image upload data", pkglog.Err(err))
+
 		dto.FromError(c, err)
 
 		return
@@ -71,6 +81,8 @@ func (h *UserHandler) GetProfileImageUploadData(c *gin.Context) {
 // @Failure      500   {object}  dto.ErrorResponse
 // @Router       /users/documents/upload [post]
 func (h *UserHandler) GetUploadDocumentData(c *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetUploadDocumentData"), utils.MetadataFromCtx(c))
+
 	imageType, err := dto.FromGetUploadDocumentDataRequest(c)
 	if err != nil {
 		dto.FromError(c, err)
@@ -80,6 +92,8 @@ func (h *UserHandler) GetUploadDocumentData(c *gin.Context) {
 
 	data, err := h.svc.GetUploadDocumentData(c, imageType)
 	if err != nil {
+		log.Warn("getting document upload data", pkglog.Err(err))
+
 		dto.FromError(c, err)
 
 		return
@@ -102,6 +116,8 @@ func (h *UserHandler) GetUploadDocumentData(c *gin.Context) {
 // @Failure      500   {object}  dto.ErrorResponse
 // @Router       /users/{id}/documents/processed [get]
 func (h *UserHandler) GetProcessedDocumentsForUser(c *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetProcessedDocumentsForUser"), utils.MetadataFromCtx(c))
+
 	userID, err := dto.IDParam(c)
 	if err != nil {
 		dto.FromError(c, err)
@@ -111,6 +127,8 @@ func (h *UserHandler) GetProcessedDocumentsForUser(c *gin.Context) {
 
 	documents, err := h.svc.GetProcessedDocumentsForUser(c, userID)
 	if err != nil {
+		log.Warn("getting processed documents for user", pkglog.Err(err))
+
 		dto.FromError(c, err)
 
 		return
@@ -140,6 +158,8 @@ func (h *UserHandler) GetProcessedDocumentsForUser(c *gin.Context) {
 // @Failure      500   {object}  dto.ErrorResponse
 // @Router       /users/documents/check/{id} [post]
 func (h *UserHandler) CheckDocument(c *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CheckDocument"), utils.MetadataFromCtx(c))
+
 	docID, err := dto.IDParam(c)
 	if err != nil {
 		dto.FromError(c, err)
@@ -154,8 +174,9 @@ func (h *UserHandler) CheckDocument(c *gin.Context) {
 		return
 	}
 
-	err = h.svc.CheckDocument(c, docID, status, documentError)
-	if err != nil {
+	if err = h.svc.CheckDocument(c, docID, status, documentError); err != nil {
+		log.Warn("checking document", pkglog.Err(err))
+
 		dto.FromError(c, err)
 
 		return

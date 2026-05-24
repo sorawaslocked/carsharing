@@ -18,6 +18,9 @@
 package main
 
 import (
+	"log/slog"
+	"os"
+
 	"carsharing/api-gateway/internal/app"
 	"carsharing/api-gateway/internal/config"
 	"carsharing/shared/pkg/log"
@@ -30,9 +33,11 @@ func main() {
 
 	logger := log.SetupLogger(cfg.Env)
 
-	application := app.New(cfg, logger)
-
-	if application != nil {
-		application.Run()
+	application, err := app.New(cfg, logger)
+	if err != nil {
+		logger.Error("initialising application", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
+
+	application.Run()
 }

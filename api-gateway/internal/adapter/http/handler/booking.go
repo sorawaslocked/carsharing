@@ -1,16 +1,24 @@
 package handler
 
 import (
+	"log/slog"
+
 	"carsharing/api-gateway/internal/adapter/http/dto"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 
 type BookingHandler struct {
 	svc BookingService
+	log *slog.Logger
 }
 
-func NewBookingHandler(svc BookingService) *BookingHandler {
-	return &BookingHandler{svc: svc}
+func NewBookingHandler(svc BookingService, log *slog.Logger) *BookingHandler {
+	return &BookingHandler{
+		svc: svc,
+		log: pkglog.WithComponent(log, "http.BookingHandler"),
+	}
 }
 
 // Create (Booking) godoc
@@ -28,6 +36,8 @@ func NewBookingHandler(svc BookingService) *BookingHandler {
 // @Failure      500   {object}  dto.ErrorResponse
 // @Router       /bookings [post]
 func (h *BookingHandler) Create(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
+
 	data, err := dto.FromBookingCreateRequest(ctx)
 	if err != nil {
 		dto.MalformedJson(ctx)
@@ -37,6 +47,8 @@ func (h *BookingHandler) Create(ctx *gin.Context) {
 
 	id, err := h.svc.Create(ctx, data)
 	if err != nil {
+		log.Warn("creating booking", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -58,6 +70,8 @@ func (h *BookingHandler) Create(ctx *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /bookings/{id} [get]
 func (h *BookingHandler) Get(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
+
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -67,6 +81,8 @@ func (h *BookingHandler) Get(ctx *gin.Context) {
 
 	booking, err := h.svc.Get(ctx, id)
 	if err != nil {
+		log.Warn("getting booking", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -93,6 +109,8 @@ func (h *BookingHandler) Get(ctx *gin.Context) {
 // @Failure      500            {object}  dto.ErrorResponse
 // @Router       /bookings [get]
 func (h *BookingHandler) List(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
+
 	filter, err := dto.BookingFilterFromCtx(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -102,6 +120,8 @@ func (h *BookingHandler) List(ctx *gin.Context) {
 
 	bookings, err := h.svc.List(ctx, filter)
 	if err != nil {
+		log.Warn("listing bookings", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -129,6 +149,8 @@ func (h *BookingHandler) List(ctx *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /bookings/{id}/cancel [post]
 func (h *BookingHandler) Cancel(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Cancel"), utils.MetadataFromCtx(ctx))
+
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -137,6 +159,8 @@ func (h *BookingHandler) Cancel(ctx *gin.Context) {
 	}
 
 	if err = h.svc.Cancel(ctx, id); err != nil {
+		log.Warn("cancelling booking", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -161,6 +185,8 @@ func (h *BookingHandler) Cancel(ctx *gin.Context) {
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /bookings/{id}/status [patch]
 func (h *BookingHandler) UpdateStatus(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "UpdateStatus"), utils.MetadataFromCtx(ctx))
+
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -176,6 +202,8 @@ func (h *BookingHandler) UpdateStatus(ctx *gin.Context) {
 	}
 
 	if err = h.svc.UpdateStatus(ctx, id, data); err != nil {
+		log.Warn("updating booking status", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return
@@ -202,6 +230,8 @@ func (h *BookingHandler) UpdateStatus(ctx *gin.Context) {
 // @Failure      500     {object}  dto.ErrorResponse
 // @Router       /bookings/{id}/status-history [get]
 func (h *BookingHandler) GetStatusHistory(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetStatusHistory"), utils.MetadataFromCtx(ctx))
+
 	id, err := dto.IDParam(ctx)
 	if err != nil {
 		dto.FromError(ctx, err)
@@ -218,6 +248,8 @@ func (h *BookingHandler) GetStatusHistory(ctx *gin.Context) {
 
 	readings, err := h.svc.GetStatusHistory(ctx, id, filter)
 	if err != nil {
+		log.Warn("getting booking status history", pkglog.Err(err))
+
 		dto.FromError(ctx, err)
 
 		return

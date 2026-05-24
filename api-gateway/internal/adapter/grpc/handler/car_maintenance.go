@@ -27,8 +27,7 @@ func NewCarMaintenanceHandler(client carsvc.CarMaintenanceServiceClient, logger 
 }
 
 func (h *CarMaintenanceHandler) CreateTemplate(ctx context.Context, data model.CarMaintenanceTemplateCreate) (string, error) {
-	logger := pkglog.WithMethod(h.log, "CreateTemplate")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CreateTemplate"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.CreateMaintenanceTemplate(ctx, &carsvc.CreateMaintenanceTemplateRequest{
 		Name:        data.Name,
@@ -39,9 +38,7 @@ func (h *CarMaintenanceHandler) CreateTemplate(ctx context.Context, data model.C
 		PullPct:     data.PullPct,
 	})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("creating maintenance template", pkglog.Err(err))
 
 		return "", dto.FromGrpcErr(err)
 	}
@@ -50,14 +47,11 @@ func (h *CarMaintenanceHandler) CreateTemplate(ctx context.Context, data model.C
 }
 
 func (h *CarMaintenanceHandler) GetTemplate(ctx context.Context, id string) (model.CarMaintenanceTemplate, error) {
-	logger := pkglog.WithMethod(h.log, "GetTemplate")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetTemplate"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetMaintenanceTemplate(ctx, &carsvc.GetMaintenanceTemplateRequest{Id: id})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("getting maintenance template", pkglog.Err(err))
 
 		return model.CarMaintenanceTemplate{}, dto.FromGrpcErr(err)
 	}
@@ -66,8 +60,7 @@ func (h *CarMaintenanceHandler) GetTemplate(ctx context.Context, id string) (mod
 }
 
 func (h *CarMaintenanceHandler) ListTemplates(ctx context.Context, filter model.CarMaintenanceTemplateFilter) ([]model.CarMaintenanceTemplate, error) {
-	logger := pkglog.WithMethod(h.log, "ListTemplates")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "ListTemplates"), utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.ListMaintenanceTemplatesRequest{}
 	if filter.Pagination != nil {
@@ -79,9 +72,7 @@ func (h *CarMaintenanceHandler) ListTemplates(ctx context.Context, filter model.
 
 	res, err := h.client.ListMaintenanceTemplates(ctx, req)
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("listing maintenance templates", pkglog.Err(err))
 
 		return nil, dto.FromGrpcErr(err)
 	}
@@ -95,8 +86,7 @@ func (h *CarMaintenanceHandler) ListTemplates(ctx context.Context, filter model.
 }
 
 func (h *CarMaintenanceHandler) UpdateTemplate(ctx context.Context, id string, data model.CarMaintenanceTemplateUpdate) error {
-	logger := pkglog.WithMethod(h.log, "UpdateTemplate")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "UpdateTemplate"), utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.UpdateMaintenanceTemplate(ctx, &carsvc.UpdateMaintenanceTemplateRequest{
 		Id:          id,
@@ -108,9 +98,7 @@ func (h *CarMaintenanceHandler) UpdateTemplate(ctx context.Context, id string, d
 		PullPct:     data.PullPct,
 	})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("updating maintenance template", pkglog.Err(err))
 
 		return dto.FromGrpcErr(err)
 	}
@@ -119,14 +107,11 @@ func (h *CarMaintenanceHandler) UpdateTemplate(ctx context.Context, id string, d
 }
 
 func (h *CarMaintenanceHandler) DeleteTemplate(ctx context.Context, id string) error {
-	logger := pkglog.WithMethod(h.log, "DeleteTemplate")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "DeleteTemplate"), utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.DeleteMaintenanceTemplate(ctx, &carsvc.DeleteMaintenanceTemplateRequest{Id: id})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("deleting maintenance template", pkglog.Err(err))
 
 		return dto.FromGrpcErr(err)
 	}
@@ -135,8 +120,7 @@ func (h *CarMaintenanceHandler) DeleteTemplate(ctx context.Context, id string) e
 }
 
 func (h *CarMaintenanceHandler) ListRecords(ctx context.Context, filter model.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error) {
-	logger := pkglog.WithMethod(h.log, "ListRecords")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "ListRecords"), utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.ListMaintenanceRecordsRequest{
 		CarId:      filter.CarID,
@@ -152,9 +136,7 @@ func (h *CarMaintenanceHandler) ListRecords(ctx context.Context, filter model.Ca
 
 	res, err := h.client.ListMaintenanceRecords(ctx, req)
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("listing maintenance records", pkglog.Err(err))
 
 		return nil, dto.FromGrpcErr(err)
 	}
@@ -168,8 +150,7 @@ func (h *CarMaintenanceHandler) ListRecords(ctx context.Context, filter model.Ca
 }
 
 func (h *CarMaintenanceHandler) CompleteRecord(ctx context.Context, recordID string, data model.CarMaintenanceRecordComplete) error {
-	logger := pkglog.WithMethod(h.log, "CompleteRecord")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CompleteRecord"), utils.MetadataFromCtx(ctx))
 
 	_, err := h.client.CompleteMaintenanceRecord(ctx, &carsvc.CompleteMaintenanceRecordRequest{
 		RecordId:              recordID,
@@ -179,9 +160,7 @@ func (h *CarMaintenanceHandler) CompleteRecord(ctx context.Context, recordID str
 		Notes:                 data.Notes,
 	})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("completing maintenance record", pkglog.Err(err))
 
 		return dto.FromGrpcErr(err)
 	}
@@ -190,14 +169,11 @@ func (h *CarMaintenanceHandler) CompleteRecord(ctx context.Context, recordID str
 }
 
 func (h *CarMaintenanceHandler) GetReceiptImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
-	logger := pkglog.WithMethod(h.log, "GetReceiptImageUploadData")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetReceiptImageUploadData"), utils.MetadataFromCtx(ctx))
 
 	res, err := h.client.GetMaintenanceReceiptImageUploadData(ctx, &emptypb.Empty{})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("getting maintenance receipt image upload data", pkglog.Err(err))
 
 		return sharedmodel.ImageUploadData{}, dto.FromGrpcErr(err)
 	}

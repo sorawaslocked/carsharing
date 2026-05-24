@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -51,10 +52,13 @@ type App struct {
 	natsUserSubscriber     *natssub.UserSubscriber
 	natsDocumentSubscriber *natssub.DocumentSubscriber
 	natsCarSubscriber      *natssub.CarSubscriber
+	closer                 closer
 }
 
-func New(cfg config.Config, log *slog.Logger) *App {
+func New(cfg config.Config, log *slog.Logger) (*App, error) {
 	log = log.With(slog.String("appID", "api-gateway"))
+
+	var cl closer
 
 	baseInterceptor := interceptor.NewBaseInterceptor()
 	unaryOpt := grpc.WithUnaryInterceptor(baseInterceptor.Unary)
@@ -66,9 +70,9 @@ func New(cfg config.Config, log *slog.Logger) *App {
 
 	userServiceGrpcConn, err := pkggrpc.NewClientConn(userServiceLog, cfg.GRPCServer.UserService, unaryOpt, streamOpt)
 	if err != nil {
-		userServiceLog.Error("connecting to grpc server", pkglog.Err(err))
-		return nil
+		return nil, fmt.Errorf("user-service grpc: %w", err)
 	}
+	cl.add(func() { _ = userServiceGrpcConn.Close() })
 
 	// Car service gRPC connection
 	carServiceLog := log.With(slog.String("grpcService", "car-service"))
@@ -76,9 +80,10 @@ func New(cfg config.Config, log *slog.Logger) *App {
 
 	carServiceGrpcConn, err := pkggrpc.NewClientConn(carServiceLog, cfg.GRPCServer.CarService, unaryOpt, streamOpt)
 	if err != nil {
-		carServiceLog.Error("connecting to grpc server", pkglog.Err(err))
-		return nil
+		cl.closeAll()
+		return nil, fmt.Errorf("car-service grpc: %w", err)
 	}
+	cl.add(func() { _ = carServiceGrpcConn.Close() })
 
 	// Booking service gRPC connection
 	bookingServiceLog := log.With(slog.String("grpcService", "booking-service"))
@@ -86,9 +91,10 @@ func New(cfg config.Config, log *slog.Logger) *App {
 
 	bookingServiceGrpcConn, err := pkggrpc.NewClientConn(bookingServiceLog, cfg.GRPCServer.BookingService, unaryOpt, streamOpt)
 	if err != nil {
-		bookingServiceLog.Error("connecting to grpc server", pkglog.Err(err))
-		return nil
+		cl.closeAll()
+		return nil, fmt.Errorf("booking-service grpc: %w", err)
 	}
+	cl.add(func() { _ = bookingServiceGrpcConn.Close() })
 
 	// Trip service gRPC connection
 	tripServiceLog := log.With(slog.String("grpcService", "trip-service"))
@@ -96,9 +102,10 @@ func New(cfg config.Config, log *slog.Logger) *App {
 
 	tripServiceGrpcConn, err := pkggrpc.NewClientConn(tripServiceLog, cfg.GRPCServer.TripService, unaryOpt, streamOpt)
 	if err != nil {
-		tripServiceLog.Error("connecting to grpc server", pkglog.Err(err))
-		return nil
+		cl.closeAll()
+		return nil, fmt.Errorf("trip-service grpc: %w", err)
 	}
+	cl.add(func() { _ = tripServiceGrpcConn.Close() })
 
 	// gRPC clients
 	userGrpcClient := usersvc.NewUserServiceClient(userServiceGrpcConn)
@@ -137,21 +144,23 @@ func New(cfg config.Config, log *slog.Logger) *App {
 
 	// Services
 	lazy := &lazySessionCache{}
-	userService := service.NewUserService(userServiceGrpcHandler, jwtManager, lazy)
-	carService := service.NewCarService(carGrpcHandler)
-	carModelService := service.NewCarModelService(carModelGrpcHandler)
-	carInsuranceService := service.NewCarInsuranceService(carInsuranceGrpcHandler)
-	carMaintenanceService := service.NewCarMaintenanceService(carMaintenanceGrpcHandler)
-	zoneService := service.NewZoneService(zoneGrpcHandler)
-	pricingRuleService := service.NewPricingRuleService(pricingRuleGrpcHandler)
-	bookingService := service.NewBookingService(bookingGrpcHandler)
-	tripService := service.NewTripService(tripGrpcHandler)
+	userService := service.NewUserService(userServiceGrpcHandler, jwtManager, lazy, log)
+	carService := service.NewCarService(carGrpcHandler, log)
+	carModelService := service.NewCarModelService(carModelGrpcHandler, log)
+	carInsuranceService := service.NewCarInsuranceService(carInsuranceGrpcHandler, log)
+	carMaintenanceService := service.NewCarMaintenanceService(carMaintenanceGrpcHandler, log)
+	zoneService := service.NewZoneService(zoneGrpcHandler, log)
+	pricingRuleService := service.NewPricingRuleService(pricingRuleGrpcHandler, log)
+	bookingService := service.NewBookingService(bookingGrpcHandler, log)
+	tripService := service.NewTripService(tripGrpcHandler, log)
 
 	// Redis
 	rdb, err := pkgredis.NewClient(log, cfg.Redis)
 	if err != nil {
-		return nil
+		cl.closeAll()
+		return nil, fmt.Errorf("redis: %w", err)
 	}
+	cl.add(func() { _ = rdb.Close() })
 
 	userCache := redisadapter.NewUserCache(rdb, userService, cfg.Cache, log)
 	lazy.real = userCache
@@ -159,12 +168,15 @@ func New(cfg config.Config, log *slog.Logger) *App {
 	// NATS
 	natsConn, err := pkgnats.NewSubscriber(log, cfg.NATS)
 	if err != nil {
-		return nil
+		cl.closeAll()
+		return nil, fmt.Errorf("nats: %w", err)
 	}
+	cl.add(natsConn.Close)
 
 	natsUserSub := natssub.NewUserSubscriber(natsConn, userCache, log)
 	if err = natsUserSub.Subscribe(); err != nil {
-		return nil
+		cl.closeAll()
+		return nil, fmt.Errorf("nats user subscribe: %w", err)
 	}
 
 	documentHub := wshandler.NewDocumentHub()
@@ -172,12 +184,14 @@ func New(cfg config.Config, log *slog.Logger) *App {
 
 	natsDocumentSub := natssub.NewDocumentSubscriber(natsConn, documentHub, log)
 	if err = natsDocumentSub.Subscribe(); err != nil {
-		return nil
+		cl.closeAll()
+		return nil, fmt.Errorf("nats document subscribe: %w", err)
 	}
 
 	natsCarSub := natssub.NewCarSubscriber(natsConn, carStatusHub, log)
 	if err = natsCarSub.Subscribe(); err != nil {
-		return nil
+		cl.closeAll()
+		return nil, fmt.Errorf("nats car subscribe: %w", err)
 	}
 
 	healthCheckers := []httphandler.HealthChecker{
@@ -212,12 +226,13 @@ func New(cfg config.Config, log *slog.Logger) *App {
 
 	return &App{
 		cfg:                    cfg,
-		log:                    log,
+		log:                    pkglog.WithComponent(log, "app"),
 		httpServer:             httpServer,
 		natsUserSubscriber:     natsUserSub,
 		natsDocumentSubscriber: natsDocumentSub,
 		natsCarSubscriber:      natsCarSub,
-	}
+		closer:                 cl,
+	}, nil
 }
 
 func (a *App) Run() {
@@ -243,4 +258,6 @@ func (a *App) Stop() {
 	defer cancel()
 
 	a.httpServer.Stop(ctx)
+
+	a.closer.closeAll()
 }

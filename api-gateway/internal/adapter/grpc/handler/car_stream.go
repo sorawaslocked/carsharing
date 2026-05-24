@@ -14,8 +14,7 @@ import (
 )
 
 func (h *CarHandler) StreamCarsWithFilter(ctx context.Context, filter model.CarFilter, send func([]model.SlimCar) error) error {
-	logger := pkglog.WithMethod(h.log, "StreamCarsWithFilter")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "StreamCarsWithFilter"), utils.MetadataFromCtx(ctx))
 
 	req := &carsvc.StreamCarsWithFilterRequest{
 		Brand:        filter.Brand,
@@ -42,9 +41,8 @@ func (h *CarHandler) StreamCarsWithFilter(ctx context.Context, filter model.CarF
 
 	stream, err := h.streamClient.StreamCarsWithFilter(ctx, req)
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("streaming cars with filter", pkglog.Err(err))
+
 		return dto.FromGrpcErr(err)
 	}
 
@@ -57,9 +55,8 @@ func (h *CarHandler) StreamCarsWithFilter(ctx context.Context, filter model.CarF
 			if ctx.Err() != nil {
 				return nil
 			}
-			if dto.IsSystemErr(err) {
-				logger.Error("stream recv failed", pkglog.Err(err))
-			}
+			log.Warn("receiving car stream", pkglog.Err(err))
+
 			return dto.FromGrpcErr(err)
 		}
 
@@ -83,14 +80,12 @@ func (h *CarHandler) StreamCarsWithFilter(ctx context.Context, filter model.CarF
 }
 
 func (h *CarHandler) StreamCarTelemetry(ctx context.Context, carID string, send func(model.CarTelemetryEvent) error) error {
-	logger := pkglog.WithMethod(h.log, "StreamCarTelemetry")
-	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "StreamCarTelemetry"), utils.MetadataFromCtx(ctx))
 
 	stream, err := h.streamClient.StreamCarTelemetry(ctx, &carsvc.StreamCarTelemetryRequest{CarId: carID})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
+		log.Warn("streaming car telemetry", pkglog.Err(err))
+
 		return dto.FromGrpcErr(err)
 	}
 
@@ -103,9 +98,8 @@ func (h *CarHandler) StreamCarTelemetry(ctx context.Context, carID string, send 
 			if ctx.Err() != nil {
 				return nil
 			}
-			if dto.IsSystemErr(err) {
-				logger.Error("stream recv failed", pkglog.Err(err))
-			}
+			log.Warn("receiving car telemetry stream", pkglog.Err(err))
+
 			return dto.FromGrpcErr(err)
 		}
 

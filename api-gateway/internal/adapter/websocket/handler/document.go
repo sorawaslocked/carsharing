@@ -44,7 +44,7 @@ func (h *UserWsHandler) DocumentUpdates(c *gin.Context) {
 		return
 	}
 
-	conn, err := websocket.Accept(c.Writer, c.Request, nil)
+	conn, err := acceptWebSocket(c, nil)
 	if err != nil {
 		logger.Error("accepting websocket", pkglog.Err(err))
 		return

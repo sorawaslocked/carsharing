@@ -41,7 +41,7 @@ func (h *TripWsHandler) LiveFeed(c *gin.Context) {
 
 	tripID := c.Param("id")
 
-	conn, err := websocket.Accept(c.Writer, c.Request, nil)
+	conn, err := acceptWebSocket(c, nil)
 	if err != nil {
 		logger.Error("accepting websocket", pkglog.Err(err))
 		return

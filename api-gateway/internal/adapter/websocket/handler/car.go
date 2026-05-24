@@ -61,7 +61,7 @@ func (h *CarWsHandler) Fleet(c *gin.Context) {
 		return
 	}
 
-	conn, err := websocket.Accept(c.Writer, c.Request, nil)
+	conn, err := acceptWebSocket(c, nil)
 	if err != nil {
 		logger.Error("accepting websocket", pkglog.Err(err))
 		return
@@ -110,7 +110,7 @@ func (h *CarWsHandler) Telemetry(c *gin.Context) {
 
 	carID := c.Param("id")
 
-	conn, err := websocket.Accept(c.Writer, c.Request, nil)
+	conn, err := acceptWebSocket(c, nil)
 	if err != nil {
 		logger.Error("accepting websocket", pkglog.Err(err))
 		return
@@ -152,7 +152,7 @@ func (h *CarWsHandler) Status(c *gin.Context) {
 
 	carID := c.Param("id")
 
-	conn, err := websocket.Accept(c.Writer, c.Request, nil)
+	conn, err := acceptWebSocket(c, nil)
 	if err != nil {
 		logger.Error("accepting websocket", pkglog.Err(err))
 		return

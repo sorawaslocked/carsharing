@@ -145,6 +145,18 @@ func FromGetCarStatusHistoryRequest(req *carsvc.GetCarStatusHistoryRequest) vali
 		FromStatus: req.FromStatus,
 		ToStatus:   req.ToStatus,
 	}
+	if req.TimeRange != nil {
+		tr := &sharedvalidation.TimeRange{}
+		if req.TimeRange.From != nil {
+			t := req.TimeRange.From.AsTime()
+			tr.From = &t
+		}
+		if req.TimeRange.To != nil {
+			t := req.TimeRange.To.AsTime()
+			tr.To = &t
+		}
+		filter.TimeRange = tr
+	}
 	if req.Pagination != nil {
 		filter.Pagination = &sharedvalidation.Pagination{
 			Limit:  req.Pagination.Limit,
@@ -158,13 +170,17 @@ func FromGetCarTelemetryHistoryRequest(req *carsvc.GetCarTelemetryHistoryRequest
 	filter := validation.TelemetryReadingFilter{
 		CarID: req.CarId,
 	}
-	if req.From != nil {
-		t := req.From.AsTime()
-		filter.From = &t
-	}
-	if req.To != nil {
-		t := req.To.AsTime()
-		filter.To = &t
+	if req.TimeRange != nil {
+		tr := &sharedvalidation.TimeRange{}
+		if req.TimeRange.From != nil {
+			t := req.TimeRange.From.AsTime()
+			tr.From = &t
+		}
+		if req.TimeRange.To != nil {
+			t := req.TimeRange.To.AsTime()
+			tr.To = &t
+		}
+		filter.TimeRange = tr
 	}
 	if req.Pagination != nil {
 		filter.Pagination = &sharedvalidation.Pagination{

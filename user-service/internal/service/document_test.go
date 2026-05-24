@@ -88,11 +88,11 @@ func TestGetProcessedDocumentsForUser_UserNotFound(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
-	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(model.User{}, model.ErrNotFound)
+	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(model.User{}, model.ErrUserNotFound)
 
 	_, err := svc.GetProcessedDocumentsForUser(ctx, testUserID)
 
-	assert.ErrorIs(t, err, model.ErrNotFound)
+	assert.ErrorIs(t, err, model.ErrUserNotFound)
 }
 
 // --- CheckDocument ---
@@ -169,11 +169,11 @@ func TestCheckDocument_NotFound(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
-	d.docRepo.EXPECT().FindByID(ctx, testDocID).Return(model.Document{}, model.ErrNotFound)
+	d.docRepo.EXPECT().FindByID(ctx, testDocID).Return(model.Document{}, model.ErrDocumentNotFound)
 
 	err := svc.CheckDocument(ctx, testDocID, validation.DocumentUpdate{Status: "approved"})
 
-	assert.ErrorIs(t, err, model.ErrNotFound)
+	assert.ErrorIs(t, err, model.ErrDocumentNotFound)
 }
 
 // --- HandleDocumentAnalyzed ---
@@ -224,11 +224,11 @@ func TestHandleDocumentAnalyzed_DocumentNotFound(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
-	d.docRepo.EXPECT().FindByID(ctx, testDocID).Return(model.Document{}, model.ErrNotFound)
+	d.docRepo.EXPECT().FindByID(ctx, testDocID).Return(model.Document{}, model.ErrDocumentNotFound)
 
 	err := svc.HandleDocumentAnalyzed(ctx, model.DocumentAnalyzedEvent{DocumentID: testDocID, Passed: true})
 
-	assert.ErrorIs(t, err, model.ErrNotFound)
+	assert.ErrorIs(t, err, model.ErrDocumentNotFound)
 }
 
 func TestCheckDocument_InvalidStatus_Pending(t *testing.T) {

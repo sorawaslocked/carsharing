@@ -71,7 +71,7 @@ func (s *UserService) GetProcessedDocumentsForUser(ctx context.Context, userID s
 	}
 
 	if _, err := s.userRepo.FindByID(ctx, userID); err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrUserNotFound) {
 			log.Error("repo: finding user", pkglog.Err(err))
 		}
 		return nil, err
@@ -123,7 +123,7 @@ func (s *UserService) CheckDocument(ctx context.Context, docID string, data vali
 
 	doc, err := s.docRepo.FindByID(ctx, docID)
 	if err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrDocumentNotFound) {
 			log.Error("repo: finding document", pkglog.Err(err))
 		}
 		return err

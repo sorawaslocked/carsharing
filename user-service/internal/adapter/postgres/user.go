@@ -148,7 +148,7 @@ func (r *UserRepository) FindByID(ctx context.Context, id string) (model.User, e
 	user, err := scanUser(r.pool.QueryRow(ctx, userSelect+" WHERE u.id = $1", id))
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return model.User{}, model.ErrNotFound
+			return model.User{}, model.ErrUserNotFound
 		}
 		log.Error("scanning user", pkglog.Err(err))
 		return model.User{}, model.ErrSql
@@ -168,7 +168,7 @@ func (r *UserRepository) FindOne(ctx context.Context, filter model.UserFilter) (
 	user, err := scanUser(r.pool.QueryRow(ctx, query, args...))
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return model.User{}, model.ErrNotFound
+			return model.User{}, model.ErrUserNotFound
 		}
 		log.Error("scanning user", pkglog.Err(err))
 		return model.User{}, model.ErrSql
@@ -238,7 +238,7 @@ func (r *UserRepository) Update(ctx context.Context, id string, update model.Use
 			return r.handlePGErr(log, err)
 		}
 		if tag.RowsAffected() == 0 {
-			return model.ErrNotFound
+			return model.ErrUserNotFound
 		}
 
 		if _, err = tx.Exec(ctx, `DELETE FROM user_roles WHERE user_id = $1`, id); err != nil {
@@ -267,7 +267,7 @@ func (r *UserRepository) Update(ctx context.Context, id string, update model.Use
 		return r.handlePGErr(log, err)
 	}
 	if tag.RowsAffected() == 0 {
-		return model.ErrNotFound
+		return model.ErrUserNotFound
 	}
 	return nil
 }
@@ -282,7 +282,7 @@ func (r *UserRepository) Delete(ctx context.Context, id string) error {
 	}
 
 	if tag.RowsAffected() == 0 {
-		return model.ErrNotFound
+		return model.ErrUserNotFound
 	}
 	return nil
 }

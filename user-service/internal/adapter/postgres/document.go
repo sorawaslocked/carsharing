@@ -93,7 +93,7 @@ func (r *DocumentRepository) FindByID(ctx context.Context, id string) (model.Doc
 	doc, err := scanDocument(r.pool.QueryRow(ctx, documentSelect+" WHERE id = $1", id))
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return model.Document{}, model.ErrNotFound
+			return model.Document{}, model.ErrDocumentNotFound
 		}
 		log.Error("scanning document", pkglog.Err(err))
 		return model.Document{}, model.ErrSql
@@ -159,7 +159,7 @@ func (r *DocumentRepository) Update(ctx context.Context, id string, update model
 		return model.ErrSql
 	}
 	if tag.RowsAffected() == 0 {
-		return model.ErrNotFound
+		return model.ErrDocumentNotFound
 	}
 
 	return nil

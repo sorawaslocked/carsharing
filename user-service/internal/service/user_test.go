@@ -141,11 +141,11 @@ func TestGet_NotFound(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
-	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(model.User{}, model.ErrNotFound)
+	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(model.User{}, model.ErrUserNotFound)
 
 	_, err := svc.Get(ctx, testUserID)
 
-	assert.ErrorIs(t, err, model.ErrNotFound)
+	assert.ErrorIs(t, err, model.ErrUserNotFound)
 }
 
 // --- List ---
@@ -227,11 +227,11 @@ func TestUpdate_NotFound(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
-	d.userRepo.EXPECT().Update(ctx, testUserID, mock.Anything).Return(model.ErrNotFound)
+	d.userRepo.EXPECT().Update(ctx, testUserID, mock.Anything).Return(model.ErrUserNotFound)
 
 	err := svc.Update(ctx, testUserID, validation.UserUpdate{FirstName: ptr("Jane")})
 
-	assert.ErrorIs(t, err, model.ErrNotFound)
+	assert.ErrorIs(t, err, model.ErrUserNotFound)
 }
 
 func TestUpdate_PasswordMismatch(t *testing.T) {
@@ -302,11 +302,11 @@ func TestDelete_NotFound(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
-	d.userRepo.EXPECT().Delete(ctx, testUserID).Return(model.ErrNotFound)
+	d.userRepo.EXPECT().Delete(ctx, testUserID).Return(model.ErrUserNotFound)
 
 	err := svc.Delete(ctx, testUserID)
 
-	assert.ErrorIs(t, err, model.ErrNotFound)
+	assert.ErrorIs(t, err, model.ErrUserNotFound)
 }
 
 // --- SignIn ---
@@ -347,11 +347,11 @@ func TestSignIn_UserNotFound(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxAnon()
 
-	d.userRepo.EXPECT().FindOne(ctx, model.UserFilter{Email: ptr(testEmail)}).Return(model.User{}, model.ErrNotFound)
+	d.userRepo.EXPECT().FindOne(ctx, model.UserFilter{Email: ptr(testEmail)}).Return(model.User{}, model.ErrUserNotFound)
 
 	_, err := svc.SignIn(ctx, validation.Credentials{Email: ptr(testEmail), Password: testPasswd})
 
-	assert.ErrorIs(t, err, model.ErrNotFound)
+	assert.ErrorIs(t, err, model.ErrUserNotFound)
 }
 
 func TestSignIn_ByPhone_Success(t *testing.T) {

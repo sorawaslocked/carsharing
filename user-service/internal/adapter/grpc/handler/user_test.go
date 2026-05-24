@@ -175,7 +175,7 @@ func TestGetUser_NotFound(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxWithUser(testUserID)
 
-	svc.EXPECT().Get(ctx, testUserID).Return(model.User{}, model.ErrNotFound)
+	svc.EXPECT().Get(ctx, testUserID).Return(model.User{}, model.ErrUserNotFound)
 
 	_, err := h.GetUser(ctx, &usersvc.GetUserRequest{Id: testUserID})
 
@@ -255,7 +255,7 @@ func TestUpdateUser_NotFound(t *testing.T) {
 	ctx := ctxWithUser(testUserID)
 	newName := "Jane"
 
-	svc.EXPECT().Update(ctx, testUserID, validation.UserUpdate{FirstName: &newName}).Return(model.ErrNotFound)
+	svc.EXPECT().Update(ctx, testUserID, validation.UserUpdate{FirstName: &newName}).Return(model.ErrUserNotFound)
 
 	_, err := h.UpdateUser(ctx, &usersvc.UpdateUserRequest{Id: testUserID, FirstName: &newName})
 
@@ -289,7 +289,7 @@ func TestDeleteUser_NotFound(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxWithUser(testUserID)
 
-	svc.EXPECT().Delete(ctx, testUserID).Return(model.ErrNotFound)
+	svc.EXPECT().Delete(ctx, testUserID).Return(model.ErrUserNotFound)
 
 	_, err := h.DeleteUser(ctx, &usersvc.DeleteUserRequest{Id: testUserID})
 
@@ -507,7 +507,7 @@ func TestGetProcessedDocumentsForUser_UserNotFound(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxWithUser(testUserID)
 
-	svc.EXPECT().GetProcessedDocumentsForUser(ctx, testUserID).Return(nil, model.ErrNotFound)
+	svc.EXPECT().GetProcessedDocumentsForUser(ctx, testUserID).Return(nil, model.ErrUserNotFound)
 
 	_, err := h.GetProcessedDocumentsForUser(ctx, &usersvc.GetProcessedDocumentsForUserRequest{UserId: testUserID})
 

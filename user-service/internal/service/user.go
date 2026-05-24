@@ -69,7 +69,7 @@ func (s *UserService) SignIn(ctx context.Context, creds validation.Credentials) 
 
 	user, err := s.userRepo.FindOne(ctx, filter)
 	if err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrUserNotFound) {
 			log.Error("repo: finding user by id", pkglog.Err(err))
 		}
 		return "", err
@@ -143,7 +143,7 @@ func (s *UserService) Get(ctx context.Context, id string) (model.User, error) {
 
 	user, err := s.userRepo.FindByID(ctx, id)
 	if err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrUserNotFound) {
 			log.Error("repo: finding user by id", pkglog.Err(err))
 		}
 		return model.User{}, err
@@ -221,7 +221,7 @@ func (s *UserService) Update(ctx context.Context, id string, data validation.Use
 	}
 
 	if err := s.userRepo.Update(ctx, id, repoUpdate); err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrUserNotFound) {
 			log.Error("repo: updating user", pkglog.Err(err))
 		}
 		return err
@@ -243,7 +243,7 @@ func (s *UserService) Delete(ctx context.Context, id string) error {
 	}
 
 	if err := s.userRepo.Delete(ctx, id); err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrUserNotFound) {
 			log.Error("repo: deleting user", pkglog.Err(err))
 		}
 		return err

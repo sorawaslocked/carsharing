@@ -31,7 +31,7 @@ func (s *UserService) SendActivationCode(ctx context.Context) error {
 
 	user, err := s.userRepo.FindByID(ctx, *md.UserID)
 	if err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrUserNotFound) {
 			log.Error("repo: finding user", pkglog.Err(err))
 		}
 		return err
@@ -63,7 +63,7 @@ func (s *UserService) CheckActivationCode(ctx context.Context, code string) erro
 
 	user, err := s.userRepo.FindByID(ctx, *md.UserID)
 	if err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrUserNotFound) {
 			log.Error("repo: finding user", pkglog.Err(err))
 		}
 		return err
@@ -96,7 +96,7 @@ func (s *UserService) CheckActivationCode(ctx context.Context, code string) erro
 		IsEmailVerified: &isEmailVerified,
 		UpdatedAt:       time.Now(),
 	}); err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, model.ErrUserNotFound) {
 			log.Error("repo: updating user email verified", pkglog.Err(err))
 		}
 		return err

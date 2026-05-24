@@ -113,7 +113,7 @@ func TestUserRepo_FindByID_NotFound(t *testing.T) {
 
 	_, err := newUserRepo().FindByID(context.Background(), "00000000-0000-0000-0000-000000000000")
 
-	assert.ErrorIs(t, err, model.ErrNotFound)
+	assert.ErrorIs(t, err, model.ErrUserNotFound)
 }
 
 // --- FindOne ---
@@ -155,7 +155,7 @@ func TestUserRepo_FindOne_NotFound(t *testing.T) {
 	email := "ghost@example.com"
 	_, err := newUserRepo().FindOne(context.Background(), model.UserFilter{Email: &email})
 
-	assert.ErrorIs(t, err, model.ErrNotFound)
+	assert.ErrorIs(t, err, model.ErrUserNotFound)
 }
 
 // --- Find ---
@@ -320,7 +320,7 @@ func TestUserRepo_Update_NotFound(t *testing.T) {
 		UpdatedAt: time.Now(),
 	})
 
-	assert.ErrorIs(t, err, model.ErrNotFound)
+	assert.ErrorIs(t, err, model.ErrUserNotFound)
 }
 
 // --- Delete ---
@@ -336,7 +336,7 @@ func TestUserRepo_Delete_RemovesUser(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = r.FindByID(ctx, id)
-	assert.ErrorIs(t, err, model.ErrNotFound)
+	assert.ErrorIs(t, err, model.ErrUserNotFound)
 }
 
 func TestUserRepo_Delete_CascadesToRoles(t *testing.T) {
@@ -358,5 +358,5 @@ func TestUserRepo_Delete_NotFound(t *testing.T) {
 
 	err := newUserRepo().Delete(context.Background(), "00000000-0000-0000-0000-000000000000")
 
-	assert.ErrorIs(t, err, model.ErrNotFound)
+	assert.ErrorIs(t, err, model.ErrUserNotFound)
 }

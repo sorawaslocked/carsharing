@@ -67,7 +67,7 @@ func TestDocumentRepo_FindByID_NotFound(t *testing.T) {
 
 	_, err := newDocRepo().FindByID(context.Background(), "00000000-0000-0000-0000-000000000000")
 
-	assert.ErrorIs(t, err, model.ErrNotFound)
+	assert.ErrorIs(t, err, model.ErrDocumentNotFound)
 }
 
 // --- Find ---
@@ -232,7 +232,7 @@ func TestDocumentRepo_Update_NotFound(t *testing.T) {
 		UpdatedAt: time.Now(),
 	})
 
-	assert.ErrorIs(t, err, model.ErrNotFound)
+	assert.ErrorIs(t, err, model.ErrDocumentNotFound)
 }
 
 func TestDocumentRepo_Delete_CascadesWithUser(t *testing.T) {
@@ -248,5 +248,5 @@ func TestDocumentRepo_Delete_CascadesWithUser(t *testing.T) {
 	require.NoError(t, newUserRepo().Delete(ctx, userID))
 
 	_, err = r.FindByID(ctx, id)
-	assert.ErrorIs(t, err, model.ErrNotFound)
+	assert.ErrorIs(t, err, model.ErrDocumentNotFound)
 }

@@ -68,11 +68,11 @@ func TestSendActivationCode_UserNotFound(t *testing.T) {
 	ctx := ctxWithUser(testUserID)
 
 	d.codeStorage.EXPECT().ResendAllowedIn(ctx, testUserID).Return(time.Duration(0), nil)
-	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(model.User{}, model.ErrNotFound)
+	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(model.User{}, model.ErrUserNotFound)
 
 	err := svc.SendActivationCode(ctx)
 
-	assert.ErrorIs(t, err, model.ErrNotFound)
+	assert.ErrorIs(t, err, model.ErrUserNotFound)
 }
 
 // --- CheckActivationCode ---
@@ -172,9 +172,9 @@ func TestCheckActivationCode_UserNotFound(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
-	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(model.User{}, model.ErrNotFound)
+	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(model.User{}, model.ErrUserNotFound)
 
 	err := svc.CheckActivationCode(ctx, testCode)
 
-	assert.ErrorIs(t, err, model.ErrNotFound)
+	assert.ErrorIs(t, err, model.ErrUserNotFound)
 }

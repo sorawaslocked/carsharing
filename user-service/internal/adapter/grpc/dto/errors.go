@@ -45,7 +45,9 @@ func ToStatusError(err error) error {
 	case errors.Is(err, model.ErrInsufficientPermissions):
 		return status.Error(codes.PermissionDenied, err.Error())
 
-	case errors.Is(err, model.ErrNotFound):
+	case errors.Is(err, model.ErrUserNotFound),
+		errors.Is(err, model.ErrDocumentNotFound),
+		errors.Is(err, model.ErrNotFound):
 		return status.Error(codes.NotFound, err.Error())
 
 	case errors.Is(err, model.ErrDuplicateEmail),

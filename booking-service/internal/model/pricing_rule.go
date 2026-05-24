@@ -9,15 +9,15 @@ import (
 type PricingRuleType string
 
 const (
-	PricingRuleTypeTime     PricingRuleType = "time"
-	PricingRuleTypeDistance PricingRuleType = "distance"
-	PricingRuleTypeCombined PricingRuleType = "combined"
+	PricingRuleTypeByMinute PricingRuleType = "by_minute"
+	PricingRuleTypeByHour   PricingRuleType = "by_hour"
+	PricingRuleTypeByDay    PricingRuleType = "by_day"
 )
 
 var validPricingRuleTypes = map[PricingRuleType]struct{}{
-	PricingRuleTypeTime:     {},
-	PricingRuleTypeDistance: {},
-	PricingRuleTypeCombined: {},
+	PricingRuleTypeByMinute: {},
+	PricingRuleTypeByHour:   {},
+	PricingRuleTypeByDay:    {},
 }
 
 func PricingRuleTypeFromString(s string) (PricingRuleType, bool) {

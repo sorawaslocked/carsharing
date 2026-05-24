@@ -36,19 +36,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.AccessTokenResponse"
+                            "$ref": "#/definitions/dto.AccessTokenResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -56,7 +56,7 @@ const docTemplate = `{
         },
         "/auth/register": {
             "post": {
-                "description": "Creates a new user account. Returns the new user's ID.",
+                "description": "Creates a new user account. Returns the new user's ID. password 8–20 chars with complexity requirements; passwordConfirmation must match password; birthDate must indicate age ≥ 18; phoneNumber in E.164 format if provided.",
                 "consumes": [
                     "application/json"
                 ],
@@ -74,7 +74,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RegisterRequest"
+                            "$ref": "#/definitions/dto.RegisterRequest"
                         }
                     }
                 ],
@@ -82,25 +82,25 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -108,7 +108,7 @@ const docTemplate = `{
         },
         "/auth/sign-in": {
             "post": {
-                "description": "Authenticates a user by email or phone + password. Returns an access token and sets an HttpOnly refresh token cookie.",
+                "description": "Authenticates a user by email or phone + password. Returns an access token and sets an HttpOnly refresh token cookie. Exactly one of email or phoneNumber is required.",
                 "consumes": [
                     "application/json"
                 ],
@@ -126,7 +126,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.LoginRequest"
+                            "$ref": "#/definitions/dto.LoginRequest"
                         }
                     }
                 ],
@@ -134,25 +134,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.AccessTokenResponse"
+                            "$ref": "#/definitions/dto.AccessTokenResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -180,13 +180,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -251,26 +251,26 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Booking"
+                                "$ref": "#/definitions/dto.Booking"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -299,7 +299,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.BookingCreateRequest"
+                            "$ref": "#/definitions/dto.BookingCreateRequest"
                         }
                     }
                 ],
@@ -307,31 +307,31 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -364,31 +364,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Booking"
+                            "$ref": "#/definitions/dto.Booking"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -425,25 +425,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -481,7 +481,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.BookingStatusUpdateRequest"
+                            "$ref": "#/definitions/dto.BookingStatusUpdateRequest"
                         }
                     }
                 ],
@@ -492,25 +492,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -570,32 +570,32 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.BookingStatusReading"
+                                "$ref": "#/definitions/dto.BookingStatusReading"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -637,7 +637,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Return policies expiring within N days",
+                        "description": "Return policies expiring within N days (1–365)",
                         "name": "expiringWithinDays",
                         "in": "query"
                     },
@@ -658,25 +658,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsurancesResponse"
+                            "$ref": "#/definitions/dto.CarInsurancesResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -687,7 +687,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Records an ОСАГО or КАСКО policy for a specific car.",
+                "description": "Records an ОСАГО or КАСКО policy for a specific car. type must be osago or kasko; expiresAt must be after startsAt; costTenge min 0; provider and policyNum 1–100 chars.",
                 "consumes": [
                     "application/json"
                 ],
@@ -705,7 +705,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceCreateRequest"
+                            "$ref": "#/definitions/dto.CarInsuranceCreateRequest"
                         }
                     }
                 ],
@@ -713,31 +713,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -761,19 +761,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ImageUploadResponse"
+                            "$ref": "#/definitions/dto.ImageUploadResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -806,31 +806,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceResponse"
+                            "$ref": "#/definitions/dto.CarInsuranceResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -864,25 +864,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -917,7 +917,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceUpdateRequest"
+                            "$ref": "#/definitions/dto.CarInsuranceUpdateRequest"
                         }
                     }
                 ],
@@ -928,25 +928,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -971,13 +971,13 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Filter by car UUID",
-                        "name": "carID",
+                        "name": "carId",
                         "in": "query"
                     },
                     {
                         "type": "string",
                         "description": "Filter by template UUID",
-                        "name": "templateID",
+                        "name": "templateId",
                         "in": "query"
                     },
                     {
@@ -1003,25 +1003,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceRecordsResponse"
+                            "$ref": "#/definitions/dto.CarMaintenanceRecordsResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1059,7 +1059,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceRecordCompleteRequest"
+                            "$ref": "#/definitions/dto.CarMaintenanceRecordCompleteRequest"
                         }
                     }
                 ],
@@ -1070,25 +1070,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1112,19 +1112,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ImageUploadResponse"
+                            "$ref": "#/definitions/dto.ImageUploadResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1162,25 +1162,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplatesResponse"
+                            "$ref": "#/definitions/dto.CarMaintenanceTemplatesResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1191,7 +1191,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Defines a recurring service interval (e.g. oil change every 8,000 km / 180 days).",
+                "description": "Defines a recurring service interval (e.g. oil change every 8,000 km / 180 days). kmInterval min 100 km; dayInterval min 1 day; warnPct and pullPct are proportions 0.0–1.0 (not percent), pullPct must be ≥ warnPct.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1209,7 +1209,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateCreateRequest"
+                            "$ref": "#/definitions/dto.CarMaintenanceTemplateCreateRequest"
                         }
                     }
                 ],
@@ -1217,25 +1217,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1268,31 +1268,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateItemResponse"
+                            "$ref": "#/definitions/dto.CarMaintenanceTemplateItemResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1326,25 +1326,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1379,7 +1379,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateUpdateRequest"
+                            "$ref": "#/definitions/dto.CarMaintenanceTemplateUpdateRequest"
                         }
                     }
                 ],
@@ -1390,25 +1390,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1450,19 +1450,19 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Transmission (automatic, manual)",
+                        "description": "Transmission (manual, auto)",
                         "name": "transmission",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Body type (sedan, suv, hatchback…)",
+                        "description": "Body type (sedan, hatchback, suv, crossover, minivan, coupe, convertible, pickup)",
                         "name": "bodyType",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Class (economy, comfort, business)",
+                        "description": "Class (economy, compact, comfort, business, luxury)",
                         "name": "class",
                         "in": "query"
                     },
@@ -1489,25 +1489,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelsResponse"
+                            "$ref": "#/definitions/dto.CarModelsResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1518,7 +1518,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Registers a new car model (e.g. Hyundai Solaris 2022). Returns the new model's UUID.",
+                "description": "Registers a new car model (e.g. Hyundai Solaris 2022). Returns the new model's UUID. year min 1886; seats 1–9; engineVolume 0.1–28.5 L if provided; warnPct and pullPct are proportions 0.0–1.0 (not percent), pullPct must be ≥ warnPct.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1536,7 +1536,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelCreateRequest"
+                            "$ref": "#/definitions/dto.CarModelCreateRequest"
                         }
                     }
                 ],
@@ -1544,31 +1544,31 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1593,19 +1593,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ImageUploadResponse"
+                            "$ref": "#/definitions/dto.ImageUploadResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1638,31 +1638,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelGetResponse"
+                            "$ref": "#/definitions/dto.CarModelGetResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1696,25 +1696,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1749,7 +1749,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelUpdateRequest"
+                            "$ref": "#/definitions/dto.CarModelUpdateRequest"
                         }
                     }
                 ],
@@ -1760,25 +1760,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1874,7 +1874,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Car status",
+                        "description": "Car status (available, reserved, in_use, maintenance, out_of_service)",
                         "name": "status",
                         "in": "query"
                     },
@@ -1895,25 +1895,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarsResponse"
+                            "$ref": "#/definitions/dto.CarsResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1924,7 +1924,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Creates a new physical car record linked to a car model and telemetry device.",
+                "description": "Creates a new physical car record linked to a car model and telemetry device. VIN must be exactly 17 alphanumeric characters. yearManufactured minimum 1886. fuelLevel and batteryLevel 0–100 if provided.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1942,7 +1942,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarCreateRequest"
+                            "$ref": "#/definitions/dto.CarCreateRequest"
                         }
                     }
                 ],
@@ -1950,31 +1950,31 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1999,19 +1999,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ImageUploadResponse"
+                            "$ref": "#/definitions/dto.ImageUploadResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2044,31 +2044,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarResponse"
+                            "$ref": "#/definitions/dto.CarResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2102,25 +2102,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2155,7 +2155,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarUpdateRequest"
+                            "$ref": "#/definitions/dto.CarUpdateRequest"
                         }
                     }
                 ],
@@ -2166,353 +2166,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/cars/{id}/battery-history": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Returns time-series battery readings for an EV or hybrid car.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "cars"
-                ],
-                "summary": "Get car battery level history",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Car UUID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Start date (YYYY-MM-DD)",
-                        "name": "from",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "End date (YYYY-MM-DD)",
-                        "name": "to",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Pagination limit",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Pagination offset",
-                        "name": "offset",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarBatteryHistoryResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/cars/{id}/fuel-history": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Returns time-series fuel readings for a car.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "cars"
-                ],
-                "summary": "Get car fuel reading history",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Car UUID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Start date (YYYY-MM-DD)",
-                        "name": "from",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "End date (YYYY-MM-DD)",
-                        "name": "to",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Pagination limit",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Pagination offset",
-                        "name": "offset",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarFuelHistoryResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/cars/{id}/location-history": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Returns time-series GPS location readings for a car.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "cars"
-                ],
-                "summary": "Get car location history",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Car UUID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Start date (YYYY-MM-DD)",
-                        "name": "from",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "End date (YYYY-MM-DD)",
-                        "name": "to",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Pagination limit",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Pagination offset",
-                        "name": "offset",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarLocationHistoryResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/cars/{id}/mileage-history": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Returns time-series mileage readings for a car.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "cars"
-                ],
-                "summary": "Get car mileage history",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Car UUID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Start date (YYYY-MM-DD)",
-                        "name": "from",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "End date (YYYY-MM-DD)",
-                        "name": "to",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Pagination limit",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Pagination offset",
-                        "name": "offset",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMileageHistoryResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2525,7 +2197,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Records an audited operational status transition for a car.",
+                "description": "Records an audited operational status transition for a car. status must be one of: available, reserved, in_use, maintenance, out_of_service. reason optional (1–500 chars).",
                 "consumes": [
                     "application/json"
                 ],
@@ -2550,7 +2222,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarStatusUpdateRequest"
+                            "$ref": "#/definitions/dto.CarStatusUpdateRequest"
                         }
                     }
                 ],
@@ -2561,25 +2233,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2637,31 +2309,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarStatusHistoryResponse"
+                            "$ref": "#/definitions/dto.CarStatusHistoryResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2674,7 +2346,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Records audited sensor readings (mileage, fuel, battery, location) for a car.",
+                "description": "Records audited sensor readings (mileage, fuel, battery, location) for a car. mileageKm min 0; fuelLevel and batteryLevel 0–100 if provided; reason optional (1–500 chars).",
                 "consumes": [
                     "application/json"
                 ],
@@ -2699,7 +2371,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarTelemetryUpdateRequest"
+                            "$ref": "#/definitions/dto.CarTelemetryUpdateRequest"
                         }
                     }
                 ],
@@ -2710,25 +2382,107 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/cars/{id}/telemetry-history": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns time-series telemetry readings for a car.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cars"
+                ],
+                "summary": "Get car telemetry history",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Car UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Start date (YYYY-MM-DD)",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date (YYYY-MM-DD)",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CarTelemetryHistoryResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2748,7 +2502,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.HealthResponse"
+                            "$ref": "#/definitions/dto.HealthResponse"
                         }
                     }
                 }
@@ -2817,25 +2571,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRulesResponse"
+                            "$ref": "#/definitions/dto.PricingRulesResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2864,7 +2618,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRuleCreateRequest"
+                            "$ref": "#/definitions/dto.PricingRuleCreateRequest"
                         }
                     }
                 ],
@@ -2872,31 +2626,31 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2929,31 +2683,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRuleResponse"
+                            "$ref": "#/definitions/dto.PricingRuleResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2987,25 +2741,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3041,7 +2795,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRuleUpdateRequest"
+                            "$ref": "#/definitions/dto.PricingRuleUpdateRequest"
                         }
                     }
                 ],
@@ -3052,25 +2806,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3141,26 +2895,26 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Trip"
+                                "$ref": "#/definitions/dto.Trip"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3189,7 +2943,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.TripStartRequest"
+                            "$ref": "#/definitions/dto.TripStartRequest"
                         }
                     }
                 ],
@@ -3197,37 +2951,37 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3260,31 +3014,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Trip"
+                            "$ref": "#/definitions/dto.Trip"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3321,7 +3075,7 @@ const docTemplate = `{
                         "name": "body",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.TripCancelRequest"
+                            "$ref": "#/definitions/dto.TripCancelRequest"
                         }
                     }
                 ],
@@ -3332,25 +3086,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3387,25 +3141,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3465,32 +3219,32 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.TripStatusReading"
+                                "$ref": "#/definitions/dto.TripStatusReading"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3524,31 +3278,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.TripSummary"
+                            "$ref": "#/definitions/dto.TripSummary"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3629,25 +3383,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UsersResponse"
+                            "$ref": "#/definitions/dto.UsersResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3676,7 +3430,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserCreateRequest"
+                            "$ref": "#/definitions/dto.UserCreateRequest"
                         }
                     }
                 ],
@@ -3684,31 +3438,31 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3721,7 +3475,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Verifies the activation code submitted by the user.",
+                "description": "Verifies the activation code submitted by the user. code must be exactly 6 uppercase alphanumeric characters.",
                 "consumes": [
                     "application/json"
                 ],
@@ -3739,7 +3493,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CheckActivationCodeRequest"
+                            "$ref": "#/definitions/dto.CheckActivationCodeRequest"
                         }
                     }
                 ],
@@ -3750,19 +3504,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3790,13 +3544,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3827,7 +3581,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CreateDocumentRequest"
+                            "$ref": "#/definitions/dto.CreateDocumentRequest"
                         }
                     }
                 ],
@@ -3835,25 +3589,25 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3891,7 +3645,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CheckDocumentRequest"
+                            "$ref": "#/definitions/dto.CheckDocumentRequest"
                         }
                     }
                 ],
@@ -3902,25 +3656,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3951,7 +3705,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.GetUploadDocumentDataRequest"
+                            "$ref": "#/definitions/dto.GetUploadDocumentDataRequest"
                         }
                     }
                 ],
@@ -3959,25 +3713,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ImageUploadResponse"
+                            "$ref": "#/definitions/dto.ImageUploadResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4002,19 +3756,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserResponse"
+                            "$ref": "#/definitions/dto.UserResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4043,7 +3797,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserProfileUpdateRequest"
+                            "$ref": "#/definitions/dto.UserProfileUpdateRequest"
                         }
                     }
                 ],
@@ -4054,25 +3808,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4097,19 +3851,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ImageUploadResponse"
+                            "$ref": "#/definitions/dto.ImageUploadResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4143,31 +3897,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserResponse"
+                            "$ref": "#/definitions/dto.UserResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4202,25 +3956,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4256,7 +4010,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserUpdateRequest"
+                            "$ref": "#/definitions/dto.UserUpdateRequest"
                         }
                     }
                 ],
@@ -4267,25 +4021,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4319,31 +4073,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.DocumentsResponse"
+                            "$ref": "#/definitions/dto.DocumentsResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4448,7 +4202,7 @@ const docTemplate = `{
                     "101": {
                         "description": "Streamed WebSocket message format",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.CarFleetMessage"
+                            "$ref": "#/definitions/wsdto.CarFleetMessage"
                         }
                     },
                     "400": {
@@ -4491,7 +4245,7 @@ const docTemplate = `{
                     "101": {
                         "description": "Streamed WebSocket message format",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.CarStatusMessage"
+                            "$ref": "#/definitions/wsdto.CarStatusMessage"
                         }
                     },
                     "401": {
@@ -4531,7 +4285,7 @@ const docTemplate = `{
                     "101": {
                         "description": "Streamed WebSocket message format",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.CarTelemetryMessage"
+                            "$ref": "#/definitions/wsdto.CarTelemetryMessage"
                         }
                     },
                     "401": {
@@ -4571,7 +4325,7 @@ const docTemplate = `{
                     "101": {
                         "description": "Streamed WebSocket message format",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.TripLiveFeedMessage"
+                            "$ref": "#/definitions/wsdto.TripLiveFeedMessage"
                         }
                     },
                     "401": {
@@ -4611,7 +4365,7 @@ const docTemplate = `{
                     "101": {
                         "description": "WebSocket message (one-shot, then closes)",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.DocumentAnalyzedMessage"
+                            "$ref": "#/definitions/wsdto.DocumentAnalyzedMessage"
                         }
                     },
                     "400": {
@@ -4659,25 +4413,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZonesResponse"
+                            "$ref": "#/definitions/dto.ZonesResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4706,7 +4460,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZoneCreateRequest"
+                            "$ref": "#/definitions/dto.ZoneCreateRequest"
                         }
                     }
                 ],
@@ -4714,31 +4468,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4771,31 +4525,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZoneResponse"
+                            "$ref": "#/definitions/dto.ZoneResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4829,25 +4583,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4882,7 +4636,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZoneUpdateRequest"
+                            "$ref": "#/definitions/dto.ZoneUpdateRequest"
                         }
                     }
                 ],
@@ -4893,25 +4647,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4919,7 +4673,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.AccessTokenData": {
+        "dto.AccessTokenData": {
             "type": "object",
             "properties": {
                 "expiresIn": {
@@ -4930,15 +4684,15 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.AccessTokenResponse": {
+        "dto.AccessTokenResponse": {
             "type": "object",
             "properties": {
                 "accessToken": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.AccessTokenData"
+                    "$ref": "#/definitions/dto.AccessTokenData"
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Booking": {
+        "dto.Booking": {
             "type": "object",
             "properties": {
                 "carID": {
@@ -4960,7 +4714,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "pricingSnapshot": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingSnapshot"
+                    "$ref": "#/definitions/dto.PricingSnapshot"
                 },
                 "status": {
                     "type": "string"
@@ -4973,7 +4727,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.BookingCreateRequest": {
+        "dto.BookingCreateRequest": {
             "type": "object",
             "properties": {
                 "carID": {
@@ -4987,7 +4741,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.BookingStatusReading": {
+        "dto.BookingStatusReading": {
             "type": "object",
             "properties": {
                 "actorID": {
@@ -5016,7 +4770,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.BookingStatusUpdateRequest": {
+        "dto.BookingStatusUpdateRequest": {
             "type": "object",
             "properties": {
                 "reason": {
@@ -5027,7 +4781,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Car": {
+        "dto.Car": {
             "type": "object",
             "properties": {
                 "batteryLevel": {
@@ -5064,12 +4818,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "location": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.location"
+                    "$ref": "#/definitions/dto.location"
                 },
                 "mileageKm": {
                     "type": "integer"
                 },
-                "modelId": {
+                "modelID": {
                     "type": "string"
                 },
                 "notes": {
@@ -5078,7 +4832,7 @@ const docTemplate = `{
                 "status": {
                     "type": "string"
                 },
-                "telematicsId": {
+                "telemetryId": {
                     "type": "string"
                 },
                 "updatedAt": {
@@ -5090,60 +4844,34 @@ const docTemplate = `{
                 "yearManufactured": {
                     "type": "integer"
                 },
-                "zoneId": {
+                "zoneID": {
                     "type": "string"
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarBatteryHistoryResponse": {
+        "dto.CarCreateRequest": {
             "type": "object",
             "properties": {
-                "batteryHistory": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarBatteryReading"
-                    }
-                }
-            }
-        },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarBatteryReading": {
-            "type": "object",
-            "properties": {
-                "actorId": {
-                    "type": "string"
-                },
-                "actorType": {
-                    "type": "string"
-                },
                 "batteryLevel": {
                     "type": "number"
                 },
-                "carID": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "metadata": {
-                    "type": "object",
-                    "additionalProperties": {}
-                },
-                "reason": {
-                    "type": "string"
-                },
-                "recordedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarCreateRequest": {
-            "type": "object",
-            "properties": {
                 "color": {
                     "type": "string"
                 },
+                "fuelLevel": {
+                    "type": "number"
+                },
+                "latitude": {
+                    "type": "number"
+                },
                 "licensePlate": {
                     "type": "string"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "mileageKm": {
+                    "type": "integer"
                 },
                 "modelID": {
                     "type": "string"
@@ -5151,7 +4879,7 @@ const docTemplate = `{
                 "notes": {
                     "type": "string"
                 },
-                "telematicsId": {
+                "telemetryId": {
                     "type": "string"
                 },
                 "vin": {
@@ -5159,54 +4887,13 @@ const docTemplate = `{
                 },
                 "yearManufactured": {
                     "type": "integer"
-                }
-            }
-        },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarFuelHistoryResponse": {
-            "type": "object",
-            "properties": {
-                "fuelHistory": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarFuelReading"
-                    }
-                }
-            }
-        },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarFuelReading": {
-            "type": "object",
-            "properties": {
-                "actorId": {
-                    "type": "string"
                 },
-                "actorType": {
-                    "type": "string"
-                },
-                "carID": {
-                    "type": "string"
-                },
-                "fuelPct": {
-                    "type": "number"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "metadata": {
-                    "type": "object",
-                    "additionalProperties": {}
-                },
-                "rawPct": {
-                    "type": "number"
-                },
-                "reason": {
-                    "type": "string"
-                },
-                "recordedAt": {
+                "zoneID": {
                     "type": "string"
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsurance": {
+        "dto.CarInsurance": {
             "type": "object",
             "properties": {
                 "carID": {
@@ -5253,7 +4940,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceCreateRequest": {
+        "dto.CarInsuranceCreateRequest": {
             "type": "object",
             "properties": {
                 "carID": {
@@ -5282,15 +4969,15 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceResponse": {
+        "dto.CarInsuranceResponse": {
             "type": "object",
             "properties": {
                 "insurance": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsurance"
+                    "$ref": "#/definitions/dto.CarInsurance"
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsuranceUpdateRequest": {
+        "dto.CarInsuranceUpdateRequest": {
             "type": "object",
             "properties": {
                 "costTenge": {
@@ -5322,59 +5009,18 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsurancesResponse": {
+        "dto.CarInsurancesResponse": {
             "type": "object",
             "properties": {
                 "insurances": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarInsurance"
+                        "$ref": "#/definitions/dto.CarInsurance"
                     }
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarLocationHistoryResponse": {
-            "type": "object",
-            "properties": {
-                "locationHistory": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarLocationReading"
-                    }
-                }
-            }
-        },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarLocationReading": {
-            "type": "object",
-            "properties": {
-                "actorId": {
-                    "type": "string"
-                },
-                "actorType": {
-                    "type": "string"
-                },
-                "carID": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "location": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.location"
-                },
-                "metadata": {
-                    "type": "object",
-                    "additionalProperties": {}
-                },
-                "reason": {
-                    "type": "string"
-                },
-                "recordedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceRecord": {
+        "dto.CarMaintenanceRecord": {
             "type": "object",
             "properties": {
                 "assignedTo": {
@@ -5401,11 +5047,11 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "mileageAtWarningKm": {
+                    "type": "integer"
+                },
                 "notes": {
                     "type": "string"
-                },
-                "odometerAt": {
-                    "type": "integer"
                 },
                 "receiptImageStorageUrls": {
                     "type": "array",
@@ -5421,7 +5067,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceRecordCompleteRequest": {
+        "dto.CarMaintenanceRecordCompleteRequest": {
             "type": "object",
             "properties": {
                 "completedKm": {
@@ -5441,18 +5087,18 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceRecordsResponse": {
+        "dto.CarMaintenanceRecordsResponse": {
             "type": "object",
             "properties": {
                 "records": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceRecord"
+                        "$ref": "#/definitions/dto.CarMaintenanceRecord"
                     }
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplate": {
+        "dto.CarMaintenanceTemplate": {
             "type": "object",
             "properties": {
                 "dayInterval": {
@@ -5478,7 +5124,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateCreateRequest": {
+        "dto.CarMaintenanceTemplateCreateRequest": {
             "type": "object",
             "properties": {
                 "dayInterval": {
@@ -5501,15 +5147,15 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateItemResponse": {
+        "dto.CarMaintenanceTemplateItemResponse": {
             "type": "object",
             "properties": {
                 "template": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplate"
+                    "$ref": "#/definitions/dto.CarMaintenanceTemplate"
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateUpdateRequest": {
+        "dto.CarMaintenanceTemplateUpdateRequest": {
             "type": "object",
             "properties": {
                 "dayInterval": {
@@ -5532,59 +5178,18 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplatesResponse": {
+        "dto.CarMaintenanceTemplatesResponse": {
             "type": "object",
             "properties": {
                 "templates": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMaintenanceTemplate"
+                        "$ref": "#/definitions/dto.CarMaintenanceTemplate"
                     }
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMileageHistoryResponse": {
-            "type": "object",
-            "properties": {
-                "mileageHistory": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMileageReading"
-                    }
-                }
-            }
-        },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarMileageReading": {
-            "type": "object",
-            "properties": {
-                "actorId": {
-                    "type": "string"
-                },
-                "actorType": {
-                    "type": "string"
-                },
-                "carID": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "metadata": {
-                    "type": "object",
-                    "additionalProperties": {}
-                },
-                "mileageKm": {
-                    "type": "integer"
-                },
-                "reason": {
-                    "type": "string"
-                },
-                "recordedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModel": {
+        "dto.CarModel": {
             "type": "object",
             "properties": {
                 "bodyType": {
@@ -5640,7 +5245,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelCreateRequest": {
+        "dto.CarModelCreateRequest": {
             "type": "object",
             "properties": {
                 "bodyType": {
@@ -5664,12 +5269,6 @@ const docTemplate = `{
                 "fuelType": {
                     "type": "string"
                 },
-                "imageStorageKeys": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
                 "model": {
                     "type": "string"
                 },
@@ -5687,15 +5286,15 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelGetResponse": {
+        "dto.CarModelGetResponse": {
             "type": "object",
             "properties": {
                 "carModel": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModel"
+                    "$ref": "#/definitions/dto.CarModel"
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelUpdateRequest": {
+        "dto.CarModelUpdateRequest": {
             "type": "object",
             "properties": {
                 "bodyType": {
@@ -5742,49 +5341,46 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModelsResponse": {
+        "dto.CarModelsResponse": {
             "type": "object",
             "properties": {
                 "carModels": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarModel"
+                        "$ref": "#/definitions/dto.CarModel"
                     }
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarResponse": {
+        "dto.CarResponse": {
             "type": "object",
             "properties": {
                 "car": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Car"
+                    "$ref": "#/definitions/dto.Car"
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarStatusHistoryResponse": {
+        "dto.CarStatusHistoryResponse": {
             "type": "object",
             "properties": {
                 "statusHistory": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarStatusReading"
+                        "$ref": "#/definitions/dto.CarStatusReading"
                     }
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarStatusReading": {
+        "dto.CarStatusReading": {
             "type": "object",
             "properties": {
-                "actorId": {
+                "actorID": {
                     "type": "string"
                 },
                 "actorType": {
                     "type": "string"
                 },
                 "carID": {
-                    "type": "string"
-                },
-                "changedAt": {
                     "type": "string"
                 },
                 "fromStatus": {
@@ -5800,12 +5396,15 @@ const docTemplate = `{
                 "reason": {
                     "type": "string"
                 },
+                "recordedAt": {
+                    "type": "string"
+                },
                 "toStatus": {
                     "type": "string"
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarStatusUpdateRequest": {
+        "dto.CarStatusUpdateRequest": {
             "type": "object",
             "properties": {
                 "metadata": {
@@ -5820,7 +5419,60 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarTelemetryUpdateRequest": {
+        "dto.CarTelemetryHistoryResponse": {
+            "type": "object",
+            "properties": {
+                "telemetryHistory": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.CarTelemetryReading"
+                    }
+                }
+            }
+        },
+        "dto.CarTelemetryReading": {
+            "type": "object",
+            "properties": {
+                "actorID": {
+                    "type": "string"
+                },
+                "actorType": {
+                    "type": "string"
+                },
+                "batteryLevel": {
+                    "type": "number"
+                },
+                "carID": {
+                    "type": "string"
+                },
+                "fuelPct": {
+                    "type": "number"
+                },
+                "fuelRawPct": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "location": {
+                    "$ref": "#/definitions/dto.location"
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {}
+                },
+                "mileageKm": {
+                    "type": "integer"
+                },
+                "reason": {
+                    "type": "string"
+                },
+                "recordedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CarTelemetryUpdateRequest": {
             "type": "object",
             "properties": {
                 "batteryLevel": {
@@ -5847,7 +5499,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarUpdateRequest": {
+        "dto.CarUpdateRequest": {
             "type": "object",
             "properties": {
                 "color": {
@@ -5871,7 +5523,7 @@ const docTemplate = `{
                 "notes": {
                     "type": "string"
                 },
-                "telematicsId": {
+                "telemetryId": {
                     "type": "string"
                 },
                 "zoneID": {
@@ -5879,18 +5531,18 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CarsResponse": {
+        "dto.CarsResponse": {
             "type": "object",
             "properties": {
                 "cars": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Car"
+                        "$ref": "#/definitions/dto.Car"
                     }
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CheckActivationCodeRequest": {
+        "dto.CheckActivationCodeRequest": {
             "type": "object",
             "properties": {
                 "code": {
@@ -5898,7 +5550,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CheckDocumentRequest": {
+        "dto.CheckDocumentRequest": {
             "type": "object",
             "properties": {
                 "error": {
@@ -5909,7 +5561,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.CreateDocumentRequest": {
+        "dto.CreateDocumentRequest": {
             "type": "object",
             "properties": {
                 "imageType": {
@@ -5920,7 +5572,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.DependencyHealthResponse": {
+        "dto.DependencyHealthResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -5937,7 +5589,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Document": {
+        "dto.Document": {
             "type": "object",
             "properties": {
                 "createdAt": {
@@ -5966,18 +5618,18 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.DocumentsResponse": {
+        "dto.DocumentsResponse": {
             "type": "object",
             "properties": {
                 "documents": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Document"
+                        "$ref": "#/definitions/dto.Document"
                     }
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorDetail": {
+        "dto.ErrorDetail": {
             "type": "object",
             "properties": {
                 "message": {
@@ -5985,15 +5637,15 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorResponse": {
+        "dto.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ErrorDetail"
+                    "$ref": "#/definitions/dto.ErrorDetail"
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.GetUploadDocumentDataRequest": {
+        "dto.GetUploadDocumentDataRequest": {
             "type": "object",
             "properties": {
                 "imageType": {
@@ -6001,13 +5653,13 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.HealthResponse": {
+        "dto.HealthResponse": {
             "type": "object",
             "properties": {
                 "services": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ServiceHealthResponse"
+                        "$ref": "#/definitions/dto.ServiceHealthResponse"
                     }
                 },
                 "status": {
@@ -6015,7 +5667,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.IDResponse": {
+        "dto.IDResponse": {
             "type": "object",
             "properties": {
                 "id": {
@@ -6023,7 +5675,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ImageUploadData": {
+        "dto.ImageUploadData": {
             "type": "object",
             "properties": {
                 "objectKey": {
@@ -6034,15 +5686,15 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ImageUploadResponse": {
+        "dto.ImageUploadResponse": {
             "type": "object",
             "properties": {
                 "uploadData": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ImageUploadData"
+                    "$ref": "#/definitions/dto.ImageUploadData"
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.LoginRequest": {
+        "dto.LoginRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -6056,7 +5708,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRule": {
+        "dto.PricingRule": {
             "type": "object",
             "properties": {
                 "class": {
@@ -6103,7 +5755,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRuleCreateRequest": {
+        "dto.PricingRuleCreateRequest": {
             "type": "object",
             "properties": {
                 "class": {
@@ -6138,15 +5790,15 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRuleResponse": {
+        "dto.PricingRuleResponse": {
             "type": "object",
             "properties": {
                 "rule": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRule"
+                    "$ref": "#/definitions/dto.PricingRule"
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRuleUpdateRequest": {
+        "dto.PricingRuleUpdateRequest": {
             "type": "object",
             "properties": {
                 "class": {
@@ -6184,18 +5836,18 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRulesResponse": {
+        "dto.PricingRulesResponse": {
             "type": "object",
             "properties": {
                 "rules": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingRule"
+                        "$ref": "#/definitions/dto.PricingRule"
                     }
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingSnapshot": {
+        "dto.PricingSnapshot": {
             "type": "object",
             "properties": {
                 "freeMinutes": {
@@ -6218,7 +5870,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.RegisterRequest": {
+        "dto.RegisterRequest": {
             "type": "object",
             "properties": {
                 "birthDate": {
@@ -6244,13 +5896,13 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ServiceHealthResponse": {
+        "dto.ServiceHealthResponse": {
             "type": "object",
             "properties": {
                 "dependencies": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.DependencyHealthResponse"
+                        "$ref": "#/definitions/dto.DependencyHealthResponse"
                     }
                 },
                 "name": {
@@ -6267,7 +5919,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Trip": {
+        "dto.Trip": {
             "type": "object",
             "properties": {
                 "bookingID": {
@@ -6292,7 +5944,7 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "endLocation": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.location"
+                    "$ref": "#/definitions/dto.location"
                 },
                 "endMileageKM": {
                     "type": "integer"
@@ -6310,7 +5962,7 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "startLocation": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.location"
+                    "$ref": "#/definitions/dto.location"
                 },
                 "startMileageKM": {
                     "type": "integer"
@@ -6329,7 +5981,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.TripCancelRequest": {
+        "dto.TripCancelRequest": {
             "type": "object",
             "properties": {
                 "reason": {
@@ -6337,7 +5989,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.TripStartRequest": {
+        "dto.TripStartRequest": {
             "type": "object",
             "properties": {
                 "bookingID": {
@@ -6345,7 +5997,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.TripStatusReading": {
+        "dto.TripStatusReading": {
             "type": "object",
             "properties": {
                 "actorID": {
@@ -6374,7 +6026,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.TripSummary": {
+        "dto.TripSummary": {
             "type": "object",
             "properties": {
                 "baseCostTenge": {
@@ -6399,7 +6051,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "pricingSnapshot": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.PricingSnapshot"
+                    "$ref": "#/definitions/dto.PricingSnapshot"
                 },
                 "startedAt": {
                     "type": "string"
@@ -6412,7 +6064,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.User": {
+        "dto.User": {
             "type": "object",
             "properties": {
                 "birthDate": {
@@ -6441,12 +6093,6 @@ const docTemplate = `{
                 },
                 "lastName": {
                     "type": "string"
-                },
-                "passwordHash": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
                 },
                 "phoneNumber": {
                     "type": "string"
@@ -6465,7 +6111,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserCreateRequest": {
+        "dto.UserCreateRequest": {
             "type": "object",
             "properties": {
                 "birthDate": {
@@ -6491,7 +6137,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserProfileUpdateRequest": {
+        "dto.UserProfileUpdateRequest": {
             "type": "object",
             "properties": {
                 "birthDate": {
@@ -6517,15 +6163,15 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserResponse": {
+        "dto.UserResponse": {
             "type": "object",
             "properties": {
                 "user": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.User"
+                    "$ref": "#/definitions/dto.User"
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UserUpdateRequest": {
+        "dto.UserUpdateRequest": {
             "type": "object",
             "properties": {
                 "birthDate": {
@@ -6569,18 +6215,18 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.UsersResponse": {
+        "dto.UsersResponse": {
             "type": "object",
             "properties": {
                 "users": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.User"
+                        "$ref": "#/definitions/dto.User"
                     }
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Zone": {
+        "dto.Zone": {
             "type": "object",
             "properties": {
                 "boundary": {
@@ -6609,7 +6255,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZoneCreateRequest": {
+        "dto.ZoneCreateRequest": {
             "type": "object",
             "properties": {
                 "boundary": {
@@ -6626,15 +6272,15 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZoneResponse": {
+        "dto.ZoneResponse": {
             "type": "object",
             "properties": {
                 "zone": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Zone"
+                    "$ref": "#/definitions/dto.Zone"
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZoneUpdateRequest": {
+        "dto.ZoneUpdateRequest": {
             "type": "object",
             "properties": {
                 "boundary": {
@@ -6654,18 +6300,18 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.ZonesResponse": {
+        "dto.ZonesResponse": {
             "type": "object",
             "properties": {
                 "zones": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.Zone"
+                        "$ref": "#/definitions/dto.Zone"
                     }
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_http_dto.location": {
+        "dto.location": {
             "type": "object",
             "properties": {
                 "latitude": {
@@ -6676,18 +6322,18 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.CarFleetMessage": {
+        "wsdto.CarFleetMessage": {
             "type": "object",
             "properties": {
                 "cars": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.SlimCar"
+                        "$ref": "#/definitions/wsdto.SlimCar"
                     }
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.CarStatusMessage": {
+        "wsdto.CarStatusMessage": {
             "type": "object",
             "properties": {
                 "carID": {
@@ -6701,7 +6347,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.CarTelemetryMessage": {
+        "wsdto.CarTelemetryMessage": {
             "type": "object",
             "properties": {
                 "batteryLevel": {
@@ -6711,7 +6357,7 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "location": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.SlimCarLocation"
+                    "$ref": "#/definitions/wsdto.SlimCarLocation"
                 },
                 "mileageKm": {
                     "type": "integer"
@@ -6721,13 +6367,13 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.DocumentAnalyzedMessage": {
+        "wsdto.DocumentAnalyzedMessage": {
             "type": "object",
             "properties": {
                 "defects": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.DocumentDefect"
+                        "$ref": "#/definitions/wsdto.DocumentDefect"
                     }
                 },
                 "documentId": {
@@ -6738,7 +6384,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.DocumentDefect": {
+        "wsdto.DocumentDefect": {
             "type": "object",
             "properties": {
                 "description": {
@@ -6749,7 +6395,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.SlimCar": {
+        "wsdto.SlimCar": {
             "type": "object",
             "properties": {
                 "color": {
@@ -6765,7 +6411,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "location": {
-                    "$ref": "#/definitions/github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.SlimCarLocation"
+                    "$ref": "#/definitions/wsdto.SlimCarLocation"
                 },
                 "modelID": {
                     "type": "string"
@@ -6775,7 +6421,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.SlimCarLocation": {
+        "wsdto.SlimCarLocation": {
             "type": "object",
             "properties": {
                 "latitude": {
@@ -6786,7 +6432,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_sorawaslocked_car-rental-api-gateway_internal_adapter_websocket_dto.TripLiveFeedMessage": {
+        "wsdto.TripLiveFeedMessage": {
             "type": "object",
             "properties": {
                 "currentCostTenge": {

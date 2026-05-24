@@ -37,8 +37,8 @@ func RegisterCustomValidators(v *validator.Validate, log *slog.Logger) error {
 }
 
 func bookingStatusValidator(fl validator.FieldLevel) bool {
-	_, err := model.ParseBookingStatus(fl.Field().String())
-	return err == nil
+	_, ok := model.ParseBookingStatus(fl.Field().String())
+	return ok
 }
 
 func pricingRuleTypeValidator(fl validator.FieldLevel) bool {

@@ -34,12 +34,12 @@ func ValidateTransition(from, to BookingStatus) error {
 	return ErrInvalidTransition
 }
 
-func ParseBookingStatus(s string) (BookingStatus, error) {
+func ParseBookingStatus(s string) (BookingStatus, bool) {
 	switch BookingStatus(s) {
 	case BookingStatusCreated, BookingStatusExpired, BookingStatusCompleted, BookingStatusCancelled:
-		return BookingStatus(s), nil
+		return BookingStatus(s), true
 	default:
-		return "", ErrInvalidStatus
+		return "", false
 	}
 }
 

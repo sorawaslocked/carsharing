@@ -56,6 +56,8 @@ func validationError(fieldErr validator.FieldError) error {
 		return ErrNotAlphaNum
 	case "alphaunicode":
 		return ErrNotAlphaUnicode
+	case "len":
+		return fmt.Errorf("must be exactly %s characters", fieldErr.Param())
 	case "min":
 		return fmt.Errorf("must be at least %s", fieldErr.Param())
 	case "max":

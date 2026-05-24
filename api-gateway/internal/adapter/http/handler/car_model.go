@@ -23,7 +23,7 @@ func NewCarModelHandler(svc CarModelService, log *slog.Logger) *CarModelHandler 
 
 // Create (CarModel) godoc
 // @Summary      Create car model
-// @Description  Registers a new car model (e.g. Hyundai Solaris 2022). Returns the new model's UUID.
+// @Description  Registers a new car model (e.g. Hyundai Solaris 2022). Returns the new model's UUID. year min 1886; seats 1–9; engineVolume 0.1–28.5 L if provided; warnPct and pullPct are proportions 0.0–1.0 (not percent), pullPct must be ≥ warnPct.
 // @Tags         car-models
 // @Accept       json
 // @Produce      json
@@ -100,9 +100,9 @@ func (h *CarModelHandler) Get(ctx *gin.Context) {
 // @Param        brand         query     string   false  "Brand filter (e.g. Hyundai)"
 // @Param        model         query     string   false  "Model name filter"
 // @Param        fuelType      query     string   false  "Fuel type (petrol, diesel, electric, hybrid)"
-// @Param        transmission  query     string   false  "Transmission (automatic, manual)"
-// @Param        bodyType      query     string   false  "Body type (sedan, suv, hatchback…)"
-// @Param        class         query     string   false  "Class (economy, comfort, business)"
+// @Param        transmission  query     string   false  "Transmission (manual, auto)"
+// @Param        bodyType      query     string   false  "Body type (sedan, hatchback, suv, crossover, minivan, coupe, convertible, pickup)"
+// @Param        class         query     string   false  "Class (economy, compact, comfort, business, luxury)"
 // @Param        minSeats      query     integer  false  "Minimum seat count"
 // @Param        limit         query     integer  false  "Pagination limit"
 // @Param        offset        query     integer  false  "Pagination offset"

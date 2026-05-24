@@ -23,7 +23,7 @@ func NewCarMaintenanceHandler(svc CarMaintenanceService, log *slog.Logger) *CarM
 
 // CreateTemplate godoc
 // @Summary      Create maintenance template
-// @Description  Defines a recurring service interval (e.g. oil change every 8,000 km / 180 days).
+// @Description  Defines a recurring service interval (e.g. oil change every 8,000 km / 180 days). kmInterval min 100 km; dayInterval min 1 day; warnPct and pullPct are proportions 0.0–1.0 (not percent), pullPct must be ≥ warnPct.
 // @Tags         car-maintenance
 // @Accept       json
 // @Produce      json
@@ -210,8 +210,8 @@ func (h *CarMaintenanceHandler) DeleteTemplate(ctx *gin.Context) {
 // @Tags         car-maintenance
 // @Produce      json
 // @Security     BearerAuth
-// @Param        carID       query     string   false  "Filter by car UUID"
-// @Param        templateID  query     string   false  "Filter by template UUID"
+// @Param        carId       query     string   false  "Filter by car UUID"
+// @Param        templateId  query     string   false  "Filter by template UUID"
 // @Param        status      query     string   false  "Filter by status (pending, in_progress, completed)"
 // @Param        limit       query     integer  false  "Pagination limit"
 // @Param        offset      query     integer  false  "Pagination offset"

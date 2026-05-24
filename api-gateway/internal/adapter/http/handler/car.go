@@ -23,7 +23,7 @@ func NewCarHandler(svc CarService, log *slog.Logger) *CarHandler {
 
 // Create (Car) godoc
 // @Summary      Register a car in the fleet
-// @Description  Creates a new physical car record linked to a car model and telemetry device.
+// @Description  Creates a new physical car record linked to a car model and telemetry device. VIN must be exactly 17 alphanumeric characters. yearManufactured minimum 1886. fuelLevel and batteryLevel 0–100 if provided.
 // @Tags         cars
 // @Accept       json
 // @Produce      json
@@ -109,7 +109,7 @@ func (h *CarHandler) Get(ctx *gin.Context) {
 // @Param        radiusM       query     integer  false  "Search radius in metres"
 // @Param        zoneId        query     string   false  "Filter by zone UUID"
 // @Param        minFuelLevel  query     number   false  "Minimum fuel level (0–100)"
-// @Param        status        query     string   false  "Car status"
+// @Param        status        query     string   false  "Car status (available, reserved, in_use, maintenance, out_of_service)"
 // @Param        limit         query     integer  false  "Pagination limit"
 // @Param        offset        query     integer  false  "Pagination offset"
 // @Success      200           {object}  dto.CarsResponse
@@ -221,7 +221,7 @@ func (h *CarHandler) Delete(ctx *gin.Context) {
 
 // UpdateTelemetry (Car) godoc
 // @Summary      Update car telemetry (admin)
-// @Description  Records audited sensor readings (mileage, fuel, battery, location) for a car.
+// @Description  Records audited sensor readings (mileage, fuel, battery, location) for a car. mileageKm min 0; fuelLevel and batteryLevel 0–100 if provided; reason optional (1–500 chars).
 // @Tags         cars
 // @Accept       json
 // @Produce      json
@@ -264,7 +264,7 @@ func (h *CarHandler) UpdateTelemetry(ctx *gin.Context) {
 
 // UpdateStatus (Car) godoc
 // @Summary      Update car status (admin)
-// @Description  Records an audited operational status transition for a car.
+// @Description  Records an audited operational status transition for a car. status must be one of: available, reserved, in_use, maintenance, out_of_service. reason optional (1–500 chars).
 // @Tags         cars
 // @Accept       json
 // @Produce      json

@@ -40,25 +40,25 @@ func TestValidateTransition(t *testing.T) {
 
 func TestParseBookingStatus(t *testing.T) {
 	tests := []struct {
-		input   string
-		want    model.BookingStatus
-		wantErr error
+		input  string
+		want   model.BookingStatus
+		wantOk bool
 	}{
-		{"created", model.BookingStatusCreated, nil},
-		{"expired", model.BookingStatusExpired, nil},
-		{"completed", model.BookingStatusCompleted, nil},
-		{"cancelled", model.BookingStatusCancelled, nil},
-		{"", "", model.ErrInvalidStatus},
-		{"CREATED", "", model.ErrInvalidStatus},
-		{"Expired", "", model.ErrInvalidStatus},
-		{"unknown", "", model.ErrInvalidStatus},
+		{"created", model.BookingStatusCreated, true},
+		{"expired", model.BookingStatusExpired, true},
+		{"completed", model.BookingStatusCompleted, true},
+		{"cancelled", model.BookingStatusCancelled, true},
+		{"", "", false},
+		{"CREATED", "", false},
+		{"Expired", "", false},
+		{"unknown", "", false},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
-			got, err := model.ParseBookingStatus(tt.input)
-			if err != tt.wantErr {
-				t.Errorf("ParseBookingStatus(%q) error = %v, want %v", tt.input, err, tt.wantErr)
+			got, ok := model.ParseBookingStatus(tt.input)
+			if ok != tt.wantOk {
+				t.Errorf("ParseBookingStatus(%q) ok = %v, want %v", tt.input, ok, tt.wantOk)
 			}
 			if got != tt.want {
 				t.Errorf("ParseBookingStatus(%q) = %q, want %q", tt.input, got, tt.want)

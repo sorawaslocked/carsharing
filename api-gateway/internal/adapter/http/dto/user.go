@@ -38,7 +38,7 @@ type User struct {
 	FirstName       string  `json:"firstName"`
 	LastName        string  `json:"lastName"`
 	BirthDate       string  `json:"birthDate"`
-	PasswordHash    []byte  `json:"passwordHash"`
+	PasswordHash    []byte  `json:"-"`
 	ProfileImageURL *string `json:"profileImageURL"`
 
 	Roles              []string `json:"roles"`

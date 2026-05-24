@@ -1,4 +1,4 @@
-package dto
+package wsdto
 
 type SlimCarLocation struct {
 	Latitude  float64 `json:"latitude"`

@@ -223,7 +223,7 @@ func (h *UserHandler) Delete(c *gin.Context) {
 
 // Register godoc
 // @Summary      Register a new user
-// @Description  Creates a new user account. Returns the new user's ID.
+// @Description  Creates a new user account. Returns the new user's ID. password 8–20 chars with complexity requirements; passwordConfirmation must match password; birthDate must indicate age ≥ 18; phoneNumber in E.164 format if provided.
 // @Tags         auth
 // @Accept       json
 // @Produce      json
@@ -257,7 +257,7 @@ func (h *UserHandler) Register(c *gin.Context) {
 
 // SignIn godoc
 // @Summary      Sign in
-// @Description  Authenticates a user by email or phone + password. Returns an access token and sets an HttpOnly refresh token cookie.
+// @Description  Authenticates a user by email or phone + password. Returns an access token and sets an HttpOnly refresh token cookie. Exactly one of email or phoneNumber is required.
 // @Tags         auth
 // @Accept       json
 // @Produce      json
@@ -448,7 +448,7 @@ func (h *UserHandler) SendActivationCode(c *gin.Context) {
 
 // CheckActivationCode godoc
 // @Summary      Check activation code
-// @Description  Verifies the activation code submitted by the user.
+// @Description  Verifies the activation code submitted by the user. code must be exactly 6 uppercase alphanumeric characters.
 // @Tags         users
 // @Accept       json
 // @Produce      json

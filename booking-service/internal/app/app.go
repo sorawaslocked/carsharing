@@ -21,39 +21,38 @@ import (
 	pkgnats "carsharing/shared/pkg/nats"
 	pkgpostgres "carsharing/shared/pkg/postgres"
 
-	"github.com/jackc/pgx/v5/pgxpool"
-	natsgo "github.com/nats-io/nats.go"
 	"google.golang.org/grpc"
 )
 
 type App struct {
-	log            *slog.Logger
-	grpcServer     *grpc.Server
-	grpcAddr       string
-	pool           *pgxpool.Pool
-	publisherConn  *natsgo.Conn
-	subscriberConn *natsgo.Conn
-	cancel         context.CancelFunc
+	log        *slog.Logger
+	grpcServer *grpc.Server
+	grpcAddr   string
+	closer     closer
 }
 
 func New(log *slog.Logger, cfg config.Config) (*App, error) {
+	var cl closer
+
 	pool, err := pkgpostgres.NewPool(log, cfg.PG)
 	if err != nil {
 		return nil, fmt.Errorf("postgres: %w", err)
 	}
+	cl.add(pool.Close)
 
 	publisherConn, err := pkgnats.NewPublisher(log, cfg.NATSPublisher)
 	if err != nil {
-		pool.Close()
+		cl.closeAll()
 		return nil, fmt.Errorf("nats publisher: %w", err)
 	}
+	cl.add(publisherConn.Close)
 
 	subscriberConn, err := pkgnats.NewSubscriber(log, cfg.NATSSubscriber)
 	if err != nil {
-		pool.Close()
-		publisherConn.Close()
+		cl.closeAll()
 		return nil, fmt.Errorf("nats subscriber: %w", err)
 	}
+	cl.add(subscriberConn.Close)
 
 	bookingRepo := postgresadapter.NewBookingRepo(log, pool)
 	ruleRepo := postgresadapter.NewPricingRuleRepo(log, pool)
@@ -64,13 +63,11 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	ruleSvc := service.NewPricingRuleService(log, ruleRepo)
 
 	ctx, cancel := context.WithCancel(context.Background())
+	cl.add(cancel)
 
 	consumer := natsadapter.NewConsumer(log, subscriberConn, bookingSvc)
 	if err := consumer.Subscribe(ctx); err != nil {
-		cancel()
-		subscriberConn.Close()
-		publisherConn.Close()
-		pool.Close()
+		cl.closeAll()
 		return nil, fmt.Errorf("nats consumer: %w", err)
 	}
 
@@ -90,21 +87,15 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 		baseInterceptor, loggerInterceptor, authInterceptor,
 	)
 	if err != nil {
-		cancel()
-		subscriberConn.Close()
-		publisherConn.Close()
-		pool.Close()
+		cl.closeAll()
 		return nil, fmt.Errorf("grpc server: %w", err)
 	}
 
 	return &App{
-		log:            pkglog.WithComponent(log, "app"),
-		grpcServer:     grpcSrv,
-		grpcAddr:       fmt.Sprintf("%s:%d", cfg.GRPC.Host, cfg.GRPC.Port),
-		pool:           pool,
-		publisherConn:  publisherConn,
-		subscriberConn: subscriberConn,
-		cancel:         cancel,
+		log:        pkglog.WithComponent(log, "app"),
+		grpcServer: grpcSrv,
+		grpcAddr:   fmt.Sprintf("%s:%d", cfg.GRPC.Host, cfg.GRPC.Port),
+		closer:     cl,
 	}, nil
 }
 
@@ -146,14 +137,11 @@ func (a *App) stop() {
 
 	select {
 	case <-stopped:
-		a.log.Info("grpc server stopped gracefully")
+		a.log.Info("gRPC server stopped gracefully")
 	case <-time.After(15 * time.Second):
 		a.log.Warn("graceful stop timed out, forcing stop")
 		a.grpcServer.Stop()
 	}
 
-	a.cancel()
-	a.pool.Close()
-	a.publisherConn.Close()
-	a.subscriberConn.Close()
+	a.closer.closeAll()
 }

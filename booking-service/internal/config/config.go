@@ -11,7 +11,8 @@ import (
 )
 
 type Config struct {
-	Env            string                   `yaml:"env"             env:"ENV"  env-default:"local"`
+	Env            string                   `yaml:"env"             env:"ENV"      env-default:"local"`
+	Version        string                   `yaml:"version"         env:"VERSION"  env-default:"1.0.0"`
 	GRPC           pkggrpc.ServerConfig     `yaml:"grpc_server"`
 	PG             pkgpostgres.Config       `yaml:"postgres"`
 	NATSPublisher  pkgnats.PublisherConfig  `yaml:"nats_publisher"`

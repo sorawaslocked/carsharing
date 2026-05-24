@@ -23,7 +23,7 @@ func NewCarInsuranceHandler(svc CarInsuranceService, log *slog.Logger) *CarInsur
 
 // Create (CarInsurance) godoc
 // @Summary      Create car insurance record
-// @Description  Records an ОСАГО or КАСКО policy for a specific car.
+// @Description  Records an ОСАГО or КАСКО policy for a specific car. type must be osago or kasko; expiresAt must be after startsAt; costTenge min 0; provider and policyNum 1–100 chars.
 // @Tags         car-insurances
 // @Accept       json
 // @Produce      json
@@ -100,7 +100,7 @@ func (h *CarInsuranceHandler) Get(ctx *gin.Context) {
 // @Param        carID               query     string   false  "Filter by car UUID"
 // @Param        type                query     string   false  "Insurance type (osago, kasko)"
 // @Param        status              query     string   false  "Status (active, expired, cancelled)"
-// @Param        expiringWithinDays  query     integer  false  "Return policies expiring within N days"
+// @Param        expiringWithinDays  query     integer  false  "Return policies expiring within N days (1–365)"
 // @Param        limit               query     integer  false  "Pagination limit"
 // @Param        offset              query     integer  false  "Pagination offset"
 // @Success      200                 {object}  dto.CarInsurancesResponse

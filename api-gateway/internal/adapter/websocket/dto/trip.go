@@ -1,4 +1,4 @@
-package dto
+package wsdto
 
 type TripLiveFeedMessage struct {
 	ElapsedSeconds     int64   `json:"elapsedSeconds"`

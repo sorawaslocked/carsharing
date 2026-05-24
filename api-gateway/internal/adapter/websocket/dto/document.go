@@ -1,4 +1,4 @@
-package dto
+package wsdto
 
 type DocumentDefect struct {
 	Type        string `json:"type"`

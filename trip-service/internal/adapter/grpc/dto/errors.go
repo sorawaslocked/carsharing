@@ -24,9 +24,12 @@ func ToStatusError(err error) error {
 		return status.Error(codes.Unauthenticated, err.Error())
 	case errors.Is(err, model.ErrInsufficientPermissions):
 		return status.Error(codes.PermissionDenied, err.Error())
+	case errors.Is(err, model.ErrConflict):
+		return status.Error(codes.Aborted, err.Error())
 	case errors.Is(err, model.ErrBookingNotCreated),
 		errors.Is(err, model.ErrInvalidTripStatusTransition),
-		errors.Is(err, model.ErrTripNotActive):
+		errors.Is(err, model.ErrTripNotActive),
+		errors.Is(err, model.ErrTripNotCompleted):
 		return status.Error(codes.FailedPrecondition, err.Error())
 	default:
 		return status.Error(codes.Internal, "internal server error")

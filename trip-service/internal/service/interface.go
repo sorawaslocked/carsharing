@@ -6,6 +6,10 @@ import (
 	"carsharing/trip-service/internal/model"
 )
 
+type Transactor interface {
+	InTx(ctx context.Context, fn func(ctx context.Context) error) error
+}
+
 type TripRepository interface {
 	Create(ctx context.Context, trip model.TripCreate) (model.Trip, error)
 	GetByID(ctx context.Context, id string) (model.Trip, error)

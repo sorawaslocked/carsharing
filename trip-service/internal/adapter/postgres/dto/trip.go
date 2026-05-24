@@ -135,11 +135,9 @@ func BuildTripWhereClauses(f model.TripFilter, b *ArgsBuilder) []string {
 	if f.Status != nil {
 		clauses = append(clauses, fmt.Sprintf("status = %s", b.Add(f.Status.String())))
 	}
-	if f.StartedAfter != nil {
-		clauses = append(clauses, fmt.Sprintf("started_at >= %s", b.Add(*f.StartedAfter)))
-	}
-	if f.StartedBefore != nil {
-		clauses = append(clauses, fmt.Sprintf("started_at <= %s", b.Add(*f.StartedBefore)))
+	if f.TimeRange != nil {
+		clauses = append(clauses, fmt.Sprintf("started_at >= %s", b.Add(f.TimeRange.From)))
+		clauses = append(clauses, fmt.Sprintf("started_at <= %s", b.Add(f.TimeRange.To)))
 	}
 	return clauses
 }

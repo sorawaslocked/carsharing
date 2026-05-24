@@ -46,6 +46,12 @@ func newDeps(t *testing.T) *deps {
 	}
 }
 
+type passThroughTransactor struct{}
+
+func (p *passThroughTransactor) InTx(ctx context.Context, fn func(context.Context) error) error {
+	return fn(ctx)
+}
+
 func newService(t *testing.T, d *deps) *service.TripService {
 	t.Helper()
 	v := validator.New()
@@ -53,6 +59,7 @@ func newService(t *testing.T, d *deps) *service.TripService {
 	return service.NewTripService(
 		slog.New(slog.NewTextHandler(io.Discard, nil)),
 		v,
+		&passThroughTransactor{},
 		d.tripRepo,
 		d.summaryRepo,
 		d.statusRepo,

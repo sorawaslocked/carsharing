@@ -35,7 +35,7 @@ func (r *TripStatusReadingRepo) Create(ctx context.Context, reading model.TripSt
 		) VALUES ($1, $2, $3, $4, $5, $6, $7)
 		RETURNING id, trip_id, from_status, to_status, actor_type, actor_id, reason, changed_at`
 
-	result, err := dto.ScanTripStatusReading(r.pool.QueryRow(ctx, q,
+	result, err := dto.ScanTripStatusReading(dbFromCtx(ctx, r.pool).QueryRow(ctx, q,
 		reading.TripID,
 		reading.FromStatus.String(), reading.ToStatus.String(),
 		string(reading.ActorType),
@@ -65,7 +65,7 @@ func (r *TripStatusReadingRepo) List(ctx context.Context, filter model.TripStatu
 		pagination,
 	)
 
-	rows, err := r.pool.Query(ctx, q, b.Args...)
+	rows, err := dbFromCtx(ctx, r.pool).Query(ctx, q, b.Args...)
 	if err != nil {
 		log.Error("listing status readings", pkglog.Err(err))
 		return nil, model.ErrSQL

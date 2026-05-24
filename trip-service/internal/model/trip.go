@@ -83,13 +83,13 @@ type TripUpdate struct {
 	FinalCostTenge     *int32
 	CancelReason       *string
 	UpdatedAt          time.Time
+	ExpectedUpdatedAt  *time.Time
 }
 
 type TripFilter struct {
-	UserID        *string
-	CarID         *string
-	Status        *TripStatus
-	StartedAfter  *time.Time
-	StartedBefore *time.Time
-	Pagination    *sharedmodel.Pagination
+	UserID     *string
+	CarID      *string
+	Status     *TripStatus
+	TimeRange  *sharedmodel.TimeRange
+	Pagination *sharedmodel.Pagination
 }

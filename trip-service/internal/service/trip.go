@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"io"
 	"log/slog"
 	"time"
@@ -20,6 +21,7 @@ import (
 type TripService struct {
 	log         *slog.Logger
 	validate    *validator.Validate
+	transactor  Transactor
 	tripRepo    TripRepository
 	summaryRepo TripSummaryRepository
 	statusRepo  TripStatusReadingRepository
@@ -31,6 +33,7 @@ type TripService struct {
 func NewTripService(
 	log *slog.Logger,
 	validate *validator.Validate,
+	transactor Transactor,
 	tripRepo TripRepository,
 	summaryRepo TripSummaryRepository,
 	statusRepo TripStatusReadingRepository,
@@ -41,6 +44,7 @@ func NewTripService(
 	return &TripService{
 		log:         pkglog.WithComponent(log, "service.TripService"),
 		validate:    validate,
+		transactor:  transactor,
 		tripRepo:    tripRepo,
 		summaryRepo: summaryRepo,
 		statusRepo:  statusRepo,
@@ -79,37 +83,39 @@ func (s *TripService) StartTrip(ctx context.Context, bookingID string) (string, 
 
 	now := time.Now()
 	tripID := uuid.New().String()
-
-	trip, err := s.tripRepo.Create(ctx, model.TripCreate{
-		ID:        tripID,
-		BookingID: bookingID,
-		UserID:    booking.UserID,
-		CarID:     booking.CarID,
-		Status:    model.TripStatusActive,
-		StartedAt: now,
-		StartLocation: sharedmodel.Location{
-			Latitude:  telemetry.Location.Latitude,
-			Longitude: telemetry.Location.Longitude,
-		},
-		StartMileageKM: telemetry.MileageKM,
-		StartFuelLevel: telemetry.FuelLevel,
-	})
-	if err != nil {
-		log.Error("repo: creating trip", pkglog.Err(err))
-		return "", err
-	}
-
 	actorID := booking.UserID
-	_, err = s.statusRepo.Create(ctx, model.TripStatusReadingCreate{
-		TripID:     tripID,
-		FromStatus: model.TripStatus(""),
-		ToStatus:   model.TripStatusActive,
-		ActorType:  sharedmodel.ActorTypeUser,
-		ActorID:    &actorID,
-		ChangedAt:  now,
-	})
-	if err != nil {
-		log.Error("repo: creating status reading", pkglog.Err(err))
+
+	var trip model.Trip
+	if err := s.transactor.InTx(ctx, func(ctx context.Context) error {
+		var e error
+		trip, e = s.tripRepo.Create(ctx, model.TripCreate{
+			ID:        tripID,
+			BookingID: bookingID,
+			UserID:    booking.UserID,
+			CarID:     booking.CarID,
+			Status:    model.TripStatusActive,
+			StartedAt: now,
+			StartLocation: sharedmodel.Location{
+				Latitude:  telemetry.Location.Latitude,
+				Longitude: telemetry.Location.Longitude,
+			},
+			StartMileageKM: telemetry.MileageKM,
+			StartFuelLevel: telemetry.FuelLevel,
+		})
+		if e != nil {
+			return e
+		}
+		_, e = s.statusRepo.Create(ctx, model.TripStatusReadingCreate{
+			TripID:     tripID,
+			FromStatus: model.TripStatus(""),
+			ToStatus:   model.TripStatusActive,
+			ActorType:  sharedmodel.ActorTypeUser,
+			ActorID:    &actorID,
+			ChangedAt:  now,
+		})
+		return e
+	}); err != nil {
+		log.Error("repo: starting trip", pkglog.Err(err))
 		return "", err
 	}
 
@@ -215,51 +221,53 @@ func (s *TripService) EndTrip(ctx context.Context, id string) error {
 	}
 	endMileage := telemetry.MileageKM
 
-	updatedTrip, err := s.tripRepo.Update(ctx, id, model.TripUpdate{
-		Status:             ptr(model.TripStatusCompleted),
-		EndedAt:            &now,
-		EndLocation:        &endLocation,
-		EndMileageKM:       &endMileage,
-		EndFuelLevel:       telemetry.FuelLevel,
-		DistanceTraveledKM: ptr(distanceKM),
-		DurationSeconds:    ptr(durationSeconds),
-		FinalCostTenge:     ptr(totalCost),
-		UpdatedAt:          now,
-	})
-	if err != nil {
-		log.Error("repo: updating trip", pkglog.Err(err))
-		return err
-	}
-
 	actorID := trip.UserID
-	_, err = s.statusRepo.Create(ctx, model.TripStatusReadingCreate{
-		TripID:     id,
-		FromStatus: model.TripStatusActive,
-		ToStatus:   model.TripStatusCompleted,
-		ActorType:  sharedmodel.ActorTypeUser,
-		ActorID:    &actorID,
-		ChangedAt:  now,
-	})
-	if err != nil {
-		log.Error("repo: creating status reading", pkglog.Err(err))
-		return err
-	}
-
-	_, err = s.summaryRepo.Create(ctx, model.TripSummaryCreate{
-		TripID:             id,
-		BookingID:          trip.BookingID,
-		StartedAt:          trip.StartedAt,
-		EndedAt:            now,
-		DurationSeconds:    durationSeconds,
-		DistanceTraveledKM: distanceKM,
-		PricingSnapshot:    booking.PricingSnapshot,
-		BaseCostTenge:      baseCost,
-		DistanceCostTenge:  distCost,
-		OvertimeCostTenge:  overtimeCost,
-		TotalCostTenge:     totalCost,
-	})
-	if err != nil {
-		log.Error("repo: creating trip summary", pkglog.Err(err))
+	var updatedTrip model.Trip
+	if err := s.transactor.InTx(ctx, func(ctx context.Context) error {
+		var e error
+		updatedTrip, e = s.tripRepo.Update(ctx, id, model.TripUpdate{
+			Status:             ptr(model.TripStatusCompleted),
+			EndedAt:            &now,
+			EndLocation:        &endLocation,
+			EndMileageKM:       &endMileage,
+			EndFuelLevel:       telemetry.FuelLevel,
+			DistanceTraveledKM: ptr(distanceKM),
+			DurationSeconds:    ptr(durationSeconds),
+			FinalCostTenge:     ptr(totalCost),
+			UpdatedAt:          now,
+			ExpectedUpdatedAt:  &trip.UpdatedAt,
+		})
+		if e != nil {
+			return e
+		}
+		if _, e = s.statusRepo.Create(ctx, model.TripStatusReadingCreate{
+			TripID:     id,
+			FromStatus: model.TripStatusActive,
+			ToStatus:   model.TripStatusCompleted,
+			ActorType:  sharedmodel.ActorTypeUser,
+			ActorID:    &actorID,
+			ChangedAt:  now,
+		}); e != nil {
+			return e
+		}
+		_, e = s.summaryRepo.Create(ctx, model.TripSummaryCreate{
+			TripID:             id,
+			BookingID:          trip.BookingID,
+			StartedAt:          trip.StartedAt,
+			EndedAt:            now,
+			DurationSeconds:    durationSeconds,
+			DistanceTraveledKM: distanceKM,
+			PricingSnapshot:    booking.PricingSnapshot,
+			BaseCostTenge:      baseCost,
+			DistanceCostTenge:  distCost,
+			OvertimeCostTenge:  overtimeCost,
+			TotalCostTenge:     totalCost,
+		})
+		return e
+	}); err != nil {
+		if !errors.Is(err, model.ErrConflict) {
+			log.Error("repo: ending trip", pkglog.Err(err))
+		}
 		return err
 	}
 
@@ -295,29 +303,34 @@ func (s *TripService) CancelTrip(ctx context.Context, id string, reason *string)
 	}
 
 	now := time.Now()
-
-	updatedTrip, err := s.tripRepo.Update(ctx, id, model.TripUpdate{
-		Status:       ptr(model.TripStatusCancelled),
-		CancelReason: reason,
-		UpdatedAt:    now,
-	})
-	if err != nil {
-		log.Error("repo: updating trip", pkglog.Err(err))
-		return err
-	}
-
 	actorID := trip.UserID
-	_, err = s.statusRepo.Create(ctx, model.TripStatusReadingCreate{
-		TripID:     id,
-		FromStatus: model.TripStatusActive,
-		ToStatus:   model.TripStatusCancelled,
-		ActorType:  sharedmodel.ActorTypeUser,
-		ActorID:    &actorID,
-		Reason:     reason,
-		ChangedAt:  now,
-	})
-	if err != nil {
-		log.Error("repo: creating status reading", pkglog.Err(err))
+
+	var updatedTrip model.Trip
+	if err := s.transactor.InTx(ctx, func(ctx context.Context) error {
+		var e error
+		updatedTrip, e = s.tripRepo.Update(ctx, id, model.TripUpdate{
+			Status:            ptr(model.TripStatusCancelled),
+			CancelReason:      reason,
+			UpdatedAt:         now,
+			ExpectedUpdatedAt: &trip.UpdatedAt,
+		})
+		if e != nil {
+			return e
+		}
+		_, e = s.statusRepo.Create(ctx, model.TripStatusReadingCreate{
+			TripID:     id,
+			FromStatus: model.TripStatusActive,
+			ToStatus:   model.TripStatusCancelled,
+			ActorType:  sharedmodel.ActorTypeUser,
+			ActorID:    &actorID,
+			Reason:     reason,
+			ChangedAt:  now,
+		})
+		return e
+	}); err != nil {
+		if !errors.Is(err, model.ErrConflict) {
+			log.Error("repo: cancelling trip", pkglog.Err(err))
+		}
 		return err
 	}
 
@@ -346,6 +359,10 @@ func (s *TripService) GetTripSummary(ctx context.Context, tripID string) (model.
 
 	if !isPrivileged(md.UserRoles) && (md.UserID == nil || trip.UserID != *md.UserID) {
 		return model.TripSummary{}, model.ErrInsufficientPermissions
+	}
+
+	if trip.Status != model.TripStatusCompleted {
+		return model.TripSummary{}, model.ErrTripNotCompleted
 	}
 
 	return s.summaryRepo.GetByTripID(ctx, tripID)
@@ -444,8 +461,14 @@ func tripFilter(filter validation.TripFilter) model.TripFilter {
 		mf.Status = &s
 	}
 	if filter.TimeRange != nil {
-		mf.StartedAfter = filter.TimeRange.From
-		mf.StartedBefore = filter.TimeRange.To
+		tr := sharedmodel.TimeRange{}
+		if filter.TimeRange.From != nil {
+			tr.From = *filter.TimeRange.From
+		}
+		if filter.TimeRange.To != nil {
+			tr.To = *filter.TimeRange.To
+		}
+		mf.TimeRange = &tr
 	}
 	mf.Pagination = &sharedmodel.Pagination{
 		Limit:  filter.Pagination.Limit,

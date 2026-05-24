@@ -42,7 +42,7 @@ func (r *TripSummaryRepo) Create(ctx context.Context, s model.TripSummaryCreate)
 		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 		RETURNING %s`, dto.TripSummaryColumns)
 
-	summary, err := dto.ScanTripSummary(r.pool.QueryRow(ctx, q,
+	summary, err := dto.ScanTripSummary(dbFromCtx(ctx, r.pool).QueryRow(ctx, q,
 		s.TripID, s.BookingID, s.StartedAt, s.EndedAt,
 		s.DurationSeconds, s.DistanceTraveledKM, snapJSON,
 		s.BaseCostTenge, s.DistanceCostTenge, s.OvertimeCostTenge, s.TotalCostTenge,
@@ -58,7 +58,7 @@ func (r *TripSummaryRepo) GetByTripID(ctx context.Context, tripID string) (model
 
 	q := fmt.Sprintf(`SELECT %s FROM trip_summaries WHERE trip_id = $1`, dto.TripSummaryColumns)
 
-	summary, err := dto.ScanTripSummary(r.pool.QueryRow(ctx, q, tripID))
+	summary, err := dto.ScanTripSummary(dbFromCtx(ctx, r.pool).QueryRow(ctx, q, tripID))
 	if err != nil {
 		return model.TripSummary{}, mapSQLError(log, err, "getting trip summary")
 	}

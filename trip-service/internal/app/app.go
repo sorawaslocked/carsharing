@@ -80,6 +80,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	}
 	cl.add(func() { _ = bookingConn.Close() })
 
+	transactor := postgres.NewTransactor(pool)
 	tripRepo := postgres.NewTripRepo(log, pool)
 	summaryRepo := postgres.NewTripSummaryRepo(log, pool)
 	statusRepo := postgres.NewTripStatusReadingRepo(log, pool)
@@ -88,7 +89,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	telematicsClient := client.NewTelematicsClient(log, carConn, streamConn)
 	publisher := natspub.NewPublisher(log, nc)
 
-	tripSvc := service.NewTripService(log, validate, tripRepo, summaryRepo, statusRepo, bookingClient, telematicsClient, publisher)
+	tripSvc := service.NewTripService(log, validate, transactor, tripRepo, summaryRepo, statusRepo, bookingClient, telematicsClient, publisher)
 
 	tripHandler := handler.NewTripHandler(log, tripSvc)
 	streamHandler := handler.NewTripStreamHandler(log, tripSvc)

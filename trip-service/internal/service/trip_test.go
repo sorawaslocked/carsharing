@@ -463,6 +463,7 @@ func TestTripService_GetTripSummary_Success(t *testing.T) {
 	svc := newService(t, d)
 	ctx := ctxOwner(testUserID)
 	trip := sampleActiveTrip()
+	trip.Status = model.TripStatusCompleted
 	summary := model.TripSummary{TripID: testTripID, BookingID: testBookingID}
 
 	d.tripRepo.EXPECT().GetByID(mock.Anything, testTripID).Return(trip, nil)
@@ -654,4 +655,78 @@ func TestTripService_StreamTripLiveFeed_EOFFromTelemetryIsClean(t *testing.T) {
 	err := svc.StreamTripLiveFeed(ctx, testTripID, func(model.TripLiveFeed) error { return nil })
 
 	assert.ErrorIs(t, err, io.EOF)
+}
+
+func TestTripService_StreamTripLiveFeed_TripCompletedMidStream(t *testing.T) {
+	d := newDeps(t)
+	svc := newService(t, d)
+	ctx := ctxOwner(testUserID)
+	trip := sampleActiveTrip()
+	completed := trip
+	completed.Status = model.TripStatusCompleted
+	booking := sampleBooking()
+
+	d.tripRepo.EXPECT().GetByID(mock.Anything, testTripID).Return(trip, nil).Once()
+	d.tripRepo.EXPECT().GetByID(mock.Anything, testTripID).Return(completed, nil).Once()
+	d.booking.EXPECT().GetBooking(mock.Anything, testBookingID).Return(booking, nil)
+	d.telematics.EXPECT().StreamTelemetry(mock.Anything, testCarID, mock.Anything).
+		Run(func(_ context.Context, _ string, fn func(model.CarTelemetry) error) {
+			tel := model.CarTelemetry{MileageKM: 1010, RecordedAt: trip.StartedAt.Add(5 * time.Minute)}
+			_ = fn(tel)
+		}).Return(io.EOF)
+
+	err := svc.StreamTripLiveFeed(ctx, testTripID, func(model.TripLiveFeed) error { return nil })
+
+	assert.ErrorIs(t, err, io.EOF)
+}
+
+// ── EndTrip (conflict) ────────────────────────────────────────────────────────
+
+func TestTripService_EndTrip_Conflict(t *testing.T) {
+	d := newDeps(t)
+	svc := newService(t, d)
+	ctx := ctxOwner(testUserID)
+	trip := sampleActiveTrip()
+	tel := sampleTelemetry()
+	booking := sampleBooking()
+
+	d.tripRepo.EXPECT().GetByID(mock.Anything, testTripID).Return(trip, nil)
+	d.telematics.EXPECT().GetLatestTelemetry(mock.Anything, testCarID).Return(tel, nil)
+	d.booking.EXPECT().GetBooking(mock.Anything, testBookingID).Return(booking, nil)
+	d.tripRepo.EXPECT().Update(mock.Anything, testTripID, mock.Anything).Return(model.Trip{}, model.ErrConflict)
+
+	err := svc.EndTrip(ctx, testTripID)
+
+	assert.ErrorIs(t, err, model.ErrConflict)
+}
+
+// ── CancelTrip (conflict) ─────────────────────────────────────────────────────
+
+func TestTripService_CancelTrip_Conflict(t *testing.T) {
+	d := newDeps(t)
+	svc := newService(t, d)
+	ctx := ctxOwner(testUserID)
+	trip := sampleActiveTrip()
+
+	d.tripRepo.EXPECT().GetByID(mock.Anything, testTripID).Return(trip, nil)
+	d.tripRepo.EXPECT().Update(mock.Anything, testTripID, mock.Anything).Return(model.Trip{}, model.ErrConflict)
+
+	err := svc.CancelTrip(ctx, testTripID, nil)
+
+	assert.ErrorIs(t, err, model.ErrConflict)
+}
+
+// ── GetTripSummary (not completed) ────────────────────────────────────────────
+
+func TestTripService_GetTripSummary_TripNotCompleted(t *testing.T) {
+	d := newDeps(t)
+	svc := newService(t, d)
+	ctx := ctxOwner(testUserID)
+	trip := sampleActiveTrip()
+
+	d.tripRepo.EXPECT().GetByID(mock.Anything, testTripID).Return(trip, nil)
+
+	_, err := svc.GetTripSummary(ctx, testTripID)
+
+	assert.ErrorIs(t, err, model.ErrTripNotCompleted)
 }

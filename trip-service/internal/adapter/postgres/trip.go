@@ -2,11 +2,13 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"strings"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	pkglog "carsharing/shared/pkg/log"
@@ -40,7 +42,7 @@ func (r *TripRepo) Create(ctx context.Context, trip model.TripCreate) (model.Tri
 		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 		RETURNING %s`, dto.TripColumns)
 
-	t, err := dto.ScanTrip(r.pool.QueryRow(ctx, q,
+	t, err := dto.ScanTrip(dbFromCtx(ctx, r.pool).QueryRow(ctx, q,
 		trip.ID, trip.BookingID, trip.UserID, trip.CarID, trip.Status.String(),
 		trip.StartedAt,
 		trip.StartLocation.Latitude, trip.StartLocation.Longitude,
@@ -58,7 +60,7 @@ func (r *TripRepo) GetByID(ctx context.Context, id string) (model.Trip, error) {
 
 	q := fmt.Sprintf(`SELECT %s FROM trips WHERE id = $1`, dto.TripColumns)
 
-	t, err := dto.ScanTrip(r.pool.QueryRow(ctx, q, id))
+	t, err := dto.ScanTrip(dbFromCtx(ctx, r.pool).QueryRow(ctx, q, id))
 	if err != nil {
 		return model.Trip{}, mapSQLError(log, err, "getting trip by id")
 	}
@@ -77,7 +79,7 @@ func (r *TripRepo) List(ctx context.Context, filter model.TripFilter) ([]model.T
 		dto.TripColumns, where, pagination,
 	)
 
-	rows, err := r.pool.Query(ctx, q, b.Args...)
+	rows, err := dbFromCtx(ctx, r.pool).Query(ctx, q, b.Args...)
 	if err != nil {
 		log.Error("listing trips", pkglog.Err(err))
 		return nil, model.ErrSQL
@@ -107,15 +109,26 @@ func (r *TripRepo) Update(ctx context.Context, id string, update model.TripUpdat
 	b := &dto.ArgsBuilder{}
 	setClauses := dto.BuildTripSetClauses(update, b)
 
+	whereClause := fmt.Sprintf("id = %s", b.Add(id))
+	if update.ExpectedUpdatedAt != nil {
+		whereClause += fmt.Sprintf(" AND updated_at = %s", b.Add(*update.ExpectedUpdatedAt))
+	}
+
 	q := fmt.Sprintf(
-		`UPDATE trips SET %s WHERE id = %s RETURNING %s`,
+		`UPDATE trips SET %s WHERE %s RETURNING %s`,
 		strings.Join(setClauses, ", "),
-		b.Add(id),
+		whereClause,
 		dto.TripColumns,
 	)
 
-	t, err := dto.ScanTrip(r.pool.QueryRow(ctx, q, b.Args...))
+	t, err := dto.ScanTrip(dbFromCtx(ctx, r.pool).QueryRow(ctx, q, b.Args...))
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			if update.ExpectedUpdatedAt != nil {
+				return model.Trip{}, model.ErrConflict
+			}
+			return model.Trip{}, model.ErrNotFound
+		}
 		return model.Trip{}, mapSQLError(log, err, "updating trip")
 	}
 	return t, nil

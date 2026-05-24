@@ -2,9 +2,10 @@ package dto
 
 import (
 	"carsharing/booking-service/internal/model"
-	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
-	basebookingpb "github.com/sorawaslocked/car-rental-protos/gen/base/booking"
-	servicebookingpb "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
+	basepb "carsharing/protos/gen/base"
+	basebookingpb "carsharing/protos/gen/base/booking"
+	servicebookingpb "carsharing/protos/gen/service/booking"
+	sharedmodel "carsharing/shared/model"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -58,7 +59,7 @@ func BookingListFilterFromProto(req *servicebookingpb.ListBookingsRequest) model
 		PricingRuleID: req.PricingRuleId,
 	}
 	if req.Pagination != nil {
-		filter.Pagination = model.Pagination{
+		filter.Pagination = sharedmodel.Pagination{
 			Limit:  req.Pagination.Limit,
 			Offset: req.Pagination.Offset,
 		}
@@ -79,7 +80,7 @@ func BookingStatusHistoryFilterFromProto(req *servicebookingpb.GetBookingStatusH
 		filter.To = &t
 	}
 	if req.Pagination != nil {
-		filter.Pagination = model.Pagination{
+		filter.Pagination = sharedmodel.Pagination{
 			Limit:  req.Pagination.Limit,
 			Offset: req.Pagination.Offset,
 		}

@@ -6,7 +6,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
+	tripsvc "carsharing/protos/gen/service/trip"
 
 	"carsharing/trip-service/internal/adapter/grpc/handler"
 	"carsharing/trip-service/internal/adapter/grpc/interceptor"

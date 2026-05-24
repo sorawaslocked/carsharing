@@ -2,8 +2,9 @@ package dto
 
 import (
 	"carsharing/booking-service/internal/model"
-	basebookingpb "github.com/sorawaslocked/car-rental-protos/gen/base/booking"
-	servicebookingpb "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
+	basebookingpb "carsharing/protos/gen/base/booking"
+	servicebookingpb "carsharing/protos/gen/service/booking"
+	sharedmodel "carsharing/shared/model"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -66,7 +67,7 @@ func PricingRuleListFilterFromProto(req *servicebookingpb.ListPricingRulesReques
 		IsActive: req.IsActive,
 	}
 	if req.Pagination != nil {
-		filter.Pagination = model.Pagination{
+		filter.Pagination = sharedmodel.Pagination{
 			Limit:  req.Pagination.Limit,
 			Offset: req.Pagination.Offset,
 		}

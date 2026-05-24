@@ -3,7 +3,7 @@ package dto
 import (
 	"carsharing/car-service/internal/model"
 
-	eventbooking "github.com/sorawaslocked/car-rental-protos/gen/event/booking"
+	eventbooking "carsharing/protos/gen/event/booking"
 )
 
 func BookingCreatedEventFromProto(e *eventbooking.BookingCreatedEvent) model.BookingCreatedEvent {

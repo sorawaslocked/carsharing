@@ -3,8 +3,8 @@ package dto
 import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	basepb "github.com/sorawaslocked/car-rental-protos/gen/base"
-	basetripmb "github.com/sorawaslocked/car-rental-protos/gen/base/trip"
+	basepb "carsharing/protos/gen/base"
+	basetripmb "carsharing/protos/gen/base/trip"
 
 	"carsharing/trip-service/internal/model"
 )

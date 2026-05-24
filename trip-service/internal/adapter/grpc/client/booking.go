@@ -6,8 +6,8 @@ import (
 
 	"google.golang.org/grpc"
 
-	basebookingpb "github.com/sorawaslocked/car-rental-protos/gen/base/booking"
-	bookingsvc "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
+	basebookingpb "carsharing/protos/gen/base/booking"
+	bookingsvc "carsharing/protos/gen/service/booking"
 
 	pkglog "carsharing/shared/pkg/log"
 	pkgutils "carsharing/shared/pkg/utils"

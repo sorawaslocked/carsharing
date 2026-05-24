@@ -10,7 +10,7 @@ import (
 	"carsharing/booking-service/internal/adapter/grpc/handler"
 	"carsharing/booking-service/internal/adapter/grpc/handler/mocks"
 	"carsharing/booking-service/internal/model"
-	servicebookingpb "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
+	servicebookingpb "carsharing/protos/gen/service/booking"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"

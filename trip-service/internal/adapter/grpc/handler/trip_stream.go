@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
+	tripsvc "carsharing/protos/gen/service/trip"
 
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/trip-service/internal/adapter/grpc/dto"

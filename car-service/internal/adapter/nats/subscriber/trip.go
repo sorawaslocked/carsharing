@@ -7,8 +7,8 @@ import (
 	natsdto "carsharing/car-service/internal/adapter/nats/dto"
 	pkglog "carsharing/shared/pkg/log"
 
+	eventtrip "carsharing/protos/gen/event/trip"
 	"github.com/nats-io/nats.go"
-	eventtrip "github.com/sorawaslocked/car-rental-protos/gen/event/trip"
 	"google.golang.org/protobuf/proto"
 )
 

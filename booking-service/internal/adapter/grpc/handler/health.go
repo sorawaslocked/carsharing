@@ -4,11 +4,11 @@ import (
 	"context"
 	"log/slog"
 
+	servicepb "carsharing/protos/gen/service"
+	servicebookingpb "carsharing/protos/gen/service/booking"
 	pkglog "carsharing/shared/pkg/log"
 	"github.com/jackc/pgx/v5/pgxpool"
 	natsgo "github.com/nats-io/nats.go"
-	servicepb "github.com/sorawaslocked/car-rental-protos/gen/service"
-	servicebookingpb "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

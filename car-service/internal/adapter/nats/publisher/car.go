@@ -8,8 +8,8 @@ import (
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 
+	eventcarpb "carsharing/protos/gen/event/car"
 	"github.com/nats-io/nats.go"
-	eventcarpb "github.com/sorawaslocked/car-rental-protos/gen/event/car"
 	"google.golang.org/protobuf/proto"
 )
 

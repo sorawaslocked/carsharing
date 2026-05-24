@@ -12,8 +12,8 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	protosvc "github.com/sorawaslocked/car-rental-protos/gen/service"
-	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
+	protosvc "carsharing/protos/gen/service"
+	tripsvc "carsharing/protos/gen/service/trip"
 
 	pkglog "carsharing/shared/pkg/log"
 )

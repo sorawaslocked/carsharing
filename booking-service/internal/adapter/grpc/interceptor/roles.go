@@ -1,8 +1,8 @@
 package interceptor
 
 import (
+	bookingpb "carsharing/protos/gen/service/booking"
 	sharedmodel "carsharing/shared/model"
-	bookingpb "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 )
 
 var bookingManagerRoles = []sharedmodel.Role{sharedmodel.RoleAdmin, sharedmodel.RoleBookingManager}

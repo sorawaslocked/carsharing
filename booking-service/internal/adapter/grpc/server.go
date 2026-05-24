@@ -5,8 +5,8 @@ import (
 
 	"carsharing/booking-service/internal/adapter/grpc/handler"
 	"carsharing/booking-service/internal/adapter/grpc/interceptor"
+	servicebookingpb "carsharing/protos/gen/service/booking"
 	pkggrpc "carsharing/shared/pkg/grpc"
-	servicebookingpb "github.com/sorawaslocked/car-rental-protos/gen/service/booking"
 	"google.golang.org/grpc"
 )
 

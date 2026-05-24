@@ -8,7 +8,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	eventtripmb "github.com/sorawaslocked/car-rental-protos/gen/event/trip"
+	eventtripmb "carsharing/protos/gen/event/trip"
 
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/trip-service/internal/model"

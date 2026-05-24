@@ -6,8 +6,8 @@ import (
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	basetripmb "github.com/sorawaslocked/car-rental-protos/gen/base/trip"
-	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
+	basetripmb "carsharing/protos/gen/base/trip"
+	tripsvc "carsharing/protos/gen/service/trip"
 
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/trip-service/internal/adapter/grpc/dto"

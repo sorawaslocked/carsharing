@@ -15,7 +15,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	tripsvc "github.com/sorawaslocked/car-rental-protos/gen/service/trip"
+	tripsvc "carsharing/protos/gen/service/trip"
 
 	"carsharing/trip-service/internal/adapter/grpc/handler"
 	handlermocks "carsharing/trip-service/internal/adapter/grpc/handler/mocks"

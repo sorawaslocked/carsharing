@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"carsharing/booking-service/internal/model"
+	eventbookingpb "carsharing/protos/gen/event/booking"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 	natsgo "github.com/nats-io/nats.go"
-	eventbookingpb "github.com/sorawaslocked/car-rental-protos/gen/event/booking"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

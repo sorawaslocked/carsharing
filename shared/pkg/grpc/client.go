@@ -90,7 +90,6 @@ func PingClient(ctx context.Context, log *slog.Logger, conn *grpc.ClientConn) (s
 			"checking grpc client health",
 			pkglog.Err(err),
 			slog.String("target", conn.Target()),
-			slog.String("status", convertHealthStatus(resp.Status)),
 		)
 
 		return "", ErrFailedConnection

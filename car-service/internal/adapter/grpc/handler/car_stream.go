@@ -14,6 +14,7 @@ import (
 	carsvc "carsharing/protos/gen/service/car"
 
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type CarStreamHandler struct {
@@ -64,17 +65,17 @@ func (h *CarStreamHandler) sendFilteredCars(req *carsvc.StreamCarsWithFilterRequ
 		return dto.FromErrorToStatusCode(err)
 	}
 
+	batch := make([]*basecar.SlimCar, 0, len(cars))
 	for _, c := range cars {
 		if req.MinFuelLevel != nil && (c.FuelLevel == nil || *c.FuelLevel < *req.MinFuelLevel) {
 			continue
 		}
+		batch = append(batch, dto.ToSlimCarProto(c))
+	}
 
-		if err := stream.Send(&carsvc.StreamCarsWithFilterResponse{
-			Car: []*basecar.SlimCar{dto.ToSlimCarProto(c)},
-		}); err != nil {
-			h.log.Error("failed to send car stream response", slog.String("error", err.Error()))
-			return err
-		}
+	if err := stream.Send(&carsvc.StreamCarsWithFilterResponse{Car: batch}); err != nil {
+		h.log.Error("failed to send car stream response", slog.String("error", err.Error()))
+		return err
 	}
 
 	return nil
@@ -92,6 +93,7 @@ func (h *CarStreamHandler) StreamCarTelemetry(req *carsvc.StreamCarTelemetryRequ
 		FuelLevel:    car.FuelLevel,
 		BatteryLevel: car.BatteryLevel,
 		MileageKm:    car.MileageKM,
+		RecordedAt:   timestamppb.New(car.LastSeenAt),
 	}
 	if car.Location.Latitude != 0 || car.Location.Longitude != 0 {
 		initial.Location = &base.Location{
@@ -116,6 +118,7 @@ func (h *CarStreamHandler) StreamCarTelemetry(req *carsvc.StreamCarTelemetryRequ
 				FuelLevel:    update.FuelLevel,
 				BatteryLevel: update.BatteryLevel,
 				MileageKm:    update.MileageKM,
+				RecordedAt:   timestamppb.New(update.RecordedAt),
 			}
 			if update.Latitude != 0 || update.Longitude != 0 {
 				resp.Location = &base.Location{

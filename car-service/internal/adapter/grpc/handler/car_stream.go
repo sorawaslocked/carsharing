@@ -103,10 +103,8 @@ func (h *CarStreamHandler) StreamCarTelemetry(req *carsvc.StreamCarTelemetryRequ
 		return err
 	}
 
-	ch, err := h.telemetrySubscriber.Subscribe(ctx, car)
-	if err != nil {
-		return dto.FromErrorToStatusCode(err)
-	}
+	ch, unsub := h.telemetrySubscriber.SubscribeUpdates(req.CarId)
+	defer unsub()
 
 	for {
 		select {

@@ -9,7 +9,7 @@ import (
 )
 
 type TelemetrySubscriber interface {
-	Subscribe(ctx context.Context, car model.Car) (<-chan model.TelemetryUpdate, error)
+	SubscribeUpdates(carID string) (<-chan model.TelemetryUpdate, func())
 }
 
 type Pinger interface {

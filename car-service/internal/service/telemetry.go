@@ -32,6 +32,10 @@ type TelemetryService struct {
 	totalStreams  atomic.Int32
 	activeStreams atomic.Int32
 	lastSeenAt    atomic.Pointer[time.Time]
+
+	subsMu sync.RWMutex
+	subs   map[string]map[uint64]chan model.TelemetryUpdate
+	subSeq atomic.Uint64
 }
 
 func NewTelemetryService(
@@ -49,6 +53,7 @@ func NewTelemetryService(
 		telemetryReadingRepo: telemetryReadingRepo,
 		carRepo:              carRepo,
 		stalenessThreshold:   stalenessThreshold,
+		subs:                 make(map[string]map[uint64]chan model.TelemetryUpdate),
 	}
 }
 
@@ -133,10 +138,41 @@ func (s *TelemetryService) OnCarCreated(car model.Car) {
 	}()
 }
 
-// Subscribe opens a live telemetry stream for a single car.
-// Used by the gRPC streaming handler which already holds the full car.
-func (s *TelemetryService) Subscribe(ctx context.Context, car model.Car) (<-chan model.TelemetryUpdate, error) {
-	return s.streamClient.Subscribe(ctx, car)
+// SubscribeUpdates registers a listener for live telemetry updates for carID.
+// Updates are fanned out from the single background stream maintained by TelemetryService.
+// The returned unsubscribe func must be called when the caller is done.
+func (s *TelemetryService) SubscribeUpdates(carID string) (<-chan model.TelemetryUpdate, func()) {
+	id := s.subSeq.Add(1)
+	ch := make(chan model.TelemetryUpdate, 16)
+
+	s.subsMu.Lock()
+	if s.subs[carID] == nil {
+		s.subs[carID] = make(map[uint64]chan model.TelemetryUpdate)
+	}
+	s.subs[carID][id] = ch
+	s.subsMu.Unlock()
+
+	return ch, func() {
+		s.subsMu.Lock()
+		if m, ok := s.subs[carID]; ok {
+			delete(m, id)
+			if len(m) == 0 {
+				delete(s.subs, carID)
+			}
+		}
+		s.subsMu.Unlock()
+	}
+}
+
+func (s *TelemetryService) fanOut(carID string, update model.TelemetryUpdate) {
+	s.subsMu.RLock()
+	defer s.subsMu.RUnlock()
+	for _, ch := range s.subs[carID] {
+		select {
+		case ch <- update:
+		default:
+		}
+	}
 }
 
 func (s *TelemetryService) subscribeToCarStream(ctx context.Context, car model.Car) {
@@ -163,6 +199,7 @@ func (s *TelemetryService) subscribeToCarStream(ctx context.Context, car model.C
 			if err := s.applyUpdate(ctx, log, update); err != nil {
 				log.Error("failed to apply telemetry update", pkglog.Err(err))
 			}
+			s.fanOut(update.CarID, update)
 		}
 		s.activeStreams.Add(-1)
 

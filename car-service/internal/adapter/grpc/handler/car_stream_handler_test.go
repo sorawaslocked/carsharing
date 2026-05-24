@@ -118,7 +118,7 @@ func TestStreamCarTelemetry(t *testing.T) {
 		ch <- model.TelemetryUpdate{MileageKM: updatedMileage}
 		close(ch)
 
-		sub.EXPECT().Subscribe(mock.Anything, mock.Anything).Return((<-chan model.TelemetryUpdate)(ch), nil)
+		sub.EXPECT().SubscribeUpdates(carID).Return((<-chan model.TelemetryUpdate)(ch), func() {})
 
 		err := h.StreamCarTelemetry(&carsvc.StreamCarTelemetryRequest{CarId: carID}, stream)
 		assert.NoError(t, err)
@@ -141,7 +141,7 @@ func TestStreamCarTelemetry(t *testing.T) {
 		assert.Equal(t, codes.NotFound, grpcCode(err))
 	})
 
-	t.Run("subscribe error is returned", func(t *testing.T) {
+	t.Run("closed channel causes normal exit", func(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
@@ -151,10 +151,13 @@ func TestStreamCarTelemetry(t *testing.T) {
 		stream := newStream[carsvc.StreamCarTelemetryResponse](ctx)
 
 		svc.EXPECT().Get(mock.Anything, carID).Return(model.Car{ID: carID}, nil)
-		sub.EXPECT().Subscribe(mock.Anything, mock.Anything).Return(nil, errInternal)
+
+		ch := make(chan model.TelemetryUpdate)
+		close(ch)
+		sub.EXPECT().SubscribeUpdates(carID).Return((<-chan model.TelemetryUpdate)(ch), func() {})
 
 		err := h.StreamCarTelemetry(&carsvc.StreamCarTelemetryRequest{CarId: carID}, stream)
-		assert.Equal(t, codes.Internal, grpcCode(err))
+		assert.NoError(t, err)
 	})
 
 	t.Run("context cancellation stops the stream", func(t *testing.T) {
@@ -168,7 +171,7 @@ func TestStreamCarTelemetry(t *testing.T) {
 		svc.EXPECT().Get(mock.Anything, carID).Return(model.Car{ID: carID}, nil)
 
 		ch := make(chan model.TelemetryUpdate)
-		sub.EXPECT().Subscribe(mock.Anything, mock.Anything).Return((<-chan model.TelemetryUpdate)(ch), nil)
+		sub.EXPECT().SubscribeUpdates(carID).Return((<-chan model.TelemetryUpdate)(ch), func() {})
 
 		cancel()
 		err := h.StreamCarTelemetry(&carsvc.StreamCarTelemetryRequest{CarId: carID}, stream)

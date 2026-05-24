@@ -3,8 +3,6 @@
 package mocks
 
 import (
-	context "context"
-
 	mock "github.com/stretchr/testify/mock"
 
 	model "carsharing/car-service/internal/model"
@@ -23,61 +21,62 @@ func (_m *MockTelemetrySubscriber) EXPECT() *MockTelemetrySubscriber_Expecter {
 	return &MockTelemetrySubscriber_Expecter{mock: &_m.Mock}
 }
 
-// Subscribe provides a mock function with given fields: ctx, car
-func (_m *MockTelemetrySubscriber) Subscribe(ctx context.Context, car model.Car) (<-chan model.TelemetryUpdate, error) {
-	ret := _m.Called(ctx, car)
+// SubscribeUpdates provides a mock function with given fields: carID
+func (_m *MockTelemetrySubscriber) SubscribeUpdates(carID string) (<-chan model.TelemetryUpdate, func()) {
+	ret := _m.Called(carID)
 
 	if len(ret) == 0 {
-		panic("no return value specified for Subscribe")
+		panic("no return value specified for SubscribeUpdates")
 	}
 
 	var r0 <-chan model.TelemetryUpdate
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.Car) (<-chan model.TelemetryUpdate, error)); ok {
-		return rf(ctx, car)
+	var r1 func()
+	if rf, ok := ret.Get(0).(func(string) (<-chan model.TelemetryUpdate, func())); ok {
+		return rf(carID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, model.Car) <-chan model.TelemetryUpdate); ok {
-		r0 = rf(ctx, car)
+	if rf, ok := ret.Get(0).(func(string) <-chan model.TelemetryUpdate); ok {
+		r0 = rf(carID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(<-chan model.TelemetryUpdate)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, model.Car) error); ok {
-		r1 = rf(ctx, car)
+	if rf, ok := ret.Get(1).(func(string) func()); ok {
+		r1 = rf(carID)
 	} else {
-		r1 = ret.Error(1)
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(func())
+		}
 	}
 
 	return r0, r1
 }
 
-// MockTelemetrySubscriber_Subscribe_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Subscribe'
-type MockTelemetrySubscriber_Subscribe_Call struct {
+// MockTelemetrySubscriber_SubscribeUpdates_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SubscribeUpdates'
+type MockTelemetrySubscriber_SubscribeUpdates_Call struct {
 	*mock.Call
 }
 
-// Subscribe is a helper method to define mock.On call
-//   - ctx context.Context
-//   - car model.Car
-func (_e *MockTelemetrySubscriber_Expecter) Subscribe(ctx interface{}, car interface{}) *MockTelemetrySubscriber_Subscribe_Call {
-	return &MockTelemetrySubscriber_Subscribe_Call{Call: _e.mock.On("Subscribe", ctx, car)}
+// SubscribeUpdates is a helper method to define mock.On call
+//   - carID string
+func (_e *MockTelemetrySubscriber_Expecter) SubscribeUpdates(carID interface{}) *MockTelemetrySubscriber_SubscribeUpdates_Call {
+	return &MockTelemetrySubscriber_SubscribeUpdates_Call{Call: _e.mock.On("SubscribeUpdates", carID)}
 }
 
-func (_c *MockTelemetrySubscriber_Subscribe_Call) Run(run func(ctx context.Context, car model.Car)) *MockTelemetrySubscriber_Subscribe_Call {
+func (_c *MockTelemetrySubscriber_SubscribeUpdates_Call) Run(run func(carID string)) *MockTelemetrySubscriber_SubscribeUpdates_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.Car))
+		run(args[0].(string))
 	})
 	return _c
 }
 
-func (_c *MockTelemetrySubscriber_Subscribe_Call) Return(_a0 <-chan model.TelemetryUpdate, _a1 error) *MockTelemetrySubscriber_Subscribe_Call {
+func (_c *MockTelemetrySubscriber_SubscribeUpdates_Call) Return(_a0 <-chan model.TelemetryUpdate, _a1 func()) *MockTelemetrySubscriber_SubscribeUpdates_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockTelemetrySubscriber_Subscribe_Call) RunAndReturn(run func(context.Context, model.Car) (<-chan model.TelemetryUpdate, error)) *MockTelemetrySubscriber_Subscribe_Call {
+func (_c *MockTelemetrySubscriber_SubscribeUpdates_Call) RunAndReturn(run func(string) (<-chan model.TelemetryUpdate, func())) *MockTelemetrySubscriber_SubscribeUpdates_Call {
 	_c.Call.Return(run)
 	return _c
 }

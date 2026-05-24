@@ -9,7 +9,9 @@ import (
 	"strings"
 	"time"
 
+	pgdto "carsharing/booking-service/internal/adapter/postgres/dto"
 	"carsharing/booking-service/internal/model"
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 
@@ -26,113 +28,37 @@ type pricingSnapshotJSON struct {
 	OvertimeRateTenge *int32  `json:"overtime_rate_tenge,omitempty"`
 }
 
-type BookingRepo struct {
-	log *slog.Logger
-	db  *pgxpool.Pool
+type rowScanner interface {
+	Scan(dest ...any) error
 }
 
-func NewBookingRepo(log *slog.Logger, db *pgxpool.Pool) *BookingRepo {
-	return &BookingRepo{
-		log: pkglog.WithComponent(log, "repo.BookingRepo"),
-		db:  db,
+type BookingRepository struct {
+	log  *slog.Logger
+	pool *pgxpool.Pool
+}
+
+func NewBookingRepository(log *slog.Logger, pool *pgxpool.Pool) *BookingRepository {
+	return &BookingRepository{
+		log:  pkglog.WithComponent(log, "adapter.postgres.BookingRepository"),
+		pool: pool,
 	}
 }
 
-func (r *BookingRepo) Create(ctx context.Context, data model.BookingCreate, expiresAt time.Time) (string, error) {
-	log := pkglog.WithMethod(r.log, "Create")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+const bookingSelect = `
+    SELECT id, user_id, car_id, committed_periods, status, pricing_rule_id, pricing_snapshot, expires_at, created_at, updated_at
+    FROM bookings`
 
-	var (
-		ratePerKM      *int32
-		freeMinutes    *int32
-		minCharge      *int32
-		overtimePolicy *string
-		overtimeRate   *int32
-		snap           pricingSnapshotJSON
-	)
-	err := r.db.QueryRow(ctx, `
-		SELECT rate_tenge, rate_per_km_tenge, free_minutes, min_charge_tenge, overtime_policy, overtime_rate_tenge
-		FROM pricing_rules WHERE id = $1 AND is_active = TRUE
-	`, data.PricingRuleID).Scan(
-		&snap.RateTenge, &ratePerKM, &freeMinutes,
-		&minCharge, &overtimePolicy, &overtimeRate,
-	)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return "", model.ErrNotFound
-	}
-	if err != nil {
-		log.Error("failed to fetch pricing rule for snapshot", pkglog.Err(err))
-		return "", model.ErrInternalServerError
-	}
-	snap.RatePerKMTenge = ratePerKM
-	snap.FreeMinutes = freeMinutes
-	snap.MinChargeTenge = minCharge
-	snap.OvertimePolicy = overtimePolicy
-	snap.OvertimeRateTenge = overtimeRate
-
-	snapJSON, err := json.Marshal(snap)
-	if err != nil {
-		log.Error("failed to marshal pricing snapshot", pkglog.Err(err))
-		return "", model.ErrInternalServerError
-	}
-
-	tx, err := r.db.Begin(ctx)
-	if err != nil {
-		log.Error("failed to begin transaction", pkglog.Err(err))
-		return "", model.ErrInternalServerError
-	}
-	defer func() { _ = tx.Rollback(ctx) }()
-
-	var id string
-	err = tx.QueryRow(ctx, `
-		INSERT INTO bookings (user_id, car_id, committed_periods, pricing_rule_id, pricing_snapshot, expires_at)
-		VALUES ($1, $2, $3, $4, $5, $6)
-		RETURNING id
-	`, data.UserID, data.CarID, data.CommittedPeriods, data.PricingRuleID, snapJSON, expiresAt).Scan(&id)
-	if err != nil {
-		log.Error("failed to insert booking", pkglog.Err(err))
-		return "", model.ErrInternalServerError
-	}
-
-	_, err = tx.Exec(ctx, `
-		INSERT INTO booking_status_history (booking_id, from_status, to_status, actor_type)
-		VALUES ($1, '', 'created', 'system')
-	`, id)
-	if err != nil {
-		log.Error("failed to insert initial status history", pkglog.Err(err))
-		return "", model.ErrInternalServerError
-	}
-
-	if err := tx.Commit(ctx); err != nil {
-		log.Error("failed to commit transaction", pkglog.Err(err))
-		return "", model.ErrInternalServerError
-	}
-
-	return id, nil
-}
-
-func (r *BookingRepo) GetByID(ctx context.Context, id string) (model.Booking, error) {
-	log := pkglog.WithMethod(r.log, "GetByID")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
-
+func scanBooking(rs rowScanner) (model.Booking, error) {
 	var b model.Booking
 	var statusStr string
 	var snapJSON []byte
 	var cp *int32
 
-	err := r.db.QueryRow(ctx, `
-		SELECT id, user_id, car_id, committed_periods, status, pricing_rule_id, pricing_snapshot, expires_at, created_at, updated_at
-		FROM bookings WHERE id = $1
-	`, id).Scan(
+	if err := rs.Scan(
 		&b.ID, &b.UserID, &b.CarID, &cp,
 		&statusStr, &b.PricingRuleID, &snapJSON, &b.ExpiresAt, &b.CreatedAt, &b.UpdatedAt,
-	)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return model.Booking{}, model.ErrNotFound
-	}
-	if err != nil {
-		log.Error("failed to query booking", pkglog.Err(err))
-		return model.Booking{}, model.ErrInternalServerError
+	); err != nil {
+		return model.Booking{}, err
 	}
 
 	b.Status = model.BookingStatus(statusStr)
@@ -140,8 +66,7 @@ func (r *BookingRepo) GetByID(ctx context.Context, id string) (model.Booking, er
 
 	var snap pricingSnapshotJSON
 	if err := json.Unmarshal(snapJSON, &snap); err != nil {
-		log.Error("failed to unmarshal pricing snapshot", pkglog.Err(err))
-		return model.Booking{}, model.ErrInternalServerError
+		return model.Booking{}, err
 	}
 	b.PricingSnapshot = model.PricingSnapshot{
 		RateTenge:         snap.RateTenge,
@@ -155,241 +80,232 @@ func (r *BookingRepo) GetByID(ctx context.Context, id string) (model.Booking, er
 	return b, nil
 }
 
-func (r *BookingRepo) List(ctx context.Context, filter model.BookingListFilter) ([]model.Booking, error) {
-	log := pkglog.WithMethod(r.log, "List")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+func (r *BookingRepository) Create(ctx context.Context, data model.BookingCreate, expiresAt time.Time) (string, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Create"), utils.MetadataFromCtx(ctx))
 
-	where := []string{"1=1"}
-	args := []any{}
-	idx := 1
+	var snap pricingSnapshotJSON
+	var ratePerKM, freeMinutes, minCharge, overtimeRate *int32
+	var overtimePolicy *string
 
-	if filter.UserID != nil {
-		where = append(where, fmt.Sprintf("user_id = $%d", idx))
-		args = append(args, *filter.UserID)
-		idx++
+	err := r.pool.QueryRow(ctx, `
+        SELECT rate_tenge, rate_per_km_tenge, free_minutes, min_charge_tenge, overtime_policy, overtime_rate_tenge
+        FROM pricing_rules WHERE id = $1 AND is_active = TRUE
+    `, data.PricingRuleID).Scan(
+		&snap.RateTenge, &ratePerKM, &freeMinutes,
+		&minCharge, &overtimePolicy, &overtimeRate,
+	)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return "", model.ErrPricingRuleNotFound
 	}
-	if filter.CarID != nil {
-		where = append(where, fmt.Sprintf("car_id = $%d", idx))
-		args = append(args, *filter.CarID)
-		idx++
+	if err != nil {
+		log.Error("fetching pricing rule for snapshot", pkglog.Err(err))
+		return "", model.ErrSql
 	}
-	if filter.Status != nil {
-		where = append(where, fmt.Sprintf("status = $%d", idx))
-		args = append(args, *filter.Status)
-		idx++
-	}
-	if filter.PricingRuleID != nil {
-		where = append(where, fmt.Sprintf("pricing_rule_id = $%d", idx))
-		args = append(args, *filter.PricingRuleID)
-		idx++
+	snap.RatePerKMTenge = ratePerKM
+	snap.FreeMinutes = freeMinutes
+	snap.MinChargeTenge = minCharge
+	snap.OvertimePolicy = overtimePolicy
+	snap.OvertimeRateTenge = overtimeRate
+
+	snapJSON, err := json.Marshal(snap)
+	if err != nil {
+		log.Error("marshaling pricing snapshot", pkglog.Err(err))
+		return "", model.ErrSql
 	}
 
-	query := fmt.Sprintf(`
-		SELECT id, user_id, car_id, committed_periods, status, pricing_rule_id, pricing_snapshot, expires_at, created_at, updated_at
-		FROM bookings WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d
-	`, strings.Join(where, " AND "), idx, idx+1)
+	tx, err := r.pool.Begin(ctx)
+	if err != nil {
+		log.Error("beginning transaction", pkglog.Err(err))
+		return "", model.ErrSqlTransaction
+	}
+	defer tx.Rollback(ctx)
 
+	var id string
+	err = tx.QueryRow(ctx, `
+        INSERT INTO bookings (user_id, car_id, committed_periods, pricing_rule_id, pricing_snapshot, expires_at)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING id
+    `, data.UserID, data.CarID, data.CommittedPeriods, data.PricingRuleID, snapJSON, expiresAt).Scan(&id)
+	if err != nil {
+		log.Error("inserting booking", pkglog.Err(err))
+		return "", model.ErrSql
+	}
+
+	if _, err = tx.Exec(ctx, `
+        INSERT INTO booking_status_history (booking_id, from_status, to_status, actor_type)
+        VALUES ($1, '', 'created', 'system')
+    `, id); err != nil {
+		log.Error("inserting initial status history", pkglog.Err(err))
+		return "", model.ErrSql
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		log.Error("committing transaction", pkglog.Err(err))
+		return "", model.ErrSqlTransaction
+	}
+
+	return id, nil
+}
+
+func (r *BookingRepository) GetByID(ctx context.Context, id string) (model.Booking, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "GetByID"), utils.MetadataFromCtx(ctx))
+
+	booking, err := scanBooking(r.pool.QueryRow(ctx, bookingSelect+" WHERE id = $1", id))
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return model.Booking{}, model.ErrBookingNotFound
+		}
+		log.Error("scanning booking", pkglog.Err(err))
+		return model.Booking{}, model.ErrSql
+	}
+	return booking, nil
+}
+
+func (r *BookingRepository) List(ctx context.Context, filter model.BookingListFilter) ([]model.Booking, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "List"), utils.MetadataFromCtx(ctx))
+
+	clauses, args, nextArg := pgdto.WhereClausesFromBookingListFilter(filter, nil, 1)
+
+	query := bookingSelect
+	if len(clauses) > 0 {
+		query += " WHERE " + strings.Join(clauses, " AND ")
+	}
+	query += fmt.Sprintf(" ORDER BY created_at DESC LIMIT $%d OFFSET $%d", nextArg, nextArg+1)
 	args = append(args, filter.Pagination.Limit, filter.Pagination.Offset)
 
-	rows, err := r.db.Query(ctx, query, args...)
+	rows, err := r.pool.Query(ctx, query, args...)
 	if err != nil {
-		log.Error("failed to list bookings", pkglog.Err(err))
-		return nil, model.ErrInternalServerError
+		log.Error("querying bookings", pkglog.Err(err))
+		return nil, model.ErrSql
 	}
 	defer rows.Close()
 
 	var bookings []model.Booking
 	for rows.Next() {
-		var b model.Booking
-		var statusStr string
-		var snapJSON []byte
-		var cp *int32
-
-		if err := rows.Scan(
-			&b.ID, &b.UserID, &b.CarID, &cp,
-			&statusStr, &b.PricingRuleID, &snapJSON, &b.ExpiresAt, &b.CreatedAt, &b.UpdatedAt,
-		); err != nil {
-			log.Error("failed to scan booking row", pkglog.Err(err))
-			return nil, model.ErrInternalServerError
+		booking, err := scanBooking(rows)
+		if err != nil {
+			log.Error("scanning booking row", pkglog.Err(err))
+			return nil, model.ErrSql
 		}
-
-		b.Status = model.BookingStatus(statusStr)
-		b.CommittedPeriods = cp
-
-		var snap pricingSnapshotJSON
-		if err := json.Unmarshal(snapJSON, &snap); err != nil {
-			log.Error("failed to unmarshal pricing snapshot", pkglog.Err(err))
-			return nil, model.ErrInternalServerError
-		}
-		b.PricingSnapshot = model.PricingSnapshot{
-			RateTenge:         snap.RateTenge,
-			RatePerKMTenge:    snap.RatePerKMTenge,
-			FreeMinutes:       snap.FreeMinutes,
-			MinChargeTenge:    snap.MinChargeTenge,
-			OvertimePolicy:    snap.OvertimePolicy,
-			OvertimeRateTenge: snap.OvertimeRateTenge,
-		}
-		bookings = append(bookings, b)
+		bookings = append(bookings, booking)
 	}
+
 	if err := rows.Err(); err != nil {
-		log.Error("rows iteration error", pkglog.Err(err))
-		return nil, model.ErrInternalServerError
+		log.Error("iterating booking rows", pkglog.Err(err))
+		return nil, model.ErrSql
 	}
 
 	return bookings, nil
 }
 
-func (r *BookingRepo) ListCreatedExpired(ctx context.Context, now time.Time) ([]model.Booking, error) {
-	log := pkglog.WithMethod(r.log, "ListCreatedExpired")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+func (r *BookingRepository) ListCreatedExpired(ctx context.Context, now time.Time) ([]model.Booking, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "ListCreatedExpired"), utils.MetadataFromCtx(ctx))
 
-	rows, err := r.db.Query(ctx, `
-		SELECT id, user_id, car_id, committed_periods, status, pricing_rule_id, pricing_snapshot, expires_at, created_at, updated_at
-		FROM bookings WHERE status = 'created' AND expires_at <= $1
-	`, now)
+	rows, err := r.pool.Query(ctx, bookingSelect+" WHERE status = 'created' AND expires_at <= $1", now)
 	if err != nil {
-		log.Error("failed to query expired bookings", pkglog.Err(err))
-		return nil, model.ErrInternalServerError
+		log.Error("querying expired bookings", pkglog.Err(err))
+		return nil, model.ErrSql
 	}
 	defer rows.Close()
 
 	var bookings []model.Booking
 	for rows.Next() {
-		var b model.Booking
-		var statusStr string
-		var snapJSON []byte
-		var cp *int32
-
-		if err := rows.Scan(
-			&b.ID, &b.UserID, &b.CarID, &cp,
-			&statusStr, &b.PricingRuleID, &snapJSON, &b.ExpiresAt, &b.CreatedAt, &b.UpdatedAt,
-		); err != nil {
-			log.Error("failed to scan expired booking row", pkglog.Err(err))
-			return nil, model.ErrInternalServerError
+		booking, err := scanBooking(rows)
+		if err != nil {
+			log.Error("scanning expired booking row", pkglog.Err(err))
+			return nil, model.ErrSql
 		}
-
-		b.Status = model.BookingStatus(statusStr)
-		b.CommittedPeriods = cp
-
-		var snap pricingSnapshotJSON
-		if err := json.Unmarshal(snapJSON, &snap); err != nil {
-			log.Error("failed to unmarshal pricing snapshot", pkglog.Err(err))
-			return nil, model.ErrInternalServerError
-		}
-		b.PricingSnapshot = model.PricingSnapshot{
-			RateTenge:         snap.RateTenge,
-			RatePerKMTenge:    snap.RatePerKMTenge,
-			FreeMinutes:       snap.FreeMinutes,
-			MinChargeTenge:    snap.MinChargeTenge,
-			OvertimePolicy:    snap.OvertimePolicy,
-			OvertimeRateTenge: snap.OvertimeRateTenge,
-		}
-		bookings = append(bookings, b)
+		bookings = append(bookings, booking)
 	}
+
 	if err := rows.Err(); err != nil {
-		log.Error("rows iteration error", pkglog.Err(err))
-		return nil, model.ErrInternalServerError
+		log.Error("iterating expired booking rows", pkglog.Err(err))
+		return nil, model.ErrSql
 	}
 
 	return bookings, nil
 }
 
-func (r *BookingRepo) UpdateStatus(ctx context.Context, id, toStatus, actorType string, actorID, reason *string) error {
-	log := pkglog.WithMethod(r.log, "UpdateStatus")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+func (r *BookingRepository) UpdateStatus(ctx context.Context, id string, status model.BookingStatus, actorType sharedmodel.ActorType, actorID *string, reason *string) error {
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "UpdateStatus"), utils.MetadataFromCtx(ctx))
 
-	tx, err := r.db.Begin(ctx)
+	tx, err := r.pool.Begin(ctx)
 	if err != nil {
-		log.Error("failed to begin transaction", pkglog.Err(err))
-		return model.ErrInternalServerError
+		log.Error("beginning transaction", pkglog.Err(err))
+		return model.ErrSqlTransaction
 	}
-	defer func() { _ = tx.Rollback(ctx) }()
+	defer tx.Rollback(ctx)
 
 	var fromStatus string
 	err = tx.QueryRow(ctx, `SELECT status FROM bookings WHERE id = $1 FOR UPDATE`, id).Scan(&fromStatus)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return model.ErrNotFound
+		return model.ErrBookingNotFound
 	}
 	if err != nil {
-		log.Error("failed to lock booking row", pkglog.Err(err))
-		return model.ErrInternalServerError
+		log.Error("locking booking row", pkglog.Err(err))
+		return model.ErrSql
 	}
 
-	if _, err = tx.Exec(ctx, `UPDATE bookings SET status = $1, updated_at = NOW() WHERE id = $2`, toStatus, id); err != nil {
-		log.Error("failed to update booking status", pkglog.Err(err))
-		return model.ErrInternalServerError
+	if _, err = tx.Exec(ctx, `UPDATE bookings SET status = $1, updated_at = NOW() WHERE id = $2`, status, id); err != nil {
+		log.Error("updating booking status", pkglog.Err(err))
+		return model.ErrSql
 	}
 
 	if _, err = tx.Exec(ctx, `
-		INSERT INTO booking_status_history (booking_id, from_status, to_status, actor_type, actor_id, reason)
-		VALUES ($1, $2, $3, $4, $5, $6)
-	`, id, fromStatus, toStatus, actorType, actorID, reason); err != nil {
-		log.Error("failed to insert status history entry", pkglog.Err(err))
-		return model.ErrInternalServerError
+        INSERT INTO booking_status_history (booking_id, from_status, to_status, actor_type, actor_id, reason)
+        VALUES ($1, $2, $3, $4, $5, $6)
+    `, id, fromStatus, status, actorType, actorID, reason); err != nil {
+		log.Error("inserting status history entry", pkglog.Err(err))
+		return model.ErrSql
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		log.Error("failed to commit transaction", pkglog.Err(err))
-		return model.ErrInternalServerError
+		log.Error("committing transaction", pkglog.Err(err))
+		return model.ErrSqlTransaction
 	}
 
 	return nil
 }
 
-func (r *BookingRepo) GetStatusHistory(ctx context.Context, filter model.BookingStatusHistoryFilter) ([]model.BookingStatusReading, error) {
-	log := pkglog.WithMethod(r.log, "GetStatusHistory")
-	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
+func (r *BookingRepository) GetStatusHistory(ctx context.Context, filter model.BookingStatusHistoryFilter) ([]model.BookingStatusReading, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "GetStatusHistory"), utils.MetadataFromCtx(ctx))
 
-	where := []string{"booking_id = $1"}
-	args := []any{filter.BookingID}
-	idx := 2
-
-	if filter.From != nil {
-		where = append(where, fmt.Sprintf("changed_at >= $%d", idx))
-		args = append(args, *filter.From)
-		idx++
-	}
-	if filter.To != nil {
-		where = append(where, fmt.Sprintf("changed_at <= $%d", idx))
-		args = append(args, *filter.To)
-		idx++
-	}
+	clauses, args, nextArg := pgdto.WhereClausesFromStatusHistoryFilter(filter, nil, 1)
 
 	query := fmt.Sprintf(`
-		SELECT id, booking_id, from_status, to_status, actor_type, actor_id, reason, changed_at
-		FROM booking_status_history WHERE %s ORDER BY changed_at ASC LIMIT $%d OFFSET $%d
-	`, strings.Join(where, " AND "), idx, idx+1)
+        SELECT id, booking_id, from_status, to_status, actor_type, actor_id, reason, changed_at
+        FROM booking_status_history WHERE %s ORDER BY changed_at ASC LIMIT $%d OFFSET $%d
+    `, strings.Join(clauses, " AND "), nextArg, nextArg+1)
 
 	args = append(args, filter.Pagination.Limit, filter.Pagination.Offset)
 
-	rows, err := r.db.Query(ctx, query, args...)
+	rows, err := r.pool.Query(ctx, query, args...)
 	if err != nil {
-		log.Error("failed to query status history", pkglog.Err(err))
-		return nil, model.ErrInternalServerError
+		log.Error("querying status history", pkglog.Err(err))
+		return nil, model.ErrSql
 	}
 	defer rows.Close()
 
 	var history []model.BookingStatusReading
 	for rows.Next() {
 		var reading model.BookingStatusReading
-		var actorID, reason *string
+		var actorType string
 
 		if err := rows.Scan(
 			&reading.ID, &reading.BookingID, &reading.FromStatus, &reading.ToStatus,
-			&reading.ActorType, &actorID, &reason, &reading.ChangedAt,
+			&actorType, &reading.ActorID, &reading.Reason, &reading.ChangedAt,
 		); err != nil {
-			log.Error("failed to scan status history row", pkglog.Err(err))
-			return nil, model.ErrInternalServerError
+			log.Error("scanning status history row", pkglog.Err(err))
+			return nil, model.ErrSql
 		}
 
-		reading.ActorID = actorID
-		reading.Reason = reason
-
+		reading.ActorType = sharedmodel.ActorType(actorType)
 		history = append(history, reading)
 	}
+
 	if err := rows.Err(); err != nil {
-		log.Error("rows iteration error", pkglog.Err(err))
-		return nil, model.ErrInternalServerError
+		log.Error("iterating status history rows", pkglog.Err(err))
+		return nil, model.ErrSql
 	}
 
 	return history, nil

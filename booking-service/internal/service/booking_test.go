@@ -216,7 +216,7 @@ func TestBookingService_Cancel_InvalidTransition(t *testing.T) {
 			err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), mocks.NewMockEventPublisher(t)).
 				Cancel(ctxAsUser("u-1"), "b-1", nil)
 
-			assert.ErrorIs(t, err, model.ErrInvalidTransition)
+			assert.ErrorIs(t, err, model.ErrInvalidBookingStatusTransition)
 		})
 	}
 }
@@ -284,7 +284,7 @@ func TestBookingService_Complete_InvalidTransition(t *testing.T) {
 	err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), mocks.NewMockEventPublisher(t)).
 		Complete(context.Background(), "b-1")
 
-	assert.ErrorIs(t, err, model.ErrInvalidTransition)
+	assert.ErrorIs(t, err, model.ErrInvalidBookingStatusTransition)
 }
 
 // --- UpdateStatus ---
@@ -309,7 +309,7 @@ func TestBookingService_UpdateStatus_InvalidStatusString(t *testing.T) {
 		mocks.NewMockEventPublisher(t),
 	).UpdateStatus(context.Background(), "b-1", "INVALID", nil)
 
-	assert.ErrorIs(t, err, model.ErrInvalidStatus)
+	assert.ErrorIs(t, err, model.ErrInvalidBookingStatus)
 }
 
 func TestBookingService_UpdateStatus_NotFound(t *testing.T) {
@@ -329,7 +329,7 @@ func TestBookingService_UpdateStatus_InvalidTransition(t *testing.T) {
 	err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), mocks.NewMockEventPublisher(t)).
 		UpdateStatus(context.Background(), "b-1", "cancelled", nil)
 
-	assert.ErrorIs(t, err, model.ErrInvalidTransition)
+	assert.ErrorIs(t, err, model.ErrInvalidBookingStatusTransition)
 }
 
 // --- GetStatusHistory ---

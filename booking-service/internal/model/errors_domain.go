@@ -16,7 +16,7 @@ var (
 	ErrCarModelNotFound    = errors.New("car model not found")
 	ErrZoneNotFound        = errors.New("zone not found")
 
-	ErrCarNotAvailable   = errors.New("car is not available for booking")
-	ErrInvalidTransition = errors.New("invalid booking status transition")
-	ErrInvalidStatus     = errors.New("invalid booking status")
+	ErrCarNotAvailable                = errors.New("car is not available for booking")
+	ErrInvalidBookingStatusTransition = errors.New("invalid booking status transition")
+	ErrInvalidBookingStatus           = errors.New("invalid booking status")
 )

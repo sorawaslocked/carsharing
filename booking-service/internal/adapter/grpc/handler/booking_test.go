@@ -142,7 +142,7 @@ func TestBookingHandler_CancelBooking_NotFound(t *testing.T) {
 
 func TestBookingHandler_CancelBooking_InvalidTransition(t *testing.T) {
 	svc := mocks.NewMockBookingService(t)
-	svc.EXPECT().Cancel(context.Background(), "b-1", (*string)(nil)).Return(model.ErrInvalidTransition)
+	svc.EXPECT().Cancel(context.Background(), "b-1", (*string)(nil)).Return(model.ErrInvalidBookingStatusTransition)
 
 	h := handler.NewBookingHandler(discardLogger(), svc)
 	_, err := h.CancelBooking(context.Background(), &servicebookingpb.CancelBookingRequest{Id: "b-1"})
@@ -168,7 +168,7 @@ func TestBookingHandler_UpdateBookingStatus_HappyPath(t *testing.T) {
 
 func TestBookingHandler_UpdateBookingStatus_InvalidStatus(t *testing.T) {
 	svc := mocks.NewMockBookingService(t)
-	svc.EXPECT().UpdateStatus(context.Background(), "b-1", "BOGUS", (*string)(nil)).Return(model.ErrInvalidStatus)
+	svc.EXPECT().UpdateStatus(context.Background(), "b-1", "BOGUS", (*string)(nil)).Return(model.ErrInvalidBookingStatus)
 
 	h := handler.NewBookingHandler(discardLogger(), svc)
 	_, err := h.UpdateBookingStatus(context.Background(), &servicebookingpb.UpdateBookingStatusRequest{
@@ -181,7 +181,7 @@ func TestBookingHandler_UpdateBookingStatus_InvalidStatus(t *testing.T) {
 
 func TestBookingHandler_UpdateBookingStatus_InvalidTransition(t *testing.T) {
 	svc := mocks.NewMockBookingService(t)
-	svc.EXPECT().UpdateStatus(context.Background(), "b-1", "cancelled", (*string)(nil)).Return(model.ErrInvalidTransition)
+	svc.EXPECT().UpdateStatus(context.Background(), "b-1", "cancelled", (*string)(nil)).Return(model.ErrInvalidBookingStatusTransition)
 
 	h := handler.NewBookingHandler(discardLogger(), svc)
 	_, err := h.UpdateBookingStatus(context.Background(), &servicebookingpb.UpdateBookingStatusRequest{

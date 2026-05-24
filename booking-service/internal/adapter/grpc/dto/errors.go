@@ -5,6 +5,7 @@ import (
 
 	"carsharing/booking-service/internal/model"
 	"carsharing/booking-service/internal/validation"
+
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -51,9 +52,9 @@ func ToStatusError(err error) error {
 	case errors.Is(err, model.ErrConflict):
 		return status.Error(codes.AlreadyExists, err.Error())
 	case errors.Is(err, model.ErrCarNotAvailable),
-		errors.Is(err, model.ErrInvalidTransition):
+		errors.Is(err, model.ErrInvalidBookingStatusTransition):
 		return status.Error(codes.FailedPrecondition, err.Error())
-	case errors.Is(err, model.ErrInvalidStatus):
+	case errors.Is(err, model.ErrInvalidBookingStatus):
 		return status.Error(codes.InvalidArgument, err.Error())
 	default:
 		return status.Error(codes.Internal, "something went wrong")

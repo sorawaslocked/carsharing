@@ -31,7 +31,7 @@ func ValidateTransition(from, to BookingStatus) error {
 			return nil
 		}
 	}
-	return ErrInvalidTransition
+	return ErrInvalidBookingStatusTransition
 }
 
 func ParseBookingStatus(s string) (BookingStatus, bool) {

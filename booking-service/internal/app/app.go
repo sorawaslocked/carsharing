@@ -63,8 +63,8 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 		return nil, fmt.Errorf("validator: %w", err)
 	}
 
-	bookingRepo := postgresadapter.NewBookingRepo(log, pool)
-	ruleRepo := postgresadapter.NewPricingRuleRepo(log, pool)
+	bookingRepo := postgresadapter.NewBookingRepository(log, pool)
+	ruleRepo := postgresadapter.NewPricingRuleRepository(log, pool)
 
 	publisher := natspub.NewBookingPublisher(log, publisherConn)
 

@@ -252,7 +252,7 @@ func (s *BookingService) UpdateStatus(ctx context.Context, id string, data valid
 
 	toStatus, ok := model.ParseBookingStatus(data.Status)
 	if !ok {
-		return model.ErrInvalidStatus
+		return model.ErrInvalidBookingStatus
 	}
 
 	booking, err := s.bookingRepo.GetByID(ctx, id)

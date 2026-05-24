@@ -97,7 +97,7 @@ func (h *ZoneHandler) Get(ctx *gin.Context) {
 // @Tags         zones
 // @Produce      json
 // @Security     BearerAuth
-// @Param        type      query     string   false  "Zone type (operating, no_drop, parking_hub, surcharge)"
+// @Param        type      query     string   false  "Zone type"  Enums(operating, no_drop, parking_hub, surcharge)
 // @Param        isActive  query     boolean  false  "Filter by active flag"
 // @Success      200       {object}  dto.ZonesResponse
 // @Failure      400       {object}  dto.ErrorResponse

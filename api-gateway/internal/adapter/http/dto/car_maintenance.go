@@ -33,7 +33,7 @@ type CarMaintenanceRecord struct {
 	ID                      string     `json:"id"`
 	CarID                   string     `json:"carID"`
 	TemplateID              string     `json:"templateID"`
-	Status                  string     `json:"status"`
+	Status                  string     `json:"status" validate:"oneof=pending in_progress completed"`
 	MileageAtWarningKM      int32      `json:"mileageAtWarningKm"`
 	CompletedKm             *int32     `json:"completedKm,omitempty"`
 	CostTenge               *int32     `json:"costTenge,omitempty"`
@@ -46,7 +46,7 @@ type CarMaintenanceRecord struct {
 }
 
 type CarMaintenanceTemplateCreateRequest struct {
-	Name        string  `json:"name"`
+	Name        string  `json:"name" binding:"required"`
 	KmInterval  *int32  `json:"kmInterval"`
 	DayInterval *int32  `json:"dayInterval"`
 	IsMandatory bool    `json:"isMandatory"`
@@ -64,8 +64,8 @@ type CarMaintenanceTemplateUpdateRequest struct {
 }
 
 type CarMaintenanceRecordCompleteRequest struct {
-	CompletedKm             int32    `json:"completedKm"`
-	CostTenge               int32    `json:"costTenge"`
+	CompletedKm             int32    `json:"completedKm" validate:"min=0"`
+	CostTenge               int32    `json:"costTenge" validate:"min=0"`
 	ReceiptImageStorageKeys []string `json:"receiptImageStorageKeys"`
 	Notes                   *string  `json:"notes"`
 }

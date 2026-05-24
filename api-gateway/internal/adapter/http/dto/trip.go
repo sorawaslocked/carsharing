@@ -12,7 +12,7 @@ type Trip struct {
 	BookingID string `json:"bookingID"`
 	UserID    string `json:"userID"`
 	CarID     string `json:"carID"`
-	Status    string `json:"status"`
+	Status    string `json:"status" validate:"oneof=active completed cancelled"`
 
 	StartedAt      time.Time `json:"startedAt"`
 	StartLocation  location  `json:"startLocation"`
@@ -53,16 +53,16 @@ type TripSummary struct {
 type TripStatusReading struct {
 	ID         string    `json:"id"`
 	TripID     string    `json:"tripID"`
-	FromStatus string    `json:"fromStatus"`
-	ToStatus   string    `json:"toStatus"`
-	ActorType  string    `json:"actorType"`
+	FromStatus string    `json:"fromStatus" validate:"oneof=active completed cancelled"`
+	ToStatus   string    `json:"toStatus" validate:"oneof=active completed cancelled"`
+	ActorType  string    `json:"actorType" validate:"oneof=user system telemetry"`
 	ActorID    *string   `json:"actorID,omitempty"`
 	Reason     *string   `json:"reason,omitempty"`
 	ChangedAt  time.Time `json:"changedAt"`
 }
 
 type TripStartRequest struct {
-	BookingID string `json:"bookingID"`
+	BookingID string `json:"bookingID" binding:"required"`
 }
 
 type TripCancelRequest struct {

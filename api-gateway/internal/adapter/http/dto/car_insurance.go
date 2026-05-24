@@ -19,13 +19,13 @@ type CarInsurancesResponse struct {
 type CarInsurance struct {
 	ID        string    `json:"id"`
 	CarID     string    `json:"carID"`
-	Type      string    `json:"type"`
+	Type      string    `json:"type" validate:"oneof=osago kasko"`
 	Provider  string    `json:"provider"`
 	PolicyNum string    `json:"policyNum"`
 	StartsAt  time.Time `json:"startsAt"`
 	ExpiresAt time.Time `json:"expiresAt"`
-	CostTenge int32     `json:"costTenge"`
-	Status    string    `json:"status"`
+	CostTenge int32     `json:"costTenge" validate:"min=0"`
+	Status    string    `json:"status" validate:"oneof=active expired cancelled"`
 	ImageURLs []string  `json:"imageURLs,omitempty"`
 	Notes     *string   `json:"notes,omitempty"`
 	CreatedAt time.Time `json:"createdAt"`
@@ -33,13 +33,13 @@ type CarInsurance struct {
 }
 
 type CarInsuranceCreateRequest struct {
-	CarID     string    `json:"carID"`
-	Type      string    `json:"type"`
-	Provider  string    `json:"provider"`
-	PolicyNum string    `json:"policyNum"`
-	StartsAt  time.Time `json:"startsAt"`
-	ExpiresAt time.Time `json:"expiresAt"`
-	CostTenge int32     `json:"costTenge"`
+	CarID     string    `json:"carID" binding:"required"`
+	Type      string    `json:"type" binding:"required,oneof=osago kasko"`
+	Provider  string    `json:"provider" binding:"required"`
+	PolicyNum string    `json:"policyNum" binding:"required"`
+	StartsAt  time.Time `json:"startsAt" binding:"required"`
+	ExpiresAt time.Time `json:"expiresAt" binding:"required"`
+	CostTenge int32     `json:"costTenge" validate:"min=0"`
 	Notes     *string   `json:"notes"`
 }
 
@@ -48,8 +48,8 @@ type CarInsuranceUpdateRequest struct {
 	PolicyNum *string    `json:"policyNum"`
 	StartsAt  *time.Time `json:"startsAt"`
 	ExpiresAt *time.Time `json:"expiresAt"`
-	CostTenge *int32     `json:"costTenge"`
-	Status    *string    `json:"status"`
+	CostTenge *int32     `json:"costTenge" validate:"omitempty,min=0"`
+	Status    *string    `json:"status" validate:"omitempty,oneof=active expired cancelled"`
 	ImageKeys []string   `json:"imageKeys"`
 	Notes     *string    `json:"notes"`
 }

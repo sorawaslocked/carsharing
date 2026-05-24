@@ -88,19 +88,19 @@ type UserProfileUpdateRequest struct {
 }
 
 type RegisterRequest struct {
-	Email                string  `json:"email"`
+	Email                string  `json:"email" binding:"required,email"`
 	PhoneNumber          *string `json:"phoneNumber"`
-	FirstName            string  `json:"firstName"`
-	LastName             string  `json:"lastName"`
-	BirthDate            string  `json:"birthDate"`
-	Password             string  `json:"password"`
-	PasswordConfirmation string  `json:"passwordConfirmation"`
+	FirstName            string  `json:"firstName" binding:"required"`
+	LastName             string  `json:"lastName" binding:"required"`
+	BirthDate            string  `json:"birthDate" binding:"required"`
+	Password             string  `json:"password" binding:"required"`
+	PasswordConfirmation string  `json:"passwordConfirmation" binding:"required"`
 }
 
 type LoginRequest struct {
 	Email       *string `json:"email"`
 	PhoneNumber *string `json:"phoneNumber"`
-	Password    string  `json:"password"`
+	Password    string  `json:"password" binding:"required"`
 }
 
 type Token struct {
@@ -109,7 +109,7 @@ type Token struct {
 }
 
 type CheckActivationCodeRequest struct {
-	Code string `json:"code"`
+	Code string `json:"code" binding:"required"`
 }
 
 func ToUserResponse(m model.User) User {

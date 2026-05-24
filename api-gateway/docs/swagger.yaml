@@ -135,6 +135,12 @@ definitions:
       notes:
         type: string
       status:
+        enum:
+        - available
+        - reserved
+        - in_use
+        - maintenance
+        - out_of_service
         type: string
       telemetryId:
         type: string
@@ -175,12 +181,20 @@ definitions:
         type: integer
       zoneID:
         type: string
+    required:
+    - color
+    - licensePlate
+    - modelID
+    - telemetryId
+    - vin
+    - yearManufactured
     type: object
   dto.CarInsurance:
     properties:
       carID:
         type: string
       costTenge:
+        minimum: 0
         type: integer
       createdAt:
         type: string
@@ -201,8 +215,15 @@ definitions:
       startsAt:
         type: string
       status:
+        enum:
+        - active
+        - expired
+        - cancelled
         type: string
       type:
+        enum:
+        - osago
+        - kasko
         type: string
       updatedAt:
         type: string
@@ -212,6 +233,7 @@ definitions:
       carID:
         type: string
       costTenge:
+        minimum: 0
         type: integer
       expiresAt:
         type: string
@@ -224,7 +246,17 @@ definitions:
       startsAt:
         type: string
       type:
+        enum:
+        - osago
+        - kasko
         type: string
+    required:
+    - carID
+    - expiresAt
+    - policyNum
+    - provider
+    - startsAt
+    - type
     type: object
   dto.CarInsuranceResponse:
     properties:
@@ -234,6 +266,7 @@ definitions:
   dto.CarInsuranceUpdateRequest:
     properties:
       costTenge:
+        minimum: 0
         type: integer
       expiresAt:
         type: string
@@ -250,6 +283,10 @@ definitions:
       startsAt:
         type: string
       status:
+        enum:
+        - active
+        - expired
+        - cancelled
         type: string
     type: object
   dto.CarInsurancesResponse:
@@ -286,6 +323,10 @@ definitions:
           type: string
         type: array
       status:
+        enum:
+        - pending
+        - in_progress
+        - completed
         type: string
       templateID:
         type: string
@@ -293,8 +334,10 @@ definitions:
   dto.CarMaintenanceRecordCompleteRequest:
     properties:
       completedKm:
+        minimum: 0
         type: integer
       costTenge:
+        minimum: 0
         type: integer
       notes:
         type: string
@@ -341,6 +384,8 @@ definitions:
         type: number
       warnPct:
         type: number
+    required:
+    - name
     type: object
   dto.CarMaintenanceTemplateItemResponse:
     properties:
@@ -372,10 +417,25 @@ definitions:
   dto.CarModel:
     properties:
       bodyType:
+        enum:
+        - sedan
+        - hatchback
+        - SUV
+        - crossover
+        - minivan
+        - coupe
+        - convertible
+        - pickup
         type: string
       brand:
         type: string
       class:
+        enum:
+        - economy
+        - compact
+        - comfort
+        - business
+        - luxury
         type: string
       createdAt:
         type: string
@@ -386,6 +446,11 @@ definitions:
           type: string
         type: array
       fuelType:
+        enum:
+        - petrol
+        - diesel
+        - electric
+        - hybrid
         type: string
       id:
         type: string
@@ -400,6 +465,9 @@ definitions:
       seats:
         type: integer
       transmission:
+        enum:
+        - manual
+        - auto
         type: string
       updatedAt:
         type: string
@@ -409,10 +477,25 @@ definitions:
   dto.CarModelCreateRequest:
     properties:
       bodyType:
+        enum:
+        - sedan
+        - hatchback
+        - SUV
+        - crossover
+        - minivan
+        - coupe
+        - convertible
+        - pickup
         type: string
       brand:
         type: string
       class:
+        enum:
+        - economy
+        - compact
+        - comfort
+        - business
+        - luxury
         type: string
       engineVolume:
         type: number
@@ -421,17 +504,36 @@ definitions:
           type: string
         type: array
       fuelType:
+        enum:
+        - petrol
+        - diesel
+        - electric
+        - hybrid
         type: string
       model:
         type: string
       rangeKm:
         type: integer
       seats:
+        maximum: 9
+        minimum: 1
         type: integer
       transmission:
+        enum:
+        - manual
+        - auto
         type: string
       year:
         type: integer
+    required:
+    - bodyType
+    - brand
+    - class
+    - fuelType
+    - model
+    - seats
+    - transmission
+    - year
     type: object
   dto.CarModelGetResponse:
     properties:
@@ -441,10 +543,25 @@ definitions:
   dto.CarModelUpdateRequest:
     properties:
       bodyType:
+        enum:
+        - sedan
+        - hatchback
+        - SUV
+        - crossover
+        - minivan
+        - coupe
+        - convertible
+        - pickup
         type: string
       brand:
         type: string
       class:
+        enum:
+        - economy
+        - compact
+        - comfort
+        - business
+        - luxury
         type: string
       engineVolume:
         type: number
@@ -453,6 +570,11 @@ definitions:
           type: string
         type: array
       fuelType:
+        enum:
+        - petrol
+        - diesel
+        - electric
+        - hybrid
         type: string
       imageStorageKeys:
         items:
@@ -465,6 +587,9 @@ definitions:
       seats:
         type: integer
       transmission:
+        enum:
+        - manual
+        - auto
         type: string
       year:
         type: integer
@@ -493,10 +618,20 @@ definitions:
       actorID:
         type: string
       actorType:
+        enum:
+        - user
+        - system
+        - telemetry
         type: string
       carID:
         type: string
       fromStatus:
+        enum:
+        - available
+        - reserved
+        - in_use
+        - maintenance
+        - out_of_service
         type: string
       id:
         type: string
@@ -508,6 +643,12 @@ definitions:
       recordedAt:
         type: string
       toStatus:
+        enum:
+        - available
+        - reserved
+        - in_use
+        - maintenance
+        - out_of_service
         type: string
     type: object
   dto.CarStatusUpdateRequest:
@@ -518,7 +659,16 @@ definitions:
       reason:
         type: string
       status:
+        enum:
+        - available
+        - reserved
+        - in_use
+        - maintenance
+        - out_of_service
         type: string
+    required:
+    - reason
+    - status
     type: object
   dto.CarTelemetryHistoryResponse:
     properties:
@@ -532,6 +682,10 @@ definitions:
       actorID:
         type: string
       actorType:
+        enum:
+        - user
+        - system
+        - telemetry
         type: string
       batteryLevel:
         type: number
@@ -572,6 +726,8 @@ definitions:
         type: integer
       reason:
         type: string
+    required:
+    - reason
     type: object
   dto.CarUpdateRequest:
     properties:
@@ -605,20 +761,37 @@ definitions:
     properties:
       code:
         type: string
+    required:
+    - code
     type: object
   dto.CheckDocumentRequest:
     properties:
       error:
         type: string
       status:
+        enum:
+        - pending
+        - processed
+        - approved
+        - rejected
         type: string
+    required:
+    - status
     type: object
   dto.CreateDocumentRequest:
     properties:
       imageType:
+        enum:
+        - id_front
+        - id_back
+        - driving_license_front
+        - driving_license_back
         type: string
       objectKey:
         type: string
+    required:
+    - imageType
+    - objectKey
     type: object
   dto.DependencyHealthResponse:
     properties:
@@ -638,12 +811,22 @@ definitions:
       id:
         type: string
       imageType:
+        enum:
+        - id_front
+        - id_back
+        - driving_license_front
+        - driving_license_back
         type: string
       imageURL:
         type: string
       reason:
         type: string
       status:
+        enum:
+        - pending
+        - processed
+        - approved
+        - rejected
         type: string
       updatedAt:
         type: string
@@ -670,7 +853,14 @@ definitions:
   dto.GetUploadDocumentDataRequest:
     properties:
       imageType:
+        enum:
+        - id_front
+        - id_back
+        - driving_license_front
+        - driving_license_back
         type: string
+    required:
+    - imageType
     type: object
   dto.HealthResponse:
     properties:
@@ -706,6 +896,8 @@ definitions:
         type: string
       phoneNumber:
         type: string
+    required:
+    - password
     type: object
   dto.PricingRule:
     properties:
@@ -877,6 +1069,13 @@ definitions:
         type: string
       phoneNumber:
         type: string
+    required:
+    - birthDate
+    - email
+    - firstName
+    - lastName
+    - password
+    - passwordConfirmation
     type: object
   dto.ServiceHealthResponse:
     properties:
@@ -928,6 +1127,10 @@ definitions:
       startedAt:
         type: string
       status:
+        enum:
+        - active
+        - completed
+        - cancelled
         type: string
       updatedAt:
         type: string
@@ -943,22 +1146,36 @@ definitions:
     properties:
       bookingID:
         type: string
+    required:
+    - bookingID
     type: object
   dto.TripStatusReading:
     properties:
       actorID:
         type: string
       actorType:
+        enum:
+        - user
+        - system
+        - telemetry
         type: string
       changedAt:
         type: string
       fromStatus:
+        enum:
+        - active
+        - completed
+        - cancelled
         type: string
       id:
         type: string
       reason:
         type: string
       toStatus:
+        enum:
+        - active
+        - completed
+        - cancelled
         type: string
       tripID:
         type: string
@@ -1109,6 +1326,11 @@ definitions:
       name:
         type: string
       type:
+        enum:
+        - operating
+        - no_drop
+        - parking_hub
+        - surcharge
         type: string
       updatedAt:
         type: string
@@ -1122,7 +1344,16 @@ definitions:
       name:
         type: string
       type:
+        enum:
+        - operating
+        - no_drop
+        - parking_hub
+        - surcharge
         type: string
+    required:
+    - boundary
+    - name
+    - type
     type: object
   dto.ZoneResponse:
     properties:
@@ -1140,6 +1371,11 @@ definitions:
       name:
         type: string
       type:
+        enum:
+        - operating
+        - no_drop
+        - parking_hub
+        - surcharge
         type: string
     type: object
   dto.ZonesResponse:
@@ -1642,11 +1878,18 @@ paths:
         in: query
         name: carID
         type: string
-      - description: Insurance type (osago, kasko)
+      - description: Insurance type
+        enum:
+        - osago
+        - kasko
         in: query
         name: type
         type: string
-      - description: Status (active, expired, cancelled)
+      - description: Status
+        enum:
+        - active
+        - expired
+        - cancelled
         in: query
         name: status
         type: string
@@ -1872,7 +2115,11 @@ paths:
         in: query
         name: templateId
         type: string
-      - description: Filter by status (pending, in_progress, completed)
+      - description: Filter by status
+        enum:
+        - pending
+        - in_progress
+        - completed
         in: query
         name: status
         type: string
@@ -2168,20 +2415,42 @@ paths:
         in: query
         name: model
         type: string
-      - description: Fuel type (petrol, diesel, electric, hybrid)
+      - description: Fuel type
+        enum:
+        - petrol
+        - diesel
+        - electric
+        - hybrid
         in: query
         name: fuelType
         type: string
-      - description: Transmission (manual, auto)
+      - description: Transmission
+        enum:
+        - manual
+        - auto
         in: query
         name: transmission
         type: string
-      - description: Body type (sedan, hatchback, suv, crossover, minivan, coupe,
-          convertible, pickup)
+      - description: Body type
+        enum:
+        - sedan
+        - hatchback
+        - SUV
+        - crossover
+        - minivan
+        - coupe
+        - convertible
+        - pickup
         in: query
         name: bodyType
         type: string
-      - description: Class (economy, compact, comfort, business, luxury)
+      - description: Class
+        enum:
+        - economy
+        - compact
+        - comfort
+        - business
+        - luxury
         in: query
         name: class
         type: string
@@ -2412,18 +2681,41 @@ paths:
         name: model
         type: string
       - description: Fuel type
+        enum:
+        - petrol
+        - diesel
+        - electric
+        - hybrid
         in: query
         name: fuelType
         type: string
       - description: Transmission
+        enum:
+        - manual
+        - auto
         in: query
         name: transmission
         type: string
       - description: Body type
+        enum:
+        - sedan
+        - hatchback
+        - SUV
+        - crossover
+        - minivan
+        - coupe
+        - convertible
+        - pickup
         in: query
         name: bodyType
         type: string
       - description: Class
+        enum:
+        - economy
+        - compact
+        - comfort
+        - business
+        - luxury
         in: query
         name: class
         type: string
@@ -2451,7 +2743,13 @@ paths:
         in: query
         name: minFuelLevel
         type: number
-      - description: Car status (available, reserved, in_use, maintenance, out_of_service)
+      - description: Car status
+        enum:
+        - available
+        - reserved
+        - in_use
+        - maintenance
+        - out_of_service
         in: query
         name: status
         type: string
@@ -3101,6 +3399,10 @@ paths:
         name: carID
         type: string
       - description: Filter by status
+        enum:
+        - active
+        - completed
+        - cancelled
         in: query
         name: status
         type: string
@@ -4095,7 +4397,12 @@ paths:
     get:
       description: Returns zones filtered by type and active status.
       parameters:
-      - description: Zone type (operating, no_drop, parking_hub, surcharge)
+      - description: Zone type
+        enum:
+        - operating
+        - no_drop
+        - parking_hub
+        - surcharge
         in: query
         name: type
         type: string

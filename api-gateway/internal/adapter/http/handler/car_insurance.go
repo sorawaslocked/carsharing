@@ -98,8 +98,8 @@ func (h *CarInsuranceHandler) Get(ctx *gin.Context) {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        carID               query     string   false  "Filter by car UUID"
-// @Param        type                query     string   false  "Insurance type (osago, kasko)"
-// @Param        status              query     string   false  "Status (active, expired, cancelled)"
+// @Param        type                query     string   false  "Insurance type"  Enums(osago, kasko)
+// @Param        status              query     string   false  "Status"          Enums(active, expired, cancelled)
 // @Param        expiringWithinDays  query     integer  false  "Return policies expiring within N days (1–365)"
 // @Param        limit               query     integer  false  "Pagination limit"
 // @Param        offset              query     integer  false  "Pagination offset"

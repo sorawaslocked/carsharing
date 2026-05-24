@@ -40,7 +40,7 @@ type Car struct {
 	TelemetryID      string    `json:"telemetryId"`
 	FuelStatus       string    `json:"fuelStatus"`
 	ZoneID           *string   `json:"zoneID,omitempty"`
-	Status           string    `json:"status"`
+	Status           string    `json:"status" validate:"oneof=available reserved in_use maintenance out_of_service"`
 	IsRetired        bool      `json:"isRetired"`
 	Notes            *string   `json:"notes,omitempty"`
 	ImageStorageUrls []string  `json:"imageStorageUrls,omitempty"`
@@ -52,9 +52,9 @@ type Car struct {
 type CarStatusReading struct {
 	ID         string         `json:"id"`
 	CarID      string         `json:"carID"`
-	FromStatus string         `json:"fromStatus"`
-	ToStatus   string         `json:"toStatus"`
-	ActorType  string         `json:"actorType"`
+	FromStatus string         `json:"fromStatus" validate:"oneof=available reserved in_use maintenance out_of_service"`
+	ToStatus   string         `json:"toStatus" validate:"oneof=available reserved in_use maintenance out_of_service"`
+	ActorType  string         `json:"actorType" validate:"oneof=user system telemetry"`
 	ActorID    *string        `json:"actorID,omitempty"`
 	Reason     *string        `json:"reason,omitempty"`
 	Metadata   map[string]any `json:"metadata,omitempty"`
@@ -69,7 +69,7 @@ type CarTelemetryReading struct {
 	BatteryLevel *float32       `json:"batteryLevel,omitempty"`
 	MileageKM    *int64         `json:"mileageKm,omitempty"`
 	Location     *location      `json:"location,omitempty"`
-	ActorType    string         `json:"actorType"`
+	ActorType    string         `json:"actorType" validate:"oneof=user system telemetry"`
 	ActorID      *string        `json:"actorID,omitempty"`
 	Reason       *string        `json:"reason,omitempty"`
 	Metadata     map[string]any `json:"metadata,omitempty"`
@@ -77,12 +77,12 @@ type CarTelemetryReading struct {
 }
 
 type CarCreateRequest struct {
-	ModelID          string   `json:"modelID"`
-	VIN              string   `json:"vin"`
-	LicensePlate     string   `json:"licensePlate"`
-	Color            string   `json:"color"`
-	YearManufactured int16    `json:"yearManufactured"`
-	TelemetryID      string   `json:"telemetryId"`
+	ModelID          string   `json:"modelID" binding:"required"`
+	VIN              string   `json:"vin" binding:"required"`
+	LicensePlate     string   `json:"licensePlate" binding:"required"`
+	Color            string   `json:"color" binding:"required"`
+	YearManufactured int16    `json:"yearManufactured" binding:"required"`
+	TelemetryID      string   `json:"telemetryId" binding:"required"`
 	ZoneID           *string  `json:"zoneID"`
 	MileageKM        *int64   `json:"mileageKm"`
 	FuelLevel        *float32 `json:"fuelLevel"`
@@ -109,13 +109,13 @@ type CarTelemetryUpdateRequest struct {
 	BatteryLevel *float32       `json:"batteryLevel"`
 	Latitude     *float64       `json:"latitude"`
 	Longitude    *float64       `json:"longitude"`
-	Reason       string         `json:"reason"`
+	Reason       string         `json:"reason" binding:"required"`
 	Metadata     map[string]any `json:"metadata"`
 }
 
 type CarStatusUpdateRequest struct {
-	Status   string         `json:"status"`
-	Reason   string         `json:"reason"`
+	Status   string         `json:"status" binding:"required,oneof=available reserved in_use maintenance out_of_service"`
+	Reason   string         `json:"reason" binding:"required"`
 	Metadata map[string]any `json:"metadata"`
 }
 

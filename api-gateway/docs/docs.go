@@ -630,14 +630,23 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "osago",
+                            "kasko"
+                        ],
                         "type": "string",
-                        "description": "Insurance type (osago, kasko)",
+                        "description": "Insurance type",
                         "name": "type",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "active",
+                            "expired",
+                            "cancelled"
+                        ],
                         "type": "string",
-                        "description": "Status (active, expired, cancelled)",
+                        "description": "Status",
                         "name": "status",
                         "in": "query"
                     },
@@ -987,8 +996,13 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "pending",
+                            "in_progress",
+                            "completed"
+                        ],
                         "type": "string",
-                        "description": "Filter by status (pending, in_progress, completed)",
+                        "description": "Filter by status",
                         "name": "status",
                         "in": "query"
                     },
@@ -1449,26 +1463,53 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "petrol",
+                            "diesel",
+                            "electric",
+                            "hybrid"
+                        ],
                         "type": "string",
-                        "description": "Fuel type (petrol, diesel, electric, hybrid)",
+                        "description": "Fuel type",
                         "name": "fuelType",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "manual",
+                            "auto"
+                        ],
                         "type": "string",
-                        "description": "Transmission (manual, auto)",
+                        "description": "Transmission",
                         "name": "transmission",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "sedan",
+                            "hatchback",
+                            "SUV",
+                            "crossover",
+                            "minivan",
+                            "coupe",
+                            "convertible",
+                            "pickup"
+                        ],
                         "type": "string",
-                        "description": "Body type (sedan, hatchback, suv, crossover, minivan, coupe, convertible, pickup)",
+                        "description": "Body type",
                         "name": "bodyType",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "economy",
+                            "compact",
+                            "comfort",
+                            "business",
+                            "luxury"
+                        ],
                         "type": "string",
-                        "description": "Class (economy, compact, comfort, business, luxury)",
+                        "description": "Class",
                         "name": "class",
                         "in": "query"
                     },
@@ -1819,24 +1860,51 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "petrol",
+                            "diesel",
+                            "electric",
+                            "hybrid"
+                        ],
                         "type": "string",
                         "description": "Fuel type",
                         "name": "fuelType",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "manual",
+                            "auto"
+                        ],
                         "type": "string",
                         "description": "Transmission",
                         "name": "transmission",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "sedan",
+                            "hatchback",
+                            "SUV",
+                            "crossover",
+                            "minivan",
+                            "coupe",
+                            "convertible",
+                            "pickup"
+                        ],
                         "type": "string",
                         "description": "Body type",
                         "name": "bodyType",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "economy",
+                            "compact",
+                            "comfort",
+                            "business",
+                            "luxury"
+                        ],
                         "type": "string",
                         "description": "Class",
                         "name": "class",
@@ -1879,8 +1947,15 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "available",
+                            "reserved",
+                            "in_use",
+                            "maintenance",
+                            "out_of_service"
+                        ],
                         "type": "string",
-                        "description": "Car status (available, reserved, in_use, maintenance, out_of_service)",
+                        "description": "Car status",
                         "name": "status",
                         "in": "query"
                     },
@@ -2877,6 +2952,11 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "active",
+                            "completed",
+                            "cancelled"
+                        ],
                         "type": "string",
                         "description": "Filter by status",
                         "name": "status",
@@ -4415,8 +4495,14 @@ const docTemplate = `{
                 "summary": "List zones",
                 "parameters": [
                     {
+                        "enum": [
+                            "operating",
+                            "no_drop",
+                            "parking_hub",
+                            "surcharge"
+                        ],
                         "type": "string",
-                        "description": "Zone type (operating, no_drop, parking_hub, surcharge)",
+                        "description": "Zone type",
                         "name": "type",
                         "in": "query"
                     },
@@ -4887,7 +4973,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "available",
+                        "reserved",
+                        "in_use",
+                        "maintenance",
+                        "out_of_service"
+                    ]
                 },
                 "telemetryId": {
                     "type": "string"
@@ -4908,6 +5001,14 @@ const docTemplate = `{
         },
         "dto.CarCreateRequest": {
             "type": "object",
+            "required": [
+                "color",
+                "licensePlate",
+                "modelID",
+                "telemetryId",
+                "vin",
+                "yearManufactured"
+            ],
             "properties": {
                 "batteryLevel": {
                     "type": "number"
@@ -4957,7 +5058,8 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "costTenge": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "createdAt": {
                     "type": "string"
@@ -4987,10 +5089,19 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "active",
+                        "expired",
+                        "cancelled"
+                    ]
                 },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "osago",
+                        "kasko"
+                    ]
                 },
                 "updatedAt": {
                     "type": "string"
@@ -4999,12 +5110,21 @@ const docTemplate = `{
         },
         "dto.CarInsuranceCreateRequest": {
             "type": "object",
+            "required": [
+                "carID",
+                "expiresAt",
+                "policyNum",
+                "provider",
+                "startsAt",
+                "type"
+            ],
             "properties": {
                 "carID": {
                     "type": "string"
                 },
                 "costTenge": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "expiresAt": {
                     "type": "string"
@@ -5022,7 +5142,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "osago",
+                        "kasko"
+                    ]
                 }
             }
         },
@@ -5038,7 +5162,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "costTenge": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "expiresAt": {
                     "type": "string"
@@ -5062,7 +5187,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "active",
+                        "expired",
+                        "cancelled"
+                    ]
                 }
             }
         },
@@ -5117,7 +5247,12 @@ const docTemplate = `{
                     }
                 },
                 "status": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "pending",
+                        "in_progress",
+                        "completed"
+                    ]
                 },
                 "templateID": {
                     "type": "string"
@@ -5128,10 +5263,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "completedKm": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "costTenge": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "notes": {
                     "type": "string"
@@ -5183,6 +5320,9 @@ const docTemplate = `{
         },
         "dto.CarMaintenanceTemplateCreateRequest": {
             "type": "object",
+            "required": [
+                "name"
+            ],
             "properties": {
                 "dayInterval": {
                     "type": "integer"
@@ -5250,13 +5390,30 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "bodyType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "sedan",
+                        "hatchback",
+                        "SUV",
+                        "crossover",
+                        "minivan",
+                        "coupe",
+                        "convertible",
+                        "pickup"
+                    ]
                 },
                 "brand": {
                     "type": "string"
                 },
                 "class": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "economy",
+                        "compact",
+                        "comfort",
+                        "business",
+                        "luxury"
+                    ]
                 },
                 "createdAt": {
                     "type": "string"
@@ -5271,7 +5428,13 @@ const docTemplate = `{
                     }
                 },
                 "fuelType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "petrol",
+                        "diesel",
+                        "electric",
+                        "hybrid"
+                    ]
                 },
                 "id": {
                     "type": "string"
@@ -5292,7 +5455,11 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "transmission": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "manual",
+                        "auto"
+                    ]
                 },
                 "updatedAt": {
                     "type": "string"
@@ -5304,15 +5471,42 @@ const docTemplate = `{
         },
         "dto.CarModelCreateRequest": {
             "type": "object",
+            "required": [
+                "bodyType",
+                "brand",
+                "class",
+                "fuelType",
+                "model",
+                "seats",
+                "transmission",
+                "year"
+            ],
             "properties": {
                 "bodyType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "sedan",
+                        "hatchback",
+                        "SUV",
+                        "crossover",
+                        "minivan",
+                        "coupe",
+                        "convertible",
+                        "pickup"
+                    ]
                 },
                 "brand": {
                     "type": "string"
                 },
                 "class": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "economy",
+                        "compact",
+                        "comfort",
+                        "business",
+                        "luxury"
+                    ]
                 },
                 "engineVolume": {
                     "type": "number"
@@ -5324,7 +5518,13 @@ const docTemplate = `{
                     }
                 },
                 "fuelType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "petrol",
+                        "diesel",
+                        "electric",
+                        "hybrid"
+                    ]
                 },
                 "model": {
                     "type": "string"
@@ -5333,10 +5533,16 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "seats": {
-                    "type": "integer"
+                    "type": "integer",
+                    "maximum": 9,
+                    "minimum": 1
                 },
                 "transmission": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "manual",
+                        "auto"
+                    ]
                 },
                 "year": {
                     "type": "integer"
@@ -5355,13 +5561,30 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "bodyType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "sedan",
+                        "hatchback",
+                        "SUV",
+                        "crossover",
+                        "minivan",
+                        "coupe",
+                        "convertible",
+                        "pickup"
+                    ]
                 },
                 "brand": {
                     "type": "string"
                 },
                 "class": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "economy",
+                        "compact",
+                        "comfort",
+                        "business",
+                        "luxury"
+                    ]
                 },
                 "engineVolume": {
                     "type": "number"
@@ -5373,7 +5596,13 @@ const docTemplate = `{
                     }
                 },
                 "fuelType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "petrol",
+                        "diesel",
+                        "electric",
+                        "hybrid"
+                    ]
                 },
                 "imageStorageKeys": {
                     "type": "array",
@@ -5391,7 +5620,11 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "transmission": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "manual",
+                        "auto"
+                    ]
                 },
                 "year": {
                     "type": "integer"
@@ -5435,13 +5668,25 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "actorType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "user",
+                        "system",
+                        "telemetry"
+                    ]
                 },
                 "carID": {
                     "type": "string"
                 },
                 "fromStatus": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "available",
+                        "reserved",
+                        "in_use",
+                        "maintenance",
+                        "out_of_service"
+                    ]
                 },
                 "id": {
                     "type": "string"
@@ -5457,12 +5702,23 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "toStatus": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "available",
+                        "reserved",
+                        "in_use",
+                        "maintenance",
+                        "out_of_service"
+                    ]
                 }
             }
         },
         "dto.CarStatusUpdateRequest": {
             "type": "object",
+            "required": [
+                "reason",
+                "status"
+            ],
             "properties": {
                 "metadata": {
                     "type": "object",
@@ -5472,7 +5728,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "available",
+                        "reserved",
+                        "in_use",
+                        "maintenance",
+                        "out_of_service"
+                    ]
                 }
             }
         },
@@ -5494,7 +5757,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "actorType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "user",
+                        "system",
+                        "telemetry"
+                    ]
                 },
                 "batteryLevel": {
                     "type": "number"
@@ -5531,6 +5799,9 @@ const docTemplate = `{
         },
         "dto.CarTelemetryUpdateRequest": {
             "type": "object",
+            "required": [
+                "reason"
+            ],
             "properties": {
                 "batteryLevel": {
                     "type": "number"
@@ -5601,6 +5872,9 @@ const docTemplate = `{
         },
         "dto.CheckActivationCodeRequest": {
             "type": "object",
+            "required": [
+                "code"
+            ],
             "properties": {
                 "code": {
                     "type": "string"
@@ -5609,20 +5883,39 @@ const docTemplate = `{
         },
         "dto.CheckDocumentRequest": {
             "type": "object",
+            "required": [
+                "status"
+            ],
             "properties": {
                 "error": {
                     "type": "string"
                 },
                 "status": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "pending",
+                        "processed",
+                        "approved",
+                        "rejected"
+                    ]
                 }
             }
         },
         "dto.CreateDocumentRequest": {
             "type": "object",
+            "required": [
+                "imageType",
+                "objectKey"
+            ],
             "properties": {
                 "imageType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "id_front",
+                        "id_back",
+                        "driving_license_front",
+                        "driving_license_back"
+                    ]
                 },
                 "objectKey": {
                     "type": "string"
@@ -5656,7 +5949,13 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "imageType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "id_front",
+                        "id_back",
+                        "driving_license_front",
+                        "driving_license_back"
+                    ]
                 },
                 "imageURL": {
                     "type": "string"
@@ -5665,7 +5964,13 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "pending",
+                        "processed",
+                        "approved",
+                        "rejected"
+                    ]
                 },
                 "updatedAt": {
                     "type": "string"
@@ -5704,9 +6009,18 @@ const docTemplate = `{
         },
         "dto.GetUploadDocumentDataRequest": {
             "type": "object",
+            "required": [
+                "imageType"
+            ],
             "properties": {
                 "imageType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "id_front",
+                        "id_back",
+                        "driving_license_front",
+                        "driving_license_back"
+                    ]
                 }
             }
         },
@@ -5753,6 +6067,9 @@ const docTemplate = `{
         },
         "dto.LoginRequest": {
             "type": "object",
+            "required": [
+                "password"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
@@ -5984,6 +6301,14 @@ const docTemplate = `{
         },
         "dto.RegisterRequest": {
             "type": "object",
+            "required": [
+                "birthDate",
+                "email",
+                "firstName",
+                "lastName",
+                "password",
+                "passwordConfirmation"
+            ],
             "properties": {
                 "birthDate": {
                     "type": "string"
@@ -6083,7 +6408,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "active",
+                        "completed",
+                        "cancelled"
+                    ]
                 },
                 "updatedAt": {
                     "type": "string"
@@ -6103,6 +6433,9 @@ const docTemplate = `{
         },
         "dto.TripStartRequest": {
             "type": "object",
+            "required": [
+                "bookingID"
+            ],
             "properties": {
                 "bookingID": {
                     "type": "string"
@@ -6116,13 +6449,23 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "actorType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "user",
+                        "system",
+                        "telemetry"
+                    ]
                 },
                 "changedAt": {
                     "type": "string"
                 },
                 "fromStatus": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "active",
+                        "completed",
+                        "cancelled"
+                    ]
                 },
                 "id": {
                     "type": "string"
@@ -6131,7 +6474,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "toStatus": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "active",
+                        "completed",
+                        "cancelled"
+                    ]
                 },
                 "tripID": {
                     "type": "string"
@@ -6360,7 +6708,13 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "operating",
+                        "no_drop",
+                        "parking_hub",
+                        "surcharge"
+                    ]
                 },
                 "updatedAt": {
                     "type": "string"
@@ -6369,6 +6723,11 @@ const docTemplate = `{
         },
         "dto.ZoneCreateRequest": {
             "type": "object",
+            "required": [
+                "boundary",
+                "name",
+                "type"
+            ],
             "properties": {
                 "boundary": {
                     "type": "string"
@@ -6380,7 +6739,13 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "operating",
+                        "no_drop",
+                        "parking_hub",
+                        "surcharge"
+                    ]
                 }
             }
         },
@@ -6408,7 +6773,13 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "operating",
+                        "no_drop",
+                        "parking_hub",
+                        "surcharge"
+                    ]
                 }
             }
         },

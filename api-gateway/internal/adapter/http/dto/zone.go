@@ -19,7 +19,7 @@ type ZonesResponse struct {
 type Zone struct {
 	ID              string    `json:"id"`
 	Name            string    `json:"name"`
-	Type            string    `json:"type"`
+	Type            string    `json:"type" validate:"oneof=operating no_drop parking_hub surcharge"`
 	BoundaryGeoJSON string    `json:"boundary"`
 	FeeAdjustment   int32     `json:"feeAdjustment"`
 	IsActive        bool      `json:"isActive"`
@@ -28,15 +28,15 @@ type Zone struct {
 }
 
 type ZoneCreateRequest struct {
-	Name            string `json:"name"`
-	Type            string `json:"type"`
-	BoundaryGeoJSON string `json:"boundary"`
+	Name            string `json:"name" binding:"required"`
+	Type            string `json:"type" binding:"required,oneof=operating no_drop parking_hub surcharge"`
+	BoundaryGeoJSON string `json:"boundary" binding:"required"`
 	FeeAdjustment   int32  `json:"feeAdjustment"`
 }
 
 type ZoneUpdateRequest struct {
 	Name            *string `json:"name"`
-	Type            *string `json:"type"`
+	Type            *string `json:"type" validate:"omitempty,oneof=operating no_drop parking_hub surcharge"`
 	BoundaryGeoJSON *string `json:"boundary"`
 	FeeAdjustment   *int32  `json:"feeAdjustment"`
 	IsActive        *bool   `json:"isActive"`

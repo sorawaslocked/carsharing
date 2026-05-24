@@ -212,7 +212,7 @@ func (h *CarMaintenanceHandler) DeleteTemplate(ctx *gin.Context) {
 // @Security     BearerAuth
 // @Param        carId       query     string   false  "Filter by car UUID"
 // @Param        templateId  query     string   false  "Filter by template UUID"
-// @Param        status      query     string   false  "Filter by status (pending, in_progress, completed)"
+// @Param        status      query     string   false  "Filter by status"  Enums(pending, in_progress, completed)
 // @Param        limit       query     integer  false  "Pagination limit"
 // @Param        offset      query     integer  false  "Pagination offset"
 // @Success      200         {object}  dto.CarMaintenanceRecordsResponse

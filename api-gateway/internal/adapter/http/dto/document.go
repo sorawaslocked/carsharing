@@ -14,8 +14,8 @@ type DocumentsResponse struct {
 type Document struct {
 	ID        string  `json:"id"`
 	UserID    string  `json:"userID"`
-	ImageType string  `json:"imageType"`
-	Status    string  `json:"status"`
+	ImageType string  `json:"imageType" validate:"oneof=id_front id_back driving_license_front driving_license_back"`
+	Status    string  `json:"status" validate:"oneof=pending processed approved rejected"`
 	Reason    *string `json:"reason,omitempty"`
 	ImageURL  string  `json:"imageURL"`
 
@@ -24,16 +24,16 @@ type Document struct {
 }
 
 type GetUploadDocumentDataRequest struct {
-	ImageType string `json:"imageType"`
+	ImageType string `json:"imageType" binding:"required,oneof=id_front id_back driving_license_front driving_license_back"`
 }
 
 type CreateDocumentRequest struct {
-	ImageType string `json:"imageType"`
-	ObjectKey string `json:"objectKey"`
+	ImageType string `json:"imageType" binding:"required,oneof=id_front id_back driving_license_front driving_license_back"`
+	ObjectKey string `json:"objectKey" binding:"required"`
 }
 
 type CheckDocumentRequest struct {
-	Status string  `json:"status"`
+	Status string  `json:"status" binding:"required,oneof=pending processed approved rejected"`
 	Error  *string `json:"error"`
 }
 

@@ -100,7 +100,7 @@ func (h *TripHandler) Get(ctx *gin.Context) {
 // @Security     BearerAuth
 // @Param        userID         query     string   false  "Filter by user UUID"
 // @Param        carID          query     string   false  "Filter by car UUID"
-// @Param        status         query     string   false  "Filter by status"
+// @Param        status         query     string   false  "Filter by status"  Enums(active, completed, cancelled)
 // @Param        startedAfter   query     string   false  "Filter by start time lower bound (RFC3339)"
 // @Param        startedBefore  query     string   false  "Filter by start time upper bound (RFC3339)"
 // @Param        limit          query     integer  false  "Pagination limit"

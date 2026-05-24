@@ -99,17 +99,17 @@ func (h *CarHandler) Get(ctx *gin.Context) {
 // @Security     BearerAuth
 // @Param        brand         query     string   false  "Brand filter"
 // @Param        model         query     string   false  "Model name filter"
-// @Param        fuelType      query     string   false  "Fuel type"
-// @Param        transmission  query     string   false  "Transmission"
-// @Param        bodyType      query     string   false  "Body type"
-// @Param        class         query     string   false  "Class"
+// @Param        fuelType      query     string   false  "Fuel type"                              Enums(petrol, diesel, electric, hybrid)
+// @Param        transmission  query     string   false  "Transmission"                           Enums(manual, auto)
+// @Param        bodyType      query     string   false  "Body type"                              Enums(sedan, hatchback, SUV, crossover, minivan, coupe, convertible, pickup)
+// @Param        class         query     string   false  "Class"                                  Enums(economy, compact, comfort, business, luxury)
 // @Param        minSeats      query     integer  false  "Minimum seats"
 // @Param        latitude      query     number   false  "Latitude for proximity search"
 // @Param        longitude     query     number   false  "Longitude for proximity search"
 // @Param        radiusM       query     integer  false  "Search radius in metres"
 // @Param        zoneId        query     string   false  "Filter by zone UUID"
 // @Param        minFuelLevel  query     number   false  "Minimum fuel level (0–100)"
-// @Param        status        query     string   false  "Car status (available, reserved, in_use, maintenance, out_of_service)"
+// @Param        status        query     string   false  "Car status"                             Enums(available, reserved, in_use, maintenance, out_of_service)
 // @Param        limit         query     integer  false  "Pagination limit"
 // @Param        offset        query     integer  false  "Pagination offset"
 // @Success      200           {object}  dto.CarsResponse

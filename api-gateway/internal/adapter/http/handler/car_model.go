@@ -99,10 +99,10 @@ func (h *CarModelHandler) Get(ctx *gin.Context) {
 // @Security     BearerAuth
 // @Param        brand         query     string   false  "Brand filter (e.g. Hyundai)"
 // @Param        model         query     string   false  "Model name filter"
-// @Param        fuelType      query     string   false  "Fuel type (petrol, diesel, electric, hybrid)"
-// @Param        transmission  query     string   false  "Transmission (manual, auto)"
-// @Param        bodyType      query     string   false  "Body type (sedan, hatchback, suv, crossover, minivan, coupe, convertible, pickup)"
-// @Param        class         query     string   false  "Class (economy, compact, comfort, business, luxury)"
+// @Param        fuelType      query     string   false  "Fuel type"      Enums(petrol, diesel, electric, hybrid)
+// @Param        transmission  query     string   false  "Transmission"   Enums(manual, auto)
+// @Param        bodyType      query     string   false  "Body type"      Enums(sedan, hatchback, SUV, crossover, minivan, coupe, convertible, pickup)
+// @Param        class         query     string   false  "Class"          Enums(economy, compact, comfort, business, luxury)
 // @Param        minSeats      query     integer  false  "Minimum seat count"
 // @Param        limit         query     integer  false  "Pagination limit"
 // @Param        offset        query     integer  false  "Pagination offset"

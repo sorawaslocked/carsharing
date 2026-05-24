@@ -21,10 +21,10 @@ type CarModel struct {
 	Brand            string    `json:"brand"`
 	Model            string    `json:"model"`
 	Year             int16     `json:"year"`
-	FuelType         string    `json:"fuelType"`
-	Transmission     string    `json:"transmission"`
-	BodyType         string    `json:"bodyType"`
-	Class            string    `json:"class"`
+	FuelType         string    `json:"fuelType" validate:"oneof=petrol diesel electric hybrid"`
+	Transmission     string    `json:"transmission" validate:"oneof=manual auto"`
+	BodyType         string    `json:"bodyType" validate:"oneof=sedan hatchback SUV crossover minivan coupe convertible pickup"`
+	Class            string    `json:"class" validate:"oneof=economy compact comfort business luxury"`
 	Seats            int8      `json:"seats"`
 	EngineVolume     *float32  `json:"engineVolume,omitempty"`
 	RangeKM          int32     `json:"rangeKm"`
@@ -35,14 +35,14 @@ type CarModel struct {
 }
 
 type CarModelCreateRequest struct {
-	Brand        string   `json:"brand"`
-	Model        string   `json:"model"`
-	Year         int16    `json:"year"`
-	FuelType     string   `json:"fuelType"`
-	Transmission string   `json:"transmission"`
-	BodyType     string   `json:"bodyType"`
-	Class        string   `json:"class"`
-	Seats        int8     `json:"seats"`
+	Brand        string   `json:"brand" binding:"required"`
+	Model        string   `json:"model" binding:"required"`
+	Year         int16    `json:"year" binding:"required"`
+	FuelType     string   `json:"fuelType" binding:"required,oneof=petrol diesel electric hybrid"`
+	Transmission string   `json:"transmission" binding:"required,oneof=manual auto"`
+	BodyType     string   `json:"bodyType" binding:"required,oneof=sedan hatchback SUV crossover minivan coupe convertible pickup"`
+	Class        string   `json:"class" binding:"required,oneof=economy compact comfort business luxury"`
+	Seats        int8     `json:"seats" binding:"required,min=1,max=9"`
 	EngineVolume *float32 `json:"engineVolume"`
 	RangeKM      int32    `json:"rangeKm"`
 	Features     []string `json:"features"`
@@ -52,10 +52,10 @@ type CarModelUpdateRequest struct {
 	Brand            *string  `json:"brand"`
 	Model            *string  `json:"model"`
 	Year             *int16   `json:"year"`
-	FuelType         *string  `json:"fuelType"`
-	Transmission     *string  `json:"transmission"`
-	BodyType         *string  `json:"bodyType"`
-	Class            *string  `json:"class"`
+	FuelType         *string  `json:"fuelType" validate:"omitempty,oneof=petrol diesel electric hybrid"`
+	Transmission     *string  `json:"transmission" validate:"omitempty,oneof=manual auto"`
+	BodyType         *string  `json:"bodyType" validate:"omitempty,oneof=sedan hatchback SUV crossover minivan coupe convertible pickup"`
+	Class            *string  `json:"class" validate:"omitempty,oneof=economy compact comfort business luxury"`
 	Seats            *int8    `json:"seats"`
 	EngineVolume     *float32 `json:"engineVolume"`
 	RangeKM          *int32   `json:"rangeKm"`

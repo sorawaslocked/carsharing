@@ -158,11 +158,13 @@ func (s *TelemetryService) subscribeToCarStream(ctx context.Context, car model.C
 			continue
 		}
 
+		s.activeStreams.Add(1)
 		for update := range ch {
 			if err := s.applyUpdate(ctx, log, update); err != nil {
 				log.Error("failed to apply telemetry update", pkglog.Err(err))
 			}
 		}
+		s.activeStreams.Add(-1)
 
 		if ctx.Err() != nil {
 			return
@@ -222,6 +224,8 @@ func (s *TelemetryService) applyUpdate(ctx context.Context, log *slog.Logger, up
 		log.Error("repo: updating car", pkglog.Err(err))
 		return err
 	}
+
+	s.lastSeenAt.Store(&now)
 
 	log.Info("telemetry update applied",
 		slog.Int64("mileageKM", update.MileageKM),

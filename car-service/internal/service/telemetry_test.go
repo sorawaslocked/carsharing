@@ -208,6 +208,7 @@ func TestTelemetryService_applyUpdate(t *testing.T) {
 
 		err := svc.applyUpdate(ctx, discardLogger(), update)
 		assert.NoError(t, err)
+		assert.NotNil(t, svc.lastSeenAt.Load())
 	})
 
 	t.Run("rejects mileage regression", func(t *testing.T) {

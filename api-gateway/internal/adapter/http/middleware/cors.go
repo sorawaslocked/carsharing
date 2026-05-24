@@ -1,18 +1,19 @@
 package middleware
 
 import (
+	"carsharing/api-gateway/internal/config"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"time"
 )
 
-func Cors() gin.HandlerFunc {
+func Cors(cfg config.CorsConfig) gin.HandlerFunc {
 	return cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
+		AllowOrigins:     cfg.AllowOrigins,
+		AllowMethods:     cfg.AllowMethods,
+		AllowHeaders:     cfg.AllowHeaders,
+		ExposeHeaders:    cfg.ExposeHeaders,
+		AllowCredentials: cfg.AllowCredentials,
+		MaxAge:           cfg.MaxAge,
 	})
 }

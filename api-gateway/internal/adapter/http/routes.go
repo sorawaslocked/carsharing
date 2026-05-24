@@ -11,7 +11,7 @@ import (
 
 func (s *Server) setupMiddleware() {
 	s.router.Use(gin.Recovery())
-	s.router.Use(middleware.Cors())
+	s.router.Use(middleware.Cors(s.httpCfg.Cors))
 	s.router.Use(requestid.New())
 	s.router.Use(middleware.Base())
 	s.router.Use(middleware.Logger(s.log))
@@ -165,7 +165,7 @@ func (s *Server) setupRoutes(
 	}
 
 	// WebSocket routes — middleware groups mirror the REST structure exactly.
-	ws := s.router.Group("/ws")
+	ws := s.router.Group("/api/v1/ws")
 	ws.Use(authentication.Middleware())
 	ws.Use(middleware.SuspensionChecker())
 	{

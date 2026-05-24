@@ -36,18 +36,28 @@ type (
 	}
 
 	HTTPServer struct {
-		Host         string `yaml:"host" env:"HTTP_SERVER_HOST" env-required:"true"`
-		Port         int    `yaml:"port" env:"HTTP_SERVER_PORT" env-required:"true"`
-		ReadTimeout  string `yaml:"read_timeout" env:"HTTP_SERVER_READ_TIMEOUT" env-default:"30s"`
-		WriteTimeout string `yaml:"write_timeout" env:"HTTP_SERVER_WRITE_TIMEOUT" env-default:"30s"`
-		IdleTimeout  string `yaml:"idle_timeout" env:"HTTP_SERVER_IDLE_TIMEOUT" env-default:"60s"`
-		GinMode      string `yaml:"gin_mode" env:"GIN_MODE" env-default:"debug"`
-		Cookie       Cookie `yaml:"cookie" env-required:"true"`
+		Host         string     `yaml:"host" env:"HTTP_SERVER_HOST" env-required:"true"`
+		Port         int        `yaml:"port" env:"HTTP_SERVER_PORT" env-required:"true"`
+		ReadTimeout  string     `yaml:"read_timeout" env:"HTTP_SERVER_READ_TIMEOUT" env-default:"30s"`
+		WriteTimeout string     `yaml:"write_timeout" env:"HTTP_SERVER_WRITE_TIMEOUT" env-default:"30s"`
+		IdleTimeout  string     `yaml:"idle_timeout" env:"HTTP_SERVER_IDLE_TIMEOUT" env-default:"60s"`
+		GinMode      string     `yaml:"gin_mode" env:"GIN_MODE" env-default:"debug"`
+		Cookie       Cookie     `yaml:"cookie" env-required:"true"`
+		Cors         CorsConfig `yaml:"cors"`
 	}
 
 	Cookie struct {
 		Secure bool   `yaml:"secure" env:"COOKIE_SECURE" env-default:"false"`
 		Domain string `yaml:"domain" env:"COOKIE_DOMAIN" env-default:""`
+	}
+
+	CorsConfig struct {
+		AllowOrigins     []string      `yaml:"allow_origins" env:"CORS_ALLOW_ORIGINS" env-separator:","`
+		AllowMethods     []string      `yaml:"allow_methods" env:"CORS_ALLOW_METHODS" env-separator:","`
+		AllowHeaders     []string      `yaml:"allow_headers" env:"CORS_ALLOW_HEADERS" env-separator:","`
+		ExposeHeaders    []string      `yaml:"expose_headers" env:"CORS_EXPOSE_HEADERS" env-separator:","`
+		AllowCredentials bool          `yaml:"allow_credentials" env:"CORS_ALLOW_CREDENTIALS" env-default:"false"`
+		MaxAge           time.Duration `yaml:"max_age" env:"CORS_MAX_AGE" env-default:"12h"`
 	}
 )
 

@@ -10,6 +10,7 @@ import (
 	"carsharing/booking-service/internal/adapter/grpc/handler"
 	"carsharing/booking-service/internal/adapter/grpc/handler/mocks"
 	"carsharing/booking-service/internal/model"
+	"carsharing/booking-service/internal/validation"
 	servicebookingpb "carsharing/protos/gen/service/booking"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -33,7 +34,7 @@ func assertCode(t *testing.T, err error, want codes.Code) {
 
 func TestBookingHandler_CreateBooking_HappyPath(t *testing.T) {
 	svc := mocks.NewMockBookingService(t)
-	svc.EXPECT().Create(context.Background(), model.BookingCreate{
+	svc.EXPECT().Create(context.Background(), validation.BookingCreate{
 		UserID:        "u-1",
 		CarID:         "c-1",
 		PricingRuleID: "r-1",
@@ -52,7 +53,7 @@ func TestBookingHandler_CreateBooking_HappyPath(t *testing.T) {
 
 func TestBookingHandler_CreateBooking_ServiceError(t *testing.T) {
 	svc := mocks.NewMockBookingService(t)
-	svc.EXPECT().Create(context.Background(), model.BookingCreate{PricingRuleID: "missing"}).
+	svc.EXPECT().Create(context.Background(), validation.BookingCreate{PricingRuleID: "missing"}).
 		Return("", model.ErrNotFound)
 
 	h := handler.NewBookingHandler(discardLogger(), svc)
@@ -92,10 +93,9 @@ func TestBookingHandler_GetBooking_NotFound(t *testing.T) {
 
 func TestBookingHandler_ListBookings_HappyPath(t *testing.T) {
 	bookings := []model.Booking{{ID: "b-1"}, {ID: "b-2"}}
-	filter := model.BookingListFilter{}
 
 	svc := mocks.NewMockBookingService(t)
-	svc.EXPECT().List(context.Background(), filter).Return(bookings, nil)
+	svc.EXPECT().List(context.Background(), validation.BookingListFilter{}).Return(bookings, nil)
 
 	h := handler.NewBookingHandler(discardLogger(), svc)
 	resp, err := h.ListBookings(context.Background(), &servicebookingpb.ListBookingsRequest{})
@@ -108,7 +108,7 @@ func TestBookingHandler_ListBookings_HappyPath(t *testing.T) {
 
 func TestBookingHandler_ListBookings_ServiceError(t *testing.T) {
 	svc := mocks.NewMockBookingService(t)
-	svc.EXPECT().List(context.Background(), model.BookingListFilter{}).
+	svc.EXPECT().List(context.Background(), validation.BookingListFilter{}).
 		Return(nil, errors.New("db error"))
 
 	h := handler.NewBookingHandler(discardLogger(), svc)
@@ -147,14 +147,14 @@ func TestBookingHandler_CancelBooking_InvalidTransition(t *testing.T) {
 	h := handler.NewBookingHandler(discardLogger(), svc)
 	_, err := h.CancelBooking(context.Background(), &servicebookingpb.CancelBookingRequest{Id: "b-1"})
 
-	assertCode(t, err, codes.InvalidArgument)
+	assertCode(t, err, codes.FailedPrecondition)
 }
 
 // --- UpdateBookingStatus ---
 
 func TestBookingHandler_UpdateBookingStatus_HappyPath(t *testing.T) {
 	svc := mocks.NewMockBookingService(t)
-	svc.EXPECT().UpdateStatus(context.Background(), "b-1", "cancelled", (*string)(nil)).Return(nil)
+	svc.EXPECT().UpdateStatus(context.Background(), "b-1", validation.BookingStatusUpdate{Status: "cancelled"}).Return(nil)
 
 	h := handler.NewBookingHandler(discardLogger(), svc)
 	resp, err := h.UpdateBookingStatus(context.Background(), &servicebookingpb.UpdateBookingStatusRequest{
@@ -168,7 +168,7 @@ func TestBookingHandler_UpdateBookingStatus_HappyPath(t *testing.T) {
 
 func TestBookingHandler_UpdateBookingStatus_InvalidStatus(t *testing.T) {
 	svc := mocks.NewMockBookingService(t)
-	svc.EXPECT().UpdateStatus(context.Background(), "b-1", "BOGUS", (*string)(nil)).Return(model.ErrInvalidBookingStatus)
+	svc.EXPECT().UpdateStatus(context.Background(), "b-1", validation.BookingStatusUpdate{Status: "BOGUS"}).Return(model.ErrInvalidBookingStatus)
 
 	h := handler.NewBookingHandler(discardLogger(), svc)
 	_, err := h.UpdateBookingStatus(context.Background(), &servicebookingpb.UpdateBookingStatusRequest{
@@ -181,7 +181,7 @@ func TestBookingHandler_UpdateBookingStatus_InvalidStatus(t *testing.T) {
 
 func TestBookingHandler_UpdateBookingStatus_InvalidTransition(t *testing.T) {
 	svc := mocks.NewMockBookingService(t)
-	svc.EXPECT().UpdateStatus(context.Background(), "b-1", "cancelled", (*string)(nil)).Return(model.ErrInvalidBookingStatusTransition)
+	svc.EXPECT().UpdateStatus(context.Background(), "b-1", validation.BookingStatusUpdate{Status: "cancelled"}).Return(model.ErrInvalidBookingStatusTransition)
 
 	h := handler.NewBookingHandler(discardLogger(), svc)
 	_, err := h.UpdateBookingStatus(context.Background(), &servicebookingpb.UpdateBookingStatusRequest{
@@ -189,7 +189,7 @@ func TestBookingHandler_UpdateBookingStatus_InvalidTransition(t *testing.T) {
 		Status: "cancelled",
 	})
 
-	assertCode(t, err, codes.InvalidArgument)
+	assertCode(t, err, codes.FailedPrecondition)
 }
 
 // --- GetBookingStatusHistory ---
@@ -199,10 +199,9 @@ func TestBookingHandler_GetBookingStatusHistory_HappyPath(t *testing.T) {
 		{ID: "h-1", BookingID: "b-1", FromStatus: "created", ToStatus: "cancelled"},
 		{ID: "h-2", BookingID: "b-1", FromStatus: "cancelled", ToStatus: "expired"},
 	}
-	filter := model.BookingStatusHistoryFilter{BookingID: "b-1"}
 
 	svc := mocks.NewMockBookingService(t)
-	svc.EXPECT().GetStatusHistory(context.Background(), filter).Return(history, nil)
+	svc.EXPECT().GetStatusHistory(context.Background(), validation.BookingStatusHistoryFilter{BookingID: "b-1"}).Return(history, nil)
 
 	h := handler.NewBookingHandler(discardLogger(), svc)
 	resp, err := h.GetBookingStatusHistory(context.Background(), &servicebookingpb.GetBookingStatusHistoryRequest{Id: "b-1"})
@@ -216,7 +215,7 @@ func TestBookingHandler_GetBookingStatusHistory_HappyPath(t *testing.T) {
 
 func TestBookingHandler_GetBookingStatusHistory_ServiceError(t *testing.T) {
 	svc := mocks.NewMockBookingService(t)
-	svc.EXPECT().GetStatusHistory(context.Background(), model.BookingStatusHistoryFilter{BookingID: "b-1"}).
+	svc.EXPECT().GetStatusHistory(context.Background(), validation.BookingStatusHistoryFilter{BookingID: "b-1"}).
 		Return(nil, errors.New("db error"))
 
 	h := handler.NewBookingHandler(discardLogger(), svc)

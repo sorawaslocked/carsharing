@@ -3,15 +3,18 @@ resolve-type-alias: false
 disable-version-string: true
 issue-845-fix: true
 packages:
-  github.com/sorawaslocked/car-rental-booking-service/internal/service:
+  carsharing/booking-service/internal/service:
     interfaces:
       BookingRepository:
       PricingRuleRepository:
       EventPublisher:
+      CarChecker:
+      CarModelChecker:
+      ZoneChecker:
     config:
       dir: internal/service/mocks
       outpkg: mocks
-  github.com/sorawaslocked/car-rental-booking-service/internal/adapter/grpc/handler:
+  carsharing/booking-service/internal/adapter/grpc/handler:
     interfaces:
       BookingService:
       PricingRuleService:

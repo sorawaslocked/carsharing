@@ -8,6 +8,7 @@ import (
 	"carsharing/booking-service/internal/adapter/grpc/handler"
 	"carsharing/booking-service/internal/adapter/grpc/handler/mocks"
 	"carsharing/booking-service/internal/model"
+	"carsharing/booking-service/internal/validation"
 	servicebookingpb "carsharing/protos/gen/service/booking"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -18,7 +19,7 @@ import (
 
 func TestPricingRuleHandler_CreatePricingRule_HappyPath(t *testing.T) {
 	svc := mocks.NewMockPricingRuleService(t)
-	svc.EXPECT().Create(context.Background(), model.PricingRuleCreate{
+	svc.EXPECT().Create(context.Background(), validation.PricingRuleCreate{
 		Type:      "per_minute",
 		RateTenge: 50,
 	}).Return("r-1", nil)
@@ -35,7 +36,7 @@ func TestPricingRuleHandler_CreatePricingRule_HappyPath(t *testing.T) {
 
 func TestPricingRuleHandler_CreatePricingRule_ServiceError(t *testing.T) {
 	svc := mocks.NewMockPricingRuleService(t)
-	svc.EXPECT().Create(context.Background(), model.PricingRuleCreate{}).
+	svc.EXPECT().Create(context.Background(), validation.PricingRuleCreate{}).
 		Return("", errors.New("db error"))
 
 	h := handler.NewPricingRuleHandler(discardLogger(), svc)
@@ -78,7 +79,7 @@ func TestPricingRuleHandler_ListPricingRules_HappyPath(t *testing.T) {
 	rules := []model.PricingRule{{ID: "r-1"}, {ID: "r-2"}}
 
 	svc := mocks.NewMockPricingRuleService(t)
-	svc.EXPECT().List(context.Background(), model.PricingRuleListFilter{}).Return(rules, nil)
+	svc.EXPECT().List(context.Background(), validation.PricingRuleListFilter{}).Return(rules, nil)
 
 	h := handler.NewPricingRuleHandler(discardLogger(), svc)
 	resp, err := h.ListPricingRules(context.Background(), &servicebookingpb.ListPricingRulesRequest{})
@@ -91,7 +92,7 @@ func TestPricingRuleHandler_ListPricingRules_HappyPath(t *testing.T) {
 
 func TestPricingRuleHandler_ListPricingRules_ServiceError(t *testing.T) {
 	svc := mocks.NewMockPricingRuleService(t)
-	svc.EXPECT().List(context.Background(), model.PricingRuleListFilter{}).
+	svc.EXPECT().List(context.Background(), validation.PricingRuleListFilter{}).
 		Return(nil, errors.New("db error"))
 
 	h := handler.NewPricingRuleHandler(discardLogger(), svc)
@@ -104,7 +105,7 @@ func TestPricingRuleHandler_ListPricingRules_ServiceError(t *testing.T) {
 
 func TestPricingRuleHandler_UpdatePricingRule_HappyPath(t *testing.T) {
 	svc := mocks.NewMockPricingRuleService(t)
-	svc.EXPECT().Update(context.Background(), "r-1", model.PricingRuleUpdate{}).Return(nil)
+	svc.EXPECT().Update(context.Background(), "r-1", validation.PricingRuleUpdate{}).Return(nil)
 
 	h := handler.NewPricingRuleHandler(discardLogger(), svc)
 	resp, err := h.UpdatePricingRule(context.Background(), &servicebookingpb.UpdatePricingRuleRequest{Id: "r-1"})
@@ -115,7 +116,7 @@ func TestPricingRuleHandler_UpdatePricingRule_HappyPath(t *testing.T) {
 
 func TestPricingRuleHandler_UpdatePricingRule_NotFound(t *testing.T) {
 	svc := mocks.NewMockPricingRuleService(t)
-	svc.EXPECT().Update(context.Background(), "missing", model.PricingRuleUpdate{}).Return(model.ErrNotFound)
+	svc.EXPECT().Update(context.Background(), "missing", validation.PricingRuleUpdate{}).Return(model.ErrNotFound)
 
 	h := handler.NewPricingRuleHandler(discardLogger(), svc)
 	_, err := h.UpdatePricingRule(context.Background(), &servicebookingpb.UpdatePricingRuleRequest{Id: "missing"})

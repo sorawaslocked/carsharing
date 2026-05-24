@@ -250,10 +250,7 @@ func (s *BookingService) UpdateStatus(ctx context.Context, id string, data valid
 		return model.ErrInsufficientPermissions
 	}
 
-	toStatus, ok := model.ParseBookingStatus(data.Status)
-	if !ok {
-		return model.ErrInvalidBookingStatus
-	}
+	toStatus, _ := model.ParseBookingStatus(data.Status)
 
 	booking, err := s.bookingRepo.GetByID(ctx, id)
 	if err != nil {
@@ -348,7 +345,7 @@ func (s *BookingService) expireBookings(ctx context.Context) {
 
 		log.Info("booking expired", slog.String("bookingID", b.ID))
 
-		if err := s.publisher.PublishBookingExpired(context.Background(), b); err != nil {
+		if err := s.publisher.PublishBookingExpired(ctx, b); err != nil {
 			log.Error("event: publishing booking.expired", slog.String("bookingID", b.ID), pkglog.Err(err))
 		}
 	}

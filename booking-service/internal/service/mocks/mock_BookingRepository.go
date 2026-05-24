@@ -6,6 +6,7 @@ import (
 	context "context"
 
 	model "carsharing/booking-service/internal/model"
+	sharedmodel "carsharing/shared/model"
 	mock "github.com/stretchr/testify/mock"
 
 	time "time"
@@ -317,7 +318,7 @@ func (_c *MockBookingRepository_ListCreatedExpired_Call) RunAndReturn(run func(c
 }
 
 // UpdateStatus provides a mock function with given fields: ctx, id, status, actorType, actorID, reason
-func (_m *MockBookingRepository) UpdateStatus(ctx context.Context, id string, status string, actorType string, actorID *string, reason *string) error {
+func (_m *MockBookingRepository) UpdateStatus(ctx context.Context, id string, status model.BookingStatus, actorType sharedmodel.ActorType, actorID *string, reason *string) error {
 	ret := _m.Called(ctx, id, status, actorType, actorID, reason)
 
 	if len(ret) == 0 {
@@ -325,7 +326,7 @@ func (_m *MockBookingRepository) UpdateStatus(ctx context.Context, id string, st
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, *string, *string) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, model.BookingStatus, sharedmodel.ActorType, *string, *string) error); ok {
 		r0 = rf(ctx, id, status, actorType, actorID, reason)
 	} else {
 		r0 = ret.Error(0)
@@ -342,17 +343,17 @@ type MockBookingRepository_UpdateStatus_Call struct {
 // UpdateStatus is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id string
-//   - status string
-//   - actorType string
+//   - status model.BookingStatus
+//   - actorType sharedmodel.ActorType
 //   - actorID *string
 //   - reason *string
 func (_e *MockBookingRepository_Expecter) UpdateStatus(ctx interface{}, id interface{}, status interface{}, actorType interface{}, actorID interface{}, reason interface{}) *MockBookingRepository_UpdateStatus_Call {
 	return &MockBookingRepository_UpdateStatus_Call{Call: _e.mock.On("UpdateStatus", ctx, id, status, actorType, actorID, reason)}
 }
 
-func (_c *MockBookingRepository_UpdateStatus_Call) Run(run func(ctx context.Context, id string, status string, actorType string, actorID *string, reason *string)) *MockBookingRepository_UpdateStatus_Call {
+func (_c *MockBookingRepository_UpdateStatus_Call) Run(run func(ctx context.Context, id string, status model.BookingStatus, actorType sharedmodel.ActorType, actorID *string, reason *string)) *MockBookingRepository_UpdateStatus_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(string), args[3].(string), args[4].(*string), args[5].(*string))
+		run(args[0].(context.Context), args[1].(string), args[2].(model.BookingStatus), args[3].(sharedmodel.ActorType), args[4].(*string), args[5].(*string))
 	})
 	return _c
 }
@@ -362,7 +363,7 @@ func (_c *MockBookingRepository_UpdateStatus_Call) Return(_a0 error) *MockBookin
 	return _c
 }
 
-func (_c *MockBookingRepository_UpdateStatus_Call) RunAndReturn(run func(context.Context, string, string, string, *string, *string) error) *MockBookingRepository_UpdateStatus_Call {
+func (_c *MockBookingRepository_UpdateStatus_Call) RunAndReturn(run func(context.Context, string, model.BookingStatus, sharedmodel.ActorType, *string, *string) error) *MockBookingRepository_UpdateStatus_Call {
 	_c.Call.Return(run)
 	return _c
 }

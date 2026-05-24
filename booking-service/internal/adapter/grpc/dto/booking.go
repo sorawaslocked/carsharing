@@ -89,14 +89,14 @@ func BookingStatusHistoryFilterFromProto(req *servicebookingpb.GetBookingStatusH
 	filter := validation.BookingStatusHistoryFilter{
 		BookingID: req.Id,
 	}
-	if req.TimeRange != nil {
+	if req.GetTimeRange() != nil {
 		tr := &sharedvalidation.TimeRange{}
-		if req.TimeRange.From != nil {
-			t := req.TimeRange.From.AsTime()
+		if req.GetTimeRange().GetFrom() != nil {
+			t := req.GetTimeRange().GetFrom().AsTime()
 			tr.From = &t
 		}
-		if req.TimeRange.To != nil {
-			t := req.TimeRange.To.AsTime()
+		if req.GetTimeRange().GetTo() != nil {
+			t := req.GetTimeRange().GetTo().AsTime()
 			tr.To = &t
 		}
 		filter.TimeRange = tr

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log/slog"
 
 	httpdto "carsharing/api-gateway/internal/adapter/http/dto"
@@ -68,6 +69,10 @@ func (h *CarWsHandler) Fleet(c *gin.Context) {
 	}
 	defer conn.CloseNow()
 
+	connID := fmt.Sprintf("%p", conn)
+	logger.Info("fleet websocket opened", slog.String("connID", connID))
+	defer logger.Info("fleet websocket closed", slog.String("connID", connID))
+
 	ctx, cancel := tokenDeadlineCtx(c)
 	defer cancel()
 
@@ -84,10 +89,11 @@ func (h *CarWsHandler) Fleet(c *gin.Context) {
 				Status:       c.Status,
 			}
 		}
+		logger.Info("fleet writing batch", slog.String("connID", connID), slog.Int("count", len(slim)))
 		return wsjson.Write(ctx, conn, wsdto.CarFleetMessage{Cars: slim})
 	})
 	if streamErr != nil {
-		logger.Error("fleet stream error", pkglog.Err(streamErr))
+		logger.Error("fleet stream error", pkglog.Err(streamErr), slog.String("connID", connID))
 	}
 
 	conn.Close(websocket.StatusNormalClosure, "")
@@ -117,10 +123,15 @@ func (h *CarWsHandler) Telemetry(c *gin.Context) {
 	}
 	defer conn.CloseNow()
 
+	connID := fmt.Sprintf("%p", conn)
+	logger.Info("telemetry websocket opened", slog.String("connID", connID), slog.String("carID", carID))
+	defer logger.Info("telemetry websocket closed", slog.String("connID", connID))
+
 	ctx, cancel := tokenDeadlineCtx(c)
 	defer cancel()
 
 	streamErr := h.svc.StreamCarTelemetry(ctx, carID, func(event model.CarTelemetryEvent) error {
+		logger.Info("telemetry writing event", slog.String("connID", connID))
 		return wsjson.Write(ctx, conn, wsdto.CarTelemetryMessage{
 			FuelLevel:    event.FuelLevel,
 			BatteryLevel: event.BatteryLevel,
@@ -130,7 +141,7 @@ func (h *CarWsHandler) Telemetry(c *gin.Context) {
 		})
 	})
 	if streamErr != nil {
-		logger.Error("telemetry stream error", pkglog.Err(streamErr))
+		logger.Error("telemetry stream error", pkglog.Err(streamErr), slog.String("connID", connID))
 	}
 
 	conn.Close(websocket.StatusNormalClosure, "")

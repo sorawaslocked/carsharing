@@ -62,7 +62,7 @@ func (r *CarInsuranceRepository) FindByID(ctx context.Context, id string) (model
 	ins, err := dto.ScanCarInsuranceRow(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return model.CarInsurance{}, model.ErrNotFound
+			return model.CarInsurance{}, model.ErrCarInsuranceNotFound
 		}
 		log.Error("failed to find car insurance by id", pkglog.Err(err))
 		return model.CarInsurance{}, model.ErrSql
@@ -137,7 +137,7 @@ func (r *CarInsuranceRepository) Update(ctx context.Context, id string, update m
 	}
 
 	if tag.RowsAffected() == 0 {
-		return model.ErrNotFound
+		return model.ErrCarInsuranceNotFound
 	}
 
 	return nil
@@ -153,7 +153,7 @@ func (r *CarInsuranceRepository) Delete(ctx context.Context, id string) error {
 	}
 
 	if tag.RowsAffected() == 0 {
-		return model.ErrNotFound
+		return model.ErrCarInsuranceNotFound
 	}
 
 	return nil

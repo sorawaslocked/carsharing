@@ -166,14 +166,14 @@ func TestCarMaintenanceServiceGetTemplate(t *testing.T) {
 		assert.Equal(t, tmplID, got.ID)
 	})
 
-	t.Run("not found returns ErrNotFound", func(t *testing.T) {
+	t.Run("not found returns ErrCarMaintenanceTemplateNotFound", func(t *testing.T) {
 		templateRepo := mocks.NewMockCarMaintenanceTemplateRepository(t)
 		svc := newTestCarMaintenanceService(t, templateRepo, nil, nil, nil, nil, nil)
 
-		templateRepo.EXPECT().FindByID(ctx, tmplID).Return(model.CarMaintenanceTemplate{}, model.ErrNotFound)
+		templateRepo.EXPECT().FindByID(ctx, tmplID).Return(model.CarMaintenanceTemplate{}, model.ErrCarMaintenanceTemplateNotFound)
 
 		_, err := svc.GetTemplate(ctx, tmplID)
-		assert.ErrorIs(t, err, model.ErrNotFound)
+		assert.ErrorIs(t, err, model.ErrCarMaintenanceTemplateNotFound)
 	})
 }
 
@@ -222,13 +222,14 @@ func TestCarMaintenanceServiceUpdateTemplate(t *testing.T) {
 		assert.NoError(t, svc.UpdateTemplate(ctx, tmplID, validation.CarMaintenanceTemplateUpdate{}))
 	})
 
-	t.Run("not found returns ErrNotFound", func(t *testing.T) {
+	t.Run("not found returns ErrCarMaintenanceTemplateNotFound", func(t *testing.T) {
 		templateRepo := mocks.NewMockCarMaintenanceTemplateRepository(t)
 		svc := newTestCarMaintenanceService(t, templateRepo, nil, nil, nil, nil, nil)
 
-		templateRepo.EXPECT().Update(ctx, tmplID, mock.Anything).Return(model.ErrNotFound)
+		templateRepo.EXPECT().Update(ctx, tmplID, mock.Anything).Return(model.ErrCarMaintenanceTemplateNotFound)
 
-		assert.ErrorIs(t, svc.UpdateTemplate(ctx, tmplID, validation.CarMaintenanceTemplateUpdate{}), model.ErrNotFound)
+		err := svc.UpdateTemplate(ctx, tmplID, validation.CarMaintenanceTemplateUpdate{})
+		assert.ErrorIs(t, err, model.ErrCarMaintenanceTemplateNotFound)
 	})
 }
 
@@ -247,13 +248,14 @@ func TestCarMaintenanceServiceDeleteTemplate(t *testing.T) {
 		assert.NoError(t, svc.DeleteTemplate(ctx, tmplID))
 	})
 
-	t.Run("not found returns ErrNotFound", func(t *testing.T) {
+	t.Run("not found returns ErrCarMaintenanceTemplateNotFound", func(t *testing.T) {
 		templateRepo := mocks.NewMockCarMaintenanceTemplateRepository(t)
 		svc := newTestCarMaintenanceService(t, templateRepo, nil, nil, nil, nil, nil)
 
-		templateRepo.EXPECT().Delete(ctx, tmplID).Return(model.ErrNotFound)
+		templateRepo.EXPECT().Delete(ctx, tmplID).Return(model.ErrCarMaintenanceTemplateNotFound)
 
-		assert.ErrorIs(t, svc.DeleteTemplate(ctx, tmplID), model.ErrNotFound)
+		err := svc.DeleteTemplate(ctx, tmplID)
+		assert.ErrorIs(t, err, model.ErrCarMaintenanceTemplateNotFound)
 	})
 }
 
@@ -295,15 +297,15 @@ func TestCarMaintenanceServiceGetRecord(t *testing.T) {
 		assert.Equal(t, presigned, got.ReceiptImages[0].URL)
 	})
 
-	t.Run("not found returns ErrNotFound", func(t *testing.T) {
+	t.Run("not found returns ErrCarMaintenanceRecordNotFound", func(t *testing.T) {
 		recordRepo := mocks.NewMockCarMaintenanceRecordRepository(t)
 		storage := mocks.NewMockObjectStorage(t)
 		svc := newTestCarMaintenanceService(t, nil, recordRepo, nil, nil, nil, storage)
 
-		recordRepo.EXPECT().FindByID(ctx, recordID).Return(model.CarMaintenanceRecord{}, model.ErrNotFound)
+		recordRepo.EXPECT().FindByID(ctx, recordID).Return(model.CarMaintenanceRecord{}, model.ErrCarMaintenanceRecordNotFound)
 
 		_, err := svc.GetRecord(ctx, recordID)
-		assert.ErrorIs(t, err, model.ErrNotFound)
+		assert.ErrorIs(t, err, model.ErrCarMaintenanceRecordNotFound)
 	})
 }
 
@@ -421,17 +423,17 @@ func TestCarMaintenanceServiceCompleteRecord(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("record not found returns ErrNotFound", func(t *testing.T) {
+	t.Run("record not found returns ErrCarMaintenanceRecordNotFound", func(t *testing.T) {
 		recordRepo := mocks.NewMockCarMaintenanceRecordRepository(t)
 		svc := newTestCarMaintenanceService(t, nil, recordRepo, nil, nil, nil, nil)
 
-		recordRepo.EXPECT().FindByID(ctx, recordID).Return(model.CarMaintenanceRecord{}, model.ErrNotFound)
+		recordRepo.EXPECT().FindByID(ctx, recordID).Return(model.CarMaintenanceRecord{}, model.ErrCarMaintenanceRecordNotFound)
 
 		err := svc.CompleteRecord(ctx, recordID, validation.CarMaintenanceRecordComplete{CompletedKM: 1000})
-		assert.ErrorIs(t, err, model.ErrNotFound)
+		assert.ErrorIs(t, err, model.ErrCarMaintenanceRecordNotFound)
 	})
 
-	t.Run("template not found returns ErrNotFound", func(t *testing.T) {
+	t.Run("template not found returns ErrCarMaintenanceTemplateNotFound", func(t *testing.T) {
 		templateRepo := mocks.NewMockCarMaintenanceTemplateRepository(t)
 		recordRepo := mocks.NewMockCarMaintenanceRecordRepository(t)
 		svc := newTestCarMaintenanceService(t, templateRepo, recordRepo, nil, nil, nil, nil)
@@ -439,10 +441,10 @@ func TestCarMaintenanceServiceCompleteRecord(t *testing.T) {
 		recordRepo.EXPECT().FindByID(ctx, recordID).Return(model.CarMaintenanceRecord{
 			ID: recordID, CarID: carID, TemplateID: templateID,
 		}, nil)
-		templateRepo.EXPECT().FindByID(ctx, templateID).Return(model.CarMaintenanceTemplate{}, model.ErrNotFound)
+		templateRepo.EXPECT().FindByID(ctx, templateID).Return(model.CarMaintenanceTemplate{}, model.ErrCarMaintenanceTemplateNotFound)
 
 		err := svc.CompleteRecord(ctx, recordID, validation.CarMaintenanceRecordComplete{CompletedKM: 1000})
-		assert.ErrorIs(t, err, model.ErrNotFound)
+		assert.ErrorIs(t, err, model.ErrCarMaintenanceTemplateNotFound)
 	})
 }
 
@@ -577,15 +579,15 @@ func TestEvaluateCarMaintenance(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("car not found returns ErrNotFound", func(t *testing.T) {
+	t.Run("car not found returns ErrCarNotFound", func(t *testing.T) {
 		carRepo := mocks.NewMockCarRepository(t)
 		carService := newTestCarServiceForMaintenance(t, carRepo)
 		svc := newTestCarMaintenanceService(t, nil, nil, nil, carRepo, carService, nil)
 
-		carRepo.EXPECT().FindByID(ctx, carID).Return(model.Car{}, model.ErrNotFound)
+		carRepo.EXPECT().FindByID(ctx, carID).Return(model.Car{}, model.ErrCarNotFound)
 
 		err := svc.EvaluateCarMaintenance(ctx, carID)
-		assert.ErrorIs(t, err, model.ErrNotFound)
+		assert.ErrorIs(t, err, model.ErrCarNotFound)
 	})
 
 	t.Run("template load failure is logged and skipped, not fatal", func(t *testing.T) {
@@ -598,7 +600,7 @@ func TestEvaluateCarMaintenance(t *testing.T) {
 		carRepo.EXPECT().FindByID(ctx, carID).
 			Return(model.Car{ID: carID, MileageKM: 50_000}, nil)
 		stateRepo.EXPECT().FindAll(ctx, mock.Anything).Return([]model.CarServiceState{state}, nil)
-		templateRepo.EXPECT().FindByID(ctx, templateID).Return(model.CarMaintenanceTemplate{}, model.ErrNotFound)
+		templateRepo.EXPECT().FindByID(ctx, templateID).Return(model.CarMaintenanceTemplate{}, model.ErrCarMaintenanceTemplateNotFound)
 
 		// Must not return an error: template failures are non-fatal per implementation.
 		err := svc.EvaluateCarMaintenance(ctx, carID)

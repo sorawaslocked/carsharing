@@ -17,6 +17,11 @@ func FromErrorToStatusCode(err error) error {
 		return validationError(ve)
 	}
 
+	var errTransition model.ErrInvalidStatusTransition
+	if errors.As(err, &errTransition) {
+		return status.Error(codes.FailedPrecondition, err.Error())
+	}
+
 	switch {
 	case errors.Is(err, model.ErrInvalidMetadata):
 		return status.Error(codes.InvalidArgument, err.Error())
@@ -27,7 +32,16 @@ func FromErrorToStatusCode(err error) error {
 	case errors.Is(err, model.ErrInsufficientPermissions):
 		return status.Error(codes.PermissionDenied, err.Error())
 
-	case errors.Is(err, model.ErrNotFound):
+	case errors.Is(err, model.ErrMileageRegression):
+		return status.Error(codes.FailedPrecondition, err.Error())
+
+	case errors.Is(err, model.ErrCarNotFound),
+		errors.Is(err, model.ErrCarModelNotFound),
+		errors.Is(err, model.ErrZoneNotFound),
+		errors.Is(err, model.ErrCarInsuranceNotFound),
+		errors.Is(err, model.ErrCarMaintenanceTemplateNotFound),
+		errors.Is(err, model.ErrCarMaintenanceRecordNotFound),
+		errors.Is(err, model.ErrNotFound):
 		return status.Error(codes.NotFound, err.Error())
 
 	case errors.Is(err, model.ErrDuplicateVIN),

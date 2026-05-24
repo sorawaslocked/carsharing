@@ -58,7 +58,7 @@ func (r *ZoneRepository) FindByID(ctx context.Context, id string) (model.Zone, e
 	zone, err := dto.ScanZoneRow(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return model.Zone{}, model.ErrNotFound
+			return model.Zone{}, model.ErrZoneNotFound
 		}
 		log.Error("failed to find zone by id", pkglog.Err(err))
 		return model.Zone{}, model.ErrSql
@@ -132,7 +132,7 @@ func (r *ZoneRepository) Update(ctx context.Context, id string, update model.Zon
 	}
 
 	if tag.RowsAffected() == 0 {
-		return model.ErrNotFound
+		return model.ErrZoneNotFound
 	}
 
 	return nil
@@ -148,7 +148,7 @@ func (r *ZoneRepository) Delete(ctx context.Context, id string) error {
 	}
 
 	if tag.RowsAffected() == 0 {
-		return model.ErrNotFound
+		return model.ErrZoneNotFound
 	}
 
 	return nil

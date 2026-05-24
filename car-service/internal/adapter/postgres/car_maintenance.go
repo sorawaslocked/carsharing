@@ -62,7 +62,7 @@ func (r *CarMaintenanceTemplateRepository) FindByID(ctx context.Context, id stri
 	tmpl, err := dto.ScanMaintenanceTemplateRow(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return model.CarMaintenanceTemplate{}, model.ErrNotFound
+			return model.CarMaintenanceTemplate{}, model.ErrCarMaintenanceTemplateNotFound
 		}
 		log.Error("failed to find maintenance template by id", pkglog.Err(err))
 		return model.CarMaintenanceTemplate{}, model.ErrSql
@@ -136,7 +136,7 @@ func (r *CarMaintenanceTemplateRepository) Update(ctx context.Context, id string
 	}
 
 	if tag.RowsAffected() == 0 {
-		return model.ErrNotFound
+		return model.ErrCarMaintenanceTemplateNotFound
 	}
 
 	return nil
@@ -152,7 +152,7 @@ func (r *CarMaintenanceTemplateRepository) Delete(ctx context.Context, id string
 	}
 
 	if tag.RowsAffected() == 0 {
-		return model.ErrNotFound
+		return model.ErrCarMaintenanceTemplateNotFound
 	}
 
 	return nil
@@ -208,7 +208,7 @@ func (r *CarMaintenanceRecordRepository) FindByID(ctx context.Context, id string
 	rec, err := dto.ScanMaintenanceRecordRow(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return model.CarMaintenanceRecord{}, model.ErrNotFound
+			return model.CarMaintenanceRecord{}, model.ErrCarMaintenanceRecordNotFound
 		}
 		log.Error("failed to find maintenance record by id", pkglog.Err(err))
 		return model.CarMaintenanceRecord{}, model.ErrSql
@@ -283,7 +283,7 @@ func (r *CarMaintenanceRecordRepository) Update(ctx context.Context, id string, 
 	}
 
 	if tag.RowsAffected() == 0 {
-		return model.ErrNotFound
+		return model.ErrCarMaintenanceRecordNotFound
 	}
 
 	return nil

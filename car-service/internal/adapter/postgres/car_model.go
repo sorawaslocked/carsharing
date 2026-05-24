@@ -64,7 +64,7 @@ func (r *CarModelRepository) FindByID(ctx context.Context, id string) (model.Car
 	cm, err := dto.ScanCarModelRow(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return model.CarModel{}, model.ErrNotFound
+			return model.CarModel{}, model.ErrCarModelNotFound
 		}
 		log.Error("failed to find car model by id", pkglog.Err(err))
 		return model.CarModel{}, model.ErrSql
@@ -139,7 +139,7 @@ func (r *CarModelRepository) Update(ctx context.Context, id string, update model
 	}
 
 	if tag.RowsAffected() == 0 {
-		return model.ErrNotFound
+		return model.ErrCarModelNotFound
 	}
 
 	return nil
@@ -155,7 +155,7 @@ func (r *CarModelRepository) Delete(ctx context.Context, id string) error {
 	}
 
 	if tag.RowsAffected() == 0 {
-		return model.ErrNotFound
+		return model.ErrCarModelNotFound
 	}
 
 	return nil

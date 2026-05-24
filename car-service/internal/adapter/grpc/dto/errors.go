@@ -30,7 +30,9 @@ func FromErrorToStatusCode(err error) error {
 	case errors.Is(err, model.ErrNotFound):
 		return status.Error(codes.NotFound, err.Error())
 
-	case errors.Is(err, model.ErrAlreadyExists):
+	case errors.Is(err, model.ErrDuplicateVIN),
+		errors.Is(err, model.ErrDuplicateLicensePlate),
+		errors.Is(err, model.ErrAlreadyExists):
 		return status.Error(codes.AlreadyExists, err.Error())
 
 	default:

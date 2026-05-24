@@ -30,8 +30,13 @@ func NewCarRepository(log *slog.Logger, pool *pgxpool.Pool) *CarRepository {
 
 func (r *CarRepository) handlePGErr(err error) error {
 	var pgErr *pgconn.PgError
-	if errors.As(err, &pgErr) && pgErr.Code == "23505" {
-		return model.ErrAlreadyExists
+	if errors.As(err, &pgErr) {
+		switch pgErr.ConstraintName {
+		case "cars_vin_key":
+			return model.ErrDuplicateVIN
+		case "cars_license_plate_key":
+			return model.ErrDuplicateLicensePlate
+		}
 	}
 	return model.ErrSql
 }
@@ -75,7 +80,7 @@ func (r *CarRepository) FindByID(ctx context.Context, id string) (model.Car, err
 	car, err := dto.ScanCarRow(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return model.Car{}, model.ErrNotFound
+			return model.Car{}, model.ErrCarNotFound
 		}
 		log.Error("failed to find car by id", pkglog.Err(err))
 		return model.Car{}, model.ErrSql
@@ -146,7 +151,7 @@ func (r *CarRepository) Update(ctx context.Context, id string, update model.CarU
 	}
 
 	if tag.RowsAffected() == 0 {
-		return model.ErrNotFound
+		return model.ErrCarNotFound
 	}
 
 	return nil
@@ -162,7 +167,7 @@ func (r *CarRepository) Delete(ctx context.Context, id string) error {
 	}
 
 	if tag.RowsAffected() == 0 {
-		return model.ErrNotFound
+		return model.ErrCarNotFound
 	}
 
 	return nil

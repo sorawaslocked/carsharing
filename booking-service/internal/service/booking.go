@@ -62,8 +62,8 @@ func (s *BookingService) Create(ctx context.Context, data validation.BookingCrea
 		return "", err
 	}
 
-	if !isPrivileged(md.UserRoles) && (md.UserID == nil || data.UserID != *md.UserID) {
-		return "", model.ErrInsufficientPermissions
+	if err := checkOwnerAccess(md, data.UserID); err != nil {
+		return "", err
 	}
 
 	carExists, err := s.carChecker.Exists(ctx, data.CarID)
@@ -136,8 +136,8 @@ func (s *BookingService) GetByID(ctx context.Context, id string) (model.Booking,
 		return model.Booking{}, err
 	}
 
-	if !isPrivileged(md.UserRoles) && (md.UserID == nil || booking.UserID != *md.UserID) {
-		return model.Booking{}, model.ErrInsufficientPermissions
+	if err := checkOwnerAccess(md, booking.UserID); err != nil {
+		return model.Booking{}, err
 	}
 
 	return booking, nil
@@ -182,8 +182,8 @@ func (s *BookingService) Cancel(ctx context.Context, id string, reason *string) 
 		return err
 	}
 
-	if !isPrivileged(md.UserRoles) && (md.UserID == nil || booking.UserID != *md.UserID) {
-		return model.ErrInsufficientPermissions
+	if err := checkOwnerAccess(md, booking.UserID); err != nil {
+		return err
 	}
 
 	if err := model.ValidateTransition(booking.Status, model.BookingStatusCancelled); err != nil {
@@ -288,8 +288,8 @@ func (s *BookingService) GetStatusHistory(ctx context.Context, filter validation
 		return nil, err
 	}
 
-	if !isPrivileged(md.UserRoles) && (md.UserID == nil || booking.UserID != *md.UserID) {
-		return nil, model.ErrInsufficientPermissions
+	if err := checkOwnerAccess(md, booking.UserID); err != nil {
+		return nil, err
 	}
 
 	history, err := s.bookingRepo.GetStatusHistory(ctx, bookingStatusHistoryFilter(filter))
@@ -326,6 +326,13 @@ func isPrivileged(roles []sharedmodel.Role) bool {
 		}
 	}
 	return false
+}
+
+func checkOwnerAccess(md utils.Metadata, ownerID string) error {
+	if !isPrivileged(md.UserRoles) && (md.UserID == nil || ownerID != *md.UserID) {
+		return model.ErrInsufficientPermissions
+	}
+	return nil
 }
 
 func (s *BookingService) expireBookings(ctx context.Context) {

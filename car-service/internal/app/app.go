@@ -143,7 +143,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 		"nats-subscriber": natsadapter.NewPinger(log, ncSub),
 		"minio":           minioadapter.NewPinger(log, minioClient),
 		"telemetry":       telemetryService,
-	})
+	}, cfg.Version)
 
 	grpcSrv, err := grpcserver.NewServer(
 		log,

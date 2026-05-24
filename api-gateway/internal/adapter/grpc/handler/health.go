@@ -18,12 +18,14 @@ type healthClient interface {
 }
 
 type HealthHandler struct {
+	name   string
 	client healthClient
 	log    *slog.Logger
 }
 
-func NewHealthHandler(client healthClient, logger *slog.Logger) *HealthHandler {
+func NewHealthHandler(name string, client healthClient, logger *slog.Logger) *HealthHandler {
 	return &HealthHandler{
+		name:   name,
 		client: client,
 		log:    pkglog.WithComponent(logger, "grpc.HealthHandler"),
 	}
@@ -35,11 +37,8 @@ func (h *HealthHandler) Health(ctx context.Context) (model.ServiceHealth, error)
 
 	res, err := h.client.Health(ctx, &emptypb.Empty{})
 	if err != nil {
-		if dto.IsSystemErr(err) {
-			logger.Error("grpc call failed", pkglog.Err(err))
-		}
-
-		return model.ServiceHealth{}, dto.FromGrpcErr(err)
+		logger.Error("grpc call failed", slog.String("service", h.name), pkglog.Err(err))
+		return model.ServiceHealth{Name: h.name, Status: "degraded"}, nil
 	}
 
 	return dto.ServiceHealthFromProto(res), nil

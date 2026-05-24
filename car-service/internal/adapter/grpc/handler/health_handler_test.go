@@ -17,7 +17,7 @@ func TestHealthHandlerHealth(t *testing.T) {
 	t.Run("healthy when all deps ping successfully", func(t *testing.T) {
 		pg := mocks.NewMockPinger(t)
 		nc := mocks.NewMockPinger(t)
-		h := NewHealthHandler(discardLogger(), map[string]Pinger{"postgres": pg, "nats": nc})
+		h := NewHealthHandler(discardLogger(), map[string]Pinger{"postgres": pg, "nats": nc}, "")
 
 		pg.EXPECT().Ping(mock.Anything).Return(nil)
 		nc.EXPECT().Ping(mock.Anything).Return(nil)
@@ -31,7 +31,7 @@ func TestHealthHandlerHealth(t *testing.T) {
 	t.Run("unhealthy when one dep ping fails", func(t *testing.T) {
 		pg := mocks.NewMockPinger(t)
 		nc := mocks.NewMockPinger(t)
-		h := NewHealthHandler(discardLogger(), map[string]Pinger{"postgres": pg, "nats": nc})
+		h := NewHealthHandler(discardLogger(), map[string]Pinger{"postgres": pg, "nats": nc}, "")
 
 		pg.EXPECT().Ping(mock.Anything).Return(errors.New("connection refused"))
 		nc.EXPECT().Ping(mock.Anything).Return(nil)
@@ -44,7 +44,7 @@ func TestHealthHandlerHealth(t *testing.T) {
 	t.Run("unhealthy when all deps fail", func(t *testing.T) {
 		pg := mocks.NewMockPinger(t)
 		nc := mocks.NewMockPinger(t)
-		h := NewHealthHandler(discardLogger(), map[string]Pinger{"postgres": pg, "nats": nc})
+		h := NewHealthHandler(discardLogger(), map[string]Pinger{"postgres": pg, "nats": nc}, "")
 
 		pg.EXPECT().Ping(mock.Anything).Return(errors.New("connection refused"))
 		nc.EXPECT().Ping(mock.Anything).Return(errors.New("disconnected"))
@@ -55,7 +55,7 @@ func TestHealthHandlerHealth(t *testing.T) {
 	})
 
 	t.Run("healthy with no deps", func(t *testing.T) {
-		h := NewHealthHandler(discardLogger(), map[string]Pinger{})
+		h := NewHealthHandler(discardLogger(), map[string]Pinger{}, "")
 
 		resp, err := h.Health(ctx, &emptypb.Empty{})
 		assert.NoError(t, err)
@@ -63,7 +63,7 @@ func TestHealthHandlerHealth(t *testing.T) {
 	})
 
 	t.Run("uptime is non-negative", func(t *testing.T) {
-		h := NewHealthHandler(discardLogger(), map[string]Pinger{})
+		h := NewHealthHandler(discardLogger(), map[string]Pinger{}, "")
 
 		resp, err := h.Health(ctx, &emptypb.Empty{})
 		assert.NoError(t, err)

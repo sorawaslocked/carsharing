@@ -115,7 +115,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 		"nats":              natsadapter.NewPinger(log, natsConn),
 		"minio":             minioadapter.NewPinger(log, minioClient),
 		"document-analyzer": grpcdocanalyzer.NewPinger(log, analyzerConn),
-	})
+	}, cfg.Version)
 
 	grpcSrv, err := grpcserver.NewServer(log, cfg.GRPC, userService, healthHandler)
 	if err != nil {

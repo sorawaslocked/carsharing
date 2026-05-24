@@ -119,18 +119,18 @@ func New(cfg config.Config, log *slog.Logger) *App {
 
 	// gRPC handlers
 	userServiceGrpcHandler := grpchandler.NewUserHandler(userGrpcClient, log)
-	userHealthGrpcHandler := grpchandler.NewHealthHandler(userHealthGrpcClient, log)
+	userHealthGrpcHandler := grpchandler.NewHealthHandler("user-service", userHealthGrpcClient, log)
 	carGrpcHandler := grpchandler.NewCarHandler(carGrpcClient, carStreamGrpcClient, log)
-	carHealthGrpcHandler := grpchandler.NewHealthHandler(carHealthGrpcClient, log)
+	carHealthGrpcHandler := grpchandler.NewHealthHandler("car-service", carHealthGrpcClient, log)
 	carModelGrpcHandler := grpchandler.NewCarModelHandler(carModelGrpcClient, log)
 	carInsuranceGrpcHandler := grpchandler.NewCarInsuranceHandler(carInsuranceGrpcClient, log)
 	carMaintenanceGrpcHandler := grpchandler.NewCarMaintenanceHandler(carMaintenanceGrpcClient, log)
 	zoneGrpcHandler := grpchandler.NewZoneHandler(zoneGrpcClient, log)
 	pricingRuleGrpcHandler := grpchandler.NewPricingRuleHandler(pricingRuleGrpcClient, log)
 	bookingGrpcHandler := grpchandler.NewBookingHandler(bookingGrpcClient, log)
-	bookingHealthGrpcHandler := grpchandler.NewHealthHandler(bookingHealthGrpcClient, log)
+	bookingHealthGrpcHandler := grpchandler.NewHealthHandler("booking-service", bookingHealthGrpcClient, log)
 	tripGrpcHandler := grpchandler.NewTripHandler(tripGrpcClient, tripStreamGrpcClient, log)
-	tripHealthGrpcHandler := grpchandler.NewHealthHandler(tripHealthGrpcClient, log)
+	tripHealthGrpcHandler := grpchandler.NewHealthHandler("trip-service", tripHealthGrpcClient, log)
 
 	// JWT
 	jwtManager := pkgjwt.NewManager(cfg.JWT, log)

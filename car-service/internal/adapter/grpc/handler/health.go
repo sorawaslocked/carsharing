@@ -16,14 +16,16 @@ import (
 
 type HealthHandler struct {
 	log       *slog.Logger
+	version   string
 	deps      map[string]Pinger
 	startTime time.Time
 	carsvc.UnimplementedHealthServiceServer
 }
 
-func NewHealthHandler(log *slog.Logger, deps map[string]Pinger) *HealthHandler {
+func NewHealthHandler(log *slog.Logger, deps map[string]Pinger, version string) *HealthHandler {
 	return &HealthHandler{
 		log:       pkglog.WithComponent(log, "adapter.grpc.handler.HealthHandler"),
+		version:   version,
 		deps:      deps,
 		startTime: time.Now(),
 	}
@@ -54,6 +56,7 @@ func (h *HealthHandler) Health(ctx context.Context, _ *emptypb.Empty) (*servicep
 
 	return &servicepb.ServiceHealthResponse{
 		Name:          "car-service",
+		Version:       h.version,
 		Status:        overallStatus,
 		Timestamp:     timestamppb.Now(),
 		UptimeSeconds: uint64(time.Since(h.startTime).Seconds()),

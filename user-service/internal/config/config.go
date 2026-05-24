@@ -15,6 +15,7 @@ import (
 
 type Config struct {
 	Env              string                  `yaml:"env"               env:"ENV"               env-default:"local"`
+	Version          string                  `yaml:"version"           env:"VERSION"           env-default:"1.0.0"`
 	GRPC             pkggrpc.ServerConfig    `yaml:"grpc_server"`
 	Postgres         pkgpostgres.Config      `yaml:"postgres"`
 	Redis            pkgredis.Config         `yaml:"redis"`

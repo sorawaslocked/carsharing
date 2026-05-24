@@ -152,36 +152,62 @@ func TestTelemetryService_OnCarCreated(t *testing.T) {
 	})
 }
 
-// --- Subscribe ---
+// --- SubscribeUpdates ---
 
-func TestTelemetryService_Subscribe(t *testing.T) {
-	ctx := context.Background()
-	car := model.Car{ID: "c-1"}
+func TestTelemetryService_SubscribeUpdates(t *testing.T) {
+	carID := "c-1"
 
-	t.Run("delegates to stream client and returns channel", func(t *testing.T) {
-		ch := make(chan model.TelemetryUpdate)
-		client := &mockStreamClient{
-			subscribeFunc: func(_ context.Context, _ model.Car) (<-chan model.TelemetryUpdate, error) {
-				return ch, nil
-			},
+	t.Run("subscriber receives fanned-out update", func(t *testing.T) {
+		svc := newTelemetrySvc(t, nil, nil, nil)
+
+		ch, unsub := svc.SubscribeUpdates(carID)
+		defer unsub()
+
+		update := model.TelemetryUpdate{CarID: carID, MileageKM: 1000}
+		svc.fanOut(carID, update)
+
+		select {
+		case got := <-ch:
+			assert.Equal(t, update, got)
+		case <-time.After(time.Second):
+			t.Fatal("timed out waiting for update")
 		}
-		svc := newTelemetrySvc(t, client, nil, nil)
-
-		got, err := svc.Subscribe(ctx, car)
-		require.NoError(t, err)
-		assert.Equal(t, (<-chan model.TelemetryUpdate)(ch), got)
 	})
 
-	t.Run("propagates stream client error", func(t *testing.T) {
-		client := &mockStreamClient{
-			subscribeFunc: func(_ context.Context, _ model.Car) (<-chan model.TelemetryUpdate, error) {
-				return nil, model.ErrSql
-			},
-		}
-		svc := newTelemetrySvc(t, client, nil, nil)
+	t.Run("unsubscribe stops delivery", func(t *testing.T) {
+		svc := newTelemetrySvc(t, nil, nil, nil)
 
-		_, err := svc.Subscribe(ctx, car)
-		assert.ErrorIs(t, err, model.ErrSql)
+		ch, unsub := svc.SubscribeUpdates(carID)
+		unsub()
+
+		svc.fanOut(carID, model.TelemetryUpdate{CarID: carID, MileageKM: 1000})
+
+		select {
+		case <-ch:
+			t.Fatal("received update after unsubscribe")
+		case <-time.After(20 * time.Millisecond):
+		}
+	})
+
+	t.Run("multiple subscribers each receive the update", func(t *testing.T) {
+		svc := newTelemetrySvc(t, nil, nil, nil)
+
+		ch1, unsub1 := svc.SubscribeUpdates(carID)
+		ch2, unsub2 := svc.SubscribeUpdates(carID)
+		defer unsub1()
+		defer unsub2()
+
+		update := model.TelemetryUpdate{CarID: carID, MileageKM: 2000}
+		svc.fanOut(carID, update)
+
+		for _, ch := range []<-chan model.TelemetryUpdate{ch1, ch2} {
+			select {
+			case got := <-ch:
+				assert.Equal(t, update, got)
+			case <-time.After(time.Second):
+				t.Fatal("timed out waiting for update")
+			}
+		}
 	})
 }
 

@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"carsharing/booking-service/internal/model"
+	sharedvalidation "carsharing/shared/validation"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -18,12 +19,18 @@ func (e ErrRegisterValidator) Error() string {
 }
 
 func RegisterCustomValidators(v *validator.Validate, log *slog.Logger) error {
+	if err := sharedvalidation.RegisterTimeRangeValidators(v, log); err != nil {
+		return err
+	}
+
 	validators := []struct {
 		tag string
 		fn  validator.Func
 	}{
 		{"booking_status", bookingStatusValidator},
 		{"pricing_rule_type", pricingRuleTypeValidator},
+		{"carstatus", carStatusValidator},
+		{"carclass", carClassValidator},
 	}
 
 	for _, vd := range validators {
@@ -43,5 +50,15 @@ func bookingStatusValidator(fl validator.FieldLevel) bool {
 
 func pricingRuleTypeValidator(fl validator.FieldLevel) bool {
 	_, ok := model.PricingRuleTypeFromString(fl.Field().String())
+	return ok
+}
+
+func carStatusValidator(fl validator.FieldLevel) bool {
+	_, ok := model.CarStatusFromString(fl.Field().String())
+	return ok
+}
+
+func carClassValidator(fl validator.FieldLevel) bool {
+	_, ok := model.CarClassFromString(fl.Field().String())
 	return ok
 }

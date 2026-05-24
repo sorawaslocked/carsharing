@@ -26,6 +26,7 @@ type BookingStatusUpdate struct {
 
 type BookingStatusHistoryFilter struct {
 	BookingID  string `validate:"required,uuid4"`
+	TimeRange  *sharedvalidation.TimeRange
 	Pagination *sharedvalidation.Pagination
 }
 

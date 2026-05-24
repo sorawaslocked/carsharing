@@ -70,6 +70,10 @@ func validationError(fieldErr validator.FieldError) error {
 		return ErrInvalidBookingStatus
 	case "pricing_rule_type":
 		return ErrInvalidPricingRuleType
+	case "carstatus":
+		return ErrInvalidCarStatus
+	case "carclass":
+		return ErrInvalidCarClass
 	default:
 		return fmt.Errorf("invalid value")
 	}

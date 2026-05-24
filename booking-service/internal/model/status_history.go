@@ -11,7 +11,7 @@ type BookingStatusReading struct {
 	BookingID  string
 	FromStatus string
 	ToStatus   string
-	ActorType  string
+	ActorType  sharedmodel.ActorType
 	ActorID    *string
 	Reason     *string
 	ChangedAt  time.Time
@@ -19,7 +19,6 @@ type BookingStatusReading struct {
 
 type BookingStatusHistoryFilter struct {
 	BookingID  string
-	From       *time.Time
-	To         *time.Time
+	TimeRange  *sharedmodel.TimeRange
 	Pagination sharedmodel.Pagination
 }

@@ -2,13 +2,18 @@ package service
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"time"
 
 	"carsharing/booking-service/internal/model"
+	"carsharing/booking-service/internal/validation"
 	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
+	sharedvalidation "carsharing/shared/validation"
+
+	"github.com/go-playground/validator/v10"
 )
 
 const (
@@ -17,64 +22,116 @@ const (
 )
 
 type BookingService struct {
-	log         *slog.Logger
-	bookingRepo BookingRepository
-	ruleRepo    PricingRuleRepository
-	publisher   EventPublisher
+	log             *slog.Logger
+	validate        *validator.Validate
+	bookingRepo     BookingRepository
+	ruleRepo        PricingRuleRepository
+	publisher       EventPublisher
+	carChecker      CarChecker
+	carModelChecker CarModelChecker
+	zoneChecker     ZoneChecker
 }
 
-func NewBookingService(log *slog.Logger, bookingRepo BookingRepository, ruleRepo PricingRuleRepository, publisher EventPublisher) *BookingService {
+func NewBookingService(
+	log *slog.Logger,
+	validate *validator.Validate,
+	bookingRepo BookingRepository,
+	ruleRepo PricingRuleRepository,
+	publisher EventPublisher,
+	carChecker CarChecker,
+	carModelChecker CarModelChecker,
+	zoneChecker ZoneChecker,
+) *BookingService {
 	return &BookingService{
-		log:         pkglog.WithComponent(log, "service.BookingService"),
-		bookingRepo: bookingRepo,
-		ruleRepo:    ruleRepo,
-		publisher:   publisher,
+		log:             pkglog.WithComponent(log, "service.BookingService"),
+		validate:        validate,
+		bookingRepo:     bookingRepo,
+		ruleRepo:        ruleRepo,
+		publisher:       publisher,
+		carChecker:      carChecker,
+		carModelChecker: carModelChecker,
+		zoneChecker:     zoneChecker,
 	}
 }
 
-func (s *BookingService) Create(ctx context.Context, data model.BookingCreate) (string, error) {
-	log := pkglog.WithMethod(s.log, "Create")
+func (s *BookingService) Create(ctx context.Context, data validation.BookingCreate) (string, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Create"), utils.MetadataFromCtx(ctx))
 	md := utils.MetadataFromCtx(ctx)
-	log = pkglog.WithMetadata(log, md)
+
+	if err := validation.ValidateInput(s.validate, data); err != nil {
+		return "", err
+	}
 
 	if !isPrivileged(md.UserRoles) && (md.UserID == nil || data.UserID != *md.UserID) {
 		return "", model.ErrInsufficientPermissions
 	}
 
+	carExists, err := s.carChecker.Exists(ctx, data.CarID)
+	if err != nil {
+		log.Error("checking car existence", pkglog.Err(err))
+		return "", err
+	}
+	if !carExists {
+		return "", model.ErrCarNotFound
+	}
+
+	carStatus, err := s.carChecker.GetStatus(ctx, data.CarID)
+	if err != nil {
+		log.Error("getting car status", pkglog.Err(err))
+		return "", err
+	}
+	if carStatus != model.CarStatusAvailable {
+		return "", model.ErrCarNotAvailable
+	}
+
 	if _, err := s.ruleRepo.GetByID(ctx, data.PricingRuleID); err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return "", model.ErrPricingRuleNotFound
+		}
+		log.Error("getting pricing rule", pkglog.Err(err))
 		return "", err
 	}
 
 	expiresAt := time.Now().Add(defaultExpiryDuration)
 
-	id, err := s.bookingRepo.Create(ctx, data, expiresAt)
+	bookingData := model.BookingCreate{
+		UserID:           data.UserID,
+		CarID:            data.CarID,
+		CommittedPeriods: data.CommittedPeriods,
+		PricingRuleID:    data.PricingRuleID,
+	}
+
+	id, err := s.bookingRepo.Create(ctx, bookingData, expiresAt)
 	if err != nil {
-		log.Error("failed to create booking", pkglog.Err(err))
+		log.Error("repo: creating booking", pkglog.Err(err))
 		return "", err
 	}
 
 	booking, err := s.bookingRepo.GetByID(ctx, id)
 	if err != nil {
-		log.Error("failed to fetch created booking for event", pkglog.Err(err))
+		log.Error("repo: fetching created booking for event", pkglog.Err(err))
 		return id, nil
 	}
 
 	if err := s.publisher.PublishBookingCreated(ctx, booking); err != nil {
-		log.Error("failed to publish booking.created", pkglog.Err(err))
+		log.Error("event: publishing booking.created", pkglog.Err(err))
 	}
 
 	return id, nil
 }
 
 func (s *BookingService) GetByID(ctx context.Context, id string) (model.Booking, error) {
-	log := pkglog.WithMethod(s.log, "GetByID")
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetByID"), utils.MetadataFromCtx(ctx))
 	md := utils.MetadataFromCtx(ctx)
-	log = pkglog.WithMetadata(log, md)
+
+	if err := validation.ValidateID(s.validate, id); err != nil {
+		return model.Booking{}, err
+	}
 
 	booking, err := s.bookingRepo.GetByID(ctx, id)
 	if err != nil {
-		if err != model.ErrNotFound {
-			log.Error("failed to get booking", pkglog.Err(err))
+		if !errors.Is(err, model.ErrBookingNotFound) {
+			log.Error("repo: getting booking", pkglog.Err(err))
 		}
 		return model.Booking{}, err
 	}
@@ -86,18 +143,23 @@ func (s *BookingService) GetByID(ctx context.Context, id string) (model.Booking,
 	return booking, nil
 }
 
-func (s *BookingService) List(ctx context.Context, filter model.BookingListFilter) ([]model.Booking, error) {
-	log := pkglog.WithMethod(s.log, "List")
+func (s *BookingService) List(ctx context.Context, filter validation.BookingListFilter) ([]model.Booking, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "List"), utils.MetadataFromCtx(ctx))
 	md := utils.MetadataFromCtx(ctx)
-	log = pkglog.WithMetadata(log, md)
 
-	if !isPrivileged(md.UserRoles) {
-		filter.UserID = md.UserID
+	if err := validation.ValidateInput(s.validate, filter); err != nil {
+		return nil, err
 	}
 
-	bookings, err := s.bookingRepo.List(ctx, filter)
+	repoFilter := bookingListFilter(filter)
+
+	if !isPrivileged(md.UserRoles) {
+		repoFilter.UserID = md.UserID
+	}
+
+	bookings, err := s.bookingRepo.List(ctx, repoFilter)
 	if err != nil {
-		log.Error("failed to list bookings", pkglog.Err(err))
+		log.Error("repo: listing bookings", pkglog.Err(err))
 		return nil, err
 	}
 
@@ -105,14 +167,17 @@ func (s *BookingService) List(ctx context.Context, filter model.BookingListFilte
 }
 
 func (s *BookingService) Cancel(ctx context.Context, id string, reason *string) error {
-	log := pkglog.WithMethod(s.log, "Cancel")
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Cancel"), utils.MetadataFromCtx(ctx))
 	md := utils.MetadataFromCtx(ctx)
-	log = pkglog.WithMetadata(log, md)
+
+	if err := validation.ValidateID(s.validate, id); err != nil {
+		return err
+	}
 
 	booking, err := s.bookingRepo.GetByID(ctx, id)
 	if err != nil {
-		if err != model.ErrNotFound {
-			log.Error("failed to get booking for cancel", pkglog.Err(err))
+		if !errors.Is(err, model.ErrBookingNotFound) {
+			log.Error("repo: getting booking for cancel", pkglog.Err(err))
 		}
 		return err
 	}
@@ -125,9 +190,8 @@ func (s *BookingService) Cancel(ctx context.Context, id string, reason *string) 
 		return err
 	}
 
-	actorType := "user"
-	if err := s.bookingRepo.UpdateStatus(ctx, id, string(model.BookingStatusCancelled), actorType, md.UserID, reason); err != nil {
-		log.Error("failed to cancel booking", pkglog.Err(err))
+	if err := s.bookingRepo.UpdateStatus(ctx, id, model.BookingStatusCancelled, sharedmodel.ActorTypeUser, md.UserID, reason); err != nil {
+		log.Error("repo: cancelling booking", pkglog.Err(err))
 		return err
 	}
 
@@ -137,7 +201,7 @@ func (s *BookingService) Cancel(ctx context.Context, id string, reason *string) 
 	}
 
 	if err := s.publisher.PublishBookingCancelled(ctx, booking, reasonStr); err != nil {
-		log.Error("failed to publish booking.cancelled", pkglog.Err(err))
+		log.Error("event: publishing booking.cancelled", pkglog.Err(err))
 	}
 
 	return nil
@@ -148,8 +212,8 @@ func (s *BookingService) Complete(ctx context.Context, id string) error {
 
 	booking, err := s.bookingRepo.GetByID(ctx, id)
 	if err != nil {
-		if err != model.ErrNotFound {
-			log.Error("failed to get booking for complete", pkglog.Err(err))
+		if !errors.Is(err, model.ErrBookingNotFound) {
+			log.Error("repo: getting booking for complete", pkglog.Err(err))
 		}
 		return err
 	}
@@ -158,33 +222,43 @@ func (s *BookingService) Complete(ctx context.Context, id string) error {
 		return err
 	}
 
-	actorType := "system"
-	if err := s.bookingRepo.UpdateStatus(ctx, id, string(model.BookingStatusCompleted), actorType, nil, nil); err != nil {
-		log.Error("failed to complete booking", pkglog.Err(err))
+	if err := s.bookingRepo.UpdateStatus(ctx, id, model.BookingStatusCompleted, sharedmodel.ActorTypeSystem, nil, nil); err != nil {
+		log.Error("repo: completing booking", pkglog.Err(err))
 		return err
 	}
 
 	if err := s.publisher.PublishBookingCompleted(ctx, booking); err != nil {
-		log.Error("failed to publish booking.completed", pkglog.Err(err))
+		log.Error("event: publishing booking.completed", pkglog.Err(err))
 	}
 
 	return nil
 }
 
-func (s *BookingService) UpdateStatus(ctx context.Context, id, rawStatus string, reason *string) error {
-	log := pkglog.WithMethod(s.log, "UpdateStatus")
+func (s *BookingService) UpdateStatus(ctx context.Context, id string, data validation.BookingStatusUpdate) error {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "UpdateStatus"), utils.MetadataFromCtx(ctx))
 	md := utils.MetadataFromCtx(ctx)
-	log = pkglog.WithMetadata(log, md)
 
-	toStatus, err := model.ParseBookingStatus(rawStatus)
-	if err != nil {
+	if err := validation.ValidateID(s.validate, id); err != nil {
 		return err
+	}
+
+	if err := validation.ValidateInput(s.validate, data); err != nil {
+		return err
+	}
+
+	if !isPrivileged(md.UserRoles) {
+		return model.ErrInsufficientPermissions
+	}
+
+	toStatus, ok := model.ParseBookingStatus(data.Status)
+	if !ok {
+		return model.ErrInvalidStatus
 	}
 
 	booking, err := s.bookingRepo.GetByID(ctx, id)
 	if err != nil {
-		if err != model.ErrNotFound {
-			log.Error("failed to get booking for status update", pkglog.Err(err))
+		if !errors.Is(err, model.ErrBookingNotFound) {
+			log.Error("repo: getting booking for status update", pkglog.Err(err))
 		}
 		return err
 	}
@@ -193,25 +267,37 @@ func (s *BookingService) UpdateStatus(ctx context.Context, id, rawStatus string,
 		return err
 	}
 
-	actorType := "system"
-	if err := s.bookingRepo.UpdateStatus(ctx, id, string(toStatus), actorType, md.UserID, reason); err != nil {
-		if err != model.ErrNotFound {
-			log.Error("failed to update booking status", pkglog.Err(err))
-		}
+	if err := s.bookingRepo.UpdateStatus(ctx, id, toStatus, sharedmodel.ActorTypeUser, md.UserID, data.Reason); err != nil {
+		log.Error("repo: updating booking status", pkglog.Err(err))
 		return err
 	}
 
 	return nil
 }
 
-func (s *BookingService) GetStatusHistory(ctx context.Context, filter model.BookingStatusHistoryFilter) ([]model.BookingStatusReading, error) {
-	log := pkglog.WithMethod(s.log, "GetStatusHistory")
+func (s *BookingService) GetStatusHistory(ctx context.Context, filter validation.BookingStatusHistoryFilter) ([]model.BookingStatusReading, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetStatusHistory"), utils.MetadataFromCtx(ctx))
 	md := utils.MetadataFromCtx(ctx)
-	log = pkglog.WithMetadata(log, md)
 
-	history, err := s.bookingRepo.GetStatusHistory(ctx, filter)
+	if err := validation.ValidateInput(s.validate, filter); err != nil {
+		return nil, err
+	}
+
+	booking, err := s.bookingRepo.GetByID(ctx, filter.BookingID)
 	if err != nil {
-		log.Error("failed to get booking status history", pkglog.Err(err))
+		if !errors.Is(err, model.ErrBookingNotFound) {
+			log.Error("repo: getting booking for history", pkglog.Err(err))
+		}
+		return nil, err
+	}
+
+	if !isPrivileged(md.UserRoles) && (md.UserID == nil || booking.UserID != *md.UserID) {
+		return nil, model.ErrInsufficientPermissions
+	}
+
+	history, err := s.bookingRepo.GetStatusHistory(ctx, bookingStatusHistoryFilter(filter))
+	if err != nil {
+		log.Error("repo: getting booking status history", pkglog.Err(err))
 		return nil, err
 	}
 
@@ -250,21 +336,47 @@ func (s *BookingService) expireBookings(ctx context.Context) {
 
 	bookings, err := s.bookingRepo.ListCreatedExpired(ctx, time.Now())
 	if err != nil {
-		log.Error("failed to list expired bookings", pkglog.Err(err))
+		log.Error("repo: listing expired bookings", pkglog.Err(err))
 		return
 	}
 
 	for _, b := range bookings {
-		actorType := "system"
-		if err := s.bookingRepo.UpdateStatus(ctx, b.ID, string(model.BookingStatusExpired), actorType, nil, nil); err != nil {
-			log.Error("failed to expire booking", slog.String("bookingID", b.ID), pkglog.Err(err))
+		if err := s.bookingRepo.UpdateStatus(ctx, b.ID, model.BookingStatusExpired, sharedmodel.ActorTypeSystem, nil, nil); err != nil {
+			log.Error("repo: expiring booking", slog.String("bookingID", b.ID), pkglog.Err(err))
 			continue
 		}
 
 		log.Info("booking expired", slog.String("bookingID", b.ID))
 
 		if err := s.publisher.PublishBookingExpired(context.Background(), b); err != nil {
-			log.Error("failed to publish booking.expired", slog.String("bookingID", b.ID), pkglog.Err(err))
+			log.Error("event: publishing booking.expired", slog.String("bookingID", b.ID), pkglog.Err(err))
 		}
 	}
+}
+
+func bookingListFilter(f validation.BookingListFilter) model.BookingListFilter {
+	if f.Pagination == nil {
+		f.Pagination = sharedvalidation.DefaultPagination()
+	}
+	return model.BookingListFilter{
+		UserID:        f.UserID,
+		CarID:         f.CarID,
+		Status:        f.Status,
+		PricingRuleID: f.PricingRuleID,
+		Pagination:    sharedmodel.Pagination{Limit: f.Pagination.Limit, Offset: f.Pagination.Offset},
+	}
+}
+
+func bookingStatusHistoryFilter(f validation.BookingStatusHistoryFilter) model.BookingStatusHistoryFilter {
+	if f.Pagination == nil {
+		f.Pagination = sharedvalidation.DefaultPagination()
+	}
+	filter := model.BookingStatusHistoryFilter{
+		BookingID:  f.BookingID,
+		Pagination: sharedmodel.Pagination{Limit: f.Pagination.Limit, Offset: f.Pagination.Offset},
+	}
+	if f.TimeRange != nil && f.TimeRange.From != nil && f.TimeRange.To != nil {
+		filter.TimeRange = &sharedmodel.TimeRange{From: *f.TimeRange.From, To: *f.TimeRange.To}
+	}
+	return filter
 }

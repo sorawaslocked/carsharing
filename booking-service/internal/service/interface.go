@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"carsharing/booking-service/internal/model"
+	sharedmodel "carsharing/shared/model"
 )
 
 type BookingRepository interface {
@@ -12,7 +13,7 @@ type BookingRepository interface {
 	GetByID(ctx context.Context, id string) (model.Booking, error)
 	List(ctx context.Context, filter model.BookingListFilter) ([]model.Booking, error)
 	ListCreatedExpired(ctx context.Context, now time.Time) ([]model.Booking, error)
-	UpdateStatus(ctx context.Context, id, status, actorType string, actorID, reason *string) error
+	UpdateStatus(ctx context.Context, id string, status model.BookingStatus, actorType sharedmodel.ActorType, actorID *string, reason *string) error
 	GetStatusHistory(ctx context.Context, filter model.BookingStatusHistoryFilter) ([]model.BookingStatusReading, error)
 }
 
@@ -29,4 +30,17 @@ type EventPublisher interface {
 	PublishBookingCancelled(ctx context.Context, booking model.Booking, reason string) error
 	PublishBookingExpired(ctx context.Context, booking model.Booking) error
 	PublishBookingCompleted(ctx context.Context, booking model.Booking) error
+}
+
+type CarChecker interface {
+	Exists(ctx context.Context, carID string) (bool, error)
+	GetStatus(ctx context.Context, carID string) (model.CarStatus, error)
+}
+
+type CarModelChecker interface {
+	Exists(ctx context.Context, modelID string) (bool, error)
+}
+
+type ZoneChecker interface {
+	Exists(ctx context.Context, zoneID string) (bool, error)
 }

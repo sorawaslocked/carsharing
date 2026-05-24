@@ -46,3 +46,9 @@ var (
 var (
 	ErrInvalidPricingRuleType = errors.New("must be a valid pricing rule type")
 )
+
+// Car
+var (
+	ErrInvalidCarStatus = errors.New("must be a valid car status")
+	ErrInvalidCarClass  = errors.New("must be a valid car class")
+)

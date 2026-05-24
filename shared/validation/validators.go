@@ -40,6 +40,18 @@ func RegisterLocationValidators(v *validator.Validate, log *slog.Logger) error {
 	return nil
 }
 
+func RegisterTimeRangeValidators(v *validator.Validate, _ *slog.Logger) error {
+	v.RegisterStructValidation(validateTimeRange, TimeRange{})
+	return nil
+}
+
+func validateTimeRange(sl validator.StructLevel) {
+	tr := sl.Current().Interface().(TimeRange)
+	if tr.From != nil && tr.To != nil && tr.From.After(*tr.To) {
+		sl.ReportError(tr.To, "To", "To", "time_range_from_before_to", "")
+	}
+}
+
 func latitudeValidator(fl validator.FieldLevel) bool {
 	lat := fl.Field().Float()
 	return lat >= -90 && lat <= 90

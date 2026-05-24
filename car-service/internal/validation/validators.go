@@ -13,6 +13,9 @@ func RegisterCustomValidators(v *validator.Validate, log *slog.Logger) error {
 	if err := sharedvalidation.RegisterLocationValidators(v, log); err != nil {
 		return err
 	}
+	if err := sharedvalidation.RegisterTimeRangeValidators(v, log); err != nil {
+		return err
+	}
 
 	validators := []struct {
 		tag string

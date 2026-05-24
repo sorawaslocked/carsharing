@@ -5,6 +5,7 @@ import (
 
 	"carsharing/booking-service/internal/adapter/grpc/handler"
 	"carsharing/booking-service/internal/adapter/grpc/interceptor"
+	"carsharing/booking-service/internal/adapter/grpc/interceptor/auth"
 	servicebookingpb "carsharing/protos/gen/service/booking"
 	pkggrpc "carsharing/shared/pkg/grpc"
 	"google.golang.org/grpc"
@@ -16,17 +17,18 @@ func NewServer(
 	bookingHandler *handler.BookingHandler,
 	ruleHandler *handler.PricingRuleHandler,
 	healthHandler *handler.HealthHandler,
-	base *interceptor.BaseInterceptor,
-	logger *interceptor.LoggerInterceptor,
-	auth *interceptor.AuthInterceptor,
 ) (*grpc.Server, error) {
+	baseInterceptor := interceptor.NewBaseInterceptor()
+	loggerInterceptor := interceptor.NewLoggerInterceptor(log)
+	authInterceptor := auth.NewInterceptor(log)
+
 	srv, err := pkggrpc.NewServer(
 		log,
 		cfg,
 		grpc.ChainUnaryInterceptor(
-			base.Unary(),
-			logger.Unary(),
-			auth.Unary(),
+			baseInterceptor.Unary,
+			loggerInterceptor.Unary,
+			authInterceptor.Unary,
 		),
 		grpc.ChainStreamInterceptor(),
 	)

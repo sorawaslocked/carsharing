@@ -2,10 +2,11 @@ package dto
 
 import (
 	"carsharing/booking-service/internal/model"
+	"carsharing/booking-service/internal/validation"
 	basepb "carsharing/protos/gen/base"
 	basebookingpb "carsharing/protos/gen/base/booking"
 	servicebookingpb "carsharing/protos/gen/service/booking"
-	sharedmodel "carsharing/shared/model"
+	sharedvalidation "carsharing/shared/validation"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -44,46 +45,68 @@ func BookingStatusReadingToProto(r model.BookingStatusReading) *basebookingpb.Bo
 		BookingId:  r.BookingID,
 		FromStatus: r.FromStatus,
 		ToStatus:   r.ToStatus,
-		ActorType:  r.ActorType,
+		ActorType:  string(r.ActorType),
 		ActorId:    r.ActorID,
 		Reason:     r.Reason,
 		ChangedAt:  timestamppb.New(r.ChangedAt),
 	}
 }
 
-func BookingListFilterFromProto(req *servicebookingpb.ListBookingsRequest) model.BookingListFilter {
-	filter := model.BookingListFilter{
+func BookingCreateFromProto(req *servicebookingpb.CreateBookingRequest) validation.BookingCreate {
+	return validation.BookingCreate{
+		UserID:           req.UserId,
+		CarID:            req.CarId,
+		PricingRuleID:    req.PricingRuleId,
+		CommittedPeriods: req.CommittedPeriods,
+	}
+}
+
+func BookingStatusUpdateFromProto(req *servicebookingpb.UpdateBookingStatusRequest) validation.BookingStatusUpdate {
+	return validation.BookingStatusUpdate{
+		Status: req.Status,
+		Reason: req.Reason,
+	}
+}
+
+func BookingListFilterFromProto(req *servicebookingpb.ListBookingsRequest) validation.BookingListFilter {
+	filter := validation.BookingListFilter{
 		UserID:        req.UserId,
 		CarID:         req.CarId,
 		Status:        req.Status,
 		PricingRuleID: req.PricingRuleId,
 	}
 	if req.Pagination != nil {
-		filter.Pagination = sharedmodel.Pagination{
+		p := sharedvalidation.Pagination{
 			Limit:  req.Pagination.Limit,
 			Offset: req.Pagination.Offset,
 		}
+		filter.Pagination = &p
 	}
 	return filter
 }
 
-func BookingStatusHistoryFilterFromProto(req *servicebookingpb.GetBookingStatusHistoryRequest) model.BookingStatusHistoryFilter {
-	filter := model.BookingStatusHistoryFilter{
+func BookingStatusHistoryFilterFromProto(req *servicebookingpb.GetBookingStatusHistoryRequest) validation.BookingStatusHistoryFilter {
+	filter := validation.BookingStatusHistoryFilter{
 		BookingID: req.Id,
 	}
-	if req.From != nil {
-		t := req.From.AsTime()
-		filter.From = &t
-	}
-	if req.To != nil {
-		t := req.To.AsTime()
-		filter.To = &t
+	if req.TimeRange != nil {
+		tr := &sharedvalidation.TimeRange{}
+		if req.TimeRange.From != nil {
+			t := req.TimeRange.From.AsTime()
+			tr.From = &t
+		}
+		if req.TimeRange.To != nil {
+			t := req.TimeRange.To.AsTime()
+			tr.To = &t
+		}
+		filter.TimeRange = tr
 	}
 	if req.Pagination != nil {
-		filter.Pagination = sharedmodel.Pagination{
+		p := sharedvalidation.Pagination{
 			Limit:  req.Pagination.Limit,
 			Offset: req.Pagination.Offset,
 		}
+		filter.Pagination = &p
 	}
 	return filter
 }

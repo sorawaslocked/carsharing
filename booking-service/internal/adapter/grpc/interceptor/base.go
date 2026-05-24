@@ -4,6 +4,8 @@ import (
 	"context"
 	"strings"
 
+	"carsharing/booking-service/internal/adapter/grpc/dto"
+	"carsharing/booking-service/internal/model"
 	sharedmodel "carsharing/shared/model"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -15,44 +17,44 @@ func NewBaseInterceptor() *BaseInterceptor {
 	return &BaseInterceptor{}
 }
 
-func (i *BaseInterceptor) Unary() grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
-		ctx = i.extractMetadata(ctx)
-		return handler(ctx, req)
-	}
-}
+func (i *BaseInterceptor) Unary(ctx context.Context, req any, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
 
-func (i *BaseInterceptor) extractMetadata(ctx context.Context) context.Context {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return ctx
-	}
+	ctx = context.WithValue(ctx, "x-request-id", stringFromMD(md, "x-request-id"))
+	ctx = context.WithValue(ctx, "x-client-ip", stringFromMD(md, "x-client-ip"))
 
-	ctx = context.WithValue(ctx, "x-request-id", firstVal(md.Get("x-request-id")))
-	ctx = context.WithValue(ctx, "x-client-ip", firstVal(md.Get("x-client-ip")))
-
-	if userID := firstVal(md.Get("x-user-id")); userID != "" {
+	if userID := stringFromMD(md, "x-user-id"); userID != "" {
 		ctx = context.WithValue(ctx, "x-user-id", userID)
 	}
-
-	if rolesStr := firstVal(md.Get("x-user-roles")); rolesStr != "" {
-		var roles []sharedmodel.Role
-		for _, r := range strings.Split(rolesStr, ",") {
-			if s := strings.TrimSpace(r); s != "" {
-				roles = append(roles, sharedmodel.Role(s))
+	if roleStrs := stringsFromMD(md, "x-user-roles"); len(roleStrs) > 0 {
+		roles := make([]sharedmodel.Role, len(roleStrs))
+		for j, s := range roleStrs {
+			role, ok := sharedmodel.RoleFromString(s)
+			if !ok {
+				return nil, dto.ToStatusError(model.ErrInvalidMetadata)
 			}
+			roles[j] = role
 		}
-		if len(roles) > 0 {
-			ctx = context.WithValue(ctx, "x-user-roles", roles)
-		}
+		ctx = context.WithValue(ctx, "x-user-roles", roles)
 	}
 
-	return ctx
+	return handler(ctx, req)
 }
 
-func firstVal(vals []string) string {
-	if len(vals) > 0 {
-		return vals[0]
+func stringFromMD(md metadata.MD, key string) string {
+	if values := md.Get(key); len(values) > 0 {
+		return values[0]
 	}
 	return ""
+}
+
+func stringsFromMD(md metadata.MD, key string) []string {
+	values := md.Get(key)
+	if len(values) == 0 {
+		return nil
+	}
+	if len(values) == 1 {
+		return strings.Split(values[0], ",")
+	}
+	return values
 }

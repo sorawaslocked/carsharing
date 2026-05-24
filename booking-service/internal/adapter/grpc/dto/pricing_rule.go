@@ -2,9 +2,10 @@ package dto
 
 import (
 	"carsharing/booking-service/internal/model"
+	"carsharing/booking-service/internal/validation"
 	basebookingpb "carsharing/protos/gen/base/booking"
 	servicebookingpb "carsharing/protos/gen/service/booking"
-	sharedmodel "carsharing/shared/model"
+	sharedvalidation "carsharing/shared/validation"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -27,8 +28,8 @@ func PricingRuleToProto(r model.PricingRule) *basebookingpb.PricingRule {
 	}
 }
 
-func PricingRuleCreateFromProto(req *servicebookingpb.CreatePricingRuleRequest) model.PricingRuleCreate {
-	return model.PricingRuleCreate{
+func PricingRuleCreateFromProto(req *servicebookingpb.CreatePricingRuleRequest) validation.PricingRuleCreate {
+	return validation.PricingRuleCreate{
 		ModelID:           req.ModelId,
 		ZoneID:            req.ZoneId,
 		Class:             req.Class,
@@ -42,8 +43,8 @@ func PricingRuleCreateFromProto(req *servicebookingpb.CreatePricingRuleRequest) 
 	}
 }
 
-func PricingRuleUpdateFromProto(req *servicebookingpb.UpdatePricingRuleRequest) model.PricingRuleUpdate {
-	return model.PricingRuleUpdate{
+func PricingRuleUpdateFromProto(req *servicebookingpb.UpdatePricingRuleRequest) validation.PricingRuleUpdate {
+	return validation.PricingRuleUpdate{
 		ModelID:           req.ModelId,
 		ZoneID:            req.ZoneId,
 		Class:             req.Class,
@@ -58,8 +59,8 @@ func PricingRuleUpdateFromProto(req *servicebookingpb.UpdatePricingRuleRequest) 
 	}
 }
 
-func PricingRuleListFilterFromProto(req *servicebookingpb.ListPricingRulesRequest) model.PricingRuleListFilter {
-	filter := model.PricingRuleListFilter{
+func PricingRuleListFilterFromProto(req *servicebookingpb.ListPricingRulesRequest) validation.PricingRuleListFilter {
+	filter := validation.PricingRuleListFilter{
 		ModelID:  req.ModelId,
 		ZoneID:   req.ZoneId,
 		Class:    req.Class,
@@ -67,10 +68,11 @@ func PricingRuleListFilterFromProto(req *servicebookingpb.ListPricingRulesReques
 		IsActive: req.IsActive,
 	}
 	if req.Pagination != nil {
-		filter.Pagination = sharedmodel.Pagination{
+		p := sharedvalidation.Pagination{
 			Limit:  req.Pagination.Limit,
 			Offset: req.Pagination.Offset,
 		}
+		filter.Pagination = &p
 	}
 	return filter
 }

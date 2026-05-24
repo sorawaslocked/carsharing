@@ -12,15 +12,18 @@ import (
 
 	grpcadapter "carsharing/booking-service/internal/adapter/grpc"
 	"carsharing/booking-service/internal/adapter/grpc/handler"
-	"carsharing/booking-service/internal/adapter/grpc/interceptor"
 	natsadapter "carsharing/booking-service/internal/adapter/nats"
+	natspub "carsharing/booking-service/internal/adapter/nats/publisher"
+	natssub "carsharing/booking-service/internal/adapter/nats/subscriber"
 	postgresadapter "carsharing/booking-service/internal/adapter/postgres"
 	"carsharing/booking-service/internal/config"
 	"carsharing/booking-service/internal/service"
+	"carsharing/booking-service/internal/validation"
 	pkglog "carsharing/shared/pkg/log"
 	pkgnats "carsharing/shared/pkg/nats"
 	pkgpostgres "carsharing/shared/pkg/postgres"
 
+	"github.com/go-playground/validator/v10"
 	"google.golang.org/grpc"
 )
 
@@ -54,38 +57,39 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	}
 	cl.add(subscriberConn.Close)
 
+	validate := validator.New()
+	if err := validation.RegisterCustomValidators(validate, log); err != nil {
+		cl.closeAll()
+		return nil, fmt.Errorf("validator: %w", err)
+	}
+
 	bookingRepo := postgresadapter.NewBookingRepo(log, pool)
 	ruleRepo := postgresadapter.NewPricingRuleRepo(log, pool)
 
-	publisher := natsadapter.NewPublisher(log, publisherConn)
+	publisher := natspub.NewBookingPublisher(log, publisherConn)
 
-	bookingSvc := service.NewBookingService(log, bookingRepo, ruleRepo, publisher)
-	ruleSvc := service.NewPricingRuleService(log, ruleRepo)
+	bookingSvc := service.NewBookingService(log, validate, bookingRepo, ruleRepo, publisher, nil, nil, nil)
+	ruleSvc := service.NewPricingRuleService(log, validate, ruleRepo, nil, nil)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	cl.add(cancel)
 
-	consumer := natsadapter.NewConsumer(log, subscriberConn, bookingSvc)
-	if err := consumer.Subscribe(ctx); err != nil {
+	tripSubscriber := natssub.NewTripSubscriber(log, subscriberConn, bookingSvc)
+	if err := tripSubscriber.Subscribe(); err != nil {
 		cl.closeAll()
-		return nil, fmt.Errorf("nats consumer: %w", err)
+		return nil, fmt.Errorf("nats subscriber: %w", err)
 	}
 
 	go bookingSvc.StartExpiryWatcher(ctx)
 
 	bookingHandler := handler.NewBookingHandler(log, bookingSvc)
 	ruleHandler := handler.NewPricingRuleHandler(log, ruleSvc)
-	healthHandler := handler.NewHealthHandler(log, pool, publisherConn)
+	healthHandler := handler.NewHealthHandler(log, map[string]handler.Pinger{
+		"postgres": pool,
+		"nats":     natsadapter.NewPinger(log, publisherConn),
+	}, cfg.Version)
 
-	baseInterceptor := interceptor.NewBaseInterceptor()
-	loggerInterceptor := interceptor.NewLoggerInterceptor(log)
-	authInterceptor := interceptor.NewAuthInterceptor(log)
-
-	grpcSrv, err := grpcadapter.NewServer(
-		log, cfg.GRPC,
-		bookingHandler, ruleHandler, healthHandler,
-		baseInterceptor, loggerInterceptor, authInterceptor,
-	)
+	grpcSrv, err := grpcadapter.NewServer(log, cfg.GRPC, bookingHandler, ruleHandler, healthHandler)
 	if err != nil {
 		cl.closeAll()
 		return nil, fmt.Errorf("grpc server: %w", err)

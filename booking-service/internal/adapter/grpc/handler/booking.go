@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	"carsharing/booking-service/internal/adapter/grpc/dto"
-	"carsharing/booking-service/internal/model"
 	basebookingpb "carsharing/protos/gen/base/booking"
 	servicebookingpb "carsharing/protos/gen/service/booking"
 	pkglog "carsharing/shared/pkg/log"
@@ -30,16 +29,9 @@ func (h *BookingHandler) CreateBooking(ctx context.Context, req *servicebookingp
 	log := pkglog.WithMethod(h.log, "CreateBooking")
 	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
-	data := model.BookingCreate{
-		UserID:           req.UserId,
-		CarID:            req.CarId,
-		PricingRuleID:    req.PricingRuleId,
-		CommittedPeriods: req.CommittedPeriods,
-	}
-
-	id, err := h.svc.Create(ctx, data)
+	id, err := h.svc.Create(ctx, dto.BookingCreateFromProto(req))
 	if err != nil {
-		return nil, dto.ToGRPCError(err)
+		return nil, dto.ToStatusError(err)
 	}
 
 	log.Info("booking created", slog.String("id", id))
@@ -53,7 +45,7 @@ func (h *BookingHandler) GetBooking(ctx context.Context, req *servicebookingpb.G
 
 	booking, err := h.svc.GetByID(ctx, req.Id)
 	if err != nil {
-		return nil, dto.ToGRPCError(err)
+		return nil, dto.ToStatusError(err)
 	}
 
 	log.Info("booking retrieved", slog.String("id", req.Id))
@@ -67,7 +59,7 @@ func (h *BookingHandler) ListBookings(ctx context.Context, req *servicebookingpb
 
 	bookings, err := h.svc.List(ctx, dto.BookingListFilterFromProto(req))
 	if err != nil {
-		return nil, dto.ToGRPCError(err)
+		return nil, dto.ToStatusError(err)
 	}
 
 	log.Info("bookings listed", slog.Int("count", len(bookings)))
@@ -85,7 +77,7 @@ func (h *BookingHandler) CancelBooking(ctx context.Context, req *servicebookingp
 	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
 	if err := h.svc.Cancel(ctx, req.Id, nil); err != nil {
-		return nil, dto.ToGRPCError(err)
+		return nil, dto.ToStatusError(err)
 	}
 
 	log.Info("booking cancelled", slog.String("id", req.Id))
@@ -97,8 +89,8 @@ func (h *BookingHandler) UpdateBookingStatus(ctx context.Context, req *servicebo
 	log := pkglog.WithMethod(h.log, "UpdateBookingStatus")
 	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
-	if err := h.svc.UpdateStatus(ctx, req.Id, req.Status, req.Reason); err != nil {
-		return nil, dto.ToGRPCError(err)
+	if err := h.svc.UpdateStatus(ctx, req.Id, dto.BookingStatusUpdateFromProto(req)); err != nil {
+		return nil, dto.ToStatusError(err)
 	}
 
 	log.Info("booking status updated", slog.String("id", req.Id), slog.String("status", req.Status))
@@ -112,7 +104,7 @@ func (h *BookingHandler) GetBookingStatusHistory(ctx context.Context, req *servi
 
 	history, err := h.svc.GetStatusHistory(ctx, dto.BookingStatusHistoryFilterFromProto(req))
 	if err != nil {
-		return nil, dto.ToGRPCError(err)
+		return nil, dto.ToStatusError(err)
 	}
 
 	log.Info("status history retrieved", slog.String("bookingID", req.Id), slog.Int("count", len(history)))

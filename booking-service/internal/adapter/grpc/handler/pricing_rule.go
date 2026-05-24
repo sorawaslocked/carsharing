@@ -31,7 +31,7 @@ func (h *PricingRuleHandler) CreatePricingRule(ctx context.Context, req *service
 
 	id, err := h.svc.Create(ctx, dto.PricingRuleCreateFromProto(req))
 	if err != nil {
-		return nil, dto.ToGRPCError(err)
+		return nil, dto.ToStatusError(err)
 	}
 
 	log.Info("pricing rule created", slog.String("id", id))
@@ -45,7 +45,7 @@ func (h *PricingRuleHandler) GetPricingRule(ctx context.Context, req *serviceboo
 
 	rule, err := h.svc.GetByID(ctx, req.Id)
 	if err != nil {
-		return nil, dto.ToGRPCError(err)
+		return nil, dto.ToStatusError(err)
 	}
 
 	log.Info("pricing rule retrieved", slog.String("id", req.Id))
@@ -59,7 +59,7 @@ func (h *PricingRuleHandler) ListPricingRules(ctx context.Context, req *serviceb
 
 	rules, err := h.svc.List(ctx, dto.PricingRuleListFilterFromProto(req))
 	if err != nil {
-		return nil, dto.ToGRPCError(err)
+		return nil, dto.ToStatusError(err)
 	}
 
 	log.Info("pricing rules listed", slog.Int("count", len(rules)))
@@ -77,7 +77,7 @@ func (h *PricingRuleHandler) UpdatePricingRule(ctx context.Context, req *service
 	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
 	if err := h.svc.Update(ctx, req.Id, dto.PricingRuleUpdateFromProto(req)); err != nil {
-		return nil, dto.ToGRPCError(err)
+		return nil, dto.ToStatusError(err)
 	}
 
 	log.Info("pricing rule updated", slog.String("id", req.Id))
@@ -90,7 +90,7 @@ func (h *PricingRuleHandler) DeletePricingRule(ctx context.Context, req *service
 	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
 	if err := h.svc.Delete(ctx, req.Id); err != nil {
-		return nil, dto.ToGRPCError(err)
+		return nil, dto.ToStatusError(err)
 	}
 
 	log.Info("pricing rule deleted", slog.String("id", req.Id))

@@ -4,40 +4,58 @@ import (
 	"errors"
 
 	"carsharing/booking-service/internal/model"
+	"carsharing/booking-service/internal/validation"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-func ToGRPCError(err error) error {
-	if err == nil {
-		return nil
+func validationError(ve validation.Errors) error {
+	st := status.New(codes.InvalidArgument, "validation failed")
+
+	var fieldViolations []*errdetails.BadRequest_FieldViolation
+	for field, err := range ve {
+		fieldViolations = append(fieldViolations, &errdetails.BadRequest_FieldViolation{
+			Field:       field,
+			Description: err.Error(),
+		})
+	}
+
+	st, _ = st.WithDetails(&errdetails.BadRequest{
+		FieldViolations: fieldViolations,
+	})
+
+	return st.Err()
+}
+
+func ToStatusError(err error) error {
+	ve, ok := errors.AsType[validation.Errors](err)
+	if ok {
+		return validationError(ve)
 	}
 
 	switch {
-	case errors.Is(err, model.ErrNotFound):
+	case errors.Is(err, model.ErrInvalidMetadata):
+		return status.Error(codes.InvalidArgument, err.Error())
+	case errors.Is(err, model.ErrUnauthenticated):
+		return status.Error(codes.Unauthenticated, err.Error())
+	case errors.Is(err, model.ErrInsufficientPermissions):
+		return status.Error(codes.PermissionDenied, err.Error())
+	case errors.Is(err, model.ErrBookingNotFound),
+		errors.Is(err, model.ErrPricingRuleNotFound),
+		errors.Is(err, model.ErrCarNotFound),
+		errors.Is(err, model.ErrCarModelNotFound),
+		errors.Is(err, model.ErrZoneNotFound),
+		errors.Is(err, model.ErrNotFound):
 		return status.Error(codes.NotFound, err.Error())
 	case errors.Is(err, model.ErrConflict):
 		return status.Error(codes.AlreadyExists, err.Error())
-	case errors.Is(err, model.ErrInsufficientPermissions):
-		return status.Error(codes.PermissionDenied, err.Error())
-	case errors.Is(err, model.ErrUnauthenticated):
-		return status.Error(codes.Unauthenticated, err.Error())
-	case errors.Is(err, model.ErrInvalidTransition):
-		return fieldViolation("status", err.Error())
+	case errors.Is(err, model.ErrCarNotAvailable),
+		errors.Is(err, model.ErrInvalidTransition):
+		return status.Error(codes.FailedPrecondition, err.Error())
 	case errors.Is(err, model.ErrInvalidStatus):
-		return fieldViolation("status", err.Error())
+		return status.Error(codes.InvalidArgument, err.Error())
 	default:
-		return status.Error(codes.Internal, model.ErrInternalServerError.Error())
+		return status.Error(codes.Internal, "something went wrong")
 	}
-}
-
-func fieldViolation(field, desc string) error {
-	st, _ := status.New(codes.InvalidArgument, "validation failed").
-		WithDetails(&errdetails.BadRequest{
-			FieldViolations: []*errdetails.BadRequest_FieldViolation{
-				{Field: field, Description: desc},
-			},
-		})
-	return st.Err()
 }

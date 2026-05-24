@@ -5,7 +5,6 @@ package service.booking;
 import "base/booking/booking.proto";
 import "base/common.proto";
 import "google/protobuf/empty.proto";
-import "google/protobuf/timestamp.proto";
 
 option go_package = "carsharing/protos/gen/service/booking";
 
@@ -64,10 +63,9 @@ message UpdateBookingStatusRequest {
 
 message GetBookingStatusHistoryRequest {
   string id = 1;
-  optional google.protobuf.Timestamp from = 2;
-  optional google.protobuf.Timestamp to = 3;
+  optional base.TimeRange time_range = 2;
 
-  optional base.Pagination pagination = 4;
+  optional base.Pagination pagination = 3;
 }
 
 message GetBookingStatusHistoryResponse {

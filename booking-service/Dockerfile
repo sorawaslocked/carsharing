@@ -3,6 +3,7 @@ FROM golang:1.26-alpine AS builder
 WORKDIR /app
 
 COPY shared/go.mod shared/go.sum ./shared/
+COPY protos/go.mod protos/go.sum ./protos/
 COPY booking-service/go.mod booking-service/go.sum ./booking-service/
 
 WORKDIR /app/booking-service
@@ -10,6 +11,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
 
 COPY shared/ /app/shared/
+COPY protos/ /app/protos/
 COPY booking-service/ .
 
 RUN --mount=type=cache,target=/root/.cache/go-build \

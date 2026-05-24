@@ -12,6 +12,33 @@ import (
 
 var ErrInvalidStatusCode = errors.New("invalid status code")
 
+// domainErr wraps a sentinel domain error with the original gRPC error so the
+// HTTP layer can surface the service's message while errors.Is still matches.
+type domainErr struct {
+	sentinel error
+	cause    error
+}
+
+func (e *domainErr) Error() string {
+	st, ok := status.FromError(e.cause)
+	if ok && st.Message() != "" {
+		return st.Message()
+	}
+	return e.sentinel.Error()
+}
+
+func (e *domainErr) Is(target error) bool {
+	return errors.Is(e.sentinel, target)
+}
+
+func (e *domainErr) Unwrap() error {
+	return e.cause
+}
+
+func wrapDomain(sentinel, cause error) error {
+	return &domainErr{sentinel: sentinel, cause: cause}
+}
+
 func IsSystemErr(err error) bool {
 	st, ok := status.FromError(err)
 	return !ok || st.Code() == codes.Internal
@@ -25,27 +52,27 @@ func FromGrpcErr(err error) error {
 
 	switch st.Code() {
 	case codes.InvalidArgument:
-		return fromInvalidArgument(st)
+		return fromInvalidArgument(st, err)
 	case codes.NotFound:
-		return model.ErrNotFound
+		return wrapDomain(model.ErrNotFound, err)
 	case codes.AlreadyExists:
-		return model.ErrAlreadyExists
+		return wrapDomain(model.ErrAlreadyExists, err)
 	case codes.FailedPrecondition:
-		return model.ErrConflict
+		return wrapDomain(model.ErrConflict, err)
 	case codes.PermissionDenied:
-		return model.ErrForbidden
+		return wrapDomain(model.ErrForbidden, err)
 	case codes.ResourceExhausted:
-		return model.ErrTooManyRequests
+		return wrapDomain(model.ErrTooManyRequests, err)
 	case codes.Internal:
-		return model.ErrInternalServerError
+		return wrapDomain(model.ErrInternalServerError, err)
 	case codes.Unauthenticated:
-		return model.ErrUnauthorized
+		return wrapDomain(model.ErrUnauthorized, err)
 	default:
-		return model.ErrInternalServerError
+		return wrapDomain(model.ErrInternalServerError, err)
 	}
 }
 
-func fromInvalidArgument(st *status.Status) error {
+func fromInvalidArgument(st *status.Status, err error) error {
 	for _, d := range st.Details() {
 		switch info := d.(type) {
 		case *errdetails.BadRequest:
@@ -57,5 +84,5 @@ func fromInvalidArgument(st *status.Status) error {
 		}
 	}
 
-	return model.ErrInvalidArgument
+	return wrapDomain(model.ErrInvalidArgument, err)
 }

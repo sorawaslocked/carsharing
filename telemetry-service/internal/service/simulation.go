@@ -23,7 +23,7 @@ type SimulationRequest struct {
 	Longitude    float64
 	FuelLevel    *float32
 	BatteryLevel *float32
-	OdometerKm   int64
+	MileageKM    int64
 }
 
 // SimulationUpdate is one telemetry snapshot emitted every interval while a trip is active.
@@ -33,7 +33,7 @@ type SimulationUpdate struct {
 	Longitude    float64
 	FuelLevel    *float32
 	BatteryLevel *float32
-	OdometerKm   int64
+	MileageKM    int64
 	RecordedAt   time.Time
 }
 
@@ -147,7 +147,7 @@ func (s *SimulationService) runStream(
 
 	lat := req.Latitude
 	lng := req.Longitude
-	odometer := req.OdometerKm
+	mileage := req.MileageKM
 	var subKmAccM float64
 
 	var fuelLevel *float32
@@ -205,7 +205,7 @@ func (s *SimulationService) runStream(
 				subKmAccM += distM
 				kmDelta := int64(subKmAccM / 1000)
 				subKmAccM -= float64(kmDelta) * 1000
-				odometer += kmDelta
+				mileage += kmDelta
 
 				distKm := float32(distM / 1000)
 
@@ -230,7 +230,7 @@ func (s *SimulationService) runStream(
 					Longitude:    lng,
 					FuelLevel:    cloneFloat32Ptr(fuelLevel),
 					BatteryLevel: cloneFloat32Ptr(batteryLevel),
-					OdometerKm:   odometer,
+					MileageKM:    mileage,
 					RecordedAt:   time.Now(),
 				}
 

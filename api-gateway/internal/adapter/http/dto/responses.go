@@ -73,26 +73,26 @@ func unauthorized(ctx *gin.Context, body any) {
 	ctx.JSON(http.StatusUnauthorized, body)
 }
 
-func forbidden(ctx *gin.Context) {
-	body := errorBody("insufficient permissions", nil)
+func forbidden(ctx *gin.Context, message string) {
+	body := errorBody(message, nil)
 
 	ctx.JSON(http.StatusForbidden, body)
 }
 
-func notFound(ctx *gin.Context) {
-	body := errorBody("resource not found", nil)
+func notFound(ctx *gin.Context, message string) {
+	body := errorBody(message, nil)
 
 	ctx.JSON(http.StatusNotFound, body)
 }
 
-func conflict(ctx *gin.Context) {
-	body := errorBody("resource already exists", nil)
+func conflict(ctx *gin.Context, message string) {
+	body := errorBody(message, nil)
 
 	ctx.JSON(http.StatusConflict, body)
 }
 
-func tooManyRequests(ctx *gin.Context) {
-	body := errorBody("too many requests", nil)
+func tooManyRequests(ctx *gin.Context, message string) {
+	body := errorBody(message, nil)
 
 	ctx.JSON(http.StatusTooManyRequests, body)
 }

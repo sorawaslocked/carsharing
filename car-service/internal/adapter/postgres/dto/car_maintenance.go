@@ -107,38 +107,38 @@ func SetClausesFromMaintenanceTemplateUpdate(update model.CarMaintenanceTemplate
 // --- CarMaintenanceRecord ---
 
 type carMaintenanceRecordRow struct {
-	ID          string
-	CarID       string
-	TemplateID  string
-	Status      string
-	OdometerAt  int32
-	CompletedKM *int32
-	CostTenge   *int32
-	AssignedTo  *string
-	DueBy       *time.Time
-	CompletedAt *time.Time
-	Notes       *string
-	ReceiptKeys []string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID                 string
+	CarID              string
+	TemplateID         string
+	Status             string
+	MileageAtWarningKM int32
+	CompletedKM        *int32
+	CostTenge          *int32
+	AssignedTo         *string
+	DueBy              *time.Time
+	CompletedAt        *time.Time
+	Notes              *string
+	ReceiptKeys        []string
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
 }
 
 func (r carMaintenanceRecordRow) toDomain() model.CarMaintenanceRecord {
 	return model.CarMaintenanceRecord{
-		ID:            r.ID,
-		CarID:         r.CarID,
-		TemplateID:    r.TemplateID,
-		Status:        model.MaintenanceRecordStatus(r.Status),
-		OdometerAt:    r.OdometerAt,
-		CompletedKM:   r.CompletedKM,
-		CostTenge:     r.CostTenge,
-		AssignedTo:    r.AssignedTo,
-		DueBy:         r.DueBy,
-		CompletedAt:   r.CompletedAt,
-		Notes:         r.Notes,
-		ReceiptImages: ImageKeysToImages(r.ReceiptKeys),
-		CreatedAt:     r.CreatedAt,
-		UpdatedAt:     r.UpdatedAt,
+		ID:                 r.ID,
+		CarID:              r.CarID,
+		TemplateID:         r.TemplateID,
+		Status:             model.MaintenanceRecordStatus(r.Status),
+		MileageAtWarningKM: r.MileageAtWarningKM,
+		CompletedKM:        r.CompletedKM,
+		CostTenge:          r.CostTenge,
+		AssignedTo:         r.AssignedTo,
+		DueBy:              r.DueBy,
+		CompletedAt:        r.CompletedAt,
+		Notes:              r.Notes,
+		ReceiptImages:      ImageKeysToImages(r.ReceiptKeys),
+		CreatedAt:          r.CreatedAt,
+		UpdatedAt:          r.UpdatedAt,
 	}
 }
 
@@ -146,7 +146,7 @@ func ScanMaintenanceRecordRow(s scanner) (model.CarMaintenanceRecord, error) {
 	var r carMaintenanceRecordRow
 
 	err := s.Scan(
-		&r.ID, &r.CarID, &r.TemplateID, &r.Status, &r.OdometerAt,
+		&r.ID, &r.CarID, &r.TemplateID, &r.Status, &r.MileageAtWarningKM,
 		&r.CompletedKM, &r.CostTenge, &r.AssignedTo,
 		&r.DueBy, &r.CompletedAt, &r.Notes, &r.ReceiptKeys,
 		&r.CreatedAt, &r.UpdatedAt,

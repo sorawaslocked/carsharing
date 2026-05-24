@@ -117,9 +117,7 @@ func (s *CarService) Create(ctx context.Context, data validation.CarCreate) (str
 	}
 
 	car.ID = id
-	if s.carCreatedNotifier != nil {
-		s.carCreatedNotifier.OnCarCreated(car)
-	}
+	s.carCreatedNotifier.OnCarCreated(car)
 
 	return id, nil
 }
@@ -261,31 +259,29 @@ func (s *CarService) UpdateCarStatus(ctx context.Context, id string, data valida
 		actorID = md.UserID
 	}
 
-	if s.statusReadingRepo != nil {
-		if err = s.statusReadingRepo.Insert(ctx, model.CarStatusReading{
-			CarID:      current.ID,
-			FromStatus: current.Status,
-			ToStatus:   toStatus,
-			ActorType:  actorType,
-			ActorID:    actorID,
-			RecordedAt: now,
-		}); err != nil {
-			log.Error("repo: inserting status log entry",
-				slog.String("carID", current.ID),
-				slog.String("from", current.Status.String()),
-				slog.String("to", toStatus.String()),
-				pkglog.Err(err),
-			)
-		}
+	if err = s.statusReadingRepo.Insert(ctx, model.CarStatusReading{
+		CarID:      current.ID,
+		FromStatus: current.Status,
+		ToStatus:   toStatus,
+		ActorType:  actorType,
+		ActorID:    actorID,
+		Reason:     data.Reason,
+		Metadata:   data.Metadata,
+		RecordedAt: now,
+	}); err != nil {
+		log.Error("repo: inserting status log entry",
+			slog.String("carID", current.ID),
+			slog.String("from", current.Status.String()),
+			slog.String("to", toStatus.String()),
+			pkglog.Err(err),
+		)
 	}
 
-	if s.eventPublisher != nil {
-		if err := s.eventPublisher.PublishCarStatusUpdated(ctx, current.ID, current.Status.String(), toStatus.String()); err != nil {
-			log.Error("event: publishing car status updated",
-				slog.String("carID", current.ID),
-				pkglog.Err(err),
-			)
-		}
+	if err := s.eventPublisher.PublishCarStatusUpdated(ctx, current.ID, current.Status.String(), toStatus.String()); err != nil {
+		log.Error("event: publishing car status updated",
+			slog.String("carID", current.ID),
+			pkglog.Err(err),
+		)
 	}
 
 	log.Info("car status updated",
@@ -299,7 +295,8 @@ func (s *CarService) UpdateCarStatus(ctx context.Context, id string, data valida
 }
 
 func (s *CarService) UpdateCarTelemetry(ctx context.Context, id string, update validation.CarTelemetryUpdate) error {
-	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "UpdateCarTelemetry"), utils.MetadataFromCtx(ctx))
+	md := utils.MetadataFromCtx(ctx)
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "UpdateCarTelemetry"), md)
 
 	if err := validation.ValidateID(s.validate, id); err != nil {
 		return err
@@ -318,15 +315,43 @@ func (s *CarService) UpdateCarTelemetry(ctx context.Context, id string, update v
 		LastSeenAt:   &now,
 		UpdatedAt:    now,
 	}
+
+	var loc *sharedmodel.Location
 	if update.Location != nil {
-		loc := sharedmodel.Location{Latitude: update.Location.Latitude, Longitude: update.Location.Longitude}
-		carUpdate.Location = &loc
+		l := sharedmodel.Location{Latitude: update.Location.Latitude, Longitude: update.Location.Longitude}
+		loc = &l
+		carUpdate.Location = loc
 	}
+
 	if err := s.carRepo.Update(ctx, id, carUpdate); err != nil {
 		if !errors.Is(err, model.ErrCarNotFound) {
 			log.Error("repo: updating car telemetry", pkglog.Err(err))
 		}
 		return err
+	}
+
+	actorType := sharedmodel.ActorTypeSystem
+	var actorID *string
+	if md.UserID != nil {
+		actorType = sharedmodel.ActorTypeUser
+		actorID = md.UserID
+	}
+
+	mileage := update.MileageKM
+	reading := model.TelemetryReading{
+		CarID:        id,
+		Location:     loc,
+		FuelPct:      update.FuelLevel,
+		BatteryLevel: update.BatteryLevel,
+		MileageKM:    &mileage,
+		ActorType:    actorType,
+		ActorID:      actorID,
+		Reason:       update.Reason,
+		Metadata:     update.Metadata,
+		RecordedAt:   now,
+	}
+	if err := s.telemetryReadingRepo.Insert(ctx, reading); err != nil {
+		log.Error("repo: inserting telemetry reading", pkglog.Err(err))
 	}
 
 	return nil
@@ -379,10 +404,6 @@ func (s *CarService) ListCarTelemetryHistory(ctx context.Context, filter validat
 
 	if err := validation.ValidateInput(s.validate, filter); err != nil {
 		return nil, err
-	}
-
-	if s.telemetryReadingRepo == nil {
-		return nil, nil
 	}
 
 	if filter.Pagination == nil {

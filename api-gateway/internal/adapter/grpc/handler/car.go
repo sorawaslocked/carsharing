@@ -34,15 +34,23 @@ func (h *CarHandler) Create(ctx context.Context, data model.CarCreate) (string, 
 	logger := pkglog.WithMethod(h.log, "Create")
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(ctx))
 
-	res, err := h.client.CreateCar(ctx, &carsvc.CreateCarRequest{
+	req := &carsvc.CreateCarRequest{
 		ModelId:          data.ModelID,
 		Vin:              data.VIN,
 		LicensePlate:     data.LicensePlate,
 		Color:            data.Color,
 		YearManufactured: int32(data.YearManufactured),
 		TelemetryId:      data.TelemetryID,
+		ZoneId:           data.ZoneID,
+		MileageKm:        data.MileageKM,
+		FuelLevel:        data.FuelLevel,
+		BatteryLevel:     data.BatteryLevel,
 		Notes:            data.Notes,
-	})
+	}
+	if data.Location != nil {
+		req.Location = dto.LocationToProto(*data.Location)
+	}
+	res, err := h.client.CreateCar(ctx, req)
 	if err != nil {
 		if dto.IsSystemErr(err) {
 			logger.Error("grpc call failed", pkglog.Err(err))

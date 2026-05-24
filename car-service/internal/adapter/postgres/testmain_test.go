@@ -258,12 +258,12 @@ func testTemplate() model.CarMaintenanceTemplate {
 func testRecord(carID, templateID string) model.CarMaintenanceRecord {
 	now := time.Now().UTC()
 	return model.CarMaintenanceRecord{
-		CarID:      carID,
-		TemplateID: templateID,
-		Status:     model.MaintenanceRecordStatusPending,
-		OdometerAt: 50_000,
-		CreatedAt:  now,
-		UpdatedAt:  now,
+		CarID:              carID,
+		TemplateID:         templateID,
+		Status:             model.MaintenanceRecordStatusPending,
+		MileageAtWarningKM: 50_000,
+		CreatedAt:          now,
+		UpdatedAt:          now,
 	}
 }
 

@@ -82,7 +82,7 @@ func (s *TripService) StartTrip(ctx context.Context, bookingID string) (string, 
 			Latitude:  telemetry.Location.Latitude,
 			Longitude: telemetry.Location.Longitude,
 		},
-		StartMileageKM: telemetry.OdometerKM,
+		StartMileageKM: telemetry.MileageKM,
 		StartFuelLevel: telemetry.FuelLevel,
 	})
 	if err != nil {
@@ -165,7 +165,7 @@ func (s *TripService) EndTrip(ctx context.Context, id string) error {
 
 	now := time.Now()
 	durationSeconds := int64(now.Sub(trip.StartedAt).Seconds())
-	distanceKM := float64(telemetry.OdometerKM - trip.StartMileageKM)
+	distanceKM := float64(telemetry.MileageKM - trip.StartMileageKM)
 
 	baseCost, distCost, overtimeCost := calculateCosts(booking.PricingSnapshot, booking.CommittedPeriods, durationSeconds, distanceKM)
 	totalCost := baseCost + distCost + overtimeCost
@@ -174,7 +174,7 @@ func (s *TripService) EndTrip(ctx context.Context, id string) error {
 		Latitude:  telemetry.Location.Latitude,
 		Longitude: telemetry.Location.Longitude,
 	}
-	endMileage := telemetry.OdometerKM
+	endMileage := telemetry.MileageKM
 
 	updatedTrip, err := s.tripRepo.Update(ctx, id, model.TripUpdate{
 		Status:             ptr(model.TripStatusCompleted),
@@ -338,7 +338,7 @@ func (s *TripService) StreamTripLiveFeed(ctx context.Context, tripID string, sen
 		}
 
 		elapsedSeconds := int64(t.RecordedAt.Sub(trip.StartedAt).Seconds())
-		distanceKM := float64(t.OdometerKM - trip.StartMileageKM)
+		distanceKM := float64(t.MileageKM - trip.StartMileageKM)
 		currentCost := calculateCurrentCost(booking.PricingSnapshot, booking.CommittedPeriods, elapsedSeconds, distanceKM)
 
 		return send(model.TripLiveFeed{

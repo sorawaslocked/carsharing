@@ -42,7 +42,7 @@ func (c *TelematicsClient) GetLatestTelemetry(ctx context.Context, carID string)
 	car := resp.Car
 	t := model.CarTelemetry{
 		CarID:      car.Id,
-		OdometerKM: car.MileageKm,
+		MileageKM:  car.MileageKm,
 		FuelLevel:  car.FuelLevel,
 		RecordedAt: time.Now(),
 	}
@@ -79,9 +79,9 @@ func (c *TelematicsClient) StreamTelemetry(ctx context.Context, carID string, fn
 		}
 
 		t := model.CarTelemetry{
-			CarID:      carID,
-			OdometerKM: resp.MileageKm,
-			FuelLevel:  resp.FuelLevel,
+			CarID:     carID,
+			MileageKM: resp.MileageKm,
+			FuelLevel: resp.FuelLevel,
 		}
 		if resp.Location != nil {
 			t.Location = model.Location{

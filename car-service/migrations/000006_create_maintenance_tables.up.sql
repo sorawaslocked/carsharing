@@ -17,7 +17,7 @@ CREATE TABLE car_maintenance_records (
     car_id             UUID                      NOT NULL REFERENCES cars (id) ON DELETE CASCADE,
     template_id        UUID                      NOT NULL REFERENCES car_maintenance_templates (id),
     status             maintenance_record_status NOT NULL DEFAULT 'pending',
-    odometer_at        INT                       NOT NULL,
+    mileage_at         INT                       NOT NULL,
     due_by             TIMESTAMPTZ,
     completed_km       INT,
     cost_tenge         INT,

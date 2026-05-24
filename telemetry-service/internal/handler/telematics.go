@@ -58,7 +58,7 @@ func (h *TelematicsHandler) StreamCarTelematicsEvents(
 		Longitude:    telemetry.Longitude,
 		FuelLevel:    telemetry.FuelLevel,
 		BatteryLevel: telemetry.BatteryLevel,
-		OdometerKm:   telemetry.MileageKm,
+		MileageKM:    telemetry.MileageKm,
 	})
 	if err != nil {
 		return status.Errorf(codes.Internal, "register stream: %v", err)
@@ -71,7 +71,7 @@ func (h *TelematicsHandler) StreamCarTelematicsEvents(
 			Longitude:    update.Longitude,
 			FuelLevel:    update.FuelLevel,
 			BatteryLevel: update.BatteryLevel,
-			OdometerKm:   update.OdometerKm,
+			OdometerKm:   update.MileageKM,
 			RecordedAt:   timestamppb.New(update.RecordedAt),
 		}); err != nil {
 			slog.Warn("stream send failed", "car_id", req.CarId, "error", err)

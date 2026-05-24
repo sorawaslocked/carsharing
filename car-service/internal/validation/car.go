@@ -39,7 +39,9 @@ type CarUpdate struct {
 }
 
 type CarStatusUpdate struct {
-	Status string `validate:"required,carstatus"`
+	Status   string         `validate:"required,carstatus"`
+	Reason   *string        `validate:"omitempty,min=1,max=500"`
+	Metadata map[string]any `validate:"omitempty"`
 }
 
 type CarStatusReadingFilter struct {
@@ -51,10 +53,12 @@ type CarStatusReadingFilter struct {
 }
 
 type CarTelemetryUpdate struct {
-	MileageKM    int64    `validate:"min=0"`
-	FuelLevel    *float32 `validate:"omitempty,min=0,max=100"`
-	BatteryLevel *float32 `validate:"omitempty,min=0,max=100"`
-	Location     *sharedvalidation.Location
+	MileageKM    int64                      `validate:"min=0"`
+	FuelLevel    *float32                   `validate:"omitempty,min=0,max=100"`
+	BatteryLevel *float32                   `validate:"omitempty,min=0,max=100"`
+	Location     *sharedvalidation.Location `validate:"omitempty"`
+	Reason       *string                    `validate:"omitempty,min=1,max=500"`
+	Metadata     map[string]any             `validate:"omitempty"`
 }
 
 type TelemetryReadingFilter struct {

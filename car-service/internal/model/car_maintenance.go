@@ -59,10 +59,10 @@ type CarMaintenanceRecord struct {
 	TemplateID string
 	Status     MaintenanceRecordStatus
 
-	OdometerAt  int32
-	CompletedKM *int32
-	CostTenge   *int32
-	AssignedTo  *string
+	MileageAtWarningKM int32
+	CompletedKM        *int32
+	CostTenge          *int32
+	AssignedTo         *string
 
 	DueBy       *time.Time
 	CompletedAt *time.Time

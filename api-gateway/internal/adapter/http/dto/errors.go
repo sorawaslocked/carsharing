@@ -42,19 +42,19 @@ func FromError(ctx *gin.Context, err error) {
 		unauthorized(ctx, nil)
 
 	case errors.Is(err, model.ErrForbidden):
-		forbidden(ctx)
+		forbidden(ctx, err.Error())
 
 	case errors.Is(err, model.ErrNotFound):
-		notFound(ctx)
+		notFound(ctx, err.Error())
 
 	case errors.Is(err, model.ErrAlreadyExists):
-		conflict(ctx)
+		conflict(ctx, err.Error())
 
 	case errors.Is(err, model.ErrConflict):
-		conflict(ctx)
+		conflict(ctx, err.Error())
 
 	case errors.Is(err, model.ErrTooManyRequests):
-		tooManyRequests(ctx)
+		tooManyRequests(ctx, err.Error())
 
 	case errors.Is(err, model.ErrInternalServerError):
 		internalServerError(ctx)

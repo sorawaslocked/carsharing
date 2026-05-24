@@ -63,6 +63,11 @@ type CarCreate struct {
 	TelemetryID string
 	ZoneID      *string
 
+	MileageKM    *int64
+	FuelLevel    *float32
+	BatteryLevel *float32
+	Location     *sharedmodel.Location
+
 	Notes *string
 }
 

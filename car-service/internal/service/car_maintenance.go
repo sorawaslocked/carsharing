@@ -375,13 +375,13 @@ func (s *CarMaintenanceService) createWorkOrder(ctx context.Context, car model.C
 
 	now := time.Now()
 	_, err := s.recordRepo.Insert(ctx, model.CarMaintenanceRecord{
-		CarID:      car.ID,
-		TemplateID: template.ID,
-		Status:     model.MaintenanceRecordStatusPending,
-		OdometerAt: int32(car.MileageKM),
-		DueBy:      dueBy,
-		CreatedAt:  now,
-		UpdatedAt:  now,
+		CarID:              car.ID,
+		TemplateID:         template.ID,
+		Status:             model.MaintenanceRecordStatusPending,
+		MileageAtWarningKM: int32(car.MileageKM),
+		DueBy:              dueBy,
+		CreatedAt:          now,
+		UpdatedAt:          now,
 	})
 	if err != nil {
 		return err

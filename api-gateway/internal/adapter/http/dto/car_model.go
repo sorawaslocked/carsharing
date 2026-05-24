@@ -35,18 +35,17 @@ type CarModel struct {
 }
 
 type CarModelCreateRequest struct {
-	Brand            string   `json:"brand"`
-	Model            string   `json:"model"`
-	Year             int16    `json:"year"`
-	FuelType         string   `json:"fuelType"`
-	Transmission     string   `json:"transmission"`
-	BodyType         string   `json:"bodyType"`
-	Class            string   `json:"class"`
-	Seats            int8     `json:"seats"`
-	EngineVolume     *float32 `json:"engineVolume"`
-	RangeKM          int32    `json:"rangeKm"`
-	Features         []string `json:"features"`
-	ImageStorageKeys []string `json:"imageStorageKeys"`
+	Brand        string   `json:"brand"`
+	Model        string   `json:"model"`
+	Year         int16    `json:"year"`
+	FuelType     string   `json:"fuelType"`
+	Transmission string   `json:"transmission"`
+	BodyType     string   `json:"bodyType"`
+	Class        string   `json:"class"`
+	Seats        int8     `json:"seats"`
+	EngineVolume *float32 `json:"engineVolume"`
+	RangeKM      int32    `json:"rangeKm"`
+	Features     []string `json:"features"`
 }
 
 type CarModelUpdateRequest struct {

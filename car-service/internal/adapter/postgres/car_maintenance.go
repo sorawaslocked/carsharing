@@ -177,12 +177,12 @@ func (r *CarMaintenanceRecordRepository) Insert(ctx context.Context, rec model.C
 
 	args := []any{
 		rec.CarID, rec.TemplateID, string(rec.Status),
-		rec.OdometerAt, rec.CompletedKM, rec.CostTenge,
+		rec.MileageAtWarningKM, rec.CompletedKM, rec.CostTenge,
 		rec.AssignedTo, rec.DueBy, rec.CompletedAt, rec.Notes,
 		dto.ImagesToKeys(rec.ReceiptImages), rec.CreatedAt, rec.UpdatedAt,
 	}
 	q := `INSERT INTO car_maintenance_records
-			(car_id, template_id, status, odometer_at, completed_km, cost_tenge,
+			(car_id, template_id, status, mileage_at, completed_km, cost_tenge,
 			 assigned_to, due_by, completed_at, notes, receipt_image_keys, created_at, updated_at)
 		  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 		  RETURNING id`
@@ -199,7 +199,7 @@ func (r *CarMaintenanceRecordRepository) Insert(ctx context.Context, rec model.C
 func (r *CarMaintenanceRecordRepository) FindByID(ctx context.Context, id string) (model.CarMaintenanceRecord, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindByID"), utils.MetadataFromCtx(ctx))
 
-	q := `SELECT id, car_id, template_id, status, odometer_at, completed_km, cost_tenge,
+	q := `SELECT id, car_id, template_id, status, mileage_at, completed_km, cost_tenge,
 		assigned_to, due_by, completed_at, notes, receipt_image_keys, created_at, updated_at
 		FROM car_maintenance_records WHERE id = $1 LIMIT 1`
 
@@ -226,7 +226,7 @@ func (r *CarMaintenanceRecordRepository) Find(ctx context.Context, filter model.
 		where = " WHERE " + strings.Join(whereClauses, " AND ")
 	}
 
-	q := `SELECT id, car_id, template_id, status, odometer_at, completed_km, cost_tenge,
+	q := `SELECT id, car_id, template_id, status, mileage_at, completed_km, cost_tenge,
 		assigned_to, due_by, completed_at, notes, receipt_image_keys, created_at, updated_at
 		FROM car_maintenance_records` + where
 

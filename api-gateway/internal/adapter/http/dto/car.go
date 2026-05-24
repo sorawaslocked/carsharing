@@ -58,7 +58,7 @@ type CarStatusReading struct {
 	ActorID    *string        `json:"actorID,omitempty"`
 	Reason     *string        `json:"reason,omitempty"`
 	Metadata   map[string]any `json:"metadata,omitempty"`
-	ChangedAt  time.Time      `json:"changedAt"`
+	RecordedAt time.Time      `json:"recordedAt"`
 }
 
 type CarTelemetryReading struct {
@@ -77,14 +77,19 @@ type CarTelemetryReading struct {
 }
 
 type CarCreateRequest struct {
-	ModelID          string  `json:"modelID"`
-	VIN              string  `json:"vin"`
-	LicensePlate     string  `json:"licensePlate"`
-	Color            string  `json:"color"`
-	YearManufactured int16   `json:"yearManufactured"`
-	TelemetryID      string  `json:"telemetryId"`
-	ZoneID           *string `json:"zoneID"`
-	Notes            *string `json:"notes"`
+	ModelID          string   `json:"modelID"`
+	VIN              string   `json:"vin"`
+	LicensePlate     string   `json:"licensePlate"`
+	Color            string   `json:"color"`
+	YearManufactured int16    `json:"yearManufactured"`
+	TelemetryID      string   `json:"telemetryId"`
+	ZoneID           *string  `json:"zoneID"`
+	MileageKM        *int64   `json:"mileageKm"`
+	FuelLevel        *float32 `json:"fuelLevel"`
+	BatteryLevel     *float32 `json:"batteryLevel"`
+	Latitude         *float64 `json:"latitude"`
+	Longitude        *float64 `json:"longitude"`
+	Notes            *string  `json:"notes"`
 }
 
 type CarUpdateRequest struct {
@@ -120,7 +125,7 @@ func FromCarCreateRequest(ctx *gin.Context) (model.CarCreate, error) {
 		return model.CarCreate{}, err
 	}
 
-	return model.CarCreate{
+	create := model.CarCreate{
 		ModelID:          req.ModelID,
 		VIN:              req.VIN,
 		LicensePlate:     req.LicensePlate,
@@ -128,8 +133,18 @@ func FromCarCreateRequest(ctx *gin.Context) (model.CarCreate, error) {
 		YearManufactured: req.YearManufactured,
 		TelemetryID:      req.TelemetryID,
 		ZoneID:           req.ZoneID,
+		MileageKM:        req.MileageKM,
+		FuelLevel:        req.FuelLevel,
+		BatteryLevel:     req.BatteryLevel,
 		Notes:            req.Notes,
-	}, nil
+	}
+	if req.Latitude != nil && req.Longitude != nil {
+		create.Location = &sharedmodel.Location{
+			Latitude:  *req.Latitude,
+			Longitude: *req.Longitude,
+		}
+	}
+	return create, nil
 }
 
 func FromCarUpdateRequest(ctx *gin.Context) (model.CarUpdate, error) {
@@ -351,7 +366,7 @@ func ToCarStatusReadingResponse(m model.CarStatusReading) CarStatusReading {
 		ActorID:    m.ActorID,
 		Reason:     m.Reason,
 		Metadata:   m.Metadata,
-		ChangedAt:  m.RecordedAt,
+		RecordedAt: m.RecordedAt,
 	}
 }
 

@@ -94,7 +94,7 @@ func ToCarMaintenanceRecordProto(r model.CarMaintenanceRecord) *basecar.CarMaint
 		CarId:                 r.CarID,
 		TemplateId:            r.TemplateID,
 		Status:                string(r.Status),
-		MileageAtWarningKm:    r.OdometerAt,
+		MileageAtWarningKm:    r.MileageAtWarningKM,
 		MileageAtCompletionKm: r.CompletedKM,
 		CostTenge:             r.CostTenge,
 		AssignedTo:            r.AssignedTo,

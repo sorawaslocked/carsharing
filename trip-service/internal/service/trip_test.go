@@ -113,7 +113,7 @@ func sampleTelemetry() model.CarTelemetry {
 	return model.CarTelemetry{
 		CarID:      testCarID,
 		Location:   model.Location{Latitude: 51.5, Longitude: -0.1},
-		OdometerKM: 1050,
+		MileageKM:  1050,
 		RecordedAt: time.Now(),
 	}
 }
@@ -596,7 +596,7 @@ func TestTripService_StreamTripLiveFeed_Success(t *testing.T) {
 	d.telematics.EXPECT().StreamTelemetry(mock.Anything, testCarID, mock.Anything).
 		Run(func(ctx context.Context, carID string, fn func(model.CarTelemetry) error) {
 			tel := model.CarTelemetry{
-				OdometerKM: 1010,
+				MileageKM:  1010,
 				RecordedAt: trip.StartedAt.Add(5 * time.Minute),
 			}
 			_ = fn(tel)

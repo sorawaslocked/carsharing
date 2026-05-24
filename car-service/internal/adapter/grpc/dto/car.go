@@ -118,9 +118,16 @@ func FromUpdateCarRequest(req *carsvc.UpdateCarRequest) validation.CarUpdate {
 }
 
 func FromUpdateCarStatusRequest(req *carsvc.UpdateCarStatusRequest) validation.CarStatusUpdate {
-	return validation.CarStatusUpdate{
+	input := validation.CarStatusUpdate{
 		Status: req.Status,
 	}
+	if req.Reason != "" {
+		input.Reason = &req.Reason
+	}
+	if req.GetMetadata() != nil {
+		input.Metadata = req.GetMetadata().AsMap()
+	}
+	return input
 }
 
 func FromUpdateCarTelemetryRequest(req *carsvc.UpdateCarTelemetryRequest) validation.CarTelemetryUpdate {
@@ -136,6 +143,12 @@ func FromUpdateCarTelemetryRequest(req *carsvc.UpdateCarTelemetryRequest) valida
 			Latitude:  req.Location.Latitude,
 			Longitude: req.Location.Longitude,
 		}
+	}
+	if req.Reason != "" {
+		input.Reason = &req.Reason
+	}
+	if req.GetMetadata() != nil {
+		input.Metadata = req.GetMetadata().AsMap()
 	}
 	return input
 }

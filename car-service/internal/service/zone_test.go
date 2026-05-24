@@ -86,14 +86,14 @@ func TestZoneServiceGet(t *testing.T) {
 		assert.Equal(t, zoneID, got.ID)
 	})
 
-	t.Run("not found returns ErrNotFound", func(t *testing.T) {
+	t.Run("not found returns ErrZoneNotFound", func(t *testing.T) {
 		repo := mocks.NewMockZoneRepository(t)
 		svc := newTestZoneService(t, repo)
 
-		repo.EXPECT().FindByID(ctx, zoneID).Return(model.Zone{}, model.ErrNotFound)
+		repo.EXPECT().FindByID(ctx, zoneID).Return(model.Zone{}, model.ErrZoneNotFound)
 
 		_, err := svc.Get(ctx, zoneID)
-		assert.ErrorIs(t, err, model.ErrNotFound)
+		assert.ErrorIs(t, err, model.ErrZoneNotFound)
 	})
 }
 
@@ -164,13 +164,13 @@ func TestZoneServiceUpdate(t *testing.T) {
 		assert.NoError(t, svc.Update(ctx, zoneID, validation.ZoneUpdate{Type: &zoneType}))
 	})
 
-	t.Run("not found returns ErrNotFound", func(t *testing.T) {
+	t.Run("not found returns ErrZoneNotFound", func(t *testing.T) {
 		repo := mocks.NewMockZoneRepository(t)
 		svc := newTestZoneService(t, repo)
 
-		repo.EXPECT().Update(ctx, zoneID, mock.Anything).Return(model.ErrNotFound)
+		repo.EXPECT().Update(ctx, zoneID, mock.Anything).Return(model.ErrZoneNotFound)
 
-		assert.ErrorIs(t, svc.Update(ctx, zoneID, validation.ZoneUpdate{}), model.ErrNotFound)
+		assert.ErrorIs(t, svc.Update(ctx, zoneID, validation.ZoneUpdate{}), model.ErrZoneNotFound)
 	})
 }
 
@@ -187,12 +187,12 @@ func TestZoneServiceDelete(t *testing.T) {
 		assert.NoError(t, svc.Delete(ctx, zoneID))
 	})
 
-	t.Run("not found returns ErrNotFound", func(t *testing.T) {
+	t.Run("not found returns ErrZoneNotFound", func(t *testing.T) {
 		repo := mocks.NewMockZoneRepository(t)
 		svc := newTestZoneService(t, repo)
 
-		repo.EXPECT().Delete(ctx, zoneID).Return(model.ErrNotFound)
+		repo.EXPECT().Delete(ctx, zoneID).Return(model.ErrZoneNotFound)
 
-		assert.ErrorIs(t, svc.Delete(ctx, zoneID), model.ErrNotFound)
+		assert.ErrorIs(t, svc.Delete(ctx, zoneID), model.ErrZoneNotFound)
 	})
 }

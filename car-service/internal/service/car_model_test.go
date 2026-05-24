@@ -96,15 +96,15 @@ func TestCarModelServiceGet(t *testing.T) {
 		assert.Equal(t, url2, got.Images[1].URL)
 	})
 
-	t.Run("not found returns ErrNotFound", func(t *testing.T) {
+	t.Run("not found returns ErrCarModelNotFound", func(t *testing.T) {
 		repo := mocks.NewMockCarModelRepository(t)
 		storage := mocks.NewMockObjectStorage(t)
 		svc := newTestCarModelService(t, repo, storage)
 
-		repo.EXPECT().FindByID(ctx, modelID).Return(model.CarModel{}, model.ErrNotFound)
+		repo.EXPECT().FindByID(ctx, modelID).Return(model.CarModel{}, model.ErrCarModelNotFound)
 
 		_, err := svc.Get(ctx, modelID)
-		assert.ErrorIs(t, err, model.ErrNotFound)
+		assert.ErrorIs(t, err, model.ErrCarModelNotFound)
 	})
 
 	t.Run("presigned URL error is propagated", func(t *testing.T) {
@@ -180,13 +180,13 @@ func TestCarModelServiceUpdate(t *testing.T) {
 		assert.NoError(t, svc.Update(ctx, modelID, validation.CarModelUpdate{}))
 	})
 
-	t.Run("not found returns ErrNotFound", func(t *testing.T) {
+	t.Run("not found returns ErrCarModelNotFound", func(t *testing.T) {
 		repo := mocks.NewMockCarModelRepository(t)
 		svc := newTestCarModelService(t, repo, nil)
 
-		repo.EXPECT().Update(ctx, modelID, mock.Anything).Return(model.ErrNotFound)
+		repo.EXPECT().Update(ctx, modelID, mock.Anything).Return(model.ErrCarModelNotFound)
 
-		assert.ErrorIs(t, svc.Update(ctx, modelID, validation.CarModelUpdate{}), model.ErrNotFound)
+		assert.ErrorIs(t, svc.Update(ctx, modelID, validation.CarModelUpdate{}), model.ErrCarModelNotFound)
 	})
 }
 
@@ -203,13 +203,13 @@ func TestCarModelServiceDelete(t *testing.T) {
 		assert.NoError(t, svc.Delete(ctx, modelID))
 	})
 
-	t.Run("not found returns ErrNotFound", func(t *testing.T) {
+	t.Run("not found returns ErrCarModelNotFound", func(t *testing.T) {
 		repo := mocks.NewMockCarModelRepository(t)
 		svc := newTestCarModelService(t, repo, nil)
 
-		repo.EXPECT().Delete(ctx, modelID).Return(model.ErrNotFound)
+		repo.EXPECT().Delete(ctx, modelID).Return(model.ErrCarModelNotFound)
 
-		assert.ErrorIs(t, svc.Delete(ctx, modelID), model.ErrNotFound)
+		assert.ErrorIs(t, svc.Delete(ctx, modelID), model.ErrCarModelNotFound)
 	})
 }
 

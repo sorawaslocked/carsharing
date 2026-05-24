@@ -42,6 +42,16 @@ func TestCarMaintenanceHandlerCreateMaintenanceTemplate(t *testing.T) {
 		_, err := h.CreateMaintenanceTemplate(ctx, &carsvc.CreateMaintenanceTemplateRequest{})
 		assert.Equal(t, codes.Internal, grpcCode(err))
 	})
+
+	t.Run("validation error maps to gRPC InvalidArgument", func(t *testing.T) {
+		svc := mocks.NewMockCarMaintenanceService(t)
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
+
+		svc.EXPECT().CreateTemplate(ctx, mock.Anything).Return("", validation.Errors{"name": validation.ErrRequiredField})
+
+		_, err := h.CreateMaintenanceTemplate(ctx, &carsvc.CreateMaintenanceTemplateRequest{})
+		assert.Equal(t, codes.InvalidArgument, grpcCode(err))
+	})
 }
 
 func TestCarMaintenanceHandlerGetMaintenanceTemplate(t *testing.T) {

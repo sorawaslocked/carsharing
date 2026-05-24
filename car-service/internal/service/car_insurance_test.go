@@ -120,15 +120,15 @@ func TestCarInsuranceServiceGet(t *testing.T) {
 		assert.Equal(t, presigned, got.Images[0].URL)
 	})
 
-	t.Run("not found returns ErrNotFound", func(t *testing.T) {
+	t.Run("not found returns ErrCarInsuranceNotFound", func(t *testing.T) {
 		repo := mocks.NewMockCarInsuranceRepository(t)
 		storage := mocks.NewMockObjectStorage(t)
 		svc := newTestCarInsuranceService(t, repo, storage)
 
-		repo.EXPECT().FindByID(ctx, insID).Return(model.CarInsurance{}, model.ErrNotFound)
+		repo.EXPECT().FindByID(ctx, insID).Return(model.CarInsurance{}, model.ErrCarInsuranceNotFound)
 
 		_, err := svc.Get(ctx, insID)
-		assert.ErrorIs(t, err, model.ErrNotFound)
+		assert.ErrorIs(t, err, model.ErrCarInsuranceNotFound)
 	})
 }
 
@@ -198,13 +198,13 @@ func TestCarInsuranceServiceUpdate(t *testing.T) {
 		assert.NoError(t, svc.Update(ctx, insID, validation.CarInsuranceUpdate{Status: &statusStr}))
 	})
 
-	t.Run("not found returns ErrNotFound", func(t *testing.T) {
+	t.Run("not found returns ErrCarInsuranceNotFound", func(t *testing.T) {
 		repo := mocks.NewMockCarInsuranceRepository(t)
 		svc := newTestCarInsuranceService(t, repo, nil)
 
-		repo.EXPECT().Update(ctx, insID, mock.Anything).Return(model.ErrNotFound)
+		repo.EXPECT().Update(ctx, insID, mock.Anything).Return(model.ErrCarInsuranceNotFound)
 
-		assert.ErrorIs(t, svc.Update(ctx, insID, validation.CarInsuranceUpdate{}), model.ErrNotFound)
+		assert.ErrorIs(t, svc.Update(ctx, insID, validation.CarInsuranceUpdate{}), model.ErrCarInsuranceNotFound)
 	})
 }
 
@@ -221,13 +221,13 @@ func TestCarInsuranceServiceDelete(t *testing.T) {
 		assert.NoError(t, svc.Delete(ctx, insID))
 	})
 
-	t.Run("not found returns ErrNotFound", func(t *testing.T) {
+	t.Run("not found returns ErrCarInsuranceNotFound", func(t *testing.T) {
 		repo := mocks.NewMockCarInsuranceRepository(t)
 		svc := newTestCarInsuranceService(t, repo, nil)
 
-		repo.EXPECT().Delete(ctx, insID).Return(model.ErrNotFound)
+		repo.EXPECT().Delete(ctx, insID).Return(model.ErrCarInsuranceNotFound)
 
-		assert.ErrorIs(t, svc.Delete(ctx, insID), model.ErrNotFound)
+		assert.ErrorIs(t, svc.Delete(ctx, insID), model.ErrCarInsuranceNotFound)
 	})
 }
 

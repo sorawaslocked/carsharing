@@ -51,6 +51,16 @@ func TestCarInsuranceHandlerCreateCarInsurance(t *testing.T) {
 		_, err := h.CreateCarInsurance(ctx, req)
 		assert.Equal(t, codes.Internal, grpcCode(err))
 	})
+
+	t.Run("validation error maps to gRPC InvalidArgument", func(t *testing.T) {
+		svc := mocks.NewMockCarInsuranceService(t)
+		h := NewCarInsuranceHandler(discardLogger(), svc)
+
+		svc.EXPECT().Create(ctx, mock.Anything).Return("", validation.Errors{"car_id": validation.ErrRequiredField})
+
+		_, err := h.CreateCarInsurance(ctx, req)
+		assert.Equal(t, codes.InvalidArgument, grpcCode(err))
+	})
 }
 
 func TestCarInsuranceHandlerGetCarInsurance(t *testing.T) {

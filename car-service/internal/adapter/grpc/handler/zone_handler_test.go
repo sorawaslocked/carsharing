@@ -41,6 +41,16 @@ func TestZoneHandlerCreateZone(t *testing.T) {
 		_, err := h.CreateZone(ctx, &carsvc.CreateZoneRequest{})
 		assert.Equal(t, codes.Internal, grpcCode(err))
 	})
+
+	t.Run("validation error maps to gRPC InvalidArgument", func(t *testing.T) {
+		svc := mocks.NewMockZoneService(t)
+		h := NewZoneHandler(discardLogger(), svc)
+
+		svc.EXPECT().Create(ctx, mock.Anything).Return("", validation.Errors{"name": validation.ErrRequiredField})
+
+		_, err := h.CreateZone(ctx, &carsvc.CreateZoneRequest{})
+		assert.Equal(t, codes.InvalidArgument, grpcCode(err))
+	})
 }
 
 func TestZoneHandlerGetZone(t *testing.T) {

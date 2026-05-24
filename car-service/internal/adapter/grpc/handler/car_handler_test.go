@@ -41,6 +41,26 @@ func TestCarHandlerCreateCar(t *testing.T) {
 		_, err := h.CreateCar(ctx, &carsvc.CreateCarRequest{})
 		assert.Equal(t, codes.Internal, grpcCode(err))
 	})
+
+	t.Run("validation error maps to gRPC InvalidArgument", func(t *testing.T) {
+		svc := mocks.NewMockCarService(t)
+		h := NewCarHandler(discardLogger(), svc)
+
+		svc.EXPECT().Create(ctx, mock.Anything).Return("", validation.Errors{"vin": validation.ErrRequiredField})
+
+		_, err := h.CreateCar(ctx, &carsvc.CreateCarRequest{})
+		assert.Equal(t, codes.InvalidArgument, grpcCode(err))
+	})
+
+	t.Run("duplicate VIN maps to gRPC AlreadyExists", func(t *testing.T) {
+		svc := mocks.NewMockCarService(t)
+		h := NewCarHandler(discardLogger(), svc)
+
+		svc.EXPECT().Create(ctx, mock.Anything).Return("", model.ErrDuplicateVIN)
+
+		_, err := h.CreateCar(ctx, &carsvc.CreateCarRequest{})
+		assert.Equal(t, codes.AlreadyExists, grpcCode(err))
+	})
 }
 
 func TestCarHandlerGetCar(t *testing.T) {
@@ -151,6 +171,18 @@ func TestCarHandlerUpdateCarStatus(t *testing.T) {
 
 		_, err := h.UpdateCarStatus(ctx, &carsvc.UpdateCarStatusRequest{Id: carID, Status: "reserved"})
 		assert.Equal(t, codes.Internal, grpcCode(err))
+	})
+
+	t.Run("invalid transition maps to gRPC FailedPrecondition", func(t *testing.T) {
+		svc := mocks.NewMockCarService(t)
+		h := NewCarHandler(discardLogger(), svc)
+
+		svc.EXPECT().UpdateCarStatus(ctx, carID, mock.Anything).Return(
+			model.ErrInvalidStatusTransition{From: model.CarStatusAvailable, To: model.CarStatusInUse},
+		)
+
+		_, err := h.UpdateCarStatus(ctx, &carsvc.UpdateCarStatusRequest{Id: carID, Status: "in_use"})
+		assert.Equal(t, codes.FailedPrecondition, grpcCode(err))
 	})
 }
 

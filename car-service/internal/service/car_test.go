@@ -9,6 +9,7 @@ import (
 	"carsharing/car-service/internal/model"
 	"carsharing/car-service/internal/service/mocks"
 	"carsharing/car-service/internal/validation"
+	sharedmodel "carsharing/shared/model"
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -20,6 +21,61 @@ func newTestCarService(t *testing.T, carRepo CarRepository, statusLogRepo CarSta
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))
 	_ = validation.RegisterCustomValidators(v, log)
 	return NewCarService(log, v, nil, carRepo, nil, statusLogRepo, nil, nil, eventPub)
+}
+
+func TestUpdateCarZoneCheck(t *testing.T) {
+	ctx := context.Background()
+	carID := "c0000000-0000-4000-8000-000000000001"
+	zoneID := "a0000000-0000-4000-8000-000000000001"
+
+	newSvc := func(t *testing.T, carRepo CarRepository, zoneRepo ZoneRepository) *CarService {
+		t.Helper()
+		return NewCarService(discardLogger(), newTestValidator(t), nil, carRepo, zoneRepo, nil, nil, nil, nil)
+	}
+
+	t.Run("valid zone check passes and car is updated", func(t *testing.T) {
+		carRepo := mocks.NewMockCarRepository(t)
+		zoneRepo := mocks.NewMockZoneRepository(t)
+		svc := newSvc(t, carRepo, zoneRepo)
+
+		zoneRepo.EXPECT().FindByID(ctx, zoneID).Return(model.Zone{ID: zoneID}, nil)
+		carRepo.EXPECT().Update(ctx, carID, mock.MatchedBy(func(u model.CarUpdate) bool {
+			return u.ZoneID != nil && *u.ZoneID == zoneID
+		})).Return(nil)
+
+		err := svc.Update(ctx, carID, validation.CarUpdate{ZoneID: &zoneID})
+		assert.NoError(t, err)
+	})
+
+	t.Run("zone not found returns ErrZoneNotFound", func(t *testing.T) {
+		zoneRepo := mocks.NewMockZoneRepository(t)
+		svc := newSvc(t, nil, zoneRepo)
+
+		zoneRepo.EXPECT().FindByID(ctx, zoneID).Return(model.Zone{}, model.ErrZoneNotFound)
+
+		err := svc.Update(ctx, carID, validation.CarUpdate{ZoneID: &zoneID})
+		assert.ErrorIs(t, err, model.ErrZoneNotFound)
+	})
+
+	t.Run("no zone id skips zone check", func(t *testing.T) {
+		carRepo := mocks.NewMockCarRepository(t)
+		svc := newSvc(t, carRepo, nil)
+
+		carRepo.EXPECT().Update(ctx, carID, mock.Anything).Return(nil)
+
+		err := svc.Update(ctx, carID, validation.CarUpdate{})
+		assert.NoError(t, err)
+	})
+
+	t.Run("car not found returns ErrCarNotFound", func(t *testing.T) {
+		carRepo := mocks.NewMockCarRepository(t)
+		svc := newSvc(t, carRepo, nil)
+
+		carRepo.EXPECT().Update(ctx, carID, mock.Anything).Return(model.ErrCarNotFound)
+
+		err := svc.Update(ctx, carID, validation.CarUpdate{})
+		assert.ErrorIs(t, err, model.ErrCarNotFound)
+	})
 }
 
 func TestTransitionCarStatus(t *testing.T) {
@@ -117,18 +173,18 @@ func TestUpdateCarStatus(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("car not found returns ErrNotFound", func(t *testing.T) {
+	t.Run("car not found returns ErrCarNotFound", func(t *testing.T) {
 		carRepo := mocks.NewMockCarRepository(t)
 		svc := newTestCarService(t, carRepo, nil, nil)
 
 		carRepo.EXPECT().
 			FindByID(ctx, carID).
-			Return(model.Car{}, model.ErrNotFound)
+			Return(model.Car{}, model.ErrCarNotFound)
 
 		err := svc.UpdateCarStatus(ctx, carID, validation.CarStatusUpdate{
 			Status: string(model.CarStatusReserved),
 		})
-		assert.ErrorIs(t, err, model.ErrNotFound)
+		assert.ErrorIs(t, err, model.ErrCarNotFound)
 	})
 
 	t.Run("status log insert failure is non-fatal", func(t *testing.T) {
@@ -174,6 +230,262 @@ func TestUpdateCarStatus(t *testing.T) {
 			Status: string(model.CarStatusAvailable),
 		})
 		assert.NoError(t, err)
+	})
+}
+
+func TestCarServiceCreate(t *testing.T) {
+	ctx := context.Background()
+	modelID := "m0000000-0000-4000-8000-000000000001"
+	zoneID := "a0000000-0000-4000-8000-000000000002"
+
+	newSvc := func(t *testing.T, modelRepo CarModelRepository, carRepo CarRepository, zoneRepo ZoneRepository) *CarService {
+		t.Helper()
+		return NewCarService(discardLogger(), newTestValidator(t), modelRepo, carRepo, zoneRepo, nil, nil, nil, nil)
+	}
+
+	validInput := validation.CarCreate{
+		ModelID:          modelID,
+		VIN:              "12345678901234567",
+		LicensePlate:     "ABC123",
+		Color:            "red",
+		YearManufactured: 2022,
+		TelemetryID:      "tel-001",
+	}
+
+	t.Run("happy path returns inserted id", func(t *testing.T) {
+		modelRepo := mocks.NewMockCarModelRepository(t)
+		carRepo := mocks.NewMockCarRepository(t)
+		svc := newSvc(t, modelRepo, carRepo, nil)
+
+		modelRepo.EXPECT().FindByID(ctx, modelID).Return(model.CarModel{ID: modelID}, nil)
+		carRepo.EXPECT().Insert(ctx, mock.MatchedBy(func(c model.Car) bool {
+			return c.VIN == "12345678901234567" && c.Status == model.CarStatusAvailable
+		})).Return("car-123", nil)
+
+		id, err := svc.Create(ctx, validInput)
+		assert.NoError(t, err)
+		assert.Equal(t, "car-123", id)
+	})
+
+	t.Run("car model not found returns ErrCarModelNotFound", func(t *testing.T) {
+		modelRepo := mocks.NewMockCarModelRepository(t)
+		svc := newSvc(t, modelRepo, nil, nil)
+
+		modelRepo.EXPECT().FindByID(ctx, modelID).Return(model.CarModel{}, model.ErrCarModelNotFound)
+
+		_, err := svc.Create(ctx, validInput)
+		assert.ErrorIs(t, err, model.ErrCarModelNotFound)
+	})
+
+	t.Run("zone not found returns ErrZoneNotFound", func(t *testing.T) {
+		modelRepo := mocks.NewMockCarModelRepository(t)
+		zoneRepo := mocks.NewMockZoneRepository(t)
+		svc := newSvc(t, modelRepo, nil, zoneRepo)
+
+		input := validInput
+		input.ZoneID = &zoneID
+
+		modelRepo.EXPECT().FindByID(ctx, modelID).Return(model.CarModel{ID: modelID}, nil)
+		zoneRepo.EXPECT().FindByID(ctx, zoneID).Return(model.Zone{}, model.ErrZoneNotFound)
+
+		_, err := svc.Create(ctx, input)
+		assert.ErrorIs(t, err, model.ErrZoneNotFound)
+	})
+
+	t.Run("duplicate VIN returns ErrDuplicateVIN", func(t *testing.T) {
+		modelRepo := mocks.NewMockCarModelRepository(t)
+		carRepo := mocks.NewMockCarRepository(t)
+		svc := newSvc(t, modelRepo, carRepo, nil)
+
+		modelRepo.EXPECT().FindByID(ctx, modelID).Return(model.CarModel{ID: modelID}, nil)
+		carRepo.EXPECT().Insert(ctx, mock.Anything).Return("", model.ErrDuplicateVIN)
+
+		_, err := svc.Create(ctx, validInput)
+		assert.ErrorIs(t, err, model.ErrDuplicateVIN)
+	})
+
+	t.Run("duplicate license plate returns ErrDuplicateLicensePlate", func(t *testing.T) {
+		modelRepo := mocks.NewMockCarModelRepository(t)
+		carRepo := mocks.NewMockCarRepository(t)
+		svc := newSvc(t, modelRepo, carRepo, nil)
+
+		modelRepo.EXPECT().FindByID(ctx, modelID).Return(model.CarModel{ID: modelID}, nil)
+		carRepo.EXPECT().Insert(ctx, mock.Anything).Return("", model.ErrDuplicateLicensePlate)
+
+		_, err := svc.Create(ctx, validInput)
+		assert.ErrorIs(t, err, model.ErrDuplicateLicensePlate)
+	})
+
+	t.Run("validation rejects missing required fields", func(t *testing.T) {
+		svc := newSvc(t, nil, nil, nil)
+
+		_, err := svc.Create(ctx, validation.CarCreate{})
+		assert.Error(t, err)
+	})
+}
+
+func TestCarServiceGet(t *testing.T) {
+	ctx := context.Background()
+	carID := "c0000000-0000-4000-8000-000000000001"
+
+	newSvc := func(t *testing.T, carRepo CarRepository, storage ObjectStorage) *CarService {
+		t.Helper()
+		return NewCarService(discardLogger(), newTestValidator(t), nil, carRepo, nil, nil, nil, storage, nil)
+	}
+
+	t.Run("returns car with no images", func(t *testing.T) {
+		carRepo := mocks.NewMockCarRepository(t)
+		svc := newSvc(t, carRepo, nil)
+
+		carRepo.EXPECT().FindByID(ctx, carID).Return(model.Car{ID: carID, Status: model.CarStatusAvailable}, nil)
+
+		got, err := svc.Get(ctx, carID)
+		assert.NoError(t, err)
+		assert.Equal(t, carID, got.ID)
+	})
+
+	t.Run("populates presigned URLs for car images", func(t *testing.T) {
+		carRepo := mocks.NewMockCarRepository(t)
+		storage := mocks.NewMockObjectStorage(t)
+		svc := newSvc(t, carRepo, storage)
+
+		key := "cars/photo.jpg"
+		carRepo.EXPECT().FindByID(ctx, carID).Return(model.Car{
+			ID:     carID,
+			Images: []sharedmodel.Image{{Key: key}},
+		}, nil)
+		storage.EXPECT().GetPresignedURL(ctx, key).Return("https://cdn/photo.jpg", nil)
+
+		got, err := svc.Get(ctx, carID)
+		assert.NoError(t, err)
+		assert.Equal(t, "https://cdn/photo.jpg", got.Images[0].URL)
+	})
+
+	t.Run("car not found returns ErrCarNotFound", func(t *testing.T) {
+		carRepo := mocks.NewMockCarRepository(t)
+		svc := newSvc(t, carRepo, nil)
+
+		carRepo.EXPECT().FindByID(ctx, carID).Return(model.Car{}, model.ErrCarNotFound)
+
+		_, err := svc.Get(ctx, carID)
+		assert.ErrorIs(t, err, model.ErrCarNotFound)
+	})
+
+	t.Run("object storage error is propagated", func(t *testing.T) {
+		carRepo := mocks.NewMockCarRepository(t)
+		storage := mocks.NewMockObjectStorage(t)
+		svc := newSvc(t, carRepo, storage)
+
+		key := "cars/photo.jpg"
+		carRepo.EXPECT().FindByID(ctx, carID).Return(model.Car{
+			ID:     carID,
+			Images: []sharedmodel.Image{{Key: key}},
+		}, nil)
+		storage.EXPECT().GetPresignedURL(ctx, key).Return("", model.ErrObjectStorage)
+
+		_, err := svc.Get(ctx, carID)
+		assert.Error(t, err)
+	})
+}
+
+func TestCarServiceDelete(t *testing.T) {
+	ctx := context.Background()
+	carID := "c0000000-0000-4000-8000-000000000001"
+
+	newSvc := func(t *testing.T, carRepo CarRepository) *CarService {
+		t.Helper()
+		return NewCarService(discardLogger(), newTestValidator(t), nil, carRepo, nil, nil, nil, nil, nil)
+	}
+
+	t.Run("happy path returns nil", func(t *testing.T) {
+		carRepo := mocks.NewMockCarRepository(t)
+		svc := newSvc(t, carRepo)
+
+		carRepo.EXPECT().Delete(ctx, carID).Return(nil)
+
+		assert.NoError(t, svc.Delete(ctx, carID))
+	})
+
+	t.Run("car not found returns ErrCarNotFound", func(t *testing.T) {
+		carRepo := mocks.NewMockCarRepository(t)
+		svc := newSvc(t, carRepo)
+
+		carRepo.EXPECT().Delete(ctx, carID).Return(model.ErrCarNotFound)
+
+		assert.ErrorIs(t, svc.Delete(ctx, carID), model.ErrCarNotFound)
+	})
+}
+
+func TestCarServiceUpdateCarTelemetry(t *testing.T) {
+	ctx := context.Background()
+	carID := "c0000000-0000-4000-8000-000000000001"
+
+	newSvc := func(t *testing.T, carRepo CarRepository) *CarService {
+		t.Helper()
+		return NewCarService(discardLogger(), newTestValidator(t), nil, carRepo, nil, nil, nil, nil, nil)
+	}
+
+	t.Run("happy path updates car telemetry", func(t *testing.T) {
+		carRepo := mocks.NewMockCarRepository(t)
+		svc := newSvc(t, carRepo)
+
+		carRepo.EXPECT().Update(ctx, carID, mock.MatchedBy(func(u model.CarUpdate) bool {
+			return u.MileageKM != nil && *u.MileageKM == 50_000
+		})).Return(nil)
+
+		err := svc.UpdateCarTelemetry(ctx, carID, validation.CarTelemetryUpdate{MileageKM: 50_000})
+		assert.NoError(t, err)
+	})
+
+	t.Run("car not found returns ErrCarNotFound", func(t *testing.T) {
+		carRepo := mocks.NewMockCarRepository(t)
+		svc := newSvc(t, carRepo)
+
+		carRepo.EXPECT().Update(ctx, carID, mock.Anything).Return(model.ErrCarNotFound)
+
+		err := svc.UpdateCarTelemetry(ctx, carID, validation.CarTelemetryUpdate{MileageKM: 50_000})
+		assert.ErrorIs(t, err, model.ErrCarNotFound)
+	})
+
+	t.Run("repo error is propagated", func(t *testing.T) {
+		carRepo := mocks.NewMockCarRepository(t)
+		svc := newSvc(t, carRepo)
+
+		carRepo.EXPECT().Update(ctx, carID, mock.Anything).Return(model.ErrSql)
+
+		err := svc.UpdateCarTelemetry(ctx, carID, validation.CarTelemetryUpdate{MileageKM: 50_000})
+		assert.ErrorIs(t, err, model.ErrSql)
+	})
+}
+
+func TestCarServiceGetImageUploadData(t *testing.T) {
+	ctx := context.Background()
+
+	newSvc := func(t *testing.T, storage ObjectStorage) *CarService {
+		t.Helper()
+		return NewCarService(discardLogger(), newTestValidator(t), nil, nil, nil, nil, nil, storage, nil)
+	}
+
+	t.Run("returns upload data from object storage", func(t *testing.T) {
+		storage := mocks.NewMockObjectStorage(t)
+		svc := newSvc(t, storage)
+
+		want := sharedmodel.ImageUploadData{ObjectKey: "cars/abc.jpg", PresignedPutURL: "https://upload.example.com"}
+		storage.EXPECT().GetCarImageUploadData(ctx).Return(want, nil)
+
+		got, err := svc.GetImageUploadData(ctx)
+		assert.NoError(t, err)
+		assert.Equal(t, want, got)
+	})
+
+	t.Run("storage error is propagated", func(t *testing.T) {
+		storage := mocks.NewMockObjectStorage(t)
+		svc := newSvc(t, storage)
+
+		storage.EXPECT().GetCarImageUploadData(ctx).Return(sharedmodel.ImageUploadData{}, model.ErrObjectStorage)
+
+		_, err := svc.GetImageUploadData(ctx)
+		assert.Error(t, err)
 	})
 }
 

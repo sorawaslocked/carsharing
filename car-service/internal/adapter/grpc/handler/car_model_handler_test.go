@@ -6,6 +6,7 @@ import (
 
 	"carsharing/car-service/internal/adapter/grpc/handler/mocks"
 	"carsharing/car-service/internal/model"
+	"carsharing/car-service/internal/validation"
 	carsvc "carsharing/protos/gen/service/car"
 	sharedmodel "carsharing/shared/model"
 	"github.com/stretchr/testify/assert"
@@ -40,6 +41,16 @@ func TestCarModelHandlerCreateCarModel(t *testing.T) {
 
 		_, err := h.CreateCarModel(ctx, &carsvc.CreateCarModelRequest{})
 		assert.Equal(t, codes.Internal, grpcCode(err))
+	})
+
+	t.Run("validation error maps to gRPC InvalidArgument", func(t *testing.T) {
+		svc := mocks.NewMockCarModelService(t)
+		h := NewCarModelHandler(discardLogger(), svc)
+
+		svc.EXPECT().Create(ctx, mock.Anything).Return("", validation.Errors{"brand": validation.ErrRequiredField})
+
+		_, err := h.CreateCarModel(ctx, &carsvc.CreateCarModelRequest{})
+		assert.Equal(t, codes.InvalidArgument, grpcCode(err))
 	})
 }
 

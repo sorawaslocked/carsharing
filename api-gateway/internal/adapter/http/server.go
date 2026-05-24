@@ -61,6 +61,7 @@ func New(
 
 	gin.SetMode(httpCfg.GinMode)
 	router := gin.New()
+	router.RedirectTrailingSlash = false
 
 	// Handlers
 	userHandler := handler.NewUser(userService, cookieCfg, log)

@@ -31,7 +31,7 @@ type UserService interface {
 	CreateDocument(ctx context.Context, objectKey, imageType string) (string, error)
 	GetUploadDocumentData(ctx context.Context, imageType string) (sharedmodel.ImageUploadData, error)
 	GetProfileImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error)
-	GetProcessedDocumentsForUser(ctx context.Context, userID string) ([]model.Document, error)
+	ListDocuments(ctx context.Context, filter model.DocumentFilter) ([]model.Document, error)
 	CheckDocument(ctx context.Context, docID string, status string, documentError *string) error
 }
 

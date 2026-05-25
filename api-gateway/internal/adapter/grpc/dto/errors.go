@@ -52,7 +52,7 @@ func FromGrpcErr(err error) error {
 		return wrapDomain(model.ErrNotFound, err)
 	case codes.AlreadyExists:
 		return wrapDomain(model.ErrAlreadyExists, err)
-	case codes.FailedPrecondition:
+	case codes.FailedPrecondition, codes.Aborted:
 		return wrapDomain(model.ErrConflict, err)
 	case codes.PermissionDenied:
 		return wrapDomain(model.ErrForbidden, err)

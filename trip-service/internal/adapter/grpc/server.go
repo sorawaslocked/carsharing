@@ -4,7 +4,6 @@ import (
 	"log/slog"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 
 	tripsvc "carsharing/protos/gen/service/trip"
 	pkggrpc "carsharing/shared/pkg/grpc"
@@ -46,7 +45,6 @@ func NewServer(
 	tripsvc.RegisterTripServiceServer(srv, tripHandler)
 	tripsvc.RegisterTripStreamServiceServer(srv, streamHandler)
 	tripsvc.RegisterHealthServiceServer(srv, healthHandler)
-	reflection.Register(srv)
 
 	return srv, nil
 }

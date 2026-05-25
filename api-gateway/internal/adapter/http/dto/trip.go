@@ -53,7 +53,7 @@ type TripSummary struct {
 type TripStatusReading struct {
 	ID         string    `json:"id"`
 	TripID     string    `json:"tripID"`
-	FromStatus string    `json:"fromStatus" validate:"oneof=active completed cancelled"`
+	FromStatus string    `json:"fromStatus"`
 	ToStatus   string    `json:"toStatus" validate:"oneof=active completed cancelled"`
 	ActorType  string    `json:"actorType" validate:"oneof=user system telemetry"`
 	ActorID    *string   `json:"actorID,omitempty"`

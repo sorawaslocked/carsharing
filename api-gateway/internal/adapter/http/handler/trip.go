@@ -32,6 +32,7 @@ func NewTripHandler(svc TripService, log *slog.Logger) *TripHandler {
 // @Success      201   {object}  dto.IDResponse
 // @Failure      400   {object}  dto.ErrorResponse
 // @Failure      401   {object}  dto.ErrorResponse
+// @Failure      403   {object}  dto.ErrorResponse
 // @Failure      404   {object}  dto.ErrorResponse
 // @Failure      409   {object}  dto.ErrorResponse
 // @Failure      500   {object}  dto.ErrorResponse
@@ -67,6 +68,7 @@ func (h *TripHandler) Start(ctx *gin.Context) {
 // @Success      200  {object}  dto.Trip
 // @Failure      400  {object}  dto.ErrorResponse
 // @Failure      401  {object}  dto.ErrorResponse
+// @Failure      403  {object}  dto.ErrorResponse
 // @Failure      404  {object}  dto.ErrorResponse
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /trips/{id} [get]
@@ -147,7 +149,9 @@ func (h *TripHandler) List(ctx *gin.Context) {
 // @Success      204
 // @Failure      400  {object}  dto.ErrorResponse
 // @Failure      401  {object}  dto.ErrorResponse
+// @Failure      403  {object}  dto.ErrorResponse
 // @Failure      404  {object}  dto.ErrorResponse
+// @Failure      409  {object}  dto.ErrorResponse
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /trips/{id}/end [post]
 func (h *TripHandler) End(ctx *gin.Context) {
@@ -183,7 +187,9 @@ func (h *TripHandler) End(ctx *gin.Context) {
 // @Success      204
 // @Failure      400  {object}  dto.ErrorResponse
 // @Failure      401  {object}  dto.ErrorResponse
+// @Failure      403  {object}  dto.ErrorResponse
 // @Failure      404  {object}  dto.ErrorResponse
+// @Failure      409  {object}  dto.ErrorResponse
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /trips/{id}/cancel [post]
 func (h *TripHandler) Cancel(ctx *gin.Context) {
@@ -224,7 +230,9 @@ func (h *TripHandler) Cancel(ctx *gin.Context) {
 // @Success      200  {object}  dto.TripSummary
 // @Failure      400  {object}  dto.ErrorResponse
 // @Failure      401  {object}  dto.ErrorResponse
+// @Failure      403  {object}  dto.ErrorResponse
 // @Failure      404  {object}  dto.ErrorResponse
+// @Failure      409  {object}  dto.ErrorResponse
 // @Failure      500  {object}  dto.ErrorResponse
 // @Router       /trips/{id}/summary [get]
 func (h *TripHandler) GetSummary(ctx *gin.Context) {
@@ -263,6 +271,7 @@ func (h *TripHandler) GetSummary(ctx *gin.Context) {
 // @Success      200     {array}   dto.TripStatusReading
 // @Failure      400     {object}  dto.ErrorResponse
 // @Failure      401     {object}  dto.ErrorResponse
+// @Failure      403     {object}  dto.ErrorResponse
 // @Failure      404     {object}  dto.ErrorResponse
 // @Failure      500     {object}  dto.ErrorResponse
 // @Router       /trips/{id}/status-history [get]

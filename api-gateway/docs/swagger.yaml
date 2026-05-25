@@ -1162,10 +1162,6 @@ definitions:
       changedAt:
         type: string
       fromStatus:
-        enum:
-        - active
-        - completed
-        - cancelled
         type: string
       id:
         type: string
@@ -3475,6 +3471,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
@@ -3513,6 +3513,10 @@ paths:
             $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "404":
@@ -3557,8 +3561,16 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Conflict
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "500":
@@ -3593,8 +3605,16 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Conflict
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "500":
@@ -3648,6 +3668,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
@@ -3685,8 +3709,16 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Conflict
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "500":
@@ -3915,15 +3947,49 @@ paths:
       summary: Update user
       tags:
       - users
-  /users/{id}/documents/processed:
+  /users/{id}/documents:
     get:
-      description: Returns all processed documents belonging to the specified user.
+      description: Returns documents for the specified user, optionally filtered by
+        status and image type, with pagination and sorting support.
       parameters:
       - description: User ID
         in: path
         name: id
         required: true
         type: string
+      - description: Filter by status
+        enum:
+        - pending
+        - processed
+        - approved
+        - rejected
+        in: query
+        name: status
+        type: string
+      - description: Filter by image type
+        enum:
+        - id_front
+        - id_back
+        - driving_license_front
+        - driving_license_back
+        in: query
+        name: imageType
+        type: string
+      - description: Sort order
+        enum:
+        - +createdAt
+        - -createdAt
+        in: query
+        name: sort
+        type: string
+      - description: Pagination limit
+        in: query
+        name: limit
+        type: integer
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:
@@ -3949,7 +4015,7 @@ paths:
             $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
-      summary: Get processed documents for a user
+      summary: List documents for a user
       tags:
       - documents
   /users/activation-code/check:

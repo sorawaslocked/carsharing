@@ -8,6 +8,10 @@ import (
 	"carsharing/user-service/internal/validation"
 )
 
+type DocumentAnalyzedSubscriber interface {
+	SubscribeStream(userID *string, passed *bool) (<-chan model.DocumentAnalyzedEvent, func())
+}
+
 type UserService interface {
 	Create(ctx context.Context, data validation.UserCreate) (string, error)
 	Get(ctx context.Context, id string) (model.User, error)

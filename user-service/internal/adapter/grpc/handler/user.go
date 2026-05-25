@@ -4,26 +4,31 @@ import (
 	"context"
 	"log/slog"
 
+	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 
+	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 	"carsharing/user-service/internal/adapter/grpc/dto"
+	"carsharing/user-service/internal/model"
 
 	baseuserpb "carsharing/protos/gen/base/user"
 	usersvc "carsharing/protos/gen/service/user"
 )
 
 type UserHandler struct {
-	log         *slog.Logger
-	userService UserService
+	log                *slog.Logger
+	userService        UserService
+	documentSubscriber DocumentAnalyzedSubscriber
 	usersvc.UnimplementedUserServiceServer
 }
 
-func NewUserHandler(log *slog.Logger, userService UserService) *UserHandler {
+func NewUserHandler(log *slog.Logger, userService UserService, documentSubscriber DocumentAnalyzedSubscriber) *UserHandler {
 	return &UserHandler{
-		log:         pkglog.WithComponent(log, "adapter.grpc.handler.UserHandler"),
-		userService: userService,
+		log:                pkglog.WithComponent(log, "adapter.grpc.handler.UserHandler"),
+		userService:        userService,
+		documentSubscriber: documentSubscriber,
 	}
 }
 
@@ -237,4 +242,58 @@ func (h *UserHandler) CheckDocument(ctx context.Context, req *usersvc.CheckDocum
 	}
 
 	return &emptypb.Empty{}, nil
+}
+
+func (h *UserHandler) StreamDocumentAnalyzed(req *usersvc.StreamDocumentAnalyzedRequest, stream grpc.ServerStreamingServer[usersvc.StreamDocumentAnalyzedResponse]) error {
+	ctx := stream.Context()
+	md := utils.MetadataFromCtx(ctx)
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "StreamDocumentAnalyzed"), md)
+
+	// Non-privileged callers may only stream events for their own user ID.
+	if !hasPrivilegedRole(md.UserRoles) {
+		if req.UserId != nil && *req.UserId != *md.UserID {
+			return dto.ToStatusError(model.ErrInsufficientPermissions)
+		}
+	}
+
+	ch, unsub := h.documentSubscriber.SubscribeStream(req.UserId, req.Passed)
+	defer unsub()
+
+	log.Info("document analyzed stream opened")
+	defer log.Info("document analyzed stream closed")
+
+	for {
+		select {
+		case event, ok := <-ch:
+			if !ok {
+				return nil
+			}
+			defects := make([]*baseuserpb.Defect, len(event.Defects))
+			for i, d := range event.Defects {
+				defects[i] = &baseuserpb.Defect{
+					Type:        d.Type,
+					Description: d.Description,
+				}
+			}
+			if err := stream.Send(&usersvc.StreamDocumentAnalyzedResponse{
+				DocumentId: event.DocumentID,
+				UserId:     event.UserID,
+				Passed:     event.Passed,
+				Defects:    defects,
+			}); err != nil {
+				return err
+			}
+		case <-ctx.Done():
+			return nil
+		}
+	}
+}
+
+func hasPrivilegedRole(roles []sharedmodel.Role) bool {
+	for _, r := range roles {
+		if r == sharedmodel.RoleAdmin || r == sharedmodel.RoleUserManager {
+			return true
+		}
+	}
+	return false
 }

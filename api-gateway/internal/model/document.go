@@ -28,6 +28,7 @@ type DocumentFilter struct {
 
 type DocumentAnalyzedEvent struct {
 	DocumentID string
+	UserID     string
 	Passed     bool
 	Defects    []DocumentDefect
 }

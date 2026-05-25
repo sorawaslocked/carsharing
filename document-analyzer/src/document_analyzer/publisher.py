@@ -14,9 +14,10 @@ class EventPublisher:
         self._nc = nc
         self._subject = cfg.subject
 
-    async def publish_document_analyzed(self, document_id: str, result: AnalysisResult) -> None:
+    async def publish_document_analyzed(self, document_id: str, user_id: str, result: AnalysisResult) -> None:
         event = event_pb2.DocumentAnalyzedEvent(
             document_id=document_id,
+            user_id=user_id,
             passed=result.passed,
             defects=[
                 event_pb2.Defect(type=d.type, description=d.description)

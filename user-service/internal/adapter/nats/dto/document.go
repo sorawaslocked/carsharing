@@ -16,6 +16,7 @@ func DocumentAnalyzedEventFromProto(e *eventuserpb.DocumentAnalyzedEvent) model.
 
 	return model.DocumentAnalyzedEvent{
 		DocumentID: e.GetDocumentId(),
+		UserID:     e.GetUserId(),
 		Passed:     e.GetPassed(),
 		Defects:    defects,
 	}

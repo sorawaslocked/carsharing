@@ -7,6 +7,7 @@ type DocumentDefect struct {
 
 type DocumentAnalyzedMessage struct {
 	DocumentID string           `json:"documentId"`
+	UserID     string           `json:"userId"`
 	Passed     bool             `json:"passed"`
 	Defects    []DocumentDefect `json:"defects"`
 }

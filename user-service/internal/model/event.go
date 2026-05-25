@@ -2,6 +2,7 @@ package model
 
 type DocumentAnalyzedEvent struct {
 	DocumentID string
+	UserID     string
 	Passed     bool
 	Defects    []Defect
 }

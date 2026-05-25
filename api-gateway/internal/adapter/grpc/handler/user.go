@@ -2,6 +2,8 @@ package handler
 
 import (
 	"context"
+	"errors"
+	"io"
 	"log/slog"
 
 	"carsharing/api-gateway/internal/adapter/grpc/dto"
@@ -217,4 +219,51 @@ func (h *UserHandler) CheckActivationCode(ctx context.Context, code string) erro
 	}
 
 	return nil
+}
+
+func (h *UserHandler) StreamDocumentAnalyzed(ctx context.Context, userID *string, passed *bool, send func(model.DocumentAnalyzedEvent) error) error {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "StreamDocumentAnalyzed"), utils.MetadataFromCtx(ctx))
+
+	stream, err := h.client.StreamDocumentAnalyzed(ctx, &usersvc.StreamDocumentAnalyzedRequest{
+		UserId: userID,
+		Passed: passed,
+	})
+	if err != nil {
+		if ctx.Err() != nil {
+			return nil
+		}
+		log.Warn("streaming document analyzed", pkglog.Err(err))
+		return dto.FromGrpcErr(err)
+	}
+
+	for {
+		msg, err := stream.Recv()
+		if errors.Is(err, io.EOF) {
+			return nil
+		}
+		if err != nil {
+			if ctx.Err() != nil {
+				return nil
+			}
+			log.Warn("receiving document analyzed stream", pkglog.Err(err))
+			return dto.FromGrpcErr(err)
+		}
+
+		defects := make([]model.DocumentDefect, len(msg.GetDefects()))
+		for i, d := range msg.GetDefects() {
+			defects[i] = model.DocumentDefect{
+				Type:        d.GetType(),
+				Description: d.GetDescription(),
+			}
+		}
+
+		if err = send(model.DocumentAnalyzedEvent{
+			DocumentID: msg.GetDocumentId(),
+			UserID:     msg.GetUserId(),
+			Passed:     msg.GetPassed(),
+			Defects:    defects,
+		}); err != nil {
+			return err
+		}
+	}
 }

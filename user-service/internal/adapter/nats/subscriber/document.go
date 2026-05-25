@@ -3,9 +3,11 @@ package subscriber
 import (
 	"context"
 	"log/slog"
+	"sync"
 
 	pkglog "carsharing/shared/pkg/log"
 	natsdto "carsharing/user-service/internal/adapter/nats/dto"
+	"carsharing/user-service/internal/model"
 
 	eventuserpb "carsharing/protos/gen/event/user"
 	"github.com/nats-io/nats.go"
@@ -14,10 +16,19 @@ import (
 
 const subjectDocumentAnalyzed = "document.analyzed"
 
+type docSub struct {
+	userID *string
+	passed *bool
+	ch     chan model.DocumentAnalyzedEvent
+}
+
 type DocumentSubscriber struct {
 	log     *slog.Logger
 	conn    *nats.Conn
 	service DocumentService
+
+	mu   sync.RWMutex
+	subs []docSub
 }
 
 func NewDocumentSubscriber(log *slog.Logger, conn *nats.Conn, service DocumentService) *DocumentSubscriber {
@@ -30,25 +41,68 @@ func NewDocumentSubscriber(log *slog.Logger, conn *nats.Conn, service DocumentSe
 
 func (s *DocumentSubscriber) Subscribe() error {
 	_, err := s.conn.Subscribe(subjectDocumentAnalyzed, s.handleDocumentAnalyzed)
-
 	return err
+}
+
+// SubscribeStream registers a channel that receives DocumentAnalyzedEvents
+// matching the optional userID and passed filters. The returned cancel func
+// must be deferred by the caller to unregister and close the channel.
+func (s *DocumentSubscriber) SubscribeStream(userID *string, passed *bool) (<-chan model.DocumentAnalyzedEvent, func()) {
+	ch := make(chan model.DocumentAnalyzedEvent, 1)
+
+	s.mu.Lock()
+	s.subs = append(s.subs, docSub{userID: userID, passed: passed, ch: ch})
+	s.mu.Unlock()
+
+	return ch, func() {
+		s.mu.Lock()
+		defer s.mu.Unlock()
+		for i, sub := range s.subs {
+			if sub.ch == ch {
+				s.subs = append(s.subs[:i], s.subs[i+1:]...)
+				break
+			}
+		}
+		close(ch)
+	}
 }
 
 func (s *DocumentSubscriber) handleDocumentAnalyzed(msg *nats.Msg) {
 	ctx := context.Background()
 	log := pkglog.WithMethod(s.log, "handleDocumentAnalyzed")
 
-	var event eventuserpb.DocumentAnalyzedEvent
-	if err := proto.Unmarshal(msg.Data, &event); err != nil {
+	var pb eventuserpb.DocumentAnalyzedEvent
+	if err := proto.Unmarshal(msg.Data, &pb); err != nil {
 		log.Error("unmarshalling document analyzed event", pkglog.Err(err))
-
 		return
 	}
 
-	if err := s.service.HandleDocumentAnalyzed(ctx, natsdto.DocumentAnalyzedEventFromProto(&event)); err != nil {
+	event := natsdto.DocumentAnalyzedEventFromProto(&pb)
+
+	if err := s.service.HandleDocumentAnalyzed(ctx, event); err != nil {
 		log.Error("handling document analyzed event",
-			slog.String("documentID", event.GetDocumentId()),
+			slog.String("documentID", event.DocumentID),
 			pkglog.Err(err),
 		)
+	}
+
+	s.fanOut(event)
+}
+
+func (s *DocumentSubscriber) fanOut(event model.DocumentAnalyzedEvent) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	for _, sub := range s.subs {
+		if sub.userID != nil && *sub.userID != event.UserID {
+			continue
+		}
+		if sub.passed != nil && *sub.passed != event.Passed {
+			continue
+		}
+		select {
+		case sub.ch <- event:
+		default:
+		}
 	}
 }

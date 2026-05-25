@@ -66,3 +66,37 @@ func (i *Interceptor) Unary(ctx context.Context, req any, info *grpc.UnaryServer
 
 	return nil, dto.ToStatusError(model.ErrInsufficientPermissions)
 }
+
+func (i *Interceptor) Stream(srv any, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	md := utils.MetadataFromCtx(ss.Context())
+	log := pkglog.WithMetadata(pkglog.WithMethod(i.log, info.FullMethod), md)
+
+	policy, known := i.policies[info.FullMethod]
+	if !known {
+		return dto.ToStatusError(model.ErrInsufficientPermissions)
+	}
+
+	if policy.public {
+		return handler(srv, ss)
+	}
+
+	if md.UserID == nil {
+		return dto.ToStatusError(model.ErrUnauthenticated)
+	}
+
+	if len(policy.allowedRoles) == 0 && policy.ownerExtract == nil {
+		return handler(srv, ss)
+	}
+
+	for _, allowed := range policy.allowedRoles {
+		for _, callerRole := range md.UserRoles {
+			if callerRole == allowed {
+				return handler(srv, ss)
+			}
+		}
+	}
+
+	log.Warn("permission denied", slog.Any("userRoles", md.UserRoles))
+
+	return dto.ToStatusError(model.ErrInsufficientPermissions)
+}

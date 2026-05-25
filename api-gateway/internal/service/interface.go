@@ -37,6 +37,8 @@ type UserPresenter interface {
 	GetProfileImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error)
 	ListDocuments(ctx context.Context, filter model.DocumentFilter) ([]model.Document, error)
 	CheckDocument(ctx context.Context, docID string, status string, documentError *string) error
+
+	StreamDocumentAnalyzed(ctx context.Context, userID *string, passed *bool, send func(model.DocumentAnalyzedEvent) error) error
 }
 
 type CarModelPresenter interface {

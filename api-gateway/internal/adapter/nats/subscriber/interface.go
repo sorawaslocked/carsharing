@@ -12,10 +12,6 @@ type UserEventHandler interface {
 	OnUserDeleted(ctx context.Context, userID string) error
 }
 
-type DocumentEventHandler interface {
-	OnDocumentAnalyzed(ctx context.Context, event model.DocumentAnalyzedEvent) error
-}
-
 type CarStatusEventHandler interface {
 	OnCarStatusUpdated(ctx context.Context, event model.CarStatusUpdatedEvent) error
 }

@@ -52,7 +52,7 @@ class DocumentAnalyzerServicer(document_pb2_grpc.DocumentAnalyzerServiceServicer
         )
 
         try:
-            await self._publisher.publish_document_analyzed(request.document_id, result)
+            await self._publisher.publish_document_analyzed(request.document_id, request.user_id, result)
         except Exception as exc:
             logger.error("Event publish failed for %s: %s", request.document_id, exc)
             await context.abort(grpc.StatusCode.INTERNAL, f"Event publish error: {exc}")

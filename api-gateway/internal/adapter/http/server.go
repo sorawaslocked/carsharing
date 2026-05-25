@@ -51,7 +51,7 @@ func New(
 	userSessionCache UserSessionCache,
 	carStreamService wshandler.CarStreamService,
 	tripStreamService wshandler.TripStreamService,
-	documentHub *wshandler.DocumentHub,
+	documentStreamService wshandler.DocumentStreamService,
 	carStatusHub *wshandler.CarStatusHub,
 ) *Server {
 	httpLog := log.With(
@@ -76,7 +76,7 @@ func New(
 	tripHandler := handler.NewTripHandler(tripService, log)
 
 	// WebSocket handlers
-	userWsHandler := wshandler.NewUserWsHandler(documentHub, log)
+	userWsHandler := wshandler.NewUserWsHandler(documentStreamService, log)
 	carWsHandler := wshandler.NewCarWsHandler(carStreamService, carStatusHub, log)
 	tripWsHandler := wshandler.NewTripWsHandler(tripStreamService, log)
 

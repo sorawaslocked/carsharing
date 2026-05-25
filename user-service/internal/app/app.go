@@ -117,7 +117,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 		"document-analyzer": grpcdocanalyzer.NewPinger(log, analyzerConn),
 	}, cfg.Version)
 
-	grpcSrv, err := grpcserver.NewServer(log, cfg.GRPC, userService, healthHandler)
+	grpcSrv, err := grpcserver.NewServer(log, cfg.GRPC, userService, docSubscriber, healthHandler)
 	if err != nil {
 		cl.closeAll()
 		return nil, fmt.Errorf("grpc server: %w", err)

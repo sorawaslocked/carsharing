@@ -43,7 +43,7 @@ func (s *UserService) CreateDocument(ctx context.Context, data validation.Docume
 		return "", err
 	}
 
-	s.documentAnalyzer.Analyze(ctx, id, data.ObjectKey)
+	s.documentAnalyzer.Analyze(ctx, id, data.ObjectKey, *md.UserID)
 
 	return id, nil
 }

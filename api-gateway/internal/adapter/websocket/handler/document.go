@@ -2,46 +2,53 @@ package handler
 
 import (
 	"log/slog"
-	"net/http"
 
 	wsdto "carsharing/api-gateway/internal/adapter/websocket/dto"
+	"carsharing/api-gateway/internal/model"
 	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 	"github.com/coder/websocket"
 	"github.com/coder/websocket/wsjson"
 	"github.com/gin-gonic/gin"
 )
 
 type UserWsHandler struct {
-	hub *DocumentHub
+	svc DocumentStreamService
 	log *slog.Logger
 }
 
-func NewUserWsHandler(hub *DocumentHub, logger *slog.Logger) *UserWsHandler {
+func NewUserWsHandler(svc DocumentStreamService, logger *slog.Logger) *UserWsHandler {
 	return &UserWsHandler{
-		hub: hub,
+		svc: svc,
 		log: pkglog.WithComponent(logger, "ws.UserHandler"),
 	}
 }
 
 // DocumentUpdates godoc
-// @Summary      Document verification updates
-// @Description  WebSocket feed that pushes a single message when the specified document has been analyzed, then closes.
+// @Summary      Document analyzed stream
+// @Description  WebSocket stream of DocumentAnalyzedEvents from the user service. Accepts optional userId and passed query params to filter events.
 // @Tags         users
 // @Security     BearerAuth
-// @Param        docID  query  string  true  "Document ID to watch"
+// @Param        userId  query  string  false  "Filter by user ID"
+// @Param        passed  query  bool    false  "Filter by pass/fail result"
 // @Produce      json
-// @Success      101  {object}  wsdto.DocumentAnalyzedMessage  "WebSocket message (one-shot, then closes)"
-// @Failure      400  "bad request"
+// @Success      101  {object}  wsdto.DocumentAnalyzedMessage  "Streamed WebSocket message format"
 // @Failure      401  "unauthorized"
 // @Failure      500  "internal server error"
 // @Router       /ws/users/documents [get]
 func (h *UserWsHandler) DocumentUpdates(c *gin.Context) {
 	logger := pkglog.WithMethod(h.log, "DocumentUpdates")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(c.Request.Context()))
 
-	docID := c.Query("docID")
-	if docID == "" {
-		c.Status(http.StatusBadRequest)
-		return
+	var userID *string
+	if v := c.Query("userId"); v != "" {
+		userID = &v
+	}
+
+	var passed *bool
+	if v := c.Query("passed"); v != "" {
+		b := v == "true"
+		passed = &b
 	}
 
 	conn, err := acceptWebSocket(c, nil)
@@ -51,13 +58,10 @@ func (h *UserWsHandler) DocumentUpdates(c *gin.Context) {
 	}
 	defer conn.CloseNow()
 
-	ctx := c.Request.Context()
+	ctx, cancel := tokenDeadlineCtx(c)
+	defer cancel()
 
-	ch, unsub := h.hub.Subscribe(docID)
-	defer unsub()
-
-	select {
-	case event := <-ch:
+	streamErr := h.svc.StreamDocumentAnalyzed(ctx, userID, passed, func(event model.DocumentAnalyzedEvent) error {
 		defects := make([]wsdto.DocumentDefect, len(event.Defects))
 		for i, d := range event.Defects {
 			defects[i] = wsdto.DocumentDefect{
@@ -65,20 +69,16 @@ func (h *UserWsHandler) DocumentUpdates(c *gin.Context) {
 				Description: d.Description,
 			}
 		}
-
-		msg := wsdto.DocumentAnalyzedMessage{
+		return wsjson.Write(ctx, conn, wsdto.DocumentAnalyzedMessage{
 			DocumentID: event.DocumentID,
+			UserID:     event.UserID,
 			Passed:     event.Passed,
 			Defects:    defects,
-		}
-
-		if writeErr := wsjson.Write(ctx, conn, msg); writeErr != nil {
-			logger.Error("writing message", pkglog.Err(writeErr))
-		}
-
-		conn.Close(websocket.StatusNormalClosure, "")
-
-	case <-ctx.Done():
-		conn.Close(websocket.StatusNormalClosure, "")
+		})
+	})
+	if streamErr != nil {
+		logger.Error("document stream error", pkglog.Err(streamErr))
 	}
+
+	conn.Close(websocket.StatusNormalClosure, "")
 }

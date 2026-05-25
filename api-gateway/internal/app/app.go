@@ -46,13 +46,12 @@ func (l *lazySessionCache) SetSignedIn(ctx context.Context, userID, deviceID str
 }
 
 type App struct {
-	cfg                    config.Config
-	log                    *slog.Logger
-	httpServer             *httpserver.Server
-	natsUserSubscriber     *natssub.UserSubscriber
-	natsDocumentSubscriber *natssub.DocumentSubscriber
-	natsCarSubscriber      *natssub.CarSubscriber
-	closer                 closer
+	cfg                config.Config
+	log                *slog.Logger
+	httpServer         *httpserver.Server
+	natsUserSubscriber *natssub.UserSubscriber
+	natsCarSubscriber  *natssub.CarSubscriber
+	closer             closer
 }
 
 func New(cfg config.Config, log *slog.Logger) (*App, error) {
@@ -179,14 +178,7 @@ func New(cfg config.Config, log *slog.Logger) (*App, error) {
 		return nil, fmt.Errorf("nats user subscribe: %w", err)
 	}
 
-	documentHub := wshandler.NewDocumentHub()
 	carStatusHub := wshandler.NewCarStatusHub()
-
-	natsDocumentSub := natssub.NewDocumentSubscriber(natsConn, documentHub, log)
-	if err = natsDocumentSub.Subscribe(); err != nil {
-		cl.closeAll()
-		return nil, fmt.Errorf("nats document subscribe: %w", err)
-	}
 
 	natsCarSub := natssub.NewCarSubscriber(natsConn, carStatusHub, log)
 	if err = natsCarSub.Subscribe(); err != nil {
@@ -220,18 +212,17 @@ func New(cfg config.Config, log *slog.Logger) (*App, error) {
 		userCache,
 		carService,
 		tripService,
-		documentHub,
+		userService,
 		carStatusHub,
 	)
 
 	return &App{
-		cfg:                    cfg,
-		log:                    pkglog.WithComponent(log, "app"),
-		httpServer:             httpServer,
-		natsUserSubscriber:     natsUserSub,
-		natsDocumentSubscriber: natsDocumentSub,
-		natsCarSubscriber:      natsCarSub,
-		closer:                 cl,
+		cfg:                cfg,
+		log:                pkglog.WithComponent(log, "app"),
+		httpServer:         httpServer,
+		natsUserSubscriber: natsUserSub,
+		natsCarSubscriber:  natsCarSub,
+		closer:             cl,
 	}, nil
 }
 
@@ -251,7 +242,6 @@ func (a *App) Run() {
 
 func (a *App) Stop() {
 	a.natsUserSubscriber.Close()
-	a.natsDocumentSubscriber.Close()
 	a.natsCarSubscriber.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

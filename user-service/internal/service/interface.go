@@ -31,7 +31,7 @@ type ObjectStorage interface {
 }
 
 type DocumentAnalyzer interface {
-	Analyze(ctx context.Context, documentID string, objectKey string)
+	Analyze(ctx context.Context, documentID string, objectKey string, userID string)
 }
 
 type UserPublisher interface {

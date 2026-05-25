@@ -67,5 +67,6 @@ func buildPolicies() map[string]methodPolicy {
 		usersvc.UserService_GetProfileImageUploadData_FullMethodName: {},
 		usersvc.UserService_CreateDocument_FullMethodName:            {},
 		usersvc.UserService_GetUploadDocumentData_FullMethodName:     {},
+		usersvc.UserService_StreamDocumentAnalyzed_FullMethodName:    {},
 	}
 }

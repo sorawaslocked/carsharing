@@ -203,7 +203,7 @@ func TestAuth_RolesOrOwner_RejectsWhenReqLacksID(t *testing.T) {
 
 func TestAuth_RolesOrOwner_UserIDCarrier_OwnerGrantsAccess(t *testing.T) {
 	req := fakeUserIDReq{userID: callerID}
-	code, called := invoke(t, ctxWithUser(callerID, sharedmodel.RoleUser), usersvc.UserService_GetProcessedDocumentsForUser_FullMethodName, req)
+	code, called := invoke(t, ctxWithUser(callerID, sharedmodel.RoleUser), usersvc.UserService_ListDocuments_FullMethodName, req)
 
 	assert.Equal(t, codes.OK, code)
 	assert.True(t, called)
@@ -211,7 +211,7 @@ func TestAuth_RolesOrOwner_UserIDCarrier_OwnerGrantsAccess(t *testing.T) {
 
 func TestAuth_RolesOrOwner_UserIDCarrier_RejectsNonOwner(t *testing.T) {
 	req := fakeUserIDReq{userID: otherID}
-	code, called := invoke(t, ctxWithUser(callerID, sharedmodel.RoleUser), usersvc.UserService_GetProcessedDocumentsForUser_FullMethodName, req)
+	code, called := invoke(t, ctxWithUser(callerID, sharedmodel.RoleUser), usersvc.UserService_ListDocuments_FullMethodName, req)
 
 	assert.Equal(t, codes.PermissionDenied, code)
 	assert.False(t, called)
@@ -219,7 +219,7 @@ func TestAuth_RolesOrOwner_UserIDCarrier_RejectsNonOwner(t *testing.T) {
 
 func TestAuth_RolesOrOwner_UserIDCarrier_PrivilegedRoleGrantsAccess(t *testing.T) {
 	req := fakeUserIDReq{userID: otherID} // not owner, but admin role wins
-	code, called := invoke(t, ctxWithUser(callerID, sharedmodel.RoleAdmin), usersvc.UserService_GetProcessedDocumentsForUser_FullMethodName, req)
+	code, called := invoke(t, ctxWithUser(callerID, sharedmodel.RoleAdmin), usersvc.UserService_ListDocuments_FullMethodName, req)
 
 	assert.Equal(t, codes.OK, code)
 	assert.True(t, called)

@@ -56,7 +56,7 @@ func buildPolicies() map[string]methodPolicy {
 		usersvc.UserService_GetUser_FullMethodName:    {allowedRoles: privilegedRoles, ownerExtract: extractByID},
 		usersvc.UserService_UpdateUser_FullMethodName: {allowedRoles: privilegedRoles, ownerExtract: extractByID},
 		usersvc.UserService_DeleteUser_FullMethodName: {allowedRoles: privilegedRoles, ownerExtract: extractByID},
-		usersvc.UserService_GetProcessedDocumentsForUser_FullMethodName: {
+		usersvc.UserService_ListDocuments_FullMethodName: {
 			allowedRoles: privilegedRoles,
 			ownerExtract: extractByUserID,
 		},

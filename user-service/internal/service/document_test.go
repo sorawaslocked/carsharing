@@ -58,39 +58,37 @@ func TestGetDocumentImageUploadData_Success(t *testing.T) {
 	assert.Equal(t, expected, got)
 }
 
-// --- GetProcessedDocumentsForUser ---
+// --- ListDocuments ---
 
-func TestGetProcessedDocumentsForUser_Success(t *testing.T) {
+func TestListDocuments_Success(t *testing.T) {
 	d := newDeps(t)
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
-	pending := model.DocumentStatusPending
 	docs := []model.Document{
 		{ID: testDocID, UserID: testUserID, Status: model.DocumentStatusApproved, ImageType: model.DocumentImageTypeIDFront},
 	}
 
 	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(baseUser(), nil)
 	d.docRepo.EXPECT().Find(ctx, model.DocumentFilter{
-		UserID:        ptr(testUserID),
-		ExcludeStatus: &pending,
-		LatestPerType: true,
+		UserID:     testUserID,
+		Pagination: &sharedmodel.Pagination{Limit: 20, Offset: 0},
 	}).Return(docs, nil)
 
-	got, err := svc.GetProcessedDocumentsForUser(ctx, testUserID)
+	got, err := svc.ListDocuments(ctx, validation.DocumentFilter{UserID: testUserID})
 
 	require.NoError(t, err)
 	require.Len(t, got, 1)
 	assert.Equal(t, testDocID, got[0].ID)
 }
 
-func TestGetProcessedDocumentsForUser_UserNotFound(t *testing.T) {
+func TestListDocuments_UserNotFound(t *testing.T) {
 	d := newDeps(t)
 	svc := newService(t, d)
 	ctx := ctxWithUser(testUserID)
 
 	d.userRepo.EXPECT().FindByID(ctx, testUserID).Return(model.User{}, model.ErrUserNotFound)
 
-	_, err := svc.GetProcessedDocumentsForUser(ctx, testUserID)
+	_, err := svc.ListDocuments(ctx, validation.DocumentFilter{UserID: testUserID})
 
 	assert.ErrorIs(t, err, model.ErrUserNotFound)
 }
@@ -127,7 +125,7 @@ func TestCheckDocument_Approved_NotAllTypesPresent(t *testing.T) {
 		return u.Status != nil && *u.Status == approved
 	})).Return(nil)
 	// Only one document type returned — not enough to set IsDocumentVerified.
-	d.docRepo.EXPECT().Find(ctx, model.DocumentFilter{UserID: ptr(testUserID), LatestPerType: true}).
+	d.docRepo.EXPECT().Find(ctx, model.DocumentFilter{UserID: testUserID, LatestPerType: true}).
 		Return([]model.Document{doc}, nil)
 
 	err := svc.CheckDocument(ctx, testDocID, validation.DocumentUpdate{Status: "approved"})
@@ -152,7 +150,7 @@ func TestCheckDocument_Approved_AllTypesApproved_SetsVerified(t *testing.T) {
 	d.docRepo.EXPECT().Update(ctx, testDocID, mock.MatchedBy(func(u model.DocumentUpdate) bool {
 		return u.Status != nil && *u.Status == model.DocumentStatusApproved
 	})).Return(nil)
-	d.docRepo.EXPECT().Find(ctx, model.DocumentFilter{UserID: ptr(testUserID), LatestPerType: true}).
+	d.docRepo.EXPECT().Find(ctx, model.DocumentFilter{UserID: testUserID, LatestPerType: true}).
 		Return(allApproved, nil)
 	d.userRepo.EXPECT().Update(ctx, testUserID, mock.MatchedBy(func(u model.UserUpdate) bool {
 		return u.IsDocumentVerified != nil && *u.IsDocumentVerified

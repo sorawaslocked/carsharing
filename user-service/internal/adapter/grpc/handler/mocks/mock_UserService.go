@@ -395,29 +395,29 @@ func (_c *MockUserService_GetDocumentImageUploadData_Call) RunAndReturn(run func
 	return _c
 }
 
-// GetProcessedDocumentsForUser provides a mock function with given fields: ctx, userID
-func (_m *MockUserService) GetProcessedDocumentsForUser(ctx context.Context, userID string) ([]model.Document, error) {
-	ret := _m.Called(ctx, userID)
+// ListDocuments provides a mock function with given fields: ctx, filter
+func (_m *MockUserService) ListDocuments(ctx context.Context, filter validation.DocumentFilter) ([]model.Document, error) {
+	ret := _m.Called(ctx, filter)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetProcessedDocumentsForUser")
+		panic("no return value specified for ListDocuments")
 	}
 
 	var r0 []model.Document
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) ([]model.Document, error)); ok {
-		return rf(ctx, userID)
+	if rf, ok := ret.Get(0).(func(context.Context, validation.DocumentFilter) ([]model.Document, error)); ok {
+		return rf(ctx, filter)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) []model.Document); ok {
-		r0 = rf(ctx, userID)
+	if rf, ok := ret.Get(0).(func(context.Context, validation.DocumentFilter) []model.Document); ok {
+		r0 = rf(ctx, filter)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]model.Document)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, userID)
+	if rf, ok := ret.Get(1).(func(context.Context, validation.DocumentFilter) error); ok {
+		r1 = rf(ctx, filter)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -425,31 +425,31 @@ func (_m *MockUserService) GetProcessedDocumentsForUser(ctx context.Context, use
 	return r0, r1
 }
 
-// MockUserService_GetProcessedDocumentsForUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetProcessedDocumentsForUser'
-type MockUserService_GetProcessedDocumentsForUser_Call struct {
+// MockUserService_ListDocuments_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListDocuments'
+type MockUserService_ListDocuments_Call struct {
 	*mock.Call
 }
 
-// GetProcessedDocumentsForUser is a helper method to define mock.On call
+// ListDocuments is a helper method to define mock.On call
 //   - ctx context.Context
-//   - userID string
-func (_e *MockUserService_Expecter) GetProcessedDocumentsForUser(ctx interface{}, userID interface{}) *MockUserService_GetProcessedDocumentsForUser_Call {
-	return &MockUserService_GetProcessedDocumentsForUser_Call{Call: _e.mock.On("GetProcessedDocumentsForUser", ctx, userID)}
+//   - filter validation.DocumentFilter
+func (_e *MockUserService_Expecter) ListDocuments(ctx interface{}, filter interface{}) *MockUserService_ListDocuments_Call {
+	return &MockUserService_ListDocuments_Call{Call: _e.mock.On("ListDocuments", ctx, filter)}
 }
 
-func (_c *MockUserService_GetProcessedDocumentsForUser_Call) Run(run func(ctx context.Context, userID string)) *MockUserService_GetProcessedDocumentsForUser_Call {
+func (_c *MockUserService_ListDocuments_Call) Run(run func(ctx context.Context, filter validation.DocumentFilter)) *MockUserService_ListDocuments_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
+		run(args[0].(context.Context), args[1].(validation.DocumentFilter))
 	})
 	return _c
 }
 
-func (_c *MockUserService_GetProcessedDocumentsForUser_Call) Return(_a0 []model.Document, _a1 error) *MockUserService_GetProcessedDocumentsForUser_Call {
+func (_c *MockUserService_ListDocuments_Call) Return(_a0 []model.Document, _a1 error) *MockUserService_ListDocuments_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockUserService_GetProcessedDocumentsForUser_Call) RunAndReturn(run func(context.Context, string) ([]model.Document, error)) *MockUserService_GetProcessedDocumentsForUser_Call {
+func (_c *MockUserService_ListDocuments_Call) RunAndReturn(run func(context.Context, validation.DocumentFilter) ([]model.Document, error)) *MockUserService_ListDocuments_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -2,8 +2,8 @@ package handler_test
 
 import (
 	"context"
+	"errors"
 	"io"
-	"io/ioutil"
 	"log/slog"
 	"testing"
 	"time"
@@ -20,12 +20,13 @@ import (
 	"carsharing/trip-service/internal/adapter/grpc/handler"
 	handlermocks "carsharing/trip-service/internal/adapter/grpc/handler/mocks"
 	"carsharing/trip-service/internal/model"
+	"carsharing/trip-service/internal/validation"
 )
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 func discardLogger() *slog.Logger {
-	return slog.New(slog.NewTextHandler(ioutil.Discard, nil))
+	return slog.New(slog.NewTextHandler(io.Discard, nil))
 }
 
 func sampleTrip() model.Trip {
@@ -85,6 +86,18 @@ func TestTripHandler_StartTrip_ServiceError(t *testing.T) {
 	assert.Equal(t, codes.FailedPrecondition, status.Code(err))
 }
 
+func TestTripHandler_StartTrip_InvalidArgument(t *testing.T) {
+	svc := handlermocks.NewMockTripService(t)
+	h := handler.NewTripHandler(discardLogger(), svc)
+
+	svc.EXPECT().StartTrip(mock.Anything, "booking-1").Return("", validation.Errors{"booking_id": validation.ErrInvalidID})
+
+	_, err := h.StartTrip(context.Background(), &tripsvc.StartTripRequest{BookingId: "booking-1"})
+
+	require.Error(t, err)
+	assert.Equal(t, codes.InvalidArgument, status.Code(err))
+}
+
 func TestTripHandler_GetTrip_Success(t *testing.T) {
 	svc := handlermocks.NewMockTripService(t)
 	h := handler.NewTripHandler(discardLogger(), svc)
@@ -136,6 +149,18 @@ func TestTripHandler_ListTrips_Success(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Len(t, resp.Trips, 2)
+}
+
+func TestTripHandler_ListTrips_ServiceError(t *testing.T) {
+	svc := handlermocks.NewMockTripService(t)
+	h := handler.NewTripHandler(discardLogger(), svc)
+
+	svc.EXPECT().ListTrips(mock.Anything, mock.Anything).Return(nil, errors.New("db error"))
+
+	_, err := h.ListTrips(context.Background(), &tripsvc.ListTripsRequest{})
+
+	require.Error(t, err)
+	assert.Equal(t, codes.Internal, status.Code(err))
 }
 
 func TestTripHandler_EndTrip_Success(t *testing.T) {
@@ -206,6 +231,30 @@ func TestTripHandler_GetTripSummary_Success(t *testing.T) {
 	assert.Equal(t, "trip-1", resp.Summary.TripId)
 }
 
+func TestTripHandler_GetTripSummary_NotFound(t *testing.T) {
+	svc := handlermocks.NewMockTripService(t)
+	h := handler.NewTripHandler(discardLogger(), svc)
+
+	svc.EXPECT().GetTripSummary(mock.Anything, "trip-1").Return(model.TripSummary{}, model.ErrNotFound)
+
+	_, err := h.GetTripSummary(context.Background(), &tripsvc.GetTripSummaryRequest{Id: "trip-1"})
+
+	require.Error(t, err)
+	assert.Equal(t, codes.NotFound, status.Code(err))
+}
+
+func TestTripHandler_GetTripSummary_PermissionDenied(t *testing.T) {
+	svc := handlermocks.NewMockTripService(t)
+	h := handler.NewTripHandler(discardLogger(), svc)
+
+	svc.EXPECT().GetTripSummary(mock.Anything, "trip-1").Return(model.TripSummary{}, model.ErrInsufficientPermissions)
+
+	_, err := h.GetTripSummary(context.Background(), &tripsvc.GetTripSummaryRequest{Id: "trip-1"})
+
+	require.Error(t, err)
+	assert.Equal(t, codes.PermissionDenied, status.Code(err))
+}
+
 func TestTripHandler_GetTripStatusHistory_Success(t *testing.T) {
 	svc := handlermocks.NewMockTripService(t)
 	h := handler.NewTripHandler(discardLogger(), svc)
@@ -220,6 +269,30 @@ func TestTripHandler_GetTripStatusHistory_Success(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Len(t, resp.StatusHistory, 2)
+}
+
+func TestTripHandler_GetTripStatusHistory_NotFound(t *testing.T) {
+	svc := handlermocks.NewMockTripService(t)
+	h := handler.NewTripHandler(discardLogger(), svc)
+
+	svc.EXPECT().GetTripStatusHistory(mock.Anything, mock.Anything).Return(nil, model.ErrNotFound)
+
+	_, err := h.GetTripStatusHistory(context.Background(), &tripsvc.GetTripStatusHistoryRequest{Id: "trip-1"})
+
+	require.Error(t, err)
+	assert.Equal(t, codes.NotFound, status.Code(err))
+}
+
+func TestTripHandler_GetTripStatusHistory_PermissionDenied(t *testing.T) {
+	svc := handlermocks.NewMockTripService(t)
+	h := handler.NewTripHandler(discardLogger(), svc)
+
+	svc.EXPECT().GetTripStatusHistory(mock.Anything, mock.Anything).Return(nil, model.ErrInsufficientPermissions)
+
+	_, err := h.GetTripStatusHistory(context.Background(), &tripsvc.GetTripStatusHistoryRequest{Id: "trip-1"})
+
+	require.Error(t, err)
+	assert.Equal(t, codes.PermissionDenied, status.Code(err))
 }
 
 // ── TripStreamHandler ─────────────────────────────────────────────────────────

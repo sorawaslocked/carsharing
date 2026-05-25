@@ -476,9 +476,9 @@ func TestGetUploadDocumentData_Success(t *testing.T) {
 	assert.Equal(t, "https://minio/put", resp.UploadData.PresignedPutUrl)
 }
 
-// --- GetProcessedDocumentsForUser ---
+// --- ListDocuments ---
 
-func TestGetProcessedDocumentsForUser_Success(t *testing.T) {
+func TestListDocuments_Success(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxWithUser(testUserID)
 	docs := []model.Document{
@@ -493,9 +493,9 @@ func TestGetProcessedDocumentsForUser_Success(t *testing.T) {
 		},
 	}
 
-	svc.EXPECT().GetProcessedDocumentsForUser(ctx, testUserID).Return(docs, nil)
+	svc.EXPECT().ListDocuments(ctx, validation.DocumentFilter{UserID: testUserID}).Return(docs, nil)
 
-	resp, err := h.GetProcessedDocumentsForUser(ctx, &usersvc.GetProcessedDocumentsForUserRequest{UserId: testUserID})
+	resp, err := h.ListDocuments(ctx, &usersvc.ListDocumentsRequest{UserId: testUserID})
 
 	require.NoError(t, err)
 	require.Len(t, resp.Documents, 1)
@@ -503,13 +503,13 @@ func TestGetProcessedDocumentsForUser_Success(t *testing.T) {
 	assert.Equal(t, "https://minio/signed", resp.Documents[0].ImageUrl)
 }
 
-func TestGetProcessedDocumentsForUser_UserNotFound(t *testing.T) {
+func TestListDocuments_UserNotFound(t *testing.T) {
 	h, svc := newHandler(t)
 	ctx := ctxWithUser(testUserID)
 
-	svc.EXPECT().GetProcessedDocumentsForUser(ctx, testUserID).Return(nil, model.ErrUserNotFound)
+	svc.EXPECT().ListDocuments(ctx, validation.DocumentFilter{UserID: testUserID}).Return(nil, model.ErrUserNotFound)
 
-	_, err := h.GetProcessedDocumentsForUser(ctx, &usersvc.GetProcessedDocumentsForUserRequest{UserId: testUserID})
+	_, err := h.ListDocuments(ctx, &usersvc.ListDocumentsRequest{UserId: testUserID})
 
 	assert.Equal(t, codes.NotFound, grpcCode(err))
 }

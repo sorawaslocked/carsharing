@@ -71,7 +71,7 @@ func (s *TripService) StartTrip(ctx context.Context, bookingID string) (string, 
 		return "", model.ErrInsufficientPermissions
 	}
 
-	if booking.Status != "created" {
+	if booking.Status != model.BookingStatusCreated {
 		return "", model.ErrBookingNotCreated
 	}
 
@@ -101,6 +101,8 @@ func (s *TripService) StartTrip(ctx context.Context, bookingID string) (string, 
 			},
 			StartMileageKM: telemetry.MileageKM,
 			StartFuelLevel: telemetry.FuelLevel,
+			CreatedAt:      now,
+			UpdatedAt:      now,
 		})
 		if e != nil {
 			return e
@@ -404,12 +406,12 @@ func (s *TripService) StreamTripLiveFeed(ctx context.Context, tripID string, sen
 		return err
 	}
 
-	if trip.Status != model.TripStatusActive {
-		return model.ErrTripNotActive
-	}
-
 	if !isPrivileged(md.UserRoles) && (md.UserID == nil || trip.UserID != *md.UserID) {
 		return model.ErrInsufficientPermissions
+	}
+
+	if trip.Status != model.TripStatusActive {
+		return model.ErrTripNotActive
 	}
 
 	booking, err := s.booking.GetBooking(ctx, trip.BookingID)

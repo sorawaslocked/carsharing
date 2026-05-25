@@ -70,6 +70,8 @@ type TripCreate struct {
 	StartLocation  sharedmodel.Location
 	StartMileageKM int64
 	StartFuelLevel *float32
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 type TripUpdate struct {

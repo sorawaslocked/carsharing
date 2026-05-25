@@ -22,14 +22,12 @@ const (
 )
 
 type BookingService struct {
-	log             *slog.Logger
-	validate        *validator.Validate
-	bookingRepo     BookingRepository
-	ruleRepo        PricingRuleRepository
-	publisher       EventPublisher
-	carChecker      CarChecker
-	carModelChecker CarModelChecker
-	zoneChecker     ZoneChecker
+	log         *slog.Logger
+	validate    *validator.Validate
+	bookingRepo BookingRepository
+	ruleRepo    PricingRuleRepository
+	publisher   EventPublisher
+	carChecker  CarChecker
 }
 
 func NewBookingService(
@@ -39,18 +37,14 @@ func NewBookingService(
 	ruleRepo PricingRuleRepository,
 	publisher EventPublisher,
 	carChecker CarChecker,
-	carModelChecker CarModelChecker,
-	zoneChecker ZoneChecker,
 ) *BookingService {
 	return &BookingService{
-		log:             pkglog.WithComponent(log, "service.BookingService"),
-		validate:        validate,
-		bookingRepo:     bookingRepo,
-		ruleRepo:        ruleRepo,
-		publisher:       publisher,
-		carChecker:      carChecker,
-		carModelChecker: carModelChecker,
-		zoneChecker:     zoneChecker,
+		log:         pkglog.WithComponent(log, "service.BookingService"),
+		validate:    validate,
+		bookingRepo: bookingRepo,
+		ruleRepo:    ruleRepo,
+		publisher:   publisher,
+		carChecker:  carChecker,
 	}
 }
 
@@ -85,7 +79,7 @@ func (s *BookingService) Create(ctx context.Context, data validation.BookingCrea
 	}
 
 	if _, err := s.ruleRepo.GetByID(ctx, data.PricingRuleID); err != nil {
-		if errors.Is(err, model.ErrNotFound) {
+		if errors.Is(err, model.ErrPricingRuleNotFound) {
 			return "", model.ErrPricingRuleNotFound
 		}
 		log.Error("getting pricing rule", pkglog.Err(err))
@@ -208,7 +202,7 @@ func (s *BookingService) Cancel(ctx context.Context, id string, reason *string) 
 }
 
 func (s *BookingService) Complete(ctx context.Context, id string) error {
-	log := pkglog.WithMethod(s.log, "Complete")
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Complete"), utils.MetadataFromCtx(ctx))
 
 	booking, err := s.bookingRepo.GetByID(ctx, id)
 	if err != nil {

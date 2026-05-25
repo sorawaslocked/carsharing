@@ -72,7 +72,7 @@ func (r *TripStatusReadingRepo) List(ctx context.Context, filter model.TripStatu
 	}
 	defer rows.Close()
 
-	var readings []model.TripStatusReading
+	readings := []model.TripStatusReading{}
 	for rows.Next() {
 		reading, err := dto.ScanTripStatusReading(rows)
 		if err != nil {

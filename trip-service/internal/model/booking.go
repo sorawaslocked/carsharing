@@ -2,6 +2,8 @@ package model
 
 import "time"
 
+const BookingStatusCreated = "created"
+
 type Booking struct {
 	ID               string
 	UserID           string

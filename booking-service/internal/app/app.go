@@ -88,7 +88,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	carModelChecker := grpcclient.NewCarModelChecker(log, carServiceConn)
 	zoneChecker := grpcclient.NewZoneChecker(log, carServiceConn)
 
-	bookingSvc := service.NewBookingService(log, validate, bookingRepo, ruleRepo, publisher, carChecker, carModelChecker, zoneChecker)
+	bookingSvc := service.NewBookingService(log, validate, bookingRepo, ruleRepo, publisher, carChecker)
 	ruleSvc := service.NewPricingRuleService(log, validate, ruleRepo, carModelChecker, zoneChecker)
 
 	ctx, cancel := context.WithCancel(context.Background())

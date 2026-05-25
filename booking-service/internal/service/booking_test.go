@@ -62,7 +62,7 @@ func newBookingSvc(
 	if len(cars) > 0 {
 		carChecker = cars[0]
 	}
-	return service.NewBookingService(discardLogger(), newValidator(), repo, rules, pub, carChecker, nil, nil)
+	return service.NewBookingService(discardLogger(), newValidator(), repo, rules, pub, carChecker)
 }
 
 // --- Create ---

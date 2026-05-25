@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log/slog"
 	"strings"
-	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -32,8 +31,6 @@ func NewTripRepo(log *slog.Logger, pool *pgxpool.Pool) *TripRepo {
 func (r *TripRepo) Create(ctx context.Context, trip model.TripCreate) (model.Trip, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Create"), pkgutils.MetadataFromCtx(ctx))
 
-	now := time.Now()
-
 	q := fmt.Sprintf(`
 		INSERT INTO trips (
 			id, booking_id, user_id, car_id, status,
@@ -47,7 +44,7 @@ func (r *TripRepo) Create(ctx context.Context, trip model.TripCreate) (model.Tri
 		trip.StartedAt,
 		trip.StartLocation.Latitude, trip.StartLocation.Longitude,
 		trip.StartMileageKM, trip.StartFuelLevel,
-		now, now,
+		trip.CreatedAt, trip.UpdatedAt,
 	))
 	if err != nil {
 		return model.Trip{}, mapSQLError(log, err, "creating trip")
@@ -86,7 +83,7 @@ func (r *TripRepo) List(ctx context.Context, filter model.TripFilter) ([]model.T
 	}
 	defer rows.Close()
 
-	var trips []model.Trip
+	trips := []model.Trip{}
 	for rows.Next() {
 		t, err := dto.ScanTrip(rows)
 		if err != nil {
@@ -125,6 +122,11 @@ func (r *TripRepo) Update(ctx context.Context, id string, update model.TripUpdat
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			if update.ExpectedUpdatedAt != nil {
+				var exists bool
+				existErr := dbFromCtx(ctx, r.pool).QueryRow(ctx, "SELECT true FROM trips WHERE id = $1", id).Scan(&exists)
+				if errors.Is(existErr, pgx.ErrNoRows) {
+					return model.Trip{}, model.ErrNotFound
+				}
 				return model.Trip{}, model.ErrConflict
 			}
 			return model.Trip{}, model.ErrNotFound

@@ -7,6 +7,7 @@ import (
 	"carsharing/api-gateway/internal/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
+
 	"github.com/coder/websocket"
 	"github.com/coder/websocket/wsjson"
 	"github.com/gin-gonic/gin"
@@ -41,7 +42,7 @@ func (h *UserWsHandler) DocumentUpdates(c *gin.Context) {
 	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(c.Request.Context()))
 
 	var userID *string
-	if v := c.Query("userId"); v != "" {
+	if v := c.Query("userID"); v != "" {
 		userID = &v
 	}
 

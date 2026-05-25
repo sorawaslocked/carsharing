@@ -1093,27 +1093,31 @@ func (x *GetUploadDocumentDataResponse) GetUploadData() *base.ImageUploadData {
 	return nil
 }
 
-type GetProcessedDocumentsForUserRequest struct {
+type ListDocumentsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Status        *string                `protobuf:"bytes,2,opt,name=status,proto3,oneof" json:"status,omitempty"`
+	ImageType     *string                `protobuf:"bytes,3,opt,name=image_type,json=imageType,proto3,oneof" json:"image_type,omitempty"`
+	Sort          *string                `protobuf:"bytes,4,opt,name=sort,proto3,oneof" json:"sort,omitempty"`
+	Pagination    *base.Pagination       `protobuf:"bytes,5,opt,name=pagination,proto3,oneof" json:"pagination,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetProcessedDocumentsForUserRequest) Reset() {
-	*x = GetProcessedDocumentsForUserRequest{}
+func (x *ListDocumentsRequest) Reset() {
+	*x = ListDocumentsRequest{}
 	mi := &file_service_user_user_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetProcessedDocumentsForUserRequest) String() string {
+func (x *ListDocumentsRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetProcessedDocumentsForUserRequest) ProtoMessage() {}
+func (*ListDocumentsRequest) ProtoMessage() {}
 
-func (x *GetProcessedDocumentsForUserRequest) ProtoReflect() protoreflect.Message {
+func (x *ListDocumentsRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_service_user_user_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1125,39 +1129,67 @@ func (x *GetProcessedDocumentsForUserRequest) ProtoReflect() protoreflect.Messag
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetProcessedDocumentsForUserRequest.ProtoReflect.Descriptor instead.
-func (*GetProcessedDocumentsForUserRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use ListDocumentsRequest.ProtoReflect.Descriptor instead.
+func (*ListDocumentsRequest) Descriptor() ([]byte, []int) {
 	return file_service_user_user_proto_rawDescGZIP(), []int{18}
 }
 
-func (x *GetProcessedDocumentsForUserRequest) GetUserId() string {
+func (x *ListDocumentsRequest) GetUserId() string {
 	if x != nil {
 		return x.UserId
 	}
 	return ""
 }
 
-type GetProcessedDocumentsForUserResponse struct {
+func (x *ListDocumentsRequest) GetStatus() string {
+	if x != nil && x.Status != nil {
+		return *x.Status
+	}
+	return ""
+}
+
+func (x *ListDocumentsRequest) GetImageType() string {
+	if x != nil && x.ImageType != nil {
+		return *x.ImageType
+	}
+	return ""
+}
+
+func (x *ListDocumentsRequest) GetSort() string {
+	if x != nil && x.Sort != nil {
+		return *x.Sort
+	}
+	return ""
+}
+
+func (x *ListDocumentsRequest) GetPagination() *base.Pagination {
+	if x != nil {
+		return x.Pagination
+	}
+	return nil
+}
+
+type ListDocumentsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Documents     []*user.Document       `protobuf:"bytes,1,rep,name=documents,proto3" json:"documents,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetProcessedDocumentsForUserResponse) Reset() {
-	*x = GetProcessedDocumentsForUserResponse{}
+func (x *ListDocumentsResponse) Reset() {
+	*x = ListDocumentsResponse{}
 	mi := &file_service_user_user_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetProcessedDocumentsForUserResponse) String() string {
+func (x *ListDocumentsResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetProcessedDocumentsForUserResponse) ProtoMessage() {}
+func (*ListDocumentsResponse) ProtoMessage() {}
 
-func (x *GetProcessedDocumentsForUserResponse) ProtoReflect() protoreflect.Message {
+func (x *ListDocumentsResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_service_user_user_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1169,12 +1201,12 @@ func (x *GetProcessedDocumentsForUserResponse) ProtoReflect() protoreflect.Messa
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetProcessedDocumentsForUserResponse.ProtoReflect.Descriptor instead.
-func (*GetProcessedDocumentsForUserResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use ListDocumentsResponse.ProtoReflect.Descriptor instead.
+func (*ListDocumentsResponse) Descriptor() ([]byte, []int) {
 	return file_service_user_user_proto_rawDescGZIP(), []int{19}
 }
 
-func (x *GetProcessedDocumentsForUserResponse) GetDocuments() []*user.Document {
+func (x *ListDocumentsResponse) GetDocuments() []*user.Document {
 	if x != nil {
 		return x.Documents
 	}
@@ -1357,16 +1389,27 @@ const file_service_user_user_proto_rawDesc = "" +
 	"image_type\x18\x01 \x01(\tR\timageType\"W\n" +
 	"\x1dGetUploadDocumentDataResponse\x126\n" +
 	"\vupload_data\x18\x01 \x01(\v2\x15.base.ImageUploadDataR\n" +
-	"uploadData\">\n" +
-	"#GetProcessedDocumentsForUserRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\"Y\n" +
-	"$GetProcessedDocumentsForUserResponse\x121\n" +
+	"uploadData\"\xf2\x01\n" +
+	"\x14ListDocumentsRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
+	"\x06status\x18\x02 \x01(\tH\x00R\x06status\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"image_type\x18\x03 \x01(\tH\x01R\timageType\x88\x01\x01\x12\x17\n" +
+	"\x04sort\x18\x04 \x01(\tH\x02R\x04sort\x88\x01\x01\x125\n" +
+	"\n" +
+	"pagination\x18\x05 \x01(\v2\x10.base.PaginationH\x03R\n" +
+	"pagination\x88\x01\x01B\t\n" +
+	"\a_statusB\r\n" +
+	"\v_image_typeB\a\n" +
+	"\x05_sortB\r\n" +
+	"\v_pagination\"J\n" +
+	"\x15ListDocumentsResponse\x121\n" +
 	"\tdocuments\x18\x01 \x03(\v2\x13.base.user.DocumentR\tdocuments\"j\n" +
 	"\x14CheckDocumentRequest\x12\x15\n" +
 	"\x06doc_id\x18\x01 \x01(\tR\x05docId\x12\x16\n" +
 	"\x06status\x18\x02 \x01(\tR\x06status\x12\x19\n" +
 	"\x05error\x18\x03 \x01(\tH\x00R\x05error\x88\x01\x01B\b\n" +
-	"\x06_error2\xfd\t\n" +
+	"\x06_error2\xcf\t\n" +
 	"\vUserService\x12@\n" +
 	"\x06Health\x12\x16.google.protobuf.Empty\x1a\x1e.service.ServiceHealthResponse\x12O\n" +
 	"\n" +
@@ -1383,8 +1426,8 @@ const file_service_user_user_proto_rawDesc = "" +
 	"\x12SendActivationCode\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\x12W\n" +
 	"\x13CheckActivationCode\x12(.service.user.CheckActivationCodeRequest\x1a\x16.google.protobuf.Empty\x12[\n" +
 	"\x0eCreateDocument\x12#.service.user.CreateDocumentRequest\x1a$.service.user.CreateDocumentResponse\x12p\n" +
-	"\x15GetUploadDocumentData\x12*.service.user.GetUploadDocumentDataRequest\x1a+.service.user.GetUploadDocumentDataResponse\x12\x85\x01\n" +
-	"\x1cGetProcessedDocumentsForUser\x121.service.user.GetProcessedDocumentsForUserRequest\x1a2.service.user.GetProcessedDocumentsForUserResponse\x12K\n" +
+	"\x15GetUploadDocumentData\x12*.service.user.GetUploadDocumentDataRequest\x1a+.service.user.GetUploadDocumentDataResponse\x12X\n" +
+	"\rListDocuments\x12\".service.user.ListDocumentsRequest\x1a#.service.user.ListDocumentsResponse\x12K\n" +
 	"\rCheckDocument\x12\".service.user.CheckDocumentRequest\x1a\x16.google.protobuf.EmptyB$Z\"carsharing/protos/gen/service/userb\x06proto3"
 
 var (
@@ -1401,33 +1444,33 @@ func file_service_user_user_proto_rawDescGZIP() []byte {
 
 var file_service_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
 var file_service_user_user_proto_goTypes = []any{
-	(*CreateUserRequest)(nil),                    // 0: service.user.CreateUserRequest
-	(*CreateUserResponse)(nil),                   // 1: service.user.CreateUserResponse
-	(*GetUserRequest)(nil),                       // 2: service.user.GetUserRequest
-	(*GetUserResponse)(nil),                      // 3: service.user.GetUserResponse
-	(*ListUsersRequest)(nil),                     // 4: service.user.ListUsersRequest
-	(*ListUsersResponse)(nil),                    // 5: service.user.ListUsersResponse
-	(*UpdateUserRequest)(nil),                    // 6: service.user.UpdateUserRequest
-	(*DeleteUserRequest)(nil),                    // 7: service.user.DeleteUserRequest
-	(*GetProfileImageUploadDataResponse)(nil),    // 8: service.user.GetProfileImageUploadDataResponse
-	(*RegisterRequest)(nil),                      // 9: service.user.RegisterRequest
-	(*RegisterResponse)(nil),                     // 10: service.user.RegisterResponse
-	(*SignInRequest)(nil),                        // 11: service.user.SignInRequest
-	(*SignInResponse)(nil),                       // 12: service.user.SignInResponse
-	(*CheckActivationCodeRequest)(nil),           // 13: service.user.CheckActivationCodeRequest
-	(*CreateDocumentRequest)(nil),                // 14: service.user.CreateDocumentRequest
-	(*CreateDocumentResponse)(nil),               // 15: service.user.CreateDocumentResponse
-	(*GetUploadDocumentDataRequest)(nil),         // 16: service.user.GetUploadDocumentDataRequest
-	(*GetUploadDocumentDataResponse)(nil),        // 17: service.user.GetUploadDocumentDataResponse
-	(*GetProcessedDocumentsForUserRequest)(nil),  // 18: service.user.GetProcessedDocumentsForUserRequest
-	(*GetProcessedDocumentsForUserResponse)(nil), // 19: service.user.GetProcessedDocumentsForUserResponse
-	(*CheckDocumentRequest)(nil),                 // 20: service.user.CheckDocumentRequest
-	(*user.User)(nil),                            // 21: base.user.User
-	(*base.Pagination)(nil),                      // 22: base.Pagination
-	(*base.ImageUploadData)(nil),                 // 23: base.ImageUploadData
-	(*user.Document)(nil),                        // 24: base.user.Document
-	(*emptypb.Empty)(nil),                        // 25: google.protobuf.Empty
-	(*service.ServiceHealthResponse)(nil),        // 26: service.ServiceHealthResponse
+	(*CreateUserRequest)(nil),                 // 0: service.user.CreateUserRequest
+	(*CreateUserResponse)(nil),                // 1: service.user.CreateUserResponse
+	(*GetUserRequest)(nil),                    // 2: service.user.GetUserRequest
+	(*GetUserResponse)(nil),                   // 3: service.user.GetUserResponse
+	(*ListUsersRequest)(nil),                  // 4: service.user.ListUsersRequest
+	(*ListUsersResponse)(nil),                 // 5: service.user.ListUsersResponse
+	(*UpdateUserRequest)(nil),                 // 6: service.user.UpdateUserRequest
+	(*DeleteUserRequest)(nil),                 // 7: service.user.DeleteUserRequest
+	(*GetProfileImageUploadDataResponse)(nil), // 8: service.user.GetProfileImageUploadDataResponse
+	(*RegisterRequest)(nil),                   // 9: service.user.RegisterRequest
+	(*RegisterResponse)(nil),                  // 10: service.user.RegisterResponse
+	(*SignInRequest)(nil),                     // 11: service.user.SignInRequest
+	(*SignInResponse)(nil),                    // 12: service.user.SignInResponse
+	(*CheckActivationCodeRequest)(nil),        // 13: service.user.CheckActivationCodeRequest
+	(*CreateDocumentRequest)(nil),             // 14: service.user.CreateDocumentRequest
+	(*CreateDocumentResponse)(nil),            // 15: service.user.CreateDocumentResponse
+	(*GetUploadDocumentDataRequest)(nil),      // 16: service.user.GetUploadDocumentDataRequest
+	(*GetUploadDocumentDataResponse)(nil),     // 17: service.user.GetUploadDocumentDataResponse
+	(*ListDocumentsRequest)(nil),              // 18: service.user.ListDocumentsRequest
+	(*ListDocumentsResponse)(nil),             // 19: service.user.ListDocumentsResponse
+	(*CheckDocumentRequest)(nil),              // 20: service.user.CheckDocumentRequest
+	(*user.User)(nil),                         // 21: base.user.User
+	(*base.Pagination)(nil),                   // 22: base.Pagination
+	(*base.ImageUploadData)(nil),              // 23: base.ImageUploadData
+	(*user.Document)(nil),                     // 24: base.user.Document
+	(*emptypb.Empty)(nil),                     // 25: google.protobuf.Empty
+	(*service.ServiceHealthResponse)(nil),     // 26: service.ServiceHealthResponse
 }
 var file_service_user_user_proto_depIdxs = []int32{
 	21, // 0: service.user.GetUserResponse.user:type_name -> base.user.User
@@ -1435,42 +1478,43 @@ var file_service_user_user_proto_depIdxs = []int32{
 	21, // 2: service.user.ListUsersResponse.users:type_name -> base.user.User
 	23, // 3: service.user.GetProfileImageUploadDataResponse.upload_data:type_name -> base.ImageUploadData
 	23, // 4: service.user.GetUploadDocumentDataResponse.upload_data:type_name -> base.ImageUploadData
-	24, // 5: service.user.GetProcessedDocumentsForUserResponse.documents:type_name -> base.user.Document
-	25, // 6: service.user.UserService.Health:input_type -> google.protobuf.Empty
-	0,  // 7: service.user.UserService.CreateUser:input_type -> service.user.CreateUserRequest
-	2,  // 8: service.user.UserService.GetUser:input_type -> service.user.GetUserRequest
-	4,  // 9: service.user.UserService.ListUsers:input_type -> service.user.ListUsersRequest
-	6,  // 10: service.user.UserService.UpdateUser:input_type -> service.user.UpdateUserRequest
-	7,  // 11: service.user.UserService.DeleteUser:input_type -> service.user.DeleteUserRequest
-	25, // 12: service.user.UserService.GetProfileImageUploadData:input_type -> google.protobuf.Empty
-	9,  // 13: service.user.UserService.Register:input_type -> service.user.RegisterRequest
-	11, // 14: service.user.UserService.SignIn:input_type -> service.user.SignInRequest
-	25, // 15: service.user.UserService.SendActivationCode:input_type -> google.protobuf.Empty
-	13, // 16: service.user.UserService.CheckActivationCode:input_type -> service.user.CheckActivationCodeRequest
-	14, // 17: service.user.UserService.CreateDocument:input_type -> service.user.CreateDocumentRequest
-	16, // 18: service.user.UserService.GetUploadDocumentData:input_type -> service.user.GetUploadDocumentDataRequest
-	18, // 19: service.user.UserService.GetProcessedDocumentsForUser:input_type -> service.user.GetProcessedDocumentsForUserRequest
-	20, // 20: service.user.UserService.CheckDocument:input_type -> service.user.CheckDocumentRequest
-	26, // 21: service.user.UserService.Health:output_type -> service.ServiceHealthResponse
-	1,  // 22: service.user.UserService.CreateUser:output_type -> service.user.CreateUserResponse
-	3,  // 23: service.user.UserService.GetUser:output_type -> service.user.GetUserResponse
-	5,  // 24: service.user.UserService.ListUsers:output_type -> service.user.ListUsersResponse
-	25, // 25: service.user.UserService.UpdateUser:output_type -> google.protobuf.Empty
-	25, // 26: service.user.UserService.DeleteUser:output_type -> google.protobuf.Empty
-	8,  // 27: service.user.UserService.GetProfileImageUploadData:output_type -> service.user.GetProfileImageUploadDataResponse
-	10, // 28: service.user.UserService.Register:output_type -> service.user.RegisterResponse
-	12, // 29: service.user.UserService.SignIn:output_type -> service.user.SignInResponse
-	25, // 30: service.user.UserService.SendActivationCode:output_type -> google.protobuf.Empty
-	25, // 31: service.user.UserService.CheckActivationCode:output_type -> google.protobuf.Empty
-	15, // 32: service.user.UserService.CreateDocument:output_type -> service.user.CreateDocumentResponse
-	17, // 33: service.user.UserService.GetUploadDocumentData:output_type -> service.user.GetUploadDocumentDataResponse
-	19, // 34: service.user.UserService.GetProcessedDocumentsForUser:output_type -> service.user.GetProcessedDocumentsForUserResponse
-	25, // 35: service.user.UserService.CheckDocument:output_type -> google.protobuf.Empty
-	21, // [21:36] is the sub-list for method output_type
-	6,  // [6:21] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	22, // 5: service.user.ListDocumentsRequest.pagination:type_name -> base.Pagination
+	24, // 6: service.user.ListDocumentsResponse.documents:type_name -> base.user.Document
+	25, // 7: service.user.UserService.Health:input_type -> google.protobuf.Empty
+	0,  // 8: service.user.UserService.CreateUser:input_type -> service.user.CreateUserRequest
+	2,  // 9: service.user.UserService.GetUser:input_type -> service.user.GetUserRequest
+	4,  // 10: service.user.UserService.ListUsers:input_type -> service.user.ListUsersRequest
+	6,  // 11: service.user.UserService.UpdateUser:input_type -> service.user.UpdateUserRequest
+	7,  // 12: service.user.UserService.DeleteUser:input_type -> service.user.DeleteUserRequest
+	25, // 13: service.user.UserService.GetProfileImageUploadData:input_type -> google.protobuf.Empty
+	9,  // 14: service.user.UserService.Register:input_type -> service.user.RegisterRequest
+	11, // 15: service.user.UserService.SignIn:input_type -> service.user.SignInRequest
+	25, // 16: service.user.UserService.SendActivationCode:input_type -> google.protobuf.Empty
+	13, // 17: service.user.UserService.CheckActivationCode:input_type -> service.user.CheckActivationCodeRequest
+	14, // 18: service.user.UserService.CreateDocument:input_type -> service.user.CreateDocumentRequest
+	16, // 19: service.user.UserService.GetUploadDocumentData:input_type -> service.user.GetUploadDocumentDataRequest
+	18, // 20: service.user.UserService.ListDocuments:input_type -> service.user.ListDocumentsRequest
+	20, // 21: service.user.UserService.CheckDocument:input_type -> service.user.CheckDocumentRequest
+	26, // 22: service.user.UserService.Health:output_type -> service.ServiceHealthResponse
+	1,  // 23: service.user.UserService.CreateUser:output_type -> service.user.CreateUserResponse
+	3,  // 24: service.user.UserService.GetUser:output_type -> service.user.GetUserResponse
+	5,  // 25: service.user.UserService.ListUsers:output_type -> service.user.ListUsersResponse
+	25, // 26: service.user.UserService.UpdateUser:output_type -> google.protobuf.Empty
+	25, // 27: service.user.UserService.DeleteUser:output_type -> google.protobuf.Empty
+	8,  // 28: service.user.UserService.GetProfileImageUploadData:output_type -> service.user.GetProfileImageUploadDataResponse
+	10, // 29: service.user.UserService.Register:output_type -> service.user.RegisterResponse
+	12, // 30: service.user.UserService.SignIn:output_type -> service.user.SignInResponse
+	25, // 31: service.user.UserService.SendActivationCode:output_type -> google.protobuf.Empty
+	25, // 32: service.user.UserService.CheckActivationCode:output_type -> google.protobuf.Empty
+	15, // 33: service.user.UserService.CreateDocument:output_type -> service.user.CreateDocumentResponse
+	17, // 34: service.user.UserService.GetUploadDocumentData:output_type -> service.user.GetUploadDocumentDataResponse
+	19, // 35: service.user.UserService.ListDocuments:output_type -> service.user.ListDocumentsResponse
+	25, // 36: service.user.UserService.CheckDocument:output_type -> google.protobuf.Empty
+	22, // [22:37] is the sub-list for method output_type
+	7,  // [7:22] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_service_user_user_proto_init() }
@@ -1484,6 +1528,7 @@ func file_service_user_user_proto_init() {
 	file_service_user_user_proto_msgTypes[6].OneofWrappers = []any{}
 	file_service_user_user_proto_msgTypes[9].OneofWrappers = []any{}
 	file_service_user_user_proto_msgTypes[11].OneofWrappers = []any{}
+	file_service_user_user_proto_msgTypes[18].OneofWrappers = []any{}
 	file_service_user_user_proto_msgTypes[20].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

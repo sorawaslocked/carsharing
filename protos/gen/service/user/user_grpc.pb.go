@@ -21,21 +21,21 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_Health_FullMethodName                       = "/service.user.UserService/Health"
-	UserService_CreateUser_FullMethodName                   = "/service.user.UserService/CreateUser"
-	UserService_GetUser_FullMethodName                      = "/service.user.UserService/GetUser"
-	UserService_ListUsers_FullMethodName                    = "/service.user.UserService/ListUsers"
-	UserService_UpdateUser_FullMethodName                   = "/service.user.UserService/UpdateUser"
-	UserService_DeleteUser_FullMethodName                   = "/service.user.UserService/DeleteUser"
-	UserService_GetProfileImageUploadData_FullMethodName    = "/service.user.UserService/GetProfileImageUploadData"
-	UserService_Register_FullMethodName                     = "/service.user.UserService/Register"
-	UserService_SignIn_FullMethodName                       = "/service.user.UserService/SignIn"
-	UserService_SendActivationCode_FullMethodName           = "/service.user.UserService/SendActivationCode"
-	UserService_CheckActivationCode_FullMethodName          = "/service.user.UserService/CheckActivationCode"
-	UserService_CreateDocument_FullMethodName               = "/service.user.UserService/CreateDocument"
-	UserService_GetUploadDocumentData_FullMethodName        = "/service.user.UserService/GetUploadDocumentData"
-	UserService_GetProcessedDocumentsForUser_FullMethodName = "/service.user.UserService/GetProcessedDocumentsForUser"
-	UserService_CheckDocument_FullMethodName                = "/service.user.UserService/CheckDocument"
+	UserService_Health_FullMethodName                    = "/service.user.UserService/Health"
+	UserService_CreateUser_FullMethodName                = "/service.user.UserService/CreateUser"
+	UserService_GetUser_FullMethodName                   = "/service.user.UserService/GetUser"
+	UserService_ListUsers_FullMethodName                 = "/service.user.UserService/ListUsers"
+	UserService_UpdateUser_FullMethodName                = "/service.user.UserService/UpdateUser"
+	UserService_DeleteUser_FullMethodName                = "/service.user.UserService/DeleteUser"
+	UserService_GetProfileImageUploadData_FullMethodName = "/service.user.UserService/GetProfileImageUploadData"
+	UserService_Register_FullMethodName                  = "/service.user.UserService/Register"
+	UserService_SignIn_FullMethodName                    = "/service.user.UserService/SignIn"
+	UserService_SendActivationCode_FullMethodName        = "/service.user.UserService/SendActivationCode"
+	UserService_CheckActivationCode_FullMethodName       = "/service.user.UserService/CheckActivationCode"
+	UserService_CreateDocument_FullMethodName            = "/service.user.UserService/CreateDocument"
+	UserService_GetUploadDocumentData_FullMethodName     = "/service.user.UserService/GetUploadDocumentData"
+	UserService_ListDocuments_FullMethodName             = "/service.user.UserService/ListDocuments"
+	UserService_CheckDocument_FullMethodName             = "/service.user.UserService/CheckDocument"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -55,7 +55,7 @@ type UserServiceClient interface {
 	CheckActivationCode(ctx context.Context, in *CheckActivationCodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CreateDocument(ctx context.Context, in *CreateDocumentRequest, opts ...grpc.CallOption) (*CreateDocumentResponse, error)
 	GetUploadDocumentData(ctx context.Context, in *GetUploadDocumentDataRequest, opts ...grpc.CallOption) (*GetUploadDocumentDataResponse, error)
-	GetProcessedDocumentsForUser(ctx context.Context, in *GetProcessedDocumentsForUserRequest, opts ...grpc.CallOption) (*GetProcessedDocumentsForUserResponse, error)
+	ListDocuments(ctx context.Context, in *ListDocumentsRequest, opts ...grpc.CallOption) (*ListDocumentsResponse, error)
 	CheckDocument(ctx context.Context, in *CheckDocumentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -197,10 +197,10 @@ func (c *userServiceClient) GetUploadDocumentData(ctx context.Context, in *GetUp
 	return out, nil
 }
 
-func (c *userServiceClient) GetProcessedDocumentsForUser(ctx context.Context, in *GetProcessedDocumentsForUserRequest, opts ...grpc.CallOption) (*GetProcessedDocumentsForUserResponse, error) {
+func (c *userServiceClient) ListDocuments(ctx context.Context, in *ListDocumentsRequest, opts ...grpc.CallOption) (*ListDocumentsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetProcessedDocumentsForUserResponse)
-	err := c.cc.Invoke(ctx, UserService_GetProcessedDocumentsForUser_FullMethodName, in, out, cOpts...)
+	out := new(ListDocumentsResponse)
+	err := c.cc.Invoke(ctx, UserService_ListDocuments_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -234,7 +234,7 @@ type UserServiceServer interface {
 	CheckActivationCode(context.Context, *CheckActivationCodeRequest) (*emptypb.Empty, error)
 	CreateDocument(context.Context, *CreateDocumentRequest) (*CreateDocumentResponse, error)
 	GetUploadDocumentData(context.Context, *GetUploadDocumentDataRequest) (*GetUploadDocumentDataResponse, error)
-	GetProcessedDocumentsForUser(context.Context, *GetProcessedDocumentsForUserRequest) (*GetProcessedDocumentsForUserResponse, error)
+	ListDocuments(context.Context, *ListDocumentsRequest) (*ListDocumentsResponse, error)
 	CheckDocument(context.Context, *CheckDocumentRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
@@ -285,8 +285,8 @@ func (UnimplementedUserServiceServer) CreateDocument(context.Context, *CreateDoc
 func (UnimplementedUserServiceServer) GetUploadDocumentData(context.Context, *GetUploadDocumentDataRequest) (*GetUploadDocumentDataResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetUploadDocumentData not implemented")
 }
-func (UnimplementedUserServiceServer) GetProcessedDocumentsForUser(context.Context, *GetProcessedDocumentsForUserRequest) (*GetProcessedDocumentsForUserResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetProcessedDocumentsForUser not implemented")
+func (UnimplementedUserServiceServer) ListDocuments(context.Context, *ListDocumentsRequest) (*ListDocumentsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListDocuments not implemented")
 }
 func (UnimplementedUserServiceServer) CheckDocument(context.Context, *CheckDocumentRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method CheckDocument not implemented")
@@ -546,20 +546,20 @@ func _UserService_GetUploadDocumentData_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_GetProcessedDocumentsForUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetProcessedDocumentsForUserRequest)
+func _UserService_ListDocuments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListDocumentsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).GetProcessedDocumentsForUser(ctx, in)
+		return srv.(UserServiceServer).ListDocuments(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_GetProcessedDocumentsForUser_FullMethodName,
+		FullMethod: UserService_ListDocuments_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetProcessedDocumentsForUser(ctx, req.(*GetProcessedDocumentsForUserRequest))
+		return srv.(UserServiceServer).ListDocuments(ctx, req.(*ListDocumentsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -642,8 +642,8 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_GetUploadDocumentData_Handler,
 		},
 		{
-			MethodName: "GetProcessedDocumentsForUser",
-			Handler:    _UserService_GetProcessedDocumentsForUser_Handler,
+			MethodName: "ListDocuments",
+			Handler:    _UserService_ListDocuments_Handler,
 		},
 		{
 			MethodName: "CheckDocument",

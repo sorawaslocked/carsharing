@@ -270,6 +270,58 @@ func (x *Document) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+type Defect struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Defect) Reset() {
+	*x = Defect{}
+	mi := &file_base_user_user_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Defect) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Defect) ProtoMessage() {}
+
+func (x *Defect) ProtoReflect() protoreflect.Message {
+	mi := &file_base_user_user_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Defect.ProtoReflect.Descriptor instead.
+func (*Defect) Descriptor() ([]byte, []int) {
+	return file_base_user_user_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *Defect) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *Defect) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
 var File_base_user_user_proto protoreflect.FileDescriptor
 
 const file_base_user_user_proto_rawDesc = "" +
@@ -309,7 +361,10 @@ const file_base_user_user_proto_rawDesc = "" +
 	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
 	"updated_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\b\n" +
-	"\x06_errorB!Z\x1fcarsharing/protos/gen/base/userb\x06proto3"
+	"\x06_error\">\n" +
+	"\x06Defect\x12\x12\n" +
+	"\x04type\x18\x01 \x01(\tR\x04type\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescriptionB!Z\x1fcarsharing/protos/gen/base/userb\x06proto3"
 
 var (
 	file_base_user_user_proto_rawDescOnce sync.Once
@@ -323,17 +378,18 @@ func file_base_user_user_proto_rawDescGZIP() []byte {
 	return file_base_user_user_proto_rawDescData
 }
 
-var file_base_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_base_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_base_user_user_proto_goTypes = []any{
 	(*User)(nil),                  // 0: base.user.User
 	(*Document)(nil),              // 1: base.user.Document
-	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
+	(*Defect)(nil),                // 2: base.user.Defect
+	(*timestamppb.Timestamp)(nil), // 3: google.protobuf.Timestamp
 }
 var file_base_user_user_proto_depIdxs = []int32{
-	2, // 0: base.user.User.created_at:type_name -> google.protobuf.Timestamp
-	2, // 1: base.user.User.updated_at:type_name -> google.protobuf.Timestamp
-	2, // 2: base.user.Document.created_at:type_name -> google.protobuf.Timestamp
-	2, // 3: base.user.Document.updated_at:type_name -> google.protobuf.Timestamp
+	3, // 0: base.user.User.created_at:type_name -> google.protobuf.Timestamp
+	3, // 1: base.user.User.updated_at:type_name -> google.protobuf.Timestamp
+	3, // 2: base.user.Document.created_at:type_name -> google.protobuf.Timestamp
+	3, // 3: base.user.Document.updated_at:type_name -> google.protobuf.Timestamp
 	4, // [4:4] is the sub-list for method output_type
 	4, // [4:4] is the sub-list for method input_type
 	4, // [4:4] is the sub-list for extension type_name
@@ -354,7 +410,7 @@ func file_base_user_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_base_user_user_proto_rawDesc), len(file_base_user_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

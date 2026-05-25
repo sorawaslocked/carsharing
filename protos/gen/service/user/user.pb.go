@@ -1273,6 +1273,126 @@ func (x *CheckDocumentRequest) GetError() string {
 	return ""
 }
 
+type StreamDocumentAnalyzedRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        *string                `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3,oneof" json:"user_id,omitempty"`
+	Passed        *bool                  `protobuf:"varint,2,opt,name=passed,proto3,oneof" json:"passed,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamDocumentAnalyzedRequest) Reset() {
+	*x = StreamDocumentAnalyzedRequest{}
+	mi := &file_service_user_user_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamDocumentAnalyzedRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamDocumentAnalyzedRequest) ProtoMessage() {}
+
+func (x *StreamDocumentAnalyzedRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_service_user_user_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamDocumentAnalyzedRequest.ProtoReflect.Descriptor instead.
+func (*StreamDocumentAnalyzedRequest) Descriptor() ([]byte, []int) {
+	return file_service_user_user_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *StreamDocumentAnalyzedRequest) GetUserId() string {
+	if x != nil && x.UserId != nil {
+		return *x.UserId
+	}
+	return ""
+}
+
+func (x *StreamDocumentAnalyzedRequest) GetPassed() bool {
+	if x != nil && x.Passed != nil {
+		return *x.Passed
+	}
+	return false
+}
+
+type StreamDocumentAnalyzedResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DocumentId    string                 `protobuf:"bytes,1,opt,name=document_id,json=documentId,proto3" json:"document_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Passed        bool                   `protobuf:"varint,3,opt,name=passed,proto3" json:"passed,omitempty"`
+	Defects       []*user.Defect         `protobuf:"bytes,4,rep,name=defects,proto3" json:"defects,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamDocumentAnalyzedResponse) Reset() {
+	*x = StreamDocumentAnalyzedResponse{}
+	mi := &file_service_user_user_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamDocumentAnalyzedResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamDocumentAnalyzedResponse) ProtoMessage() {}
+
+func (x *StreamDocumentAnalyzedResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_service_user_user_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamDocumentAnalyzedResponse.ProtoReflect.Descriptor instead.
+func (*StreamDocumentAnalyzedResponse) Descriptor() ([]byte, []int) {
+	return file_service_user_user_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *StreamDocumentAnalyzedResponse) GetDocumentId() string {
+	if x != nil {
+		return x.DocumentId
+	}
+	return ""
+}
+
+func (x *StreamDocumentAnalyzedResponse) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *StreamDocumentAnalyzedResponse) GetPassed() bool {
+	if x != nil {
+		return x.Passed
+	}
+	return false
+}
+
+func (x *StreamDocumentAnalyzedResponse) GetDefects() []*user.Defect {
+	if x != nil {
+		return x.Defects
+	}
+	return nil
+}
+
 var File_service_user_user_proto protoreflect.FileDescriptor
 
 const file_service_user_user_proto_rawDesc = "" +
@@ -1409,7 +1529,20 @@ const file_service_user_user_proto_rawDesc = "" +
 	"\x06doc_id\x18\x01 \x01(\tR\x05docId\x12\x16\n" +
 	"\x06status\x18\x02 \x01(\tR\x06status\x12\x19\n" +
 	"\x05error\x18\x03 \x01(\tH\x00R\x05error\x88\x01\x01B\b\n" +
-	"\x06_error2\xcf\t\n" +
+	"\x06_error\"q\n" +
+	"\x1dStreamDocumentAnalyzedRequest\x12\x1c\n" +
+	"\auser_id\x18\x01 \x01(\tH\x00R\x06userId\x88\x01\x01\x12\x1b\n" +
+	"\x06passed\x18\x02 \x01(\bH\x01R\x06passed\x88\x01\x01B\n" +
+	"\n" +
+	"\b_user_idB\t\n" +
+	"\a_passed\"\x9f\x01\n" +
+	"\x1eStreamDocumentAnalyzedResponse\x12\x1f\n" +
+	"\vdocument_id\x18\x01 \x01(\tR\n" +
+	"documentId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x16\n" +
+	"\x06passed\x18\x03 \x01(\bR\x06passed\x12+\n" +
+	"\adefects\x18\x04 \x03(\v2\x11.base.user.DefectR\adefects2\xc6\n" +
+	"\n" +
 	"\vUserService\x12@\n" +
 	"\x06Health\x12\x16.google.protobuf.Empty\x1a\x1e.service.ServiceHealthResponse\x12O\n" +
 	"\n" +
@@ -1428,7 +1561,8 @@ const file_service_user_user_proto_rawDesc = "" +
 	"\x0eCreateDocument\x12#.service.user.CreateDocumentRequest\x1a$.service.user.CreateDocumentResponse\x12p\n" +
 	"\x15GetUploadDocumentData\x12*.service.user.GetUploadDocumentDataRequest\x1a+.service.user.GetUploadDocumentDataResponse\x12X\n" +
 	"\rListDocuments\x12\".service.user.ListDocumentsRequest\x1a#.service.user.ListDocumentsResponse\x12K\n" +
-	"\rCheckDocument\x12\".service.user.CheckDocumentRequest\x1a\x16.google.protobuf.EmptyB$Z\"carsharing/protos/gen/service/userb\x06proto3"
+	"\rCheckDocument\x12\".service.user.CheckDocumentRequest\x1a\x16.google.protobuf.Empty\x12u\n" +
+	"\x16StreamDocumentAnalyzed\x12+.service.user.StreamDocumentAnalyzedRequest\x1a,.service.user.StreamDocumentAnalyzedResponse0\x01B$Z\"carsharing/protos/gen/service/userb\x06proto3"
 
 var (
 	file_service_user_user_proto_rawDescOnce sync.Once
@@ -1442,7 +1576,7 @@ func file_service_user_user_proto_rawDescGZIP() []byte {
 	return file_service_user_user_proto_rawDescData
 }
 
-var file_service_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
+var file_service_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_service_user_user_proto_goTypes = []any{
 	(*CreateUserRequest)(nil),                 // 0: service.user.CreateUserRequest
 	(*CreateUserResponse)(nil),                // 1: service.user.CreateUserResponse
@@ -1465,56 +1599,62 @@ var file_service_user_user_proto_goTypes = []any{
 	(*ListDocumentsRequest)(nil),              // 18: service.user.ListDocumentsRequest
 	(*ListDocumentsResponse)(nil),             // 19: service.user.ListDocumentsResponse
 	(*CheckDocumentRequest)(nil),              // 20: service.user.CheckDocumentRequest
-	(*user.User)(nil),                         // 21: base.user.User
-	(*base.Pagination)(nil),                   // 22: base.Pagination
-	(*base.ImageUploadData)(nil),              // 23: base.ImageUploadData
-	(*user.Document)(nil),                     // 24: base.user.Document
-	(*emptypb.Empty)(nil),                     // 25: google.protobuf.Empty
-	(*service.ServiceHealthResponse)(nil),     // 26: service.ServiceHealthResponse
+	(*StreamDocumentAnalyzedRequest)(nil),     // 21: service.user.StreamDocumentAnalyzedRequest
+	(*StreamDocumentAnalyzedResponse)(nil),    // 22: service.user.StreamDocumentAnalyzedResponse
+	(*user.User)(nil),                         // 23: base.user.User
+	(*base.Pagination)(nil),                   // 24: base.Pagination
+	(*base.ImageUploadData)(nil),              // 25: base.ImageUploadData
+	(*user.Document)(nil),                     // 26: base.user.Document
+	(*user.Defect)(nil),                       // 27: base.user.Defect
+	(*emptypb.Empty)(nil),                     // 28: google.protobuf.Empty
+	(*service.ServiceHealthResponse)(nil),     // 29: service.ServiceHealthResponse
 }
 var file_service_user_user_proto_depIdxs = []int32{
-	21, // 0: service.user.GetUserResponse.user:type_name -> base.user.User
-	22, // 1: service.user.ListUsersRequest.pagination:type_name -> base.Pagination
-	21, // 2: service.user.ListUsersResponse.users:type_name -> base.user.User
-	23, // 3: service.user.GetProfileImageUploadDataResponse.upload_data:type_name -> base.ImageUploadData
-	23, // 4: service.user.GetUploadDocumentDataResponse.upload_data:type_name -> base.ImageUploadData
-	22, // 5: service.user.ListDocumentsRequest.pagination:type_name -> base.Pagination
-	24, // 6: service.user.ListDocumentsResponse.documents:type_name -> base.user.Document
-	25, // 7: service.user.UserService.Health:input_type -> google.protobuf.Empty
-	0,  // 8: service.user.UserService.CreateUser:input_type -> service.user.CreateUserRequest
-	2,  // 9: service.user.UserService.GetUser:input_type -> service.user.GetUserRequest
-	4,  // 10: service.user.UserService.ListUsers:input_type -> service.user.ListUsersRequest
-	6,  // 11: service.user.UserService.UpdateUser:input_type -> service.user.UpdateUserRequest
-	7,  // 12: service.user.UserService.DeleteUser:input_type -> service.user.DeleteUserRequest
-	25, // 13: service.user.UserService.GetProfileImageUploadData:input_type -> google.protobuf.Empty
-	9,  // 14: service.user.UserService.Register:input_type -> service.user.RegisterRequest
-	11, // 15: service.user.UserService.SignIn:input_type -> service.user.SignInRequest
-	25, // 16: service.user.UserService.SendActivationCode:input_type -> google.protobuf.Empty
-	13, // 17: service.user.UserService.CheckActivationCode:input_type -> service.user.CheckActivationCodeRequest
-	14, // 18: service.user.UserService.CreateDocument:input_type -> service.user.CreateDocumentRequest
-	16, // 19: service.user.UserService.GetUploadDocumentData:input_type -> service.user.GetUploadDocumentDataRequest
-	18, // 20: service.user.UserService.ListDocuments:input_type -> service.user.ListDocumentsRequest
-	20, // 21: service.user.UserService.CheckDocument:input_type -> service.user.CheckDocumentRequest
-	26, // 22: service.user.UserService.Health:output_type -> service.ServiceHealthResponse
-	1,  // 23: service.user.UserService.CreateUser:output_type -> service.user.CreateUserResponse
-	3,  // 24: service.user.UserService.GetUser:output_type -> service.user.GetUserResponse
-	5,  // 25: service.user.UserService.ListUsers:output_type -> service.user.ListUsersResponse
-	25, // 26: service.user.UserService.UpdateUser:output_type -> google.protobuf.Empty
-	25, // 27: service.user.UserService.DeleteUser:output_type -> google.protobuf.Empty
-	8,  // 28: service.user.UserService.GetProfileImageUploadData:output_type -> service.user.GetProfileImageUploadDataResponse
-	10, // 29: service.user.UserService.Register:output_type -> service.user.RegisterResponse
-	12, // 30: service.user.UserService.SignIn:output_type -> service.user.SignInResponse
-	25, // 31: service.user.UserService.SendActivationCode:output_type -> google.protobuf.Empty
-	25, // 32: service.user.UserService.CheckActivationCode:output_type -> google.protobuf.Empty
-	15, // 33: service.user.UserService.CreateDocument:output_type -> service.user.CreateDocumentResponse
-	17, // 34: service.user.UserService.GetUploadDocumentData:output_type -> service.user.GetUploadDocumentDataResponse
-	19, // 35: service.user.UserService.ListDocuments:output_type -> service.user.ListDocumentsResponse
-	25, // 36: service.user.UserService.CheckDocument:output_type -> google.protobuf.Empty
-	22, // [22:37] is the sub-list for method output_type
-	7,  // [7:22] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	23, // 0: service.user.GetUserResponse.user:type_name -> base.user.User
+	24, // 1: service.user.ListUsersRequest.pagination:type_name -> base.Pagination
+	23, // 2: service.user.ListUsersResponse.users:type_name -> base.user.User
+	25, // 3: service.user.GetProfileImageUploadDataResponse.upload_data:type_name -> base.ImageUploadData
+	25, // 4: service.user.GetUploadDocumentDataResponse.upload_data:type_name -> base.ImageUploadData
+	24, // 5: service.user.ListDocumentsRequest.pagination:type_name -> base.Pagination
+	26, // 6: service.user.ListDocumentsResponse.documents:type_name -> base.user.Document
+	27, // 7: service.user.StreamDocumentAnalyzedResponse.defects:type_name -> base.user.Defect
+	28, // 8: service.user.UserService.Health:input_type -> google.protobuf.Empty
+	0,  // 9: service.user.UserService.CreateUser:input_type -> service.user.CreateUserRequest
+	2,  // 10: service.user.UserService.GetUser:input_type -> service.user.GetUserRequest
+	4,  // 11: service.user.UserService.ListUsers:input_type -> service.user.ListUsersRequest
+	6,  // 12: service.user.UserService.UpdateUser:input_type -> service.user.UpdateUserRequest
+	7,  // 13: service.user.UserService.DeleteUser:input_type -> service.user.DeleteUserRequest
+	28, // 14: service.user.UserService.GetProfileImageUploadData:input_type -> google.protobuf.Empty
+	9,  // 15: service.user.UserService.Register:input_type -> service.user.RegisterRequest
+	11, // 16: service.user.UserService.SignIn:input_type -> service.user.SignInRequest
+	28, // 17: service.user.UserService.SendActivationCode:input_type -> google.protobuf.Empty
+	13, // 18: service.user.UserService.CheckActivationCode:input_type -> service.user.CheckActivationCodeRequest
+	14, // 19: service.user.UserService.CreateDocument:input_type -> service.user.CreateDocumentRequest
+	16, // 20: service.user.UserService.GetUploadDocumentData:input_type -> service.user.GetUploadDocumentDataRequest
+	18, // 21: service.user.UserService.ListDocuments:input_type -> service.user.ListDocumentsRequest
+	20, // 22: service.user.UserService.CheckDocument:input_type -> service.user.CheckDocumentRequest
+	21, // 23: service.user.UserService.StreamDocumentAnalyzed:input_type -> service.user.StreamDocumentAnalyzedRequest
+	29, // 24: service.user.UserService.Health:output_type -> service.ServiceHealthResponse
+	1,  // 25: service.user.UserService.CreateUser:output_type -> service.user.CreateUserResponse
+	3,  // 26: service.user.UserService.GetUser:output_type -> service.user.GetUserResponse
+	5,  // 27: service.user.UserService.ListUsers:output_type -> service.user.ListUsersResponse
+	28, // 28: service.user.UserService.UpdateUser:output_type -> google.protobuf.Empty
+	28, // 29: service.user.UserService.DeleteUser:output_type -> google.protobuf.Empty
+	8,  // 30: service.user.UserService.GetProfileImageUploadData:output_type -> service.user.GetProfileImageUploadDataResponse
+	10, // 31: service.user.UserService.Register:output_type -> service.user.RegisterResponse
+	12, // 32: service.user.UserService.SignIn:output_type -> service.user.SignInResponse
+	28, // 33: service.user.UserService.SendActivationCode:output_type -> google.protobuf.Empty
+	28, // 34: service.user.UserService.CheckActivationCode:output_type -> google.protobuf.Empty
+	15, // 35: service.user.UserService.CreateDocument:output_type -> service.user.CreateDocumentResponse
+	17, // 36: service.user.UserService.GetUploadDocumentData:output_type -> service.user.GetUploadDocumentDataResponse
+	19, // 37: service.user.UserService.ListDocuments:output_type -> service.user.ListDocumentsResponse
+	28, // 38: service.user.UserService.CheckDocument:output_type -> google.protobuf.Empty
+	22, // 39: service.user.UserService.StreamDocumentAnalyzed:output_type -> service.user.StreamDocumentAnalyzedResponse
+	24, // [24:40] is the sub-list for method output_type
+	8,  // [8:24] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_service_user_user_proto_init() }
@@ -1530,13 +1670,14 @@ func file_service_user_user_proto_init() {
 	file_service_user_user_proto_msgTypes[11].OneofWrappers = []any{}
 	file_service_user_user_proto_msgTypes[18].OneofWrappers = []any{}
 	file_service_user_user_proto_msgTypes[20].OneofWrappers = []any{}
+	file_service_user_user_proto_msgTypes[21].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_service_user_user_proto_rawDesc), len(file_service_user_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   21,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

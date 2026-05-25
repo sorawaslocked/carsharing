@@ -26,6 +26,7 @@ type AnalyzeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	DocumentId    string                 `protobuf:"bytes,1,opt,name=document_id,json=documentId,proto3" json:"document_id,omitempty"`
 	ObjectKey     string                 `protobuf:"bytes,2,opt,name=object_key,json=objectKey,proto3" json:"object_key,omitempty"`
+	UserId        string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -74,16 +75,24 @@ func (x *AnalyzeRequest) GetObjectKey() string {
 	return ""
 }
 
+func (x *AnalyzeRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
 var File_service_user_document_proto protoreflect.FileDescriptor
 
 const file_service_user_document_proto_rawDesc = "" +
 	"\n" +
-	"\x1bservice/user/document.proto\x12\fservice.user\x1a\x1bgoogle/protobuf/empty.proto\"P\n" +
+	"\x1bservice/user/document.proto\x12\fservice.user\x1a\x1bgoogle/protobuf/empty.proto\"i\n" +
 	"\x0eAnalyzeRequest\x12\x1f\n" +
 	"\vdocument_id\x18\x01 \x01(\tR\n" +
 	"documentId\x12\x1d\n" +
 	"\n" +
-	"object_key\x18\x02 \x01(\tR\tobjectKey2Z\n" +
+	"object_key\x18\x02 \x01(\tR\tobjectKey\x12\x17\n" +
+	"\auser_id\x18\x03 \x01(\tR\x06userId2Z\n" +
 	"\x17DocumentAnalyzerService\x12?\n" +
 	"\aAnalyze\x12\x1c.service.user.AnalyzeRequest\x1a\x16.google.protobuf.EmptyB$Z\"carsharing/protos/gen/service/userb\x06proto3"
 

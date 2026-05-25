@@ -36,6 +36,7 @@ const (
 	UserService_GetUploadDocumentData_FullMethodName     = "/service.user.UserService/GetUploadDocumentData"
 	UserService_ListDocuments_FullMethodName             = "/service.user.UserService/ListDocuments"
 	UserService_CheckDocument_FullMethodName             = "/service.user.UserService/CheckDocument"
+	UserService_StreamDocumentAnalyzed_FullMethodName    = "/service.user.UserService/StreamDocumentAnalyzed"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -57,6 +58,7 @@ type UserServiceClient interface {
 	GetUploadDocumentData(ctx context.Context, in *GetUploadDocumentDataRequest, opts ...grpc.CallOption) (*GetUploadDocumentDataResponse, error)
 	ListDocuments(ctx context.Context, in *ListDocumentsRequest, opts ...grpc.CallOption) (*ListDocumentsResponse, error)
 	CheckDocument(ctx context.Context, in *CheckDocumentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	StreamDocumentAnalyzed(ctx context.Context, in *StreamDocumentAnalyzedRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[StreamDocumentAnalyzedResponse], error)
 }
 
 type userServiceClient struct {
@@ -217,6 +219,25 @@ func (c *userServiceClient) CheckDocument(ctx context.Context, in *CheckDocument
 	return out, nil
 }
 
+func (c *userServiceClient) StreamDocumentAnalyzed(ctx context.Context, in *StreamDocumentAnalyzedRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[StreamDocumentAnalyzedResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &UserService_ServiceDesc.Streams[0], UserService_StreamDocumentAnalyzed_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[StreamDocumentAnalyzedRequest, StreamDocumentAnalyzedResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type UserService_StreamDocumentAnalyzedClient = grpc.ServerStreamingClient[StreamDocumentAnalyzedResponse]
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -236,6 +257,7 @@ type UserServiceServer interface {
 	GetUploadDocumentData(context.Context, *GetUploadDocumentDataRequest) (*GetUploadDocumentDataResponse, error)
 	ListDocuments(context.Context, *ListDocumentsRequest) (*ListDocumentsResponse, error)
 	CheckDocument(context.Context, *CheckDocumentRequest) (*emptypb.Empty, error)
+	StreamDocumentAnalyzed(*StreamDocumentAnalyzedRequest, grpc.ServerStreamingServer[StreamDocumentAnalyzedResponse]) error
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -290,6 +312,9 @@ func (UnimplementedUserServiceServer) ListDocuments(context.Context, *ListDocume
 }
 func (UnimplementedUserServiceServer) CheckDocument(context.Context, *CheckDocumentRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method CheckDocument not implemented")
+}
+func (UnimplementedUserServiceServer) StreamDocumentAnalyzed(*StreamDocumentAnalyzedRequest, grpc.ServerStreamingServer[StreamDocumentAnalyzedResponse]) error {
+	return status.Error(codes.Unimplemented, "method StreamDocumentAnalyzed not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -582,6 +607,17 @@ func _UserService_CheckDocument_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_StreamDocumentAnalyzed_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(StreamDocumentAnalyzedRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(UserServiceServer).StreamDocumentAnalyzed(m, &grpc.GenericServerStream[StreamDocumentAnalyzedRequest, StreamDocumentAnalyzedResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type UserService_StreamDocumentAnalyzedServer = grpc.ServerStreamingServer[StreamDocumentAnalyzedResponse]
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -650,6 +686,12 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_CheckDocument_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "StreamDocumentAnalyzed",
+			Handler:       _UserService_StreamDocumentAnalyzed_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "service/user/user.proto",
 }

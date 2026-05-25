@@ -42,7 +42,7 @@ func ctxAnon() context.Context {
 	return ctx
 }
 
-// invoke runs the interceptor for the given method. Returns the gRPC status code
+// invoke runs the Unary interceptor for the given method. Returns the gRPC status code
 // and whether the downstream handler was actually called.
 func invoke(t *testing.T, ctx context.Context, method string) (codes.Code, bool) {
 	t.Helper()
@@ -58,6 +58,33 @@ func invoke(t *testing.T, ctx context.Context, method string) (codes.Code, bool)
 	}
 	return codes.OK, called
 }
+
+// invokeStream runs the Stream interceptor for the given method. Returns the gRPC status code
+// and whether the downstream handler was actually called.
+func invokeStream(t *testing.T, ctx context.Context, method string) (codes.Code, bool) {
+	t.Helper()
+	called := false
+	ss := &fakeStream{ctx: ctx}
+	err := newInterceptor().Stream(nil, ss, &grpc.StreamServerInfo{FullMethod: method},
+		func(srv any, stream grpc.ServerStream) error {
+			called = true
+			return nil
+		},
+	)
+	if err != nil {
+		st, ok := status.FromError(err)
+		require.True(t, ok, "error must be a gRPC status error")
+		return st.Code(), called
+	}
+	return codes.OK, called
+}
+
+type fakeStream struct {
+	grpc.ServerStream
+	ctx context.Context
+}
+
+func (f *fakeStream) Context() context.Context { return f.ctx }
 
 // --- Unknown method ---
 
@@ -142,5 +169,28 @@ func TestAuth_FleetOnly_RejectsAnonymous(t *testing.T) {
 	code, called := invoke(t, ctxAnon(), carsvc.ZoneService_CreateZone_FullMethodName)
 
 	assert.Equal(t, codes.Unauthenticated, code)
+	assert.False(t, called)
+}
+
+// --- Stream interceptor ---
+
+func TestAuth_Stream_AuthenticatedOnly_AllowsUser(t *testing.T) {
+	code, called := invokeStream(t, ctxWithUser(callerID), carsvc.CarStreamService_StreamCarsWithFilter_FullMethodName)
+
+	assert.Equal(t, codes.OK, code)
+	assert.True(t, called)
+}
+
+func TestAuth_Stream_AuthenticatedOnly_RejectsAnonymous(t *testing.T) {
+	code, called := invokeStream(t, ctxAnon(), carsvc.CarStreamService_StreamCarTelemetry_FullMethodName)
+
+	assert.Equal(t, codes.Unauthenticated, code)
+	assert.False(t, called)
+}
+
+func TestAuth_Stream_UnknownMethod_PermissionDenied(t *testing.T) {
+	code, called := invokeStream(t, ctxWithUser(callerID, sharedmodel.RoleAdmin), "/unknown.Service/Stream")
+
+	assert.Equal(t, codes.PermissionDenied, code)
 	assert.False(t, called)
 }

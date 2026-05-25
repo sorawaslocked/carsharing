@@ -26,6 +26,29 @@ func NewBaseInterceptor() *BaseInterceptor {
 }
 
 func (i *BaseInterceptor) Unary(ctx context.Context, req any, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+	ctx, err := extractMetadata(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return handler(ctx, req)
+}
+
+func (i *BaseInterceptor) Stream(srv any, ss grpc.ServerStream, _ *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	ctx, err := extractMetadata(ss.Context())
+	if err != nil {
+		return err
+	}
+	return handler(srv, &wrappedStream{ServerStream: ss, ctx: ctx})
+}
+
+type wrappedStream struct {
+	grpc.ServerStream
+	ctx context.Context
+}
+
+func (w *wrappedStream) Context() context.Context { return w.ctx }
+
+func extractMetadata(ctx context.Context) (context.Context, error) {
 	md, _ := metadata.FromIncomingContext(ctx)
 
 	ctx = context.WithValue(ctx, CtxRequestIDKey, stringFromMD(md, "x-request-id"))
@@ -39,14 +62,14 @@ func (i *BaseInterceptor) Unary(ctx context.Context, req any, _ *grpc.UnaryServe
 		for i, s := range roleStrs {
 			role, ok := sharedmodel.RoleFromString(s)
 			if !ok {
-				return nil, dto.FromErrorToStatusCode(model.ErrInvalidMetadata)
+				return ctx, dto.FromErrorToStatusCode(model.ErrInvalidMetadata)
 			}
 			roles[i] = role
 		}
 		ctx = context.WithValue(ctx, CtxUserRolesKey, roles)
 	}
 
-	return handler(ctx, req)
+	return ctx, nil
 }
 
 func stringFromMD(md metadata.MD, key string) string {

@@ -36,3 +36,8 @@ message Document {
   google.protobuf.Timestamp created_at = 7;
   google.protobuf.Timestamp updated_at = 8;
 }
+
+message Defect {
+  string type        = 1;
+  string description = 2;
+}

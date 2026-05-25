@@ -34,7 +34,11 @@ func NewServer(
 			loggerInterceptor.Unary,
 			authInterceptor.Unary,
 		),
-		grpc.ChainStreamInterceptor(),
+		grpc.ChainStreamInterceptor(
+			baseInterceptor.Stream,
+			loggerInterceptor.Stream,
+			authInterceptor.Stream,
+		),
 	)
 	if err != nil {
 		return nil, err

@@ -289,6 +289,52 @@ func (r *CarMaintenanceRecordRepository) Update(ctx context.Context, id string, 
 	return nil
 }
 
+func (r *CarMaintenanceRecordRepository) UpdateWithServiceState(ctx context.Context, id string, update model.CarMaintenanceRecordUpdate, state model.CarServiceState) error {
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "UpdateWithServiceState"), utils.MetadataFromCtx(ctx))
+
+	tx, err := r.pool.Begin(ctx)
+	if err != nil {
+		log.Error("failed to begin transaction", pkglog.Err(err))
+		return model.ErrSql
+	}
+	defer tx.Rollback(ctx)
+
+	setClauses, args, n := dto.SetClausesFromMaintenanceRecordUpdate(update)
+	if len(setClauses) > 1 {
+		n++
+		args = append(args, id)
+		q := `UPDATE car_maintenance_records SET ` + strings.Join(setClauses, ", ") + fmt.Sprintf(" WHERE id = $%d", n)
+		tag, err := tx.Exec(ctx, q, args...)
+		if err != nil {
+			log.Error("failed to update maintenance record", pkglog.Err(err))
+			return model.ErrSql
+		}
+		if tag.RowsAffected() == 0 {
+			return model.ErrCarMaintenanceRecordNotFound
+		}
+	}
+
+	stateArgs := []any{state.CarID, state.TemplateID, state.LastKM, state.LastDate, state.NextDueKM, state.NextDueDate}
+	stateQ := `INSERT INTO car_service_states (car_id, template_id, last_km, last_date, next_due_km, next_due_date)
+			  VALUES ($1, $2, $3, $4, $5, $6)
+			  ON CONFLICT (car_id, template_id) DO UPDATE SET
+				last_km       = EXCLUDED.last_km,
+				last_date     = EXCLUDED.last_date,
+				next_due_km   = EXCLUDED.next_due_km,
+				next_due_date = EXCLUDED.next_due_date`
+	if _, err := tx.Exec(ctx, stateQ, stateArgs...); err != nil {
+		log.Error("failed to upsert car service state", pkglog.Err(err))
+		return model.ErrSql
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		log.Error("failed to commit transaction", pkglog.Err(err))
+		return model.ErrSql
+	}
+
+	return nil
+}
+
 // --- CarServiceStateRepository ---
 
 type CarServiceStateRepository struct {

@@ -1,3 +1,5 @@
+//go:build integration
+
 package postgres_test
 
 import (
@@ -9,20 +11,20 @@ import (
 	"github.com/stretchr/testify/require"
 
 	sharedmodel "carsharing/shared/model"
-	"carsharing/trip-service/internal/adapter/postgres"
 	"carsharing/trip-service/internal/model"
 )
 
-func TestTripStatusReadingRepo_Create(t *testing.T) {
-	pool := requireDB(t)
-	tripRepo := postgres.NewTripRepo(discardLogger(), pool)
-	statusRepo := postgres.NewTripStatusReadingRepo(discardLogger(), pool)
+// --- Create ---
+
+func TestTripStatusReadingRepo_Create_ReturnsReading(t *testing.T) {
+	truncate(t)
 	ctx := context.Background()
+	r := newTripStatusReadingRepo()
 
-	trip := insertTrip(t, tripRepo, "bbbbbbbb-cccc-4ccc-8ccc-cccccccccccc")
-	actorID := pgTestUserID
+	trip := mustInsertTrip(t, testTripCreate())
+	actorID := trip.UserID
 
-	r, err := statusRepo.Create(ctx, model.TripStatusReadingCreate{
+	reading, err := r.Create(ctx, model.TripStatusReadingCreate{
 		TripID:     trip.ID,
 		FromStatus: model.TripStatus(""),
 		ToStatus:   model.TripStatusActive,
@@ -32,23 +34,24 @@ func TestTripStatusReadingRepo_Create(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	assert.NotEmpty(t, r.ID)
-	assert.Equal(t, trip.ID, r.TripID)
-	assert.Equal(t, model.TripStatusActive, r.ToStatus)
+	assert.NotEmpty(t, reading.ID)
+	assert.Equal(t, trip.ID, reading.TripID)
+	assert.Equal(t, model.TripStatusActive, reading.ToStatus)
 }
 
-func TestTripStatusReadingRepo_List(t *testing.T) {
-	pool := requireDB(t)
-	tripRepo := postgres.NewTripRepo(discardLogger(), pool)
-	statusRepo := postgres.NewTripStatusReadingRepo(discardLogger(), pool)
-	ctx := context.Background()
+// --- List ---
 
-	trip := insertTrip(t, tripRepo, "cccccccc-dddd-4ddd-8ddd-dddddddddddd")
-	actorID := pgTestUserID
+func TestTripStatusReadingRepo_List_ReturnsAll(t *testing.T) {
+	truncate(t)
+	ctx := context.Background()
+	r := newTripStatusReadingRepo()
+
+	trip := mustInsertTrip(t, testTripCreate())
+	actorID := trip.UserID
 	now := time.Now()
 
 	for _, toStatus := range []model.TripStatus{model.TripStatusActive, model.TripStatusCompleted} {
-		_, err := statusRepo.Create(ctx, model.TripStatusReadingCreate{
+		_, err := r.Create(ctx, model.TripStatusReadingCreate{
 			TripID:    trip.ID,
 			ToStatus:  toStatus,
 			ActorType: sharedmodel.ActorTypeUser,
@@ -58,7 +61,7 @@ func TestTripStatusReadingRepo_List(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	readings, err := statusRepo.List(ctx, model.TripStatusReadingFilter{
+	readings, err := r.List(ctx, model.TripStatusReadingFilter{
 		TripID:     trip.ID,
 		Pagination: &sharedmodel.Pagination{Limit: 10, Offset: 0},
 	})
@@ -68,16 +71,15 @@ func TestTripStatusReadingRepo_List(t *testing.T) {
 }
 
 func TestTripStatusReadingRepo_List_Pagination(t *testing.T) {
-	pool := requireDB(t)
-	tripRepo := postgres.NewTripRepo(discardLogger(), pool)
-	statusRepo := postgres.NewTripStatusReadingRepo(discardLogger(), pool)
+	truncate(t)
 	ctx := context.Background()
+	r := newTripStatusReadingRepo()
 
-	trip := insertTrip(t, tripRepo, "dddddddd-eeee-4eee-8eee-eeeeeeeeeeee")
-	actorID := pgTestUserID
+	trip := mustInsertTrip(t, testTripCreate())
+	actorID := trip.UserID
 
 	for i := range 3 {
-		_, err := statusRepo.Create(ctx, model.TripStatusReadingCreate{
+		_, err := r.Create(ctx, model.TripStatusReadingCreate{
 			TripID:    trip.ID,
 			ToStatus:  model.TripStatusActive,
 			ActorType: sharedmodel.ActorTypeUser,
@@ -87,7 +89,7 @@ func TestTripStatusReadingRepo_List_Pagination(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	readings, err := statusRepo.List(ctx, model.TripStatusReadingFilter{
+	readings, err := r.List(ctx, model.TripStatusReadingFilter{
 		TripID:     trip.ID,
 		Pagination: &sharedmodel.Pagination{Limit: 2, Offset: 0},
 	})

@@ -29,6 +29,7 @@ service UserService {
   rpc GetUploadDocumentData(GetUploadDocumentDataRequest) returns (GetUploadDocumentDataResponse);
   rpc ListDocuments(ListDocumentsRequest) returns (ListDocumentsResponse);
   rpc CheckDocument(CheckDocumentRequest) returns (google.protobuf.Empty);
+  rpc StreamDocumentAnalyzed(StreamDocumentAnalyzedRequest) returns (stream StreamDocumentAnalyzedResponse);
 }
 
 // CRUD
@@ -161,4 +162,16 @@ message CheckDocumentRequest {
   string doc_id = 1;
   string status = 2;
   optional string error = 3;
+}
+
+message StreamDocumentAnalyzedRequest {
+  optional string user_id = 1;
+  optional bool   passed  = 2;
+}
+
+message StreamDocumentAnalyzedResponse {
+  string                    document_id = 1;
+  string                    user_id     = 2;
+  bool                      passed      = 3;
+  repeated base.user.Defect defects     = 4;
 }

@@ -21,25 +21,14 @@ func NewLoggerInterceptor(log *slog.Logger) *LoggerInterceptor {
 }
 
 func (i *LoggerInterceptor) Unary(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
-	md := utils.MetadataFromCtx(ctx)
-	log := pkglog.WithMetadata(i.log, md)
+	log := pkglog.WithMetadata(i.log, utils.MetadataFromCtx(ctx))
 	log = log.With(slog.String("method", info.FullMethod))
 
 	start := time.Now()
-	m, err := handler(ctx, req)
+	resp, err := handler(ctx, req)
 	duration := time.Since(start)
 
-	code := codes.OK
-	var errMsg string
-	if err != nil {
-		if st, ok := status.FromError(err); ok {
-			code = st.Code()
-			errMsg = st.Message()
-		} else {
-			code = codes.Unknown
-			errMsg = err.Error()
-		}
-	}
+	code, errMsg := grpcCodeAndMsg(err)
 
 	attrs := []any{
 		slog.String("status", code.String()),
@@ -48,10 +37,41 @@ func (i *LoggerInterceptor) Unary(ctx context.Context, req any, info *grpc.Unary
 	if errMsg != "" {
 		attrs = append(attrs, slog.String("error", errMsg))
 	}
-
 	log.Log(ctx, grpcLogLevel(code), "grpc call", attrs...)
 
-	return m, err
+	return resp, err
+}
+
+func (i *LoggerInterceptor) Stream(srv any, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	log := pkglog.WithMetadata(i.log, utils.MetadataFromCtx(ss.Context()))
+	log = log.With(slog.String("method", info.FullMethod))
+
+	start := time.Now()
+	err := handler(srv, ss)
+	duration := time.Since(start)
+
+	code, errMsg := grpcCodeAndMsg(err)
+
+	attrs := []any{
+		slog.String("status", code.String()),
+		slog.Int64("durationMs", duration.Milliseconds()),
+	}
+	if errMsg != "" {
+		attrs = append(attrs, slog.String("error", errMsg))
+	}
+	log.Log(ss.Context(), grpcLogLevel(code), "grpc stream", attrs...)
+
+	return err
+}
+
+func grpcCodeAndMsg(err error) (codes.Code, string) {
+	if err == nil {
+		return codes.OK, ""
+	}
+	if st, ok := status.FromError(err); ok {
+		return st.Code(), st.Message()
+	}
+	return codes.Unknown, err.Error()
 }
 
 func grpcLogLevel(code codes.Code) slog.Level {

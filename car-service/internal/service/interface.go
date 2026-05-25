@@ -57,6 +57,7 @@ type CarMaintenanceRecordRepository interface {
 	FindByID(ctx context.Context, id string) (model.CarMaintenanceRecord, error)
 	Find(ctx context.Context, filter model.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error)
 	Update(ctx context.Context, id string, update model.CarMaintenanceRecordUpdate) error
+	UpdateWithServiceState(ctx context.Context, id string, update model.CarMaintenanceRecordUpdate, state model.CarServiceState) error
 }
 
 type CarServiceStateRepository interface {

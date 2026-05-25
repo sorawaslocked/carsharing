@@ -1,9 +1,9 @@
+//go:build integration
+
 package postgres_test
 
 import (
 	"context"
-	"io"
-	"log/slog"
 	"testing"
 	"time"
 
@@ -11,69 +11,35 @@ import (
 	"github.com/stretchr/testify/require"
 
 	sharedmodel "carsharing/shared/model"
-	"carsharing/trip-service/internal/adapter/postgres"
 	"carsharing/trip-service/internal/model"
 )
 
-const (
-	pgTestUserID    = "11111111-1111-4111-8111-111111111111"
-	pgTestBookingID = "22222222-2222-4222-8222-222222222222"
-	pgTestCarID     = "44444444-4444-4444-8444-444444444444"
-)
+// --- Create ---
 
-func discardLogger() *slog.Logger {
-	return slog.New(slog.NewTextHandler(io.Discard, nil))
-}
-
-func ptrOf[T any](v T) *T { return &v }
-
-func insertTrip(t *testing.T, repo *postgres.TripRepo, id string) model.Trip {
-	t.Helper()
-	trip, err := repo.Create(context.Background(), model.TripCreate{
-		ID:             id,
-		BookingID:      pgTestBookingID,
-		UserID:         pgTestUserID,
-		CarID:          pgTestCarID,
-		Status:         model.TripStatusActive,
-		StartedAt:      time.Now().Truncate(time.Millisecond),
-		StartLocation:  sharedmodel.Location{Latitude: 51.5, Longitude: -0.1},
-		StartMileageKM: 1000,
-	})
-	require.NoError(t, err)
-	return trip
-}
-
-func TestTripRepo_Create(t *testing.T) {
-	pool := requireDB(t)
-	repo := postgres.NewTripRepo(discardLogger(), pool)
+func TestTripRepo_Create_ReturnsTrip(t *testing.T) {
+	truncate(t)
 	ctx := context.Background()
+	data := testTripCreate()
 
-	trip, err := repo.Create(ctx, model.TripCreate{
-		ID:             "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
-		BookingID:      pgTestBookingID,
-		UserID:         pgTestUserID,
-		CarID:          pgTestCarID,
-		Status:         model.TripStatusActive,
-		StartedAt:      time.Now(),
-		StartLocation:  sharedmodel.Location{Latitude: 51.5, Longitude: -0.1},
-		StartMileageKM: 1000,
-	})
+	trip, err := newTripRepo().Create(ctx, data)
 
 	require.NoError(t, err)
-	assert.Equal(t, "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", trip.ID)
-	assert.Equal(t, pgTestBookingID, trip.BookingID)
+	assert.Equal(t, data.ID, trip.ID)
+	assert.Equal(t, data.BookingID, trip.BookingID)
 	assert.Equal(t, model.TripStatusActive, trip.Status)
 	assert.False(t, trip.CreatedAt.IsZero())
 }
 
-func TestTripRepo_GetByID(t *testing.T) {
-	pool := requireDB(t)
-	repo := postgres.NewTripRepo(discardLogger(), pool)
+// --- GetByID ---
+
+func TestTripRepo_GetByID_Found(t *testing.T) {
+	truncate(t)
 	ctx := context.Background()
+	r := newTripRepo()
 
-	created := insertTrip(t, repo, "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb")
+	created := mustInsertTrip(t, testTripCreate())
 
-	got, err := repo.GetByID(ctx, created.ID)
+	got, err := r.GetByID(ctx, created.ID)
 
 	require.NoError(t, err)
 	assert.Equal(t, created.ID, got.ID)
@@ -81,34 +47,32 @@ func TestTripRepo_GetByID(t *testing.T) {
 }
 
 func TestTripRepo_GetByID_NotFound(t *testing.T) {
-	pool := requireDB(t)
-	repo := postgres.NewTripRepo(discardLogger(), pool)
-	ctx := context.Background()
+	truncate(t)
 
-	_, err := repo.GetByID(ctx, "cccccccc-cccc-4ccc-8ccc-cccccccccccc")
+	_, err := newTripRepo().GetByID(context.Background(), "00000000-0000-0000-0000-000000000000")
 
 	assert.ErrorIs(t, err, model.ErrNotFound)
 }
 
+// --- List ---
+
 func TestTripRepo_List_FilterByUserID(t *testing.T) {
-	pool := requireDB(t)
-	repo := postgres.NewTripRepo(discardLogger(), pool)
+	truncate(t)
 	ctx := context.Background()
+	r := newTripRepo()
 
-	insertTrip(t, repo, "dddddddd-dddd-4ddd-8ddd-dddddddddddd")
-	insertTrip(t, repo, "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee")
+	mustInsertTrip(t, testTripCreate())
+	second := testTripCreate()
+	second.ID = "00000000-0000-4000-8000-000000000011"
+	mustInsertTrip(t, second)
 
-	otherUserID := "99999999-9999-4999-8999-999999999999"
-	_, err := repo.Create(ctx, model.TripCreate{
-		ID: "ffffffff-ffff-4fff-8fff-ffffffffffff", BookingID: pgTestBookingID,
-		UserID: otherUserID, CarID: pgTestCarID,
-		Status: model.TripStatusActive, StartedAt: time.Now(),
-		StartLocation: sharedmodel.Location{}, StartMileageKM: 0,
-	})
-	require.NoError(t, err)
+	other := testTripCreate()
+	other.ID = "00000000-0000-4000-8000-000000000099"
+	other.UserID = "99999999-9999-4999-8999-999999999999"
+	mustInsertTrip(t, other)
 
-	userID := pgTestUserID
-	trips, err := repo.List(ctx, model.TripFilter{
+	userID := testTripCreate().UserID
+	trips, err := r.List(ctx, model.TripFilter{
 		UserID:     &userID,
 		Pagination: &sharedmodel.Pagination{Limit: 10, Offset: 0},
 	})
@@ -116,53 +80,49 @@ func TestTripRepo_List_FilterByUserID(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, trips, 2)
 	for _, trip := range trips {
-		assert.Equal(t, pgTestUserID, trip.UserID)
+		assert.Equal(t, userID, trip.UserID)
 	}
 }
 
 func TestTripRepo_List_FilterByTimeRange(t *testing.T) {
-	pool := requireDB(t)
-	repo := postgres.NewTripRepo(discardLogger(), pool)
+	truncate(t)
 	ctx := context.Background()
+	r := newTripRepo()
 
 	base := time.Now().Truncate(time.Millisecond)
 
-	_, err := repo.Create(ctx, model.TripCreate{
-		ID: "11111111-aaaa-4aaa-8aaa-aaaaaaaaaaaa", BookingID: pgTestBookingID,
-		UserID: pgTestUserID, CarID: pgTestCarID,
-		Status: model.TripStatusActive, StartedAt: base.Add(-2 * time.Hour),
-		StartLocation: sharedmodel.Location{}, StartMileageKM: 0,
-	})
-	require.NoError(t, err)
-	_, err = repo.Create(ctx, model.TripCreate{
-		ID: "22222222-aaaa-4aaa-8aaa-aaaaaaaaaaaa", BookingID: pgTestBookingID,
-		UserID: pgTestUserID, CarID: pgTestCarID,
-		Status: model.TripStatusActive, StartedAt: base,
-		StartLocation: sharedmodel.Location{}, StartMileageKM: 0,
-	})
-	require.NoError(t, err)
+	old := testTripCreate()
+	old.StartedAt = base.Add(-2 * time.Hour)
+	mustInsertTrip(t, old)
+
+	recent := testTripCreate()
+	recent.ID = "00000000-0000-4000-8000-000000000011"
+	recent.StartedAt = base
+	mustInsertTrip(t, recent)
 
 	from := base.Add(-time.Hour)
 	to := base.Add(time.Hour)
-	trips, err := repo.List(ctx, model.TripFilter{
+	trips, err := r.List(ctx, model.TripFilter{
 		TimeRange:  &sharedmodel.TimeRange{From: from, To: to},
 		Pagination: &sharedmodel.Pagination{Limit: 10, Offset: 0},
 	})
 
 	require.NoError(t, err)
 	require.Len(t, trips, 1)
-	assert.Equal(t, "22222222-aaaa-4aaa-8aaa-aaaaaaaaaaaa", trips[0].ID)
+	assert.Equal(t, recent.ID, trips[0].ID)
 }
 
-func TestTripRepo_Update(t *testing.T) {
-	pool := requireDB(t)
-	repo := postgres.NewTripRepo(discardLogger(), pool)
+// --- Update ---
+
+func TestTripRepo_Update_UpdatesStatus(t *testing.T) {
+	truncate(t)
 	ctx := context.Background()
+	r := newTripRepo()
 
-	created := insertTrip(t, repo, "33333333-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
+	created := mustInsertTrip(t, testTripCreate())
 
-	updated, err := repo.Update(ctx, created.ID, model.TripUpdate{
-		Status:    ptrOf(model.TripStatusCompleted),
+	updated, err := r.Update(ctx, created.ID, model.TripUpdate{
+		Status:    ptr(model.TripStatusCompleted),
 		UpdatedAt: time.Now(),
 	})
 
@@ -171,15 +131,15 @@ func TestTripRepo_Update(t *testing.T) {
 }
 
 func TestTripRepo_Update_Conflict(t *testing.T) {
-	pool := requireDB(t)
-	repo := postgres.NewTripRepo(discardLogger(), pool)
+	truncate(t)
 	ctx := context.Background()
+	r := newTripRepo()
 
-	created := insertTrip(t, repo, "44444444-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
+	created := mustInsertTrip(t, testTripCreate())
 	stale := created.UpdatedAt.Add(-time.Second)
 
-	_, err := repo.Update(ctx, created.ID, model.TripUpdate{
-		Status:            ptrOf(model.TripStatusCompleted),
+	_, err := r.Update(ctx, created.ID, model.TripUpdate{
+		Status:            ptr(model.TripStatusCompleted),
 		UpdatedAt:         time.Now(),
 		ExpectedUpdatedAt: &stale,
 	})
@@ -188,14 +148,14 @@ func TestTripRepo_Update_Conflict(t *testing.T) {
 }
 
 func TestTripRepo_Update_OptimisticLock_Success(t *testing.T) {
-	pool := requireDB(t)
-	repo := postgres.NewTripRepo(discardLogger(), pool)
+	truncate(t)
 	ctx := context.Background()
+	r := newTripRepo()
 
-	created := insertTrip(t, repo, "55555555-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
+	created := mustInsertTrip(t, testTripCreate())
 
-	_, err := repo.Update(ctx, created.ID, model.TripUpdate{
-		Status:            ptrOf(model.TripStatusCompleted),
+	_, err := r.Update(ctx, created.ID, model.TripUpdate{
+		Status:            ptr(model.TripStatusCompleted),
 		UpdatedAt:         time.Now(),
 		ExpectedUpdatedAt: &created.UpdatedAt,
 	})
@@ -203,35 +163,34 @@ func TestTripRepo_Update_OptimisticLock_Success(t *testing.T) {
 	require.NoError(t, err)
 }
 
+// --- Transaction ---
+
 func TestTripRepo_Transaction_Rollback(t *testing.T) {
-	pool := requireDB(t)
-	repo := postgres.NewTripRepo(discardLogger(), pool)
-	statusRepo := postgres.NewTripStatusReadingRepo(discardLogger(), pool)
-	transactor := postgres.NewTransactor(pool)
+	truncate(t)
 	ctx := context.Background()
 
-	tripID := "66666666-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
-	actorID := pgTestUserID
+	data := testTripCreate()
+	actorID := data.UserID
 
-	_ = transactor.InTx(ctx, func(ctx context.Context) error {
-		_, err := repo.Create(ctx, model.TripCreate{
-			ID: tripID, BookingID: pgTestBookingID, UserID: pgTestUserID, CarID: pgTestCarID,
-			Status: model.TripStatusActive, StartedAt: time.Now(),
-			StartLocation: sharedmodel.Location{}, StartMileageKM: 0,
+	_ = newTransactor().InTx(ctx, func(ctx context.Context) error {
+		_, err := newTripRepo().Create(ctx, data)
+		if err != nil {
+			return err
+		}
+		_, err = newTripStatusReadingRepo().Create(ctx, model.TripStatusReadingCreate{
+			TripID:     data.ID,
+			FromStatus: model.TripStatus(""),
+			ToStatus:   model.TripStatusActive,
+			ActorType:  sharedmodel.ActorTypeUser,
+			ActorID:    &actorID,
+			ChangedAt:  time.Now(),
 		})
 		if err != nil {
 			return err
 		}
-		_, err = statusRepo.Create(ctx, model.TripStatusReadingCreate{
-			TripID: tripID, FromStatus: model.TripStatus(""), ToStatus: model.TripStatusActive,
-			ActorType: sharedmodel.ActorTypeUser, ActorID: &actorID, ChangedAt: time.Now(),
-		})
-		if err != nil {
-			return err
-		}
-		return context.Canceled // force rollback
+		return context.Canceled
 	})
 
-	_, err := repo.GetByID(ctx, tripID)
+	_, err := newTripRepo().GetByID(ctx, data.ID)
 	assert.ErrorIs(t, err, model.ErrNotFound, "rolled-back trip must not exist")
 }

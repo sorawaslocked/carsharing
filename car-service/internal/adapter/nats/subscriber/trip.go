@@ -3,6 +3,7 @@ package subscriber
 import (
 	"context"
 	"log/slog"
+	"time"
 
 	natsdto "carsharing/car-service/internal/adapter/nats/dto"
 	pkglog "carsharing/shared/pkg/log"
@@ -53,7 +54,8 @@ func (s *TripSubscriber) Subscribe() error {
 }
 
 func (s *TripSubscriber) handleTripStarted(msg *nats.Msg) {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	log := pkglog.WithMethod(s.log, "handleTripStarted")
 
 	var pb eventtrip.TripStartedEvent
@@ -73,7 +75,8 @@ func (s *TripSubscriber) handleTripStarted(msg *nats.Msg) {
 }
 
 func (s *TripSubscriber) handleTripEnded(msg *nats.Msg) {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	log := pkglog.WithMethod(s.log, "handleTripEnded")
 
 	var pb eventtrip.TripEndedEvent
@@ -93,7 +96,8 @@ func (s *TripSubscriber) handleTripEnded(msg *nats.Msg) {
 }
 
 func (s *TripSubscriber) handleTripCancelled(msg *nats.Msg) {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	log := pkglog.WithMethod(s.log, "handleTripCancelled")
 
 	var pb eventtrip.TripCancelledEvent

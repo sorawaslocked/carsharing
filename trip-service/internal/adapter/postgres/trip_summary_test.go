@@ -1,3 +1,5 @@
+//go:build integration
+
 package postgres_test
 
 import (
@@ -8,28 +10,31 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"carsharing/trip-service/internal/adapter/postgres"
 	"carsharing/trip-service/internal/model"
 )
 
-func TestTripSummaryRepo_Create(t *testing.T) {
-	pool := requireDB(t)
-	tripRepo := postgres.NewTripRepo(discardLogger(), pool)
-	summaryRepo := postgres.NewTripSummaryRepo(discardLogger(), pool)
-	ctx := context.Background()
+// --- Create ---
 
-	trip := insertTrip(t, tripRepo, "77777777-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
+func TestTripSummaryRepo_Create_ReturnsSummary(t *testing.T) {
+	truncate(t)
+	ctx := context.Background()
+	r := newTripSummaryRepo()
+
+	trip := mustInsertTrip(t, testTripCreate())
 	now := time.Now().Truncate(time.Millisecond)
 
-	s, err := summaryRepo.Create(ctx, model.TripSummaryCreate{
-		TripID: trip.ID, BookingID: pgTestBookingID,
-		StartedAt: trip.StartedAt, EndedAt: now,
-		DurationSeconds: 600, DistanceTraveledKM: 10.5,
-		PricingSnapshot:   model.PricingSnapshot{RateTenge: 50},
-		BaseCostTenge:     500,
-		DistanceCostTenge: 105,
-		OvertimeCostTenge: 0,
-		TotalCostTenge:    605,
+	s, err := r.Create(ctx, model.TripSummaryCreate{
+		TripID:             trip.ID,
+		BookingID:          trip.BookingID,
+		StartedAt:          trip.StartedAt,
+		EndedAt:            now,
+		DurationSeconds:    600,
+		DistanceTraveledKM: 10.5,
+		PricingSnapshot:    model.PricingSnapshot{RateTenge: 50},
+		BaseCostTenge:      500,
+		DistanceCostTenge:  105,
+		OvertimeCostTenge:  0,
+		TotalCostTenge:     605,
 	})
 
 	require.NoError(t, err)
@@ -39,26 +44,30 @@ func TestTripSummaryRepo_Create(t *testing.T) {
 	assert.Equal(t, int32(605), s.TotalCostTenge)
 }
 
-func TestTripSummaryRepo_GetByTripID(t *testing.T) {
-	pool := requireDB(t)
-	tripRepo := postgres.NewTripRepo(discardLogger(), pool)
-	summaryRepo := postgres.NewTripSummaryRepo(discardLogger(), pool)
-	ctx := context.Background()
+// --- GetByTripID ---
 
-	trip := insertTrip(t, tripRepo, "88888888-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
-	_, err := summaryRepo.Create(ctx, model.TripSummaryCreate{
-		TripID: trip.ID, BookingID: pgTestBookingID,
-		StartedAt: trip.StartedAt, EndedAt: time.Now(),
-		DurationSeconds: 300, DistanceTraveledKM: 5,
-		PricingSnapshot:   model.PricingSnapshot{RateTenge: 30},
-		BaseCostTenge:     300,
-		DistanceCostTenge: 50,
-		OvertimeCostTenge: 0,
-		TotalCostTenge:    350,
+func TestTripSummaryRepo_GetByTripID_Found(t *testing.T) {
+	truncate(t)
+	ctx := context.Background()
+	r := newTripSummaryRepo()
+
+	trip := mustInsertTrip(t, testTripCreate())
+	_, err := r.Create(ctx, model.TripSummaryCreate{
+		TripID:             trip.ID,
+		BookingID:          trip.BookingID,
+		StartedAt:          trip.StartedAt,
+		EndedAt:            time.Now(),
+		DurationSeconds:    300,
+		DistanceTraveledKM: 5,
+		PricingSnapshot:    model.PricingSnapshot{RateTenge: 30},
+		BaseCostTenge:      300,
+		DistanceCostTenge:  50,
+		OvertimeCostTenge:  0,
+		TotalCostTenge:     350,
 	})
 	require.NoError(t, err)
 
-	got, err := summaryRepo.GetByTripID(ctx, trip.ID)
+	got, err := r.GetByTripID(ctx, trip.ID)
 
 	require.NoError(t, err)
 	assert.Equal(t, trip.ID, got.TripID)
@@ -66,31 +75,27 @@ func TestTripSummaryRepo_GetByTripID(t *testing.T) {
 }
 
 func TestTripSummaryRepo_GetByTripID_NotFound(t *testing.T) {
-	pool := requireDB(t)
-	tripRepo := postgres.NewTripRepo(discardLogger(), pool)
-	summaryRepo := postgres.NewTripSummaryRepo(discardLogger(), pool)
-	ctx := context.Background()
+	truncate(t)
 
-	trip := insertTrip(t, tripRepo, "99999999-aaaa-4aaa-8aaa-aaaaaaaaaaaa")
-
-	_, err := summaryRepo.GetByTripID(ctx, trip.ID)
+	_, err := newTripSummaryRepo().GetByTripID(context.Background(), "00000000-0000-0000-0000-000000000000")
 
 	assert.ErrorIs(t, err, model.ErrNotFound)
 }
 
-func TestTripSummaryRepo_Create_InTransaction(t *testing.T) {
-	pool := requireDB(t)
-	tripRepo := postgres.NewTripRepo(discardLogger(), pool)
-	summaryRepo := postgres.NewTripSummaryRepo(discardLogger(), pool)
-	transactor := postgres.NewTransactor(pool)
+// --- Transaction ---
+
+func TestTripSummaryRepo_Create_InTx(t *testing.T) {
+	truncate(t)
 	ctx := context.Background()
 
-	trip := insertTrip(t, tripRepo, "aaaaaaaa-bbbb-4bbb-8bbb-bbbbbbbbbbbb")
+	trip := mustInsertTrip(t, testTripCreate())
 
-	err := transactor.InTx(ctx, func(ctx context.Context) error {
-		_, e := summaryRepo.Create(ctx, model.TripSummaryCreate{
-			TripID: trip.ID, BookingID: pgTestBookingID,
-			StartedAt: trip.StartedAt, EndedAt: time.Now(),
+	err := newTransactor().InTx(ctx, func(ctx context.Context) error {
+		_, e := newTripSummaryRepo().Create(ctx, model.TripSummaryCreate{
+			TripID:             trip.ID,
+			BookingID:          trip.BookingID,
+			StartedAt:          trip.StartedAt,
+			EndedAt:            time.Now(),
 			DurationSeconds:    120,
 			DistanceTraveledKM: 2,
 			PricingSnapshot:    model.PricingSnapshot{RateTenge: 20},
@@ -103,7 +108,7 @@ func TestTripSummaryRepo_Create_InTransaction(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	got, err := summaryRepo.GetByTripID(ctx, trip.ID)
+	got, err := newTripSummaryRepo().GetByTripID(ctx, trip.ID)
 	require.NoError(t, err)
 	assert.Equal(t, int32(220), got.TotalCostTenge)
 }

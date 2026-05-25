@@ -243,6 +243,55 @@ func (_c *MockCarMaintenanceRecordRepository_Update_Call) RunAndReturn(run func(
 	return _c
 }
 
+// UpdateWithServiceState provides a mock function with given fields: ctx, id, update, state
+func (_m *MockCarMaintenanceRecordRepository) UpdateWithServiceState(ctx context.Context, id string, update model.CarMaintenanceRecordUpdate, state model.CarServiceState) error {
+	ret := _m.Called(ctx, id, update, state)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateWithServiceState")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, model.CarMaintenanceRecordUpdate, model.CarServiceState) error); ok {
+		r0 = rf(ctx, id, update, state)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockCarMaintenanceRecordRepository_UpdateWithServiceState_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateWithServiceState'
+type MockCarMaintenanceRecordRepository_UpdateWithServiceState_Call struct {
+	*mock.Call
+}
+
+// UpdateWithServiceState is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id string
+//   - update model.CarMaintenanceRecordUpdate
+//   - state model.CarServiceState
+func (_e *MockCarMaintenanceRecordRepository_Expecter) UpdateWithServiceState(ctx interface{}, id interface{}, update interface{}, state interface{}) *MockCarMaintenanceRecordRepository_UpdateWithServiceState_Call {
+	return &MockCarMaintenanceRecordRepository_UpdateWithServiceState_Call{Call: _e.mock.On("UpdateWithServiceState", ctx, id, update, state)}
+}
+
+func (_c *MockCarMaintenanceRecordRepository_UpdateWithServiceState_Call) Run(run func(ctx context.Context, id string, update model.CarMaintenanceRecordUpdate, state model.CarServiceState)) *MockCarMaintenanceRecordRepository_UpdateWithServiceState_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(model.CarMaintenanceRecordUpdate), args[3].(model.CarServiceState))
+	})
+	return _c
+}
+
+func (_c *MockCarMaintenanceRecordRepository_UpdateWithServiceState_Call) Return(_a0 error) *MockCarMaintenanceRecordRepository_UpdateWithServiceState_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockCarMaintenanceRecordRepository_UpdateWithServiceState_Call) RunAndReturn(run func(context.Context, string, model.CarMaintenanceRecordUpdate, model.CarServiceState) error) *MockCarMaintenanceRecordRepository_UpdateWithServiceState_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewMockCarMaintenanceRecordRepository creates a new instance of MockCarMaintenanceRecordRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewMockCarMaintenanceRecordRepository(t interface {

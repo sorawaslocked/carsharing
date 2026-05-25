@@ -39,7 +39,16 @@ func RegisterCustomValidators(v *validator.Validate, log *slog.Logger) error {
 		}
 	}
 
+	v.RegisterStructValidation(carInsuranceUpdateValidator, CarInsuranceUpdate{})
+
 	return nil
+}
+
+func carInsuranceUpdateValidator(sl validator.StructLevel) {
+	u := sl.Current().Interface().(CarInsuranceUpdate)
+	if u.StartsAt != nil && u.ExpiresAt != nil && !u.ExpiresAt.After(*u.StartsAt) {
+		sl.ReportError(u.ExpiresAt, "ExpiresAt", "ExpiresAt", "gtfield", "StartsAt")
+	}
 }
 
 func carFuelTypeValidator(fl validator.FieldLevel) bool {

@@ -14,9 +14,8 @@ import (
 	"testing"
 	"time"
 
-	sharedmodel "carsharing/shared/model"
-	pgadapter "carsharing/trip-service/internal/adapter/postgres"
-	"carsharing/trip-service/internal/model"
+	pgadapter "carsharing/booking-service/internal/adapter/postgres"
+	"carsharing/booking-service/internal/model"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/testcontainers/testcontainers-go"
@@ -108,10 +107,10 @@ func applyMigrations(ctx context.Context) error {
 	return nil
 }
 
-// truncate clears all tables between tests. TRUNCATE trips CASCADE covers trip_summaries and trip_status_readings.
+// truncate clears all tables between tests. TRUNCATE pricing_rules CASCADE covers bookings and booking_status_history.
 func truncate(t *testing.T) {
 	t.Helper()
-	if _, err := testPool.Exec(context.Background(), "TRUNCATE trips CASCADE"); err != nil {
+	if _, err := testPool.Exec(context.Background(), "TRUNCATE pricing_rules CASCADE"); err != nil {
 		t.Fatalf("truncate: %v", err)
 	}
 }
@@ -120,47 +119,49 @@ func discardLog() *slog.Logger {
 	return slog.New(slog.NewTextHandler(io.Discard, nil))
 }
 
-func newTripRepo() *pgadapter.TripRepo {
-	return pgadapter.NewTripRepo(discardLog(), testPool)
+func newBookingRepo() *pgadapter.BookingRepository {
+	return pgadapter.NewBookingRepository(discardLog(), testPool)
 }
 
-func newTripStatusReadingRepo() *pgadapter.TripStatusReadingRepo {
-	return pgadapter.NewTripStatusReadingRepo(discardLog(), testPool)
-}
-
-func newTripSummaryRepo() *pgadapter.TripSummaryRepo {
-	return pgadapter.NewTripSummaryRepo(discardLog(), testPool)
-}
-
-func newTransactor() *pgadapter.Transactor {
-	return pgadapter.NewTransactor(testPool)
+func newPricingRuleRepo() *pgadapter.PricingRuleRepository {
+	return pgadapter.NewPricingRuleRepository(discardLog(), testPool)
 }
 
 func ptr[T any](v T) *T { return &v }
 
-// testTripCreate returns a minimal valid TripCreate (active status).
-func testTripCreate() model.TripCreate {
-	now := time.Now().Truncate(time.Millisecond)
-	return model.TripCreate{
-		ID:             "00000000-0000-4000-8000-000000000001",
-		BookingID:      "00000000-0000-4000-8000-000000000002",
-		UserID:         "00000000-0000-4000-8000-000000000003",
-		CarID:          "00000000-0000-4000-8000-000000000004",
-		Status:         model.TripStatusActive,
-		StartedAt:      now,
-		StartLocation:  sharedmodel.Location{Latitude: 51.5, Longitude: -0.1},
-		StartMileageKM: 1000,
-		CreatedAt:      now,
-		UpdatedAt:      now,
+// testPricingRuleCreate returns a minimal valid PricingRuleCreate (by_minute, 100 tenge/min).
+func testPricingRuleCreate() model.PricingRuleCreate {
+	return model.PricingRuleCreate{
+		Type:      string(model.PricingRuleTypeByMinute),
+		RateTenge: 100,
 	}
 }
 
-// mustInsertTrip inserts a trip and returns the created model.Trip.
-func mustInsertTrip(t *testing.T, data model.TripCreate) model.Trip {
+// mustInsertPricingRule inserts a pricing rule and returns its generated ID.
+func mustInsertPricingRule(t *testing.T, data model.PricingRuleCreate) string {
 	t.Helper()
-	trip, err := newTripRepo().Create(context.Background(), data)
+	id, err := newPricingRuleRepo().Create(context.Background(), data)
 	if err != nil {
-		t.Fatalf("mustInsertTrip: %v", err)
+		t.Fatalf("mustInsertPricingRule: %v", err)
 	}
-	return trip
+	return id
+}
+
+// testBookingCreate returns a BookingCreate referencing the given pricing rule.
+func testBookingCreate(pricingRuleID string) model.BookingCreate {
+	return model.BookingCreate{
+		UserID:        "00000000-0000-4000-8000-000000000001",
+		CarID:         "00000000-0000-4000-8000-000000000002",
+		PricingRuleID: pricingRuleID,
+	}
+}
+
+// mustInsertBooking inserts a booking expiring 15 minutes from now and returns its generated ID.
+func mustInsertBooking(t *testing.T, data model.BookingCreate) string {
+	t.Helper()
+	id, err := newBookingRepo().Create(context.Background(), data, time.Now().Add(15*time.Minute))
+	if err != nil {
+		t.Fatalf("mustInsertBooking: %v", err)
+	}
+	return id
 }

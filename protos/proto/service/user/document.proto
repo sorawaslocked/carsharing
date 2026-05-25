@@ -13,4 +13,5 @@ service DocumentAnalyzerService {
 message AnalyzeRequest {
   string document_id = 1;
   string object_key = 2;
+  string user_id = 3;
 }

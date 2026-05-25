@@ -117,7 +117,9 @@ func (s *CarService) Create(ctx context.Context, data validation.CarCreate) (str
 	}
 
 	car.ID = id
-	s.carCreatedNotifier.OnCarCreated(car)
+	if s.carCreatedNotifier != nil {
+		s.carCreatedNotifier.OnCarCreated(car)
+	}
 
 	return id, nil
 }
@@ -166,8 +168,8 @@ func (s *CarService) List(ctx context.Context, filter validation.CarFilter) ([]m
 		for j := range cars[i].Images {
 			url, err := s.objectStorage.GetPresignedURL(ctx, cars[i].Images[j].Key)
 			if err != nil {
-				log.Error("object storage: getting presigned url", pkglog.Err(err))
-				return nil, err
+				log.Warn("object storage: getting presigned url", pkglog.Err(err))
+				continue
 			}
 			cars[i].Images[j].URL = url
 		}
@@ -259,29 +261,33 @@ func (s *CarService) UpdateCarStatus(ctx context.Context, id string, data valida
 		actorID = md.UserID
 	}
 
-	if err = s.statusReadingRepo.Insert(ctx, model.CarStatusReading{
-		CarID:      current.ID,
-		FromStatus: current.Status,
-		ToStatus:   toStatus,
-		ActorType:  actorType,
-		ActorID:    actorID,
-		Reason:     data.Reason,
-		Metadata:   data.Metadata,
-		RecordedAt: now,
-	}); err != nil {
-		log.Error("repo: inserting status log entry",
-			slog.String("carID", current.ID),
-			slog.String("from", current.Status.String()),
-			slog.String("to", toStatus.String()),
-			pkglog.Err(err),
-		)
+	if s.statusReadingRepo != nil {
+		if err = s.statusReadingRepo.Insert(ctx, model.CarStatusReading{
+			CarID:      current.ID,
+			FromStatus: current.Status,
+			ToStatus:   toStatus,
+			ActorType:  actorType,
+			ActorID:    actorID,
+			Reason:     data.Reason,
+			Metadata:   data.Metadata,
+			RecordedAt: now,
+		}); err != nil {
+			log.Error("repo: inserting status log entry",
+				slog.String("carID", current.ID),
+				slog.String("from", current.Status.String()),
+				slog.String("to", toStatus.String()),
+				pkglog.Err(err),
+			)
+		}
 	}
 
-	if err := s.eventPublisher.PublishCarStatusUpdated(ctx, current.ID, current.Status.String(), toStatus.String()); err != nil {
-		log.Error("event: publishing car status updated",
-			slog.String("carID", current.ID),
-			pkglog.Err(err),
-		)
+	if s.eventPublisher != nil {
+		if err := s.eventPublisher.PublishCarStatusUpdated(ctx, current.ID, current.Status.String(), toStatus.String()); err != nil {
+			log.Error("event: publishing car status updated",
+				slog.String("carID", current.ID),
+				pkglog.Err(err),
+			)
+		}
 	}
 
 	log.Info("car status updated",
@@ -350,8 +356,10 @@ func (s *CarService) UpdateCarTelemetry(ctx context.Context, id string, update v
 		Metadata:     update.Metadata,
 		RecordedAt:   now,
 	}
-	if err := s.telemetryReadingRepo.Insert(ctx, reading); err != nil {
-		log.Error("repo: inserting telemetry reading", pkglog.Err(err))
+	if s.telemetryReadingRepo != nil {
+		if err := s.telemetryReadingRepo.Insert(ctx, reading); err != nil {
+			log.Error("repo: inserting telemetry reading", pkglog.Err(err))
+		}
 	}
 
 	return nil

@@ -3,6 +3,7 @@ package subscriber
 import (
 	"context"
 	"log/slog"
+	"time"
 
 	natsdto "carsharing/car-service/internal/adapter/nats/dto"
 	pkglog "carsharing/shared/pkg/log"
@@ -55,7 +56,8 @@ func (s *BookingSubscriber) Subscribe() error {
 }
 
 func (s *BookingSubscriber) handleBookingCreated(msg *nats.Msg) {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	log := pkglog.WithMethod(s.log, "handleBookingCreated")
 
 	var pb eventbooking.BookingCreatedEvent
@@ -75,7 +77,8 @@ func (s *BookingSubscriber) handleBookingCreated(msg *nats.Msg) {
 }
 
 func (s *BookingSubscriber) handleBookingCancelled(msg *nats.Msg) {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	log := pkglog.WithMethod(s.log, "handleBookingCancelled")
 
 	var pb eventbooking.BookingCancelledEvent
@@ -95,7 +98,8 @@ func (s *BookingSubscriber) handleBookingCancelled(msg *nats.Msg) {
 }
 
 func (s *BookingSubscriber) handleBookingExpired(msg *nats.Msg) {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	log := pkglog.WithMethod(s.log, "handleBookingExpired")
 
 	var pb eventbooking.BookingExpiredEvent
@@ -115,7 +119,8 @@ func (s *BookingSubscriber) handleBookingExpired(msg *nats.Msg) {
 }
 
 func (s *BookingSubscriber) handleBookingCompleted(msg *nats.Msg) {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	log := pkglog.WithMethod(s.log, "handleBookingCompleted")
 
 	var pb eventbooking.BookingCompletedEvent

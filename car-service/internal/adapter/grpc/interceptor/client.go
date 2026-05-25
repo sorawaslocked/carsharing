@@ -2,6 +2,9 @@ package interceptor
 
 import (
 	"context"
+	"strings"
+
+	"carsharing/shared/pkg/utils"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -13,18 +16,35 @@ func NewClientBaseInterceptor() *ClientBaseInterceptor {
 	return &ClientBaseInterceptor{}
 }
 
-// Unary forwards request-scoped metadata (request ID, client IP) from the
-// local context into outgoing gRPC metadata so downstream services can trace calls.
 func (i *ClientBaseInterceptor) Unary(ctx context.Context, method string, req, reply any, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-	md := metadata.New(nil)
+	return invoker(attachOutgoingMetadata(ctx), method, req, reply, cc, opts...)
+}
 
-	if v, ok := ctx.Value(CtxRequestIDKey).(string); ok && v != "" {
-		md.Set("x-request-id", v)
-	}
-	if v, ok := ctx.Value(CtxClientIPKey).(string); ok && v != "" {
-		md.Set("x-client-ip", v)
-	}
+func (i *ClientBaseInterceptor) Stream(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
+	return streamer(attachOutgoingMetadata(ctx), desc, cc, method, opts...)
+}
 
-	ctx = metadata.NewOutgoingContext(ctx, md)
-	return invoker(ctx, method, req, reply, cc, opts...)
+func attachOutgoingMetadata(ctx context.Context) context.Context {
+	md := utils.MetadataFromCtx(ctx)
+	var kv []string
+	if md.RequestID != "" {
+		kv = append(kv, "x-request-id", md.RequestID)
+	}
+	if md.ClientIP != "" {
+		kv = append(kv, "x-client-ip", md.ClientIP)
+	}
+	if md.UserID != nil {
+		kv = append(kv, "x-user-id", *md.UserID)
+	}
+	if len(md.UserRoles) > 0 {
+		roleStrs := make([]string, len(md.UserRoles))
+		for i, r := range md.UserRoles {
+			roleStrs[i] = string(r)
+		}
+		kv = append(kv, "x-user-roles", strings.Join(roleStrs, ","))
+	}
+	if len(kv) == 0 {
+		return ctx
+	}
+	return metadata.AppendToOutgoingContext(ctx, kv...)
 }

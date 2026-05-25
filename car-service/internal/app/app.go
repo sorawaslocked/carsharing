@@ -73,7 +73,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 		log,
 		cfg.TelemetryStream,
 		grpc.WithChainUnaryInterceptor(baseClientInterceptor.Unary),
-		grpc.WithChainStreamInterceptor(),
+		grpc.WithChainStreamInterceptor(baseClientInterceptor.Stream),
 	)
 	if err != nil {
 		cl.closeAll()

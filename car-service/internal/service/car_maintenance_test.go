@@ -370,14 +370,16 @@ func TestCarMaintenanceServiceCompleteRecord(t *testing.T) {
 			KmInterval:  &kmInterval,
 			DayInterval: &dayInterval,
 		}, nil)
-		recordRepo.EXPECT().Update(ctx, recordID, mock.MatchedBy(func(u model.CarMaintenanceRecordUpdate) bool {
-			return u.Status != nil && *u.Status == model.MaintenanceRecordStatusCompleted &&
-				u.CompletedKM != nil && *u.CompletedKM == 50_000
-		})).Return(nil)
-		stateRepo.EXPECT().Upsert(ctx, mock.MatchedBy(func(s model.CarServiceState) bool {
-			return s.CarID == carID && s.TemplateID == templateID &&
-				s.LastKM == 50_000 && s.NextDueKM != nil && s.NextDueDate != nil
-		})).Return(nil)
+		recordRepo.EXPECT().UpdateWithServiceState(ctx, recordID,
+			mock.MatchedBy(func(u model.CarMaintenanceRecordUpdate) bool {
+				return u.Status != nil && *u.Status == model.MaintenanceRecordStatusCompleted &&
+					u.CompletedKM != nil && *u.CompletedKM == 50_000
+			}),
+			mock.MatchedBy(func(s model.CarServiceState) bool {
+				return s.CarID == carID && s.TemplateID == templateID &&
+					s.LastKM == 50_000 && s.NextDueKM != nil && s.NextDueDate != nil
+			}),
+		).Return(nil)
 		// carService.UpdateCarStatus → FindByID + Update
 		carRepo.EXPECT().FindByID(ctx, carID).Return(
 			model.Car{ID: carID, Status: model.CarStatusMaintenance}, nil,
@@ -410,10 +412,11 @@ func TestCarMaintenanceServiceCompleteRecord(t *testing.T) {
 			ID:         templateID,
 			KmInterval: &kmInterval,
 		}, nil)
-		recordRepo.EXPECT().Update(ctx, recordID, mock.Anything).Return(nil)
-		stateRepo.EXPECT().Upsert(ctx, mock.MatchedBy(func(s model.CarServiceState) bool {
-			return s.NextDueKM != nil && s.NextDueDate == nil
-		})).Return(nil)
+		recordRepo.EXPECT().UpdateWithServiceState(ctx, recordID, mock.Anything,
+			mock.MatchedBy(func(s model.CarServiceState) bool {
+				return s.NextDueKM != nil && s.NextDueDate == nil
+			}),
+		).Return(nil)
 		carRepo.EXPECT().FindByID(ctx, carID).Return(
 			model.Car{ID: carID, Status: model.CarStatusMaintenance}, nil,
 		)

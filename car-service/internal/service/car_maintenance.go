@@ -199,8 +199,8 @@ func (s *CarMaintenanceService) ListRecords(ctx context.Context, filter validati
 		for j := range records[i].ReceiptImages {
 			url, err := s.objectStorage.GetPresignedURL(ctx, records[i].ReceiptImages[j].Key)
 			if err != nil {
-				log.Error("object storage: getting presigned url", pkglog.Err(err))
-				return nil, err
+				log.Warn("object storage: getting presigned url", pkglog.Err(err))
+				continue
 			}
 			records[i].ReceiptImages[j].URL = url
 		}
@@ -238,7 +238,7 @@ func (s *CarMaintenanceService) CompleteRecord(ctx context.Context, id string, d
 
 	now := time.Now()
 	completedStatus := model.MaintenanceRecordStatusCompleted
-	if err = s.recordRepo.Update(ctx, id, model.CarMaintenanceRecordUpdate{
+	recordUpdate := model.CarMaintenanceRecordUpdate{
 		Status:           &completedStatus,
 		CompletedKM:      &data.CompletedKM,
 		CostTenge:        &data.CostTenge,
@@ -246,9 +246,6 @@ func (s *CarMaintenanceService) CompleteRecord(ctx context.Context, id string, d
 		Notes:            data.Notes,
 		ReceiptImageKeys: data.ReceiptImageKeys,
 		UpdatedAt:        now,
-	}); err != nil {
-		log.Error("repo: updating maintenance record", pkglog.Err(err))
-		return err
 	}
 
 	state := model.CarServiceState{
@@ -266,8 +263,10 @@ func (s *CarMaintenanceService) CompleteRecord(ctx context.Context, id string, d
 		state.NextDueDate = &nextDate
 	}
 
-	if err = s.serviceStateRepo.Upsert(ctx, state); err != nil {
-		log.Error("repo: upserting car service state", pkglog.Err(err))
+	if err = s.recordRepo.UpdateWithServiceState(ctx, id, recordUpdate, state); err != nil {
+		if !errors.Is(err, model.ErrCarMaintenanceRecordNotFound) {
+			log.Error("repo: completing maintenance record", pkglog.Err(err))
+		}
 		return err
 	}
 
@@ -369,7 +368,7 @@ func (s *CarMaintenanceService) EvaluateCarMaintenance(ctx context.Context, carI
 func (s *CarMaintenanceService) createWorkOrder(ctx context.Context, car model.Car, template model.CarMaintenanceTemplate, priority string) error {
 	var dueBy *time.Time
 	if template.DayInterval != nil {
-		t := time.Now().AddDate(0, 0, int(*template.DayInterval)/10)
+		t := time.Now().AddDate(0, 0, int(*template.DayInterval))
 		dueBy = &t
 	}
 

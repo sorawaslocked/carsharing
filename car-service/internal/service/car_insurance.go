@@ -113,8 +113,8 @@ func (s *CarInsuranceService) List(ctx context.Context, filter validation.CarIns
 		for j := range insurances[i].Images {
 			url, err := s.objectStorage.GetPresignedURL(ctx, insurances[i].Images[j].Key)
 			if err != nil {
-				log.Error("object storage: getting presigned url", pkglog.Err(err))
-				return nil, err
+				log.Warn("object storage: getting presigned url", pkglog.Err(err))
+				continue
 			}
 			insurances[i].Images[j].URL = url
 		}

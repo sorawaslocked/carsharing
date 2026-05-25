@@ -272,10 +272,11 @@ func (r *BookingRepository) GetStatusHistory(ctx context.Context, filter model.B
 
 	clauses, args, nextArg := pgdto.WhereClausesFromStatusHistoryFilter(filter, nil, 1)
 
-	query := fmt.Sprintf(`
-        SELECT id, booking_id, from_status, to_status, actor_type, actor_id, reason, changed_at
-        FROM booking_status_history WHERE %s ORDER BY changed_at ASC LIMIT $%d OFFSET $%d
-    `, strings.Join(clauses, " AND "), nextArg, nextArg+1)
+	query := `SELECT id, booking_id, from_status, to_status, actor_type, actor_id, reason, changed_at FROM booking_status_history`
+	if len(clauses) > 0 {
+		query += " WHERE " + strings.Join(clauses, " AND ")
+	}
+	query += fmt.Sprintf(" ORDER BY changed_at ASC LIMIT $%d OFFSET $%d", nextArg, nextArg+1)
 
 	args = append(args, filter.Pagination.Limit, filter.Pagination.Offset)
 

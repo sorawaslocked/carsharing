@@ -105,7 +105,7 @@ func TestBookingService_Create_RuleNotFound(t *testing.T) {
 
 	cars.EXPECT().Exists(mock.Anything, testCarID).Return(true, nil)
 	cars.EXPECT().GetStatus(mock.Anything, testCarID).Return(model.CarStatusAvailable, nil)
-	rules.EXPECT().GetByID(mock.Anything, testMissingID).Return(model.PricingRule{}, model.ErrNotFound)
+	rules.EXPECT().GetByID(mock.Anything, testMissingID).Return(model.PricingRule{}, model.ErrPricingRuleNotFound)
 
 	_, err := newBookingSvc(repo, rules, pub, cars).Create(ctxAsBookingManager(), validation.BookingCreate{
 		UserID:        testManagerID,

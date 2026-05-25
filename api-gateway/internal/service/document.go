@@ -48,12 +48,12 @@ func (s *UserService) GetProfileImageUploadData(ctx context.Context) (sharedmode
 	return data, nil
 }
 
-func (s *UserService) GetProcessedDocumentsForUser(ctx context.Context, userID string) ([]model.Document, error) {
-	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetProcessedDocumentsForUser"), utils.MetadataFromCtx(ctx))
+func (s *UserService) ListDocuments(ctx context.Context, filter model.DocumentFilter) ([]model.Document, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "ListDocuments"), utils.MetadataFromCtx(ctx))
 
-	docs, err := s.presenter.GetProcessedDocumentsForUser(ctx, userID)
+	docs, err := s.presenter.ListDocuments(ctx, filter)
 	if err != nil {
-		log.Warn("getting processed documents for user", pkglog.Err(err))
+		log.Warn("listing documents", pkglog.Err(err))
 
 		return nil, err
 	}

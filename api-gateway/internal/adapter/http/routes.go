@@ -62,7 +62,7 @@ func (s *Server) setupRoutes(
 
 			users.POST("/documents", s.userHandler.CreateDocument)
 			users.POST("/documents/upload", s.userHandler.GetUploadDocumentData)
-			users.GET("/:id/documents/processed", s.userHandler.GetProcessedDocumentsForUser)
+			users.GET("/:id/documents", s.userHandler.ListDocuments)
 			users.POST("/documents/check/:id", s.userHandler.CheckDocument)
 		}
 

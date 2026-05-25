@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	sharedmodel "carsharing/shared/model"
+)
 
 type Document struct {
 	ID        string
@@ -12,6 +16,14 @@ type Document struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
+}
+
+type DocumentFilter struct {
+	UserID     string
+	Status     *string
+	ImageType  *string
+	Sort       *string
+	Pagination *sharedmodel.Pagination
 }
 
 type DocumentAnalyzedEvent struct {

@@ -5,6 +5,7 @@ import (
 
 	"carsharing/api-gateway/internal/adapter/grpc/dto"
 	"carsharing/api-gateway/internal/model"
+	basepb "carsharing/protos/gen/base"
 	usersvc "carsharing/protos/gen/service/user"
 	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
@@ -54,12 +55,25 @@ func (h *UserHandler) GetProfileImageUploadData(ctx context.Context) (sharedmode
 	return dto.ImageUploadDataFromProto(res.GetUploadData()), nil
 }
 
-func (h *UserHandler) GetProcessedDocumentsForUser(ctx context.Context, userID string) ([]model.Document, error) {
-	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetProcessedDocumentsForUser"), utils.MetadataFromCtx(ctx))
+func (h *UserHandler) ListDocuments(ctx context.Context, filter model.DocumentFilter) ([]model.Document, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "ListDocuments"), utils.MetadataFromCtx(ctx))
 
-	res, err := h.client.GetProcessedDocumentsForUser(ctx, &usersvc.GetProcessedDocumentsForUserRequest{UserId: userID})
+	req := &usersvc.ListDocumentsRequest{
+		UserId:    filter.UserID,
+		Status:    filter.Status,
+		ImageType: filter.ImageType,
+		Sort:      filter.Sort,
+	}
+	if filter.Pagination != nil {
+		req.Pagination = &basepb.Pagination{
+			Limit:  filter.Pagination.Limit,
+			Offset: filter.Pagination.Offset,
+		}
+	}
+
+	res, err := h.client.ListDocuments(ctx, req)
 	if err != nil {
-		log.Warn("getting processed documents for user", pkglog.Err(err))
+		log.Warn("listing documents", pkglog.Err(err))
 
 		return nil, dto.FromGrpcErr(err)
 	}

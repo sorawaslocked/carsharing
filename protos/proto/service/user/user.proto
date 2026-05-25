@@ -27,7 +27,7 @@ service UserService {
 
   rpc CreateDocument(CreateDocumentRequest) returns (CreateDocumentResponse);
   rpc GetUploadDocumentData(GetUploadDocumentDataRequest) returns (GetUploadDocumentDataResponse);
-  rpc GetProcessedDocumentsForUser(GetProcessedDocumentsForUserRequest) returns (GetProcessedDocumentsForUserResponse);
+  rpc ListDocuments(ListDocumentsRequest) returns (ListDocumentsResponse);
   rpc CheckDocument(CheckDocumentRequest) returns (google.protobuf.Empty);
 }
 
@@ -145,11 +145,15 @@ message GetUploadDocumentDataResponse {
   base.ImageUploadData upload_data = 1;
 }
 
-message GetProcessedDocumentsForUserRequest {
+message ListDocumentsRequest {
   string user_id = 1;
+  optional string status = 2;
+  optional string image_type = 3;
+  optional string sort = 4;
+  optional base.Pagination pagination = 5;
 }
 
-message GetProcessedDocumentsForUserResponse {
+message ListDocumentsResponse {
   repeated base.user.Document documents = 1;
 }
 

@@ -79,3 +79,30 @@ func FromCheckDocumentRequest(c *gin.Context) (status string, documentError *str
 
 	return req.Status, req.Error, nil
 }
+
+func DocumentFilterFromCtx(c *gin.Context) (model.DocumentFilter, error) {
+	userID, err := IDParam(c)
+	if err != nil {
+		return model.DocumentFilter{}, err
+	}
+
+	f := model.DocumentFilter{UserID: userID}
+
+	if v := c.Query("status"); v != "" {
+		f.Status = &v
+	}
+	if v := c.Query("imageType"); v != "" {
+		f.ImageType = &v
+	}
+	if v := c.Query("sort"); v != "" {
+		f.Sort = &v
+	}
+
+	p, err := pagination(c)
+	if err != nil {
+		return model.DocumentFilter{}, model.ErrInvalidQueryParam
+	}
+	f.Pagination = p
+
+	return f, nil
+}

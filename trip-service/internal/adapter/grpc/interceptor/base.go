@@ -4,41 +4,86 @@ import (
 	"context"
 	"strings"
 
-	sharedmodel "carsharing/shared/model"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+
+	sharedmodel "carsharing/shared/model"
+	"carsharing/trip-service/internal/adapter/grpc/dto"
+	"carsharing/trip-service/internal/model"
 )
 
-func extractMetadata(ctx context.Context) context.Context {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return ctx
+const (
+	CtxRequestIDKey = "x-request-id"
+	CtxClientIPKey  = "x-client-ip"
+	CtxUserIDKey    = "x-user-id"
+	CtxUserRolesKey = "x-user-roles"
+)
+
+type BaseInterceptor struct{}
+
+func NewBaseInterceptor() *BaseInterceptor { return &BaseInterceptor{} }
+
+func (i *BaseInterceptor) Unary(ctx context.Context, req any, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+	ctx, err := extractMetadata(ctx)
+	if err != nil {
+		return nil, err
 	}
-	if requestID := firstMD(md, "x-request-id"); requestID != "" {
-		ctx = context.WithValue(ctx, "x-request-id", requestID)
-	}
-	if clientIP := firstMD(md, "x-client-ip"); clientIP != "" {
-		ctx = context.WithValue(ctx, "x-client-ip", clientIP)
-	}
-	if userID := firstMD(md, "x-user-id"); userID != "" {
-		ctx = context.WithValue(ctx, "x-user-id", userID)
-	}
-	if rolesStr := firstMD(md, "x-user-roles"); rolesStr != "" {
-		var roles []sharedmodel.Role
-		for _, r := range strings.Split(rolesStr, ",") {
-			if r = strings.TrimSpace(r); r != "" {
-				roles = append(roles, sharedmodel.Role(r))
-			}
-		}
-		if len(roles) > 0 {
-			ctx = context.WithValue(ctx, "x-user-roles", roles)
-		}
-	}
-	return ctx
+	return handler(ctx, req)
 }
 
-func firstMD(md metadata.MD, key string) string {
-	if vals := md.Get(key); len(vals) > 0 {
-		return vals[0]
+func (i *BaseInterceptor) Stream(srv any, ss grpc.ServerStream, _ *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	ctx, err := extractMetadata(ss.Context())
+	if err != nil {
+		return err
+	}
+	return handler(srv, &wrappedStream{ServerStream: ss, ctx: ctx})
+}
+
+type wrappedStream struct {
+	grpc.ServerStream
+	ctx context.Context
+}
+
+func (w *wrappedStream) Context() context.Context { return w.ctx }
+
+func extractMetadata(ctx context.Context) (context.Context, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+
+	ctx = context.WithValue(ctx, CtxRequestIDKey, stringFromMD(md, "x-request-id"))
+	ctx = context.WithValue(ctx, CtxClientIPKey, stringFromMD(md, "x-client-ip"))
+
+	if userID := stringFromMD(md, "x-user-id"); userID != "" {
+		ctx = context.WithValue(ctx, CtxUserIDKey, userID)
+	}
+	if roleStrs := stringsFromMD(md, "x-user-roles"); len(roleStrs) > 0 {
+		roles := make([]sharedmodel.Role, len(roleStrs))
+		for i, s := range roleStrs {
+			role, ok := sharedmodel.RoleFromString(s)
+			if !ok {
+				return ctx, dto.ToStatusError(model.ErrInvalidMetadata)
+			}
+			roles[i] = role
+		}
+		ctx = context.WithValue(ctx, CtxUserRolesKey, roles)
+	}
+
+	return ctx, nil
+}
+
+func stringFromMD(md metadata.MD, key string) string {
+	if values := md.Get(key); len(values) > 0 {
+		return values[0]
 	}
 	return ""
+}
+
+func stringsFromMD(md metadata.MD, key string) []string {
+	values := md.Get(key)
+	if len(values) == 0 {
+		return nil
+	}
+	if len(values) == 1 {
+		return strings.Split(values[0], ",")
+	}
+	return values
 }

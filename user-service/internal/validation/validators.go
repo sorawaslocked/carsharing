@@ -36,6 +36,7 @@ func RegisterCustomValidators(v *validator.Validate, log *slog.Logger) error {
 		{"complex_password", complexPassword},
 		{"document_image_type", imageTypeValidator},
 		{"document_status", documentStatusValidator},
+		{"document_sort", documentSortValidator},
 		{"role", roleValidator},
 	}
 
@@ -84,6 +85,11 @@ func imageTypeValidator(fl validator.FieldLevel) bool {
 
 func documentStatusValidator(fl validator.FieldLevel) bool {
 	_, ok := model.DocumentStatusFromString(fl.Field().String())
+	return ok
+}
+
+func documentSortValidator(fl validator.FieldLevel) bool {
+	_, ok := model.DocumentSortFromString(fl.Field().String())
 	return ok
 }
 

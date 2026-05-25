@@ -111,7 +111,7 @@ func sampleBooking() model.Booking {
 		ID:     testBookingID,
 		UserID: testUserID,
 		CarID:  testCarID,
-		Status: "created",
+		Status: model.BookingStatusCreated,
 		PricingSnapshot: model.PricingSnapshot{
 			RateTenge: 10,
 		},

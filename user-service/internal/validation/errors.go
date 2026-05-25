@@ -47,5 +47,6 @@ var (
 var (
 	ErrInvalidDocumentStatus       = errors.New("must be a valid document status")
 	ErrInvalidImageType            = errors.New("must be a valid image type")
+	ErrInvalidDocumentSort         = errors.New("must be +createdAt or -createdAt")
 	ErrDocumentStatusNotReviewable = errors.New("must be approved or rejected")
 )

@@ -207,12 +207,12 @@ func (h *UserHandler) GetUploadDocumentData(ctx context.Context, req *usersvc.Ge
 	}, nil
 }
 
-func (h *UserHandler) GetProcessedDocumentsForUser(ctx context.Context, req *usersvc.GetProcessedDocumentsForUserRequest) (*usersvc.GetProcessedDocumentsForUserResponse, error) {
-	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetProcessedDocumentsForUser"), utils.MetadataFromCtx(ctx))
+func (h *UserHandler) ListDocuments(ctx context.Context, req *usersvc.ListDocumentsRequest) (*usersvc.ListDocumentsResponse, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "ListDocuments"), utils.MetadataFromCtx(ctx))
 
-	docs, err := h.userService.GetProcessedDocumentsForUser(ctx, req.GetUserId())
+	docs, err := h.userService.ListDocuments(ctx, dto.FromListDocumentsRequest(req))
 	if err != nil {
-		log.Warn("getting processed documents for user", pkglog.Err(err))
+		log.Warn("listing documents", pkglog.Err(err))
 
 		return nil, dto.ToStatusError(err)
 	}
@@ -222,7 +222,7 @@ func (h *UserHandler) GetProcessedDocumentsForUser(ctx context.Context, req *use
 		protoDocs[i] = dto.DocumentToProto(d)
 	}
 
-	return &usersvc.GetProcessedDocumentsForUserResponse{Documents: protoDocs}, nil
+	return &usersvc.ListDocumentsResponse{Documents: protoDocs}, nil
 }
 
 func (h *UserHandler) CheckDocument(ctx context.Context, req *usersvc.CheckDocumentRequest) (*emptypb.Empty, error) {

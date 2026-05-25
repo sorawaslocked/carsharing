@@ -33,7 +33,6 @@ type EventPublisher interface {
 }
 
 type CarChecker interface {
-	Exists(ctx context.Context, carID string) (bool, error)
 	GetStatus(ctx context.Context, carID string) (model.CarStatus, error)
 }
 

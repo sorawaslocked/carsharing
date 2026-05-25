@@ -108,17 +108,17 @@ func (h *UserHandler) GetUploadDocumentData(c *gin.Context) {
 // @Tags         documents
 // @Produce      json
 // @Security     BearerAuth
-// @Param        id        path      string  true   "User ID"
-// @Param        status    query     string  false  "Filter by status" Enums(pending, processed, approved, rejected)
-// @Param        imageType query     string  false  "Filter by image type" Enums(id_front, id_back, driving_license_front, driving_license_back)
-// @Param        sort      query     string  false  "Sort by field (+createdAt for ascending, -createdAt for descending)"
-// @Param        limit     query     integer false  "Pagination limit"
-// @Param        offset    query     integer false  "Pagination offset"
-// @Success      200   {object}  dto.DocumentsResponse
-// @Failure      400   {object}  dto.ErrorResponse
-// @Failure      401   {object}  dto.ErrorResponse
-// @Failure      404   {object}  dto.ErrorResponse
-// @Failure      500   {object}  dto.ErrorResponse
+// @Param        id         path      string   true   "User ID"
+// @Param        status     query     string   false  "Filter by status"     Enums(pending, processed, approved, rejected)
+// @Param        imageType  query     string   false  "Filter by image type" Enums(id_front, id_back, driving_license_front, driving_license_back)
+// @Param        sort       query     string   false  "Sort order"           Enums(+createdAt, -createdAt)
+// @Param        limit      query     integer  false  "Pagination limit"
+// @Param        offset     query     integer  false  "Pagination offset"
+// @Success      200        {object}  dto.DocumentsResponse
+// @Failure      400        {object}  dto.ErrorResponse
+// @Failure      401        {object}  dto.ErrorResponse
+// @Failure      404        {object}  dto.ErrorResponse
+// @Failure      500        {object}  dto.ErrorResponse
 // @Router       /users/{id}/documents [get]
 func (h *UserHandler) ListDocuments(c *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "ListDocuments"), utils.MetadataFromCtx(c))

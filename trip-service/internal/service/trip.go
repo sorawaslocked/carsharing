@@ -367,7 +367,12 @@ func (s *TripService) GetTripSummary(ctx context.Context, tripID string) (model.
 		return model.TripSummary{}, model.ErrTripNotCompleted
 	}
 
-	return s.summaryRepo.GetByTripID(ctx, tripID)
+	summary, err := s.summaryRepo.GetByTripID(ctx, tripID)
+	if err != nil {
+		log.Error("repo: getting trip summary", pkglog.Err(err))
+		return model.TripSummary{}, err
+	}
+	return summary, nil
 }
 
 func (s *TripService) GetTripStatusHistory(ctx context.Context, filter validation.TripStatusHistoryFilter) ([]model.TripStatusReading, error) {

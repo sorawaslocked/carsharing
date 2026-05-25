@@ -111,12 +111,23 @@ func (r *DocumentRepository) Find(ctx context.Context, filter model.DocumentFilt
 	}
 
 	query := base
-	clauses, args, _ := pgdto.WhereClausesFromDocumentFilter(filter, nil, 1)
+	clauses, args, nextArg := pgdto.WhereClausesFromDocumentFilter(filter, nil, 1)
 	if len(clauses) > 0 {
 		query += " WHERE " + strings.Join(clauses, " AND ")
 	}
+
 	if filter.LatestPerType {
 		query += " ORDER BY image_type, created_at DESC"
+	} else {
+		if filter.Sort != nil && *filter.Sort == model.DocumentSortCreatedAtAsc {
+			query += " ORDER BY created_at ASC"
+		} else {
+			query += " ORDER BY created_at DESC"
+		}
+		if filter.Pagination != nil {
+			query += fmt.Sprintf(" LIMIT $%d OFFSET $%d", nextArg, nextArg+1)
+			args = append(args, filter.Pagination.Limit, filter.Pagination.Offset)
+		}
 	}
 
 	rows, err := r.pool.Query(ctx, query, args...)

@@ -670,10 +670,10 @@ func TestTripService_StreamTripLiveFeed_TripCompletedMidStream(t *testing.T) {
 	d.tripRepo.EXPECT().GetByID(mock.Anything, testTripID).Return(completed, nil).Once()
 	d.booking.EXPECT().GetBooking(mock.Anything, testBookingID).Return(booking, nil)
 	d.telematics.EXPECT().StreamTelemetry(mock.Anything, testCarID, mock.Anything).
-		Run(func(_ context.Context, _ string, fn func(model.CarTelemetry) error) {
+		RunAndReturn(func(_ context.Context, _ string, fn func(model.CarTelemetry) error) error {
 			tel := model.CarTelemetry{MileageKM: 1010, RecordedAt: trip.StartedAt.Add(5 * time.Minute)}
-			_ = fn(tel)
-		}).Return(io.EOF)
+			return fn(tel)
+		})
 
 	err := svc.StreamTripLiveFeed(ctx, testTripID, func(model.TripLiveFeed) error { return nil })
 

@@ -12,14 +12,18 @@ func WhereClausesFromDocumentFilter(filter model.DocumentFilter, args []any, arg
 		args = []any{}
 	}
 
-	if filter.UserID != nil {
-		clauses = append(clauses, fmt.Sprintf("user_id = $%d", argNumber))
-		args = append(args, *filter.UserID)
+	clauses = append(clauses, fmt.Sprintf("user_id = $%d", argNumber))
+	args = append(args, filter.UserID)
+	argNumber++
+
+	if filter.Status != nil {
+		clauses = append(clauses, fmt.Sprintf("status = $%d", argNumber))
+		args = append(args, filter.Status.String())
 		argNumber++
 	}
-	if filter.ExcludeStatus != nil {
-		clauses = append(clauses, fmt.Sprintf("status != $%d", argNumber))
-		args = append(args, filter.ExcludeStatus.String())
+	if filter.ImageType != nil {
+		clauses = append(clauses, fmt.Sprintf("image_type = $%d", argNumber))
+		args = append(args, filter.ImageType.String())
 		argNumber++
 	}
 

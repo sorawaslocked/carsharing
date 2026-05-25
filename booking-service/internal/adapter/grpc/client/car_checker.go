@@ -26,21 +26,6 @@ func NewCarChecker(log *slog.Logger, conn *grpc.ClientConn) *CarChecker {
 	}
 }
 
-func (c *CarChecker) Exists(ctx context.Context, carID string) (bool, error) {
-	log := pkglog.WithMetadata(pkglog.WithMethod(c.log, "Exists"), utils.MetadataFromCtx(ctx))
-
-	_, err := c.client.GetCar(ctx, &carsvc.GetCarRequest{Id: carID})
-	if err != nil {
-		if status.Code(err) == codes.NotFound {
-			return false, nil
-		}
-		log.Error("grpc: checking car existence", slog.String("carID", carID), pkglog.Err(err))
-		return false, model.ErrInternalServerError
-	}
-
-	return true, nil
-}
-
 func (c *CarChecker) GetStatus(ctx context.Context, carID string) (model.CarStatus, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(c.log, "GetStatus"), utils.MetadataFromCtx(ctx))
 

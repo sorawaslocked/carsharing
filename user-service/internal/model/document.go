@@ -82,9 +82,37 @@ type Document struct {
 	UpdatedAt time.Time
 }
 
+type DocumentSort string
+
+const (
+	DocumentSortCreatedAtAsc  DocumentSort = "+createdAt"
+	DocumentSortCreatedAtDesc DocumentSort = "-createdAt"
+)
+
+var validDocumentSorts = map[DocumentSort]struct{}{
+	DocumentSortCreatedAtAsc:  {},
+	DocumentSortCreatedAtDesc: {},
+}
+
+func DocumentSortFromString(s string) (DocumentSort, bool) {
+	ds := DocumentSort(s)
+	if _, ok := validDocumentSorts[ds]; !ok {
+		return "", false
+	}
+	return ds, true
+}
+
+func (s DocumentSort) String() string {
+	return string(s)
+}
+
 type DocumentFilter struct {
-	UserID        *string
-	ExcludeStatus *DocumentStatus
+	UserID     string
+	Status     *DocumentStatus
+	ImageType  *DocumentImageType
+	Sort       *DocumentSort
+	Pagination *sharedmodel.Pagination
+
 	LatestPerType bool
 }
 

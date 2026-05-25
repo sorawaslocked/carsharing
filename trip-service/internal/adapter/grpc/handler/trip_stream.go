@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"errors"
 	"io"
 	"log/slog"
@@ -16,17 +15,13 @@ import (
 	"carsharing/trip-service/internal/model"
 )
 
-type TripStreamService interface {
-	StreamTripLiveFeed(ctx context.Context, tripID string, send func(model.TripLiveFeed) error) error
-}
-
 type TripStreamHandler struct {
 	tripsvc.UnimplementedTripStreamServiceServer
 	log     *slog.Logger
-	service TripStreamService
+	service TripService
 }
 
-func NewTripStreamHandler(log *slog.Logger, service TripStreamService) *TripStreamHandler {
+func NewTripStreamHandler(log *slog.Logger, service TripService) *TripStreamHandler {
 	return &TripStreamHandler{
 		log:     pkglog.WithComponent(log, "adapter.grpc.handler.TripStreamHandler"),
 		service: service,

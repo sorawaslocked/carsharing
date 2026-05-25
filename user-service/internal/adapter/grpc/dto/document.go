@@ -4,6 +4,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	sharedmodel "carsharing/shared/model"
+	sharedvalidation "carsharing/shared/validation"
 	"carsharing/user-service/internal/model"
 	"carsharing/user-service/internal/validation"
 
@@ -21,6 +22,22 @@ func FromCreateDocumentRequest(req *usersvc.CreateDocumentRequest) validation.Do
 
 func FromGetUploadDocumentDataRequest(req *usersvc.GetUploadDocumentDataRequest) string {
 	return req.GetImageType()
+}
+
+func FromListDocumentsRequest(req *usersvc.ListDocumentsRequest) validation.DocumentFilter {
+	filter := validation.DocumentFilter{
+		UserID:    req.GetUserId(),
+		Status:    req.Status,
+		ImageType: req.ImageType,
+		Sort:      req.Sort,
+	}
+	if req.Pagination != nil {
+		filter.Pagination = &sharedvalidation.Pagination{
+			Limit:  req.Pagination.Limit,
+			Offset: req.Pagination.Offset,
+		}
+	}
+	return filter
 }
 
 func FromCheckDocumentRequest(req *usersvc.CheckDocumentRequest) (string, validation.DocumentUpdate) {

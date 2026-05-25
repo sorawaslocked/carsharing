@@ -56,8 +56,9 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	}
 	cl.add(nc.Close)
 
-	unaryInterceptors := grpc.WithChainUnaryInterceptor(interceptor.MetadataForwardingUnaryInterceptor)
-	streamInterceptors := grpc.WithChainStreamInterceptor(interceptor.MetadataForwardingStreamInterceptor)
+	clientBase := interceptor.NewClientBaseInterceptor()
+	unaryInterceptors := grpc.WithChainUnaryInterceptor(clientBase.Unary)
+	streamInterceptors := grpc.WithChainStreamInterceptor(clientBase.Stream)
 
 	carConn, err := pkggrpc.NewClientConn(log, cfg.CarService, unaryInterceptors, streamInterceptors)
 	if err != nil {
@@ -95,7 +96,11 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	streamHandler := handler.NewTripStreamHandler(log, tripSvc)
 	healthHandler := handler.NewHealthHandler(log, pool, nc, carConn, streamConn, bookingConn)
 
-	srv := grpcserver.NewServer(log, tripHandler, streamHandler, healthHandler)
+	srv, err := grpcserver.NewServer(log, cfg.GRPC, tripHandler, streamHandler, healthHandler)
+	if err != nil {
+		cl.closeAll()
+		return nil, fmt.Errorf("grpc server: %w", err)
+	}
 
 	return &App{
 		log:        pkglog.WithComponent(log, "app"),

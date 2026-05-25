@@ -79,6 +79,8 @@ func validationError(fieldErr validator.FieldError) error {
 		return ErrInvalidImageType
 	case "document_status":
 		return ErrInvalidDocumentStatus
+	case "document_sort":
+		return ErrInvalidDocumentSort
 	case "uuid4":
 		return ErrInvalidID
 	case "role":

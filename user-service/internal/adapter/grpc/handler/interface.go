@@ -25,6 +25,6 @@ type UserService interface {
 
 	CreateDocument(ctx context.Context, data validation.DocumentCreate) (string, error)
 	GetDocumentImageUploadData(ctx context.Context, imageType string) (sharedmodel.ImageUploadData, error)
-	GetProcessedDocumentsForUser(ctx context.Context, userID string) ([]model.Document, error)
+	ListDocuments(ctx context.Context, filter validation.DocumentFilter) ([]model.Document, error)
 	CheckDocument(ctx context.Context, docID string, data validation.DocumentUpdate) error
 }

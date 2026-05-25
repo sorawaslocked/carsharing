@@ -16,6 +16,8 @@ func ToStatusError(err error) error {
 		return status.Error(codes.InvalidArgument, err.Error())
 	}
 	switch {
+	case errors.Is(err, model.ErrInvalidMetadata):
+		return status.Error(codes.InvalidArgument, err.Error())
 	case errors.Is(err, model.ErrNotFound):
 		return status.Error(codes.NotFound, err.Error())
 	case errors.Is(err, model.ErrAlreadyExists):

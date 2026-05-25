@@ -10,6 +10,7 @@ import (
 	sharedmodel "carsharing/shared/model"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
+	sharedvalidation "carsharing/shared/validation"
 	"carsharing/user-service/internal/model"
 	"carsharing/user-service/internal/validation"
 )
@@ -63,26 +64,21 @@ func (s *UserService) GetDocumentImageUploadData(ctx context.Context, imageType 
 	return data, nil
 }
 
-func (s *UserService) GetProcessedDocumentsForUser(ctx context.Context, userID string) ([]model.Document, error) {
-	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetProcessedDocumentsForUser"), utils.MetadataFromCtx(ctx))
+func (s *UserService) ListDocuments(ctx context.Context, filter validation.DocumentFilter) ([]model.Document, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "ListDocuments"), utils.MetadataFromCtx(ctx))
 
-	if err := validation.ValidateID(s.validate, userID); err != nil {
+	if err := validation.ValidateInput(s.validate, filter); err != nil {
 		return nil, err
 	}
 
-	if _, err := s.userRepo.FindByID(ctx, userID); err != nil {
+	if _, err := s.userRepo.FindByID(ctx, filter.UserID); err != nil {
 		if !errors.Is(err, model.ErrUserNotFound) {
 			log.Error("repo: finding user", pkglog.Err(err))
 		}
 		return nil, err
 	}
 
-	pending := model.DocumentStatusPending
-	docs, err := s.docRepo.Find(ctx, model.DocumentFilter{
-		UserID:        &userID,
-		ExcludeStatus: &pending,
-		LatestPerType: true,
-	})
+	docs, err := s.docRepo.Find(ctx, documentFilter(filter))
 	if err != nil {
 		log.Error("repo: listing documents", pkglog.Err(err))
 
@@ -103,6 +99,29 @@ func (s *UserService) GetProcessedDocumentsForUser(ctx context.Context, userID s
 	}
 
 	return docs, nil
+}
+
+func documentFilter(filter validation.DocumentFilter) model.DocumentFilter {
+	if filter.Pagination == nil {
+		filter.Pagination = sharedvalidation.DefaultPagination()
+	}
+	f := model.DocumentFilter{
+		UserID:     filter.UserID,
+		Pagination: &sharedmodel.Pagination{Limit: filter.Pagination.Limit, Offset: filter.Pagination.Offset},
+	}
+	if filter.Status != nil {
+		s := model.DocumentStatus(*filter.Status)
+		f.Status = &s
+	}
+	if filter.ImageType != nil {
+		it := model.DocumentImageType(*filter.ImageType)
+		f.ImageType = &it
+	}
+	if filter.Sort != nil {
+		sort := model.DocumentSort(*filter.Sort)
+		f.Sort = &sort
+	}
+	return f
 }
 
 func (s *UserService) CheckDocument(ctx context.Context, docID string, data validation.DocumentUpdate) error {
@@ -183,7 +202,7 @@ func (s *UserService) HandleDocumentAnalyzed(ctx context.Context, event model.Do
 
 func (s *UserService) checkAndFlagDocumentVerified(ctx context.Context, log *slog.Logger, userID string) error {
 	latestDocs, err := s.docRepo.Find(ctx, model.DocumentFilter{
-		UserID:        &userID,
+		UserID:        userID,
 		LatestPerType: true,
 	})
 	if err != nil {

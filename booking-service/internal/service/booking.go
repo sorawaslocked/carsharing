@@ -25,7 +25,6 @@ type BookingService struct {
 	log         *slog.Logger
 	validate    *validator.Validate
 	bookingRepo BookingRepository
-	ruleRepo    PricingRuleRepository
 	publisher   EventPublisher
 	carChecker  CarChecker
 }
@@ -34,7 +33,6 @@ func NewBookingService(
 	log *slog.Logger,
 	validate *validator.Validate,
 	bookingRepo BookingRepository,
-	ruleRepo PricingRuleRepository,
 	publisher EventPublisher,
 	carChecker CarChecker,
 ) *BookingService {
@@ -42,7 +40,6 @@ func NewBookingService(
 		log:         pkglog.WithComponent(log, "service.BookingService"),
 		validate:    validate,
 		bookingRepo: bookingRepo,
-		ruleRepo:    ruleRepo,
 		publisher:   publisher,
 		carChecker:  carChecker,
 	}
@@ -60,15 +57,6 @@ func (s *BookingService) Create(ctx context.Context, data validation.BookingCrea
 		return "", err
 	}
 
-	carExists, err := s.carChecker.Exists(ctx, data.CarID)
-	if err != nil {
-		log.Error("checking car existence", pkglog.Err(err))
-		return "", err
-	}
-	if !carExists {
-		return "", model.ErrCarNotFound
-	}
-
 	carStatus, err := s.carChecker.GetStatus(ctx, data.CarID)
 	if err != nil {
 		log.Error("getting car status", pkglog.Err(err))
@@ -76,14 +64,6 @@ func (s *BookingService) Create(ctx context.Context, data validation.BookingCrea
 	}
 	if carStatus != model.CarStatusAvailable {
 		return "", model.ErrCarNotAvailable
-	}
-
-	if _, err := s.ruleRepo.GetByID(ctx, data.PricingRuleID); err != nil {
-		if errors.Is(err, model.ErrPricingRuleNotFound) {
-			return "", model.ErrPricingRuleNotFound
-		}
-		log.Error("getting pricing rule", pkglog.Err(err))
-		return "", err
 	}
 
 	expiresAt := time.Now().Add(defaultExpiryDuration)

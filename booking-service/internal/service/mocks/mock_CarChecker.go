@@ -22,60 +22,6 @@ func (_m *MockCarChecker) EXPECT() *MockCarChecker_Expecter {
 	return &MockCarChecker_Expecter{mock: &_m.Mock}
 }
 
-// Exists provides a mock function with given fields: ctx, carID
-func (_m *MockCarChecker) Exists(ctx context.Context, carID string) (bool, error) {
-	ret := _m.Called(ctx, carID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for Exists")
-	}
-
-	var r0 bool
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (bool, error)); ok {
-		return rf(ctx, carID)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) bool); ok {
-		r0 = rf(ctx, carID)
-	} else {
-		r0 = ret.Get(0).(bool)
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, carID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// MockCarChecker_Exists_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Exists'
-type MockCarChecker_Exists_Call struct {
-	*mock.Call
-}
-
-func (_e *MockCarChecker_Expecter) Exists(ctx interface{}, carID interface{}) *MockCarChecker_Exists_Call {
-	return &MockCarChecker_Exists_Call{Call: _e.mock.On("Exists", ctx, carID)}
-}
-
-func (_c *MockCarChecker_Exists_Call) Run(run func(ctx context.Context, carID string)) *MockCarChecker_Exists_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
-	})
-	return _c
-}
-
-func (_c *MockCarChecker_Exists_Call) Return(_a0 bool, _a1 error) *MockCarChecker_Exists_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *MockCarChecker_Exists_Call) RunAndReturn(run func(context.Context, string) (bool, error)) *MockCarChecker_Exists_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // GetStatus provides a mock function with given fields: ctx, carID
 func (_m *MockCarChecker) GetStatus(ctx context.Context, carID string) (model.CarStatus, error) {
 	ret := _m.Called(ctx, carID)

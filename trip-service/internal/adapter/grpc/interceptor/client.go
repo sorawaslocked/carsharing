@@ -10,11 +10,15 @@ import (
 	pkgutils "carsharing/shared/pkg/utils"
 )
 
-func MetadataForwardingUnaryInterceptor(ctx context.Context, method string, req, reply any, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+type ClientBaseInterceptor struct{}
+
+func NewClientBaseInterceptor() *ClientBaseInterceptor { return &ClientBaseInterceptor{} }
+
+func (i *ClientBaseInterceptor) Unary(ctx context.Context, method string, req, reply any, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 	return invoker(attachOutgoingMetadata(ctx), method, req, reply, cc, opts...)
 }
 
-func MetadataForwardingStreamInterceptor(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
+func (i *ClientBaseInterceptor) Stream(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
 	return streamer(attachOutgoingMetadata(ctx), desc, cc, method, opts...)
 }
 

@@ -82,6 +82,9 @@ CREATE TABLE IF NOT EXISTS trip_summaries (
 	total_cost_tenge     INTEGER          NOT NULL
 );
 
+CREATE INDEX IF NOT EXISTS idx_trips_user_id_created_at ON trips (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trips_car_id_created_at  ON trips (car_id,  created_at DESC);
+
 CREATE TABLE IF NOT EXISTS trip_status_readings (
 	id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
 	trip_id     UUID        NOT NULL REFERENCES trips (id) ON DELETE CASCADE,

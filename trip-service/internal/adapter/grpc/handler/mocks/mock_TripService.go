@@ -408,6 +408,54 @@ func (_c *MockTripService_StartTrip_Call) RunAndReturn(run func(context.Context,
 	return _c
 }
 
+// StreamTripLiveFeed provides a mock function with given fields: ctx, tripID, send
+func (_m *MockTripService) StreamTripLiveFeed(ctx context.Context, tripID string, send func(model.TripLiveFeed) error) error {
+	ret := _m.Called(ctx, tripID, send)
+
+	if len(ret) == 0 {
+		panic("no return value specified for StreamTripLiveFeed")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, func(model.TripLiveFeed) error) error); ok {
+		r0 = rf(ctx, tripID, send)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockTripService_StreamTripLiveFeed_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'StreamTripLiveFeed'
+type MockTripService_StreamTripLiveFeed_Call struct {
+	*mock.Call
+}
+
+// StreamTripLiveFeed is a helper method to define mock.On call
+//   - ctx context.Context
+//   - tripID string
+//   - send func(model.TripLiveFeed) error
+func (_e *MockTripService_Expecter) StreamTripLiveFeed(ctx interface{}, tripID interface{}, send interface{}) *MockTripService_StreamTripLiveFeed_Call {
+	return &MockTripService_StreamTripLiveFeed_Call{Call: _e.mock.On("StreamTripLiveFeed", ctx, tripID, send)}
+}
+
+func (_c *MockTripService_StreamTripLiveFeed_Call) Run(run func(ctx context.Context, tripID string, send func(model.TripLiveFeed) error)) *MockTripService_StreamTripLiveFeed_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(func(model.TripLiveFeed) error))
+	})
+	return _c
+}
+
+func (_c *MockTripService_StreamTripLiveFeed_Call) Return(_a0 error) *MockTripService_StreamTripLiveFeed_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockTripService_StreamTripLiveFeed_Call) RunAndReturn(run func(context.Context, string, func(model.TripLiveFeed) error) error) *MockTripService_StreamTripLiveFeed_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewMockTripService creates a new instance of MockTripService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewMockTripService(t interface {

@@ -2,8 +2,6 @@ package service
 
 import "carsharing/trip-service/internal/model"
 
-// calculateCosts breaks down the total fare into base, distance, and overtime components.
-// durationSeconds is the elapsed trip time; distanceKM is the mileage delta.
 func calculateCosts(ps model.PricingSnapshot, committedPeriods *int32, durationSeconds int64, distanceKM float64) (base, distance, overtime int32) {
 	durationMinutes := int32(durationSeconds / 60)
 
@@ -17,7 +15,7 @@ func calculateCosts(ps model.PricingSnapshot, committedPeriods *int32, durationS
 		billableMinutes = 0
 	}
 
-	base = ps.RateTenge * billableMinutes
+	base = int32(int64(ps.RateTenge) * int64(billableMinutes))
 	if ps.MinChargeTenge != nil && base < *ps.MinChargeTenge {
 		base = *ps.MinChargeTenge
 	}
@@ -29,7 +27,7 @@ func calculateCosts(ps model.PricingSnapshot, committedPeriods *int32, durationS
 	if committedPeriods != nil && ps.OvertimePolicy != nil && ps.OvertimeRateTenge != nil {
 		overtimeMinutes := durationMinutes - *committedPeriods
 		if overtimeMinutes > 0 {
-			overtime = overtimeMinutes * *ps.OvertimeRateTenge
+			overtime = int32(int64(overtimeMinutes) * int64(*ps.OvertimeRateTenge))
 		}
 	}
 

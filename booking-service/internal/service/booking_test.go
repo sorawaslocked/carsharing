@@ -54,7 +54,6 @@ func newValidator() *validator.Validate {
 
 func newBookingSvc(
 	repo *mocks.MockBookingRepository,
-	rules *mocks.MockPricingRuleRepository,
 	pub *mocks.MockEventPublisher,
 	cars ...*mocks.MockCarChecker,
 ) *service.BookingService {
@@ -62,14 +61,13 @@ func newBookingSvc(
 	if len(cars) > 0 {
 		carChecker = cars[0]
 	}
-	return service.NewBookingService(discardLogger(), newValidator(), repo, rules, pub, carChecker)
+	return service.NewBookingService(discardLogger(), newValidator(), repo, pub, carChecker)
 }
 
 // --- Create ---
 
 func TestBookingService_Create_HappyPath(t *testing.T) {
 	repo := mocks.NewMockBookingRepository(t)
-	rules := mocks.NewMockPricingRuleRepository(t)
 	pub := mocks.NewMockEventPublisher(t)
 	cars := mocks.NewMockCarChecker(t)
 
@@ -80,9 +78,7 @@ func TestBookingService_Create_HappyPath(t *testing.T) {
 	}
 	booking := model.Booking{ID: testBookingID}
 
-	cars.EXPECT().Exists(mock.Anything, testCarID).Return(true, nil)
 	cars.EXPECT().GetStatus(mock.Anything, testCarID).Return(model.CarStatusAvailable, nil)
-	rules.EXPECT().GetByID(mock.Anything, testPricingRuleID).Return(model.PricingRule{}, nil)
 	repo.EXPECT().Create(mock.Anything, model.BookingCreate{
 		UserID:        testManagerID,
 		CarID:         testCarID,
@@ -91,23 +87,37 @@ func TestBookingService_Create_HappyPath(t *testing.T) {
 	repo.EXPECT().GetByID(mock.Anything, testBookingID).Return(booking, nil)
 	pub.EXPECT().PublishBookingCreated(mock.Anything, booking).Return(nil)
 
-	id, err := newBookingSvc(repo, rules, pub, cars).Create(ctxAsBookingManager(), data)
+	id, err := newBookingSvc(repo, pub, cars).Create(ctxAsBookingManager(), data)
 
 	require.NoError(t, err)
 	assert.Equal(t, testBookingID, id)
 }
 
-func TestBookingService_Create_RuleNotFound(t *testing.T) {
+func TestBookingService_Create_CarNotFound(t *testing.T) {
 	repo := mocks.NewMockBookingRepository(t)
-	rules := mocks.NewMockPricingRuleRepository(t)
 	pub := mocks.NewMockEventPublisher(t)
 	cars := mocks.NewMockCarChecker(t)
 
-	cars.EXPECT().Exists(mock.Anything, testCarID).Return(true, nil)
-	cars.EXPECT().GetStatus(mock.Anything, testCarID).Return(model.CarStatusAvailable, nil)
-	rules.EXPECT().GetByID(mock.Anything, testMissingID).Return(model.PricingRule{}, model.ErrPricingRuleNotFound)
+	cars.EXPECT().GetStatus(mock.Anything, testCarID).Return("", model.ErrCarNotFound)
 
-	_, err := newBookingSvc(repo, rules, pub, cars).Create(ctxAsBookingManager(), validation.BookingCreate{
+	_, err := newBookingSvc(repo, pub, cars).Create(ctxAsBookingManager(), validation.BookingCreate{
+		UserID:        testManagerID,
+		CarID:         testCarID,
+		PricingRuleID: testPricingRuleID,
+	})
+
+	assert.ErrorIs(t, err, model.ErrCarNotFound)
+}
+
+func TestBookingService_Create_RuleNotFound(t *testing.T) {
+	repo := mocks.NewMockBookingRepository(t)
+	pub := mocks.NewMockEventPublisher(t)
+	cars := mocks.NewMockCarChecker(t)
+
+	cars.EXPECT().GetStatus(mock.Anything, testCarID).Return(model.CarStatusAvailable, nil)
+	repo.EXPECT().Create(mock.Anything, mock.AnythingOfType("model.BookingCreate"), mock.AnythingOfType("time.Time")).Return("", model.ErrPricingRuleNotFound)
+
+	_, err := newBookingSvc(repo, pub, cars).Create(ctxAsBookingManager(), validation.BookingCreate{
 		UserID:        testManagerID,
 		CarID:         testCarID,
 		PricingRuleID: testMissingID,
@@ -120,16 +130,13 @@ func TestBookingService_Create_RepoError(t *testing.T) {
 	repoErr := errors.New("db down")
 
 	repo := mocks.NewMockBookingRepository(t)
-	rules := mocks.NewMockPricingRuleRepository(t)
 	pub := mocks.NewMockEventPublisher(t)
 	cars := mocks.NewMockCarChecker(t)
 
-	cars.EXPECT().Exists(mock.Anything, testCarID).Return(true, nil)
 	cars.EXPECT().GetStatus(mock.Anything, testCarID).Return(model.CarStatusAvailable, nil)
-	rules.EXPECT().GetByID(mock.Anything, testPricingRuleID).Return(model.PricingRule{}, nil)
 	repo.EXPECT().Create(mock.Anything, mock.AnythingOfType("model.BookingCreate"), mock.AnythingOfType("time.Time")).Return("", repoErr)
 
-	_, err := newBookingSvc(repo, rules, pub, cars).Create(ctxAsBookingManager(), validation.BookingCreate{
+	_, err := newBookingSvc(repo, pub, cars).Create(ctxAsBookingManager(), validation.BookingCreate{
 		UserID:        testManagerID,
 		CarID:         testCarID,
 		PricingRuleID: testPricingRuleID,
@@ -141,17 +148,14 @@ func TestBookingService_Create_RepoError(t *testing.T) {
 // If GetByID after create fails the service still returns the ID without error.
 func TestBookingService_Create_FetchAfterCreateFails_StillReturnsID(t *testing.T) {
 	repo := mocks.NewMockBookingRepository(t)
-	rules := mocks.NewMockPricingRuleRepository(t)
 	pub := mocks.NewMockEventPublisher(t)
 	cars := mocks.NewMockCarChecker(t)
 
-	cars.EXPECT().Exists(mock.Anything, testCarID).Return(true, nil)
 	cars.EXPECT().GetStatus(mock.Anything, testCarID).Return(model.CarStatusAvailable, nil)
-	rules.EXPECT().GetByID(mock.Anything, testPricingRuleID).Return(model.PricingRule{}, nil)
 	repo.EXPECT().Create(mock.Anything, mock.AnythingOfType("model.BookingCreate"), mock.AnythingOfType("time.Time")).Return(testBookingID2, nil)
 	repo.EXPECT().GetByID(mock.Anything, testBookingID2).Return(model.Booking{}, errors.New("transient error"))
 
-	id, err := newBookingSvc(repo, rules, pub, cars).Create(ctxAsBookingManager(), validation.BookingCreate{
+	id, err := newBookingSvc(repo, pub, cars).Create(ctxAsBookingManager(), validation.BookingCreate{
 		UserID:        testManagerID,
 		CarID:         testCarID,
 		PricingRuleID: testPricingRuleID,
@@ -164,20 +168,17 @@ func TestBookingService_Create_FetchAfterCreateFails_StillReturnsID(t *testing.T
 // Publish failure must not surface as an error to the caller.
 func TestBookingService_Create_PublishFailure_NoError(t *testing.T) {
 	repo := mocks.NewMockBookingRepository(t)
-	rules := mocks.NewMockPricingRuleRepository(t)
 	pub := mocks.NewMockEventPublisher(t)
 	cars := mocks.NewMockCarChecker(t)
 
 	booking := model.Booking{ID: testBookingID3}
 
-	cars.EXPECT().Exists(mock.Anything, testCarID).Return(true, nil)
 	cars.EXPECT().GetStatus(mock.Anything, testCarID).Return(model.CarStatusAvailable, nil)
-	rules.EXPECT().GetByID(mock.Anything, testPricingRuleID).Return(model.PricingRule{}, nil)
 	repo.EXPECT().Create(mock.Anything, mock.AnythingOfType("model.BookingCreate"), mock.AnythingOfType("time.Time")).Return(testBookingID3, nil)
 	repo.EXPECT().GetByID(mock.Anything, testBookingID3).Return(booking, nil)
 	pub.EXPECT().PublishBookingCreated(mock.Anything, booking).Return(errors.New("nats unavailable"))
 
-	id, err := newBookingSvc(repo, rules, pub, cars).Create(ctxAsBookingManager(), validation.BookingCreate{
+	id, err := newBookingSvc(repo, pub, cars).Create(ctxAsBookingManager(), validation.BookingCreate{
 		UserID:        testManagerID,
 		CarID:         testCarID,
 		PricingRuleID: testPricingRuleID,
@@ -195,7 +196,7 @@ func TestBookingService_GetByID_HappyPath(t *testing.T) {
 	repo := mocks.NewMockBookingRepository(t)
 	repo.EXPECT().GetByID(mock.Anything, testBookingID).Return(want, nil)
 
-	got, err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), mocks.NewMockEventPublisher(t)).
+	got, err := newBookingSvc(repo, mocks.NewMockEventPublisher(t)).
 		GetByID(ctxAsUser(testUserID), testBookingID)
 
 	require.NoError(t, err)
@@ -206,7 +207,7 @@ func TestBookingService_GetByID_NotFound(t *testing.T) {
 	repo := mocks.NewMockBookingRepository(t)
 	repo.EXPECT().GetByID(mock.Anything, testMissingID).Return(model.Booking{}, model.ErrBookingNotFound)
 
-	_, err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), mocks.NewMockEventPublisher(t)).
+	_, err := newBookingSvc(repo, mocks.NewMockEventPublisher(t)).
 		GetByID(ctxAsBookingManager(), testMissingID)
 
 	assert.ErrorIs(t, err, model.ErrBookingNotFound)
@@ -220,7 +221,7 @@ func TestBookingService_List_HappyPath(t *testing.T) {
 	repo := mocks.NewMockBookingRepository(t)
 	repo.EXPECT().List(mock.Anything, mock.AnythingOfType("model.BookingListFilter")).Return(want, nil)
 
-	got, err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), mocks.NewMockEventPublisher(t)).
+	got, err := newBookingSvc(repo, mocks.NewMockEventPublisher(t)).
 		List(ctxAsBookingManager(), validation.BookingListFilter{})
 
 	require.NoError(t, err)
@@ -233,7 +234,7 @@ func TestBookingService_List_RepoError(t *testing.T) {
 	repo := mocks.NewMockBookingRepository(t)
 	repo.EXPECT().List(mock.Anything, mock.AnythingOfType("model.BookingListFilter")).Return(nil, repoErr)
 
-	_, err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), mocks.NewMockEventPublisher(t)).
+	_, err := newBookingSvc(repo, mocks.NewMockEventPublisher(t)).
 		List(ctxAsBookingManager(), validation.BookingListFilter{})
 
 	assert.ErrorIs(t, err, repoErr)
@@ -252,7 +253,7 @@ func TestBookingService_Cancel_HappyPath(t *testing.T) {
 	repo.EXPECT().UpdateStatus(mock.Anything, testBookingID, model.BookingStatusCancelled, sharedmodel.ActorTypeUser, ptr(testUserID), &reason).Return(nil)
 	pub.EXPECT().PublishBookingCancelled(mock.Anything, booking, reason).Return(nil)
 
-	err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), pub).
+	err := newBookingSvc(repo, pub).
 		Cancel(ctxAsUser(testUserID), testBookingID, &reason)
 
 	require.NoError(t, err)
@@ -262,7 +263,7 @@ func TestBookingService_Cancel_NotFound(t *testing.T) {
 	repo := mocks.NewMockBookingRepository(t)
 	repo.EXPECT().GetByID(mock.Anything, testMissingID).Return(model.Booking{}, model.ErrBookingNotFound)
 
-	err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), mocks.NewMockEventPublisher(t)).
+	err := newBookingSvc(repo, mocks.NewMockEventPublisher(t)).
 		Cancel(ctxAsBookingManager(), testMissingID, nil)
 
 	assert.ErrorIs(t, err, model.ErrBookingNotFound)
@@ -280,7 +281,7 @@ func TestBookingService_Cancel_InvalidTransition(t *testing.T) {
 			repo := mocks.NewMockBookingRepository(t)
 			repo.EXPECT().GetByID(mock.Anything, testBookingID).Return(model.Booking{UserID: testUserID, Status: status}, nil)
 
-			err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), mocks.NewMockEventPublisher(t)).
+			err := newBookingSvc(repo, mocks.NewMockEventPublisher(t)).
 				Cancel(ctxAsUser(testUserID), testBookingID, nil)
 
 			assert.ErrorIs(t, err, model.ErrInvalidBookingStatusTransition)
@@ -296,7 +297,7 @@ func TestBookingService_Cancel_UpdateStatusError(t *testing.T) {
 	repo.EXPECT().GetByID(mock.Anything, testBookingID).Return(booking, nil)
 	repo.EXPECT().UpdateStatus(mock.Anything, testBookingID, model.BookingStatusCancelled, sharedmodel.ActorTypeUser, ptr(testUserID), (*string)(nil)).Return(repoErr)
 
-	err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), mocks.NewMockEventPublisher(t)).
+	err := newBookingSvc(repo, mocks.NewMockEventPublisher(t)).
 		Cancel(ctxAsUser(testUserID), testBookingID, nil)
 
 	assert.ErrorIs(t, err, repoErr)
@@ -313,7 +314,7 @@ func TestBookingService_Cancel_PublishFailure_NoError(t *testing.T) {
 	repo.EXPECT().UpdateStatus(mock.Anything, testBookingID, model.BookingStatusCancelled, sharedmodel.ActorTypeUser, ptr(testUserID), (*string)(nil)).Return(nil)
 	pub.EXPECT().PublishBookingCancelled(mock.Anything, booking, "").Return(errors.New("nats unavailable"))
 
-	err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), pub).
+	err := newBookingSvc(repo, pub).
 		Cancel(ctxAsUser(testUserID), testBookingID, nil)
 
 	require.NoError(t, err)
@@ -331,14 +332,14 @@ func TestBookingService_Complete_HappyPath(t *testing.T) {
 	repo.EXPECT().UpdateStatus(mock.Anything, testBookingID, model.BookingStatusCompleted, sharedmodel.ActorTypeSystem, (*string)(nil), (*string)(nil)).Return(nil)
 	pub.EXPECT().PublishBookingCompleted(mock.Anything, booking).Return(nil)
 
-	require.NoError(t, newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), pub).Complete(context.Background(), testBookingID))
+	require.NoError(t, newBookingSvc(repo, pub).Complete(context.Background(), testBookingID))
 }
 
 func TestBookingService_Complete_NotFound(t *testing.T) {
 	repo := mocks.NewMockBookingRepository(t)
 	repo.EXPECT().GetByID(mock.Anything, testMissingID).Return(model.Booking{}, model.ErrBookingNotFound)
 
-	err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), mocks.NewMockEventPublisher(t)).
+	err := newBookingSvc(repo, mocks.NewMockEventPublisher(t)).
 		Complete(context.Background(), testMissingID)
 
 	assert.ErrorIs(t, err, model.ErrBookingNotFound)
@@ -348,7 +349,7 @@ func TestBookingService_Complete_InvalidTransition(t *testing.T) {
 	repo := mocks.NewMockBookingRepository(t)
 	repo.EXPECT().GetByID(mock.Anything, testBookingID).Return(model.Booking{Status: model.BookingStatusCompleted}, nil)
 
-	err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), mocks.NewMockEventPublisher(t)).
+	err := newBookingSvc(repo, mocks.NewMockEventPublisher(t)).
 		Complete(context.Background(), testBookingID)
 
 	assert.ErrorIs(t, err, model.ErrInvalidBookingStatusTransition)
@@ -363,7 +364,7 @@ func TestBookingService_UpdateStatus_HappyPath(t *testing.T) {
 	repo.EXPECT().GetByID(mock.Anything, testBookingID).Return(booking, nil)
 	repo.EXPECT().UpdateStatus(mock.Anything, testBookingID, model.BookingStatusCancelled, sharedmodel.ActorTypeUser, ptr(testManagerID), (*string)(nil)).Return(nil)
 
-	err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), mocks.NewMockEventPublisher(t)).
+	err := newBookingSvc(repo, mocks.NewMockEventPublisher(t)).
 		UpdateStatus(ctxAsBookingManager(), testBookingID, validation.BookingStatusUpdate{Status: "cancelled"})
 
 	require.NoError(t, err)
@@ -372,7 +373,6 @@ func TestBookingService_UpdateStatus_HappyPath(t *testing.T) {
 func TestBookingService_UpdateStatus_InvalidStatusString(t *testing.T) {
 	err := newBookingSvc(
 		mocks.NewMockBookingRepository(t),
-		mocks.NewMockPricingRuleRepository(t),
 		mocks.NewMockEventPublisher(t),
 	).UpdateStatus(ctxAsBookingManager(), testBookingID, validation.BookingStatusUpdate{Status: "INVALID"})
 
@@ -384,7 +384,7 @@ func TestBookingService_UpdateStatus_NotFound(t *testing.T) {
 	repo := mocks.NewMockBookingRepository(t)
 	repo.EXPECT().GetByID(mock.Anything, testMissingID).Return(model.Booking{}, model.ErrBookingNotFound)
 
-	err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), mocks.NewMockEventPublisher(t)).
+	err := newBookingSvc(repo, mocks.NewMockEventPublisher(t)).
 		UpdateStatus(ctxAsBookingManager(), testMissingID, validation.BookingStatusUpdate{Status: "cancelled"})
 
 	assert.ErrorIs(t, err, model.ErrBookingNotFound)
@@ -394,7 +394,7 @@ func TestBookingService_UpdateStatus_InvalidTransition(t *testing.T) {
 	repo := mocks.NewMockBookingRepository(t)
 	repo.EXPECT().GetByID(mock.Anything, testBookingID).Return(model.Booking{Status: model.BookingStatusExpired}, nil)
 
-	err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), mocks.NewMockEventPublisher(t)).
+	err := newBookingSvc(repo, mocks.NewMockEventPublisher(t)).
 		UpdateStatus(ctxAsBookingManager(), testBookingID, validation.BookingStatusUpdate{Status: "cancelled"})
 
 	assert.ErrorIs(t, err, model.ErrInvalidBookingStatusTransition)
@@ -409,7 +409,7 @@ func TestBookingService_GetStatusHistory_HappyPath(t *testing.T) {
 	repo.EXPECT().GetByID(mock.Anything, testBookingID).Return(model.Booking{ID: testBookingID, UserID: testUserID}, nil)
 	repo.EXPECT().GetStatusHistory(mock.Anything, mock.AnythingOfType("model.BookingStatusHistoryFilter")).Return(want, nil)
 
-	got, err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), mocks.NewMockEventPublisher(t)).
+	got, err := newBookingSvc(repo, mocks.NewMockEventPublisher(t)).
 		GetStatusHistory(ctxAsUser(testUserID), validation.BookingStatusHistoryFilter{BookingID: testBookingID})
 
 	require.NoError(t, err)
@@ -423,7 +423,7 @@ func TestBookingService_GetStatusHistory_RepoError(t *testing.T) {
 	repo.EXPECT().GetByID(mock.Anything, testBookingID).Return(model.Booking{ID: testBookingID, UserID: testUserID}, nil)
 	repo.EXPECT().GetStatusHistory(mock.Anything, mock.AnythingOfType("model.BookingStatusHistoryFilter")).Return(nil, repoErr)
 
-	_, err := newBookingSvc(repo, mocks.NewMockPricingRuleRepository(t), mocks.NewMockEventPublisher(t)).
+	_, err := newBookingSvc(repo, mocks.NewMockEventPublisher(t)).
 		GetStatusHistory(ctxAsUser(testUserID), validation.BookingStatusHistoryFilter{BookingID: testBookingID})
 
 	assert.ErrorIs(t, err, repoErr)

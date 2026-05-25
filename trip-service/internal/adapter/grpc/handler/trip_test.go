@@ -225,7 +225,7 @@ func TestTripHandler_GetTripStatusHistory_Success(t *testing.T) {
 // ── TripStreamHandler ─────────────────────────────────────────────────────────
 
 func TestTripStreamHandler_StreamTripLiveFeed_Success(t *testing.T) {
-	svc := handlermocks.NewMockTripStreamService(t)
+	svc := handlermocks.NewMockTripService(t)
 	h := handler.NewTripStreamHandler(discardLogger(), svc)
 	stream := &fakeServerStream{ctx: context.Background()}
 
@@ -245,7 +245,7 @@ func TestTripStreamHandler_StreamTripLiveFeed_Success(t *testing.T) {
 }
 
 func TestTripStreamHandler_StreamTripLiveFeed_EOFIsCleanClose(t *testing.T) {
-	svc := handlermocks.NewMockTripStreamService(t)
+	svc := handlermocks.NewMockTripService(t)
 	h := handler.NewTripStreamHandler(discardLogger(), svc)
 	stream := &fakeServerStream{ctx: context.Background()}
 
@@ -257,7 +257,7 @@ func TestTripStreamHandler_StreamTripLiveFeed_EOFIsCleanClose(t *testing.T) {
 }
 
 func TestTripStreamHandler_StreamTripLiveFeed_ServiceError(t *testing.T) {
-	svc := handlermocks.NewMockTripStreamService(t)
+	svc := handlermocks.NewMockTripService(t)
 	h := handler.NewTripStreamHandler(discardLogger(), svc)
 	stream := &fakeServerStream{ctx: context.Background()}
 

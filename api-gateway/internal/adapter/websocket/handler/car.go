@@ -15,16 +15,14 @@ import (
 )
 
 type CarWsHandler struct {
-	svc          CarStreamService
-	carStatusHub *CarStatusHub
-	log          *slog.Logger
+	svc CarStreamService
+	log *slog.Logger
 }
 
-func NewCarWsHandler(svc CarStreamService, carStatusHub *CarStatusHub, logger *slog.Logger) *CarWsHandler {
+func NewCarWsHandler(svc CarStreamService, logger *slog.Logger) *CarWsHandler {
 	return &CarWsHandler{
-		svc:          svc,
-		carStatusHub: carStatusHub,
-		log:          pkglog.WithComponent(logger, "ws.CarHandler"),
+		svc: svc,
+		log: pkglog.WithComponent(logger, "ws.CarHandler"),
 	}
 }
 
@@ -149,17 +147,19 @@ func (h *CarWsHandler) Telemetry(c *gin.Context) {
 
 // Status godoc
 // @Summary      Live car status feed
-// @Description  WebSocket stream of status transition events for a single car, delivered via NATS. Streams until token expiry or disconnect.
+// @Description  WebSocket stream of status transition events for a single car. Streams until token expiry or disconnect.
 // @Tags         cars
 // @Security     BearerAuth
 // @Param        id  path  string  true  "Car ID"
 // @Produce      json
 // @Success      101  {object}  wsdto.CarStatusMessage  "Streamed WebSocket message format"
 // @Failure      401  "unauthorized"
+// @Failure      404  "car not found"
 // @Failure      500  "internal server error"
 // @Router       /ws/cars/{id}/status [get]
 func (h *CarWsHandler) Status(c *gin.Context) {
 	logger := pkglog.WithMethod(h.log, "Status")
+	logger = pkglog.WithMetadata(logger, utils.MetadataFromCtx(c.Request.Context()))
 
 	carID := c.Param("id")
 
@@ -170,29 +170,24 @@ func (h *CarWsHandler) Status(c *gin.Context) {
 	}
 	defer conn.CloseNow()
 
+	connID := fmt.Sprintf("%p", conn)
+	logger.Info("status websocket opened", slog.String("connID", connID), slog.String("carID", carID))
+	defer logger.Info("status websocket closed", slog.String("connID", connID))
+
 	ctx, cancel := tokenDeadlineCtx(c)
 	defer cancel()
 
-	ch, unsub := h.carStatusHub.Subscribe(carID)
-	defer unsub()
-
-	for {
-		select {
-		case event := <-ch:
-			msg := wsdto.CarStatusMessage{
-				CarID:      event.CarID,
-				FromStatus: event.FromStatus,
-				ToStatus:   event.ToStatus,
-			}
-			if writeErr := wsjson.Write(ctx, conn, msg); writeErr != nil {
-				logger.Error("writing message", pkglog.Err(writeErr))
-				conn.Close(websocket.StatusNormalClosure, "")
-				return
-			}
-
-		case <-ctx.Done():
-			conn.Close(websocket.StatusNormalClosure, "")
-			return
-		}
+	streamErr := h.svc.StreamCarStatusUpdates(ctx, carID, func(event model.CarStatusEvent) error {
+		logger.Info("status writing event", slog.String("connID", connID))
+		return wsjson.Write(ctx, conn, wsdto.CarStatusMessage{
+			CarID:      carID,
+			FromStatus: event.FromStatus,
+			ToStatus:   event.ToStatus,
+		})
+	})
+	if streamErr != nil {
+		logger.Error("status stream error", pkglog.Err(streamErr), slog.String("connID", connID))
 	}
+
+	conn.Close(websocket.StatusNormalClosure, "")
 }

@@ -82,6 +82,49 @@ func (h *CarHandler) StreamCarsWithFilter(ctx context.Context, filter model.CarF
 	}
 }
 
+func (h *CarHandler) StreamCarStatusUpdates(ctx context.Context, carID string, send func(model.CarStatusEvent) error) error {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "StreamCarStatusUpdates"), utils.MetadataFromCtx(ctx))
+	log.Debug("starting stream")
+
+	req := &carsvc.StreamCarStatusUpdatesRequest{CarId: carID}
+
+	stream, err := h.streamClient.StreamCarStatusUpdates(ctx, req)
+	if err != nil {
+		if ctx.Err() != nil {
+			return nil
+		}
+		log.Warn("streaming car status updates", pkglog.Err(err))
+		return dto.FromGrpcErr(err)
+	}
+	log.Debug("stream opened")
+
+	for {
+		msg, err := stream.Recv()
+		if errors.Is(err, io.EOF) {
+			return nil
+		}
+		if err != nil {
+			if ctx.Err() != nil {
+				return nil
+			}
+			log.Warn("receiving car status updates stream", pkglog.Err(err))
+			return dto.FromGrpcErr(err)
+		}
+
+		event := model.CarStatusEvent{
+			FromStatus: msg.GetFromStatus(),
+			ToStatus:   msg.GetToStatus(),
+		}
+		if t := msg.GetChangedAt(); t != nil {
+			event.ChangedAt = t.AsTime()
+		}
+
+		if err = send(event); err != nil {
+			return err
+		}
+	}
+}
+
 func (h *CarHandler) StreamCarTelemetry(ctx context.Context, carID string, send func(model.CarTelemetryEvent) error) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "StreamCarTelemetry"), utils.MetadataFromCtx(ctx))
 	log.Debug("starting stream")

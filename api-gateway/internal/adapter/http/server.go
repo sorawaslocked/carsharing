@@ -52,7 +52,6 @@ func New(
 	carStreamService wshandler.CarStreamService,
 	tripStreamService wshandler.TripStreamService,
 	documentStreamService wshandler.DocumentStreamService,
-	carStatusHub *wshandler.CarStatusHub,
 ) *Server {
 	httpLog := log.With(
 		slog.String("httpServerHost", httpCfg.Host),
@@ -77,7 +76,7 @@ func New(
 
 	// WebSocket handlers
 	userWsHandler := wshandler.NewUserWsHandler(documentStreamService, log)
-	carWsHandler := wshandler.NewCarWsHandler(carStreamService, carStatusHub, log)
+	carWsHandler := wshandler.NewCarWsHandler(carStreamService, log)
 	tripWsHandler := wshandler.NewTripWsHandler(tripStreamService, log)
 
 	server := &Server{

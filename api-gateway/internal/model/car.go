@@ -159,8 +159,8 @@ type CarTelemetryEvent struct {
 	RecordedAt   time.Time
 }
 
-type CarStatusUpdatedEvent struct {
-	CarID      string
+type CarStatusEvent struct {
 	FromStatus string
 	ToStatus   string
+	ChangedAt  time.Time
 }

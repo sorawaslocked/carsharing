@@ -38,7 +38,7 @@ func TestStreamCarsWithFilter(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 
 		svc := mocks.NewMockCarService(t)
-		h := NewCarStreamHandler(discardLogger(), svc, nil)
+		h := NewCarStreamHandler(discardLogger(), svc, nil, nil)
 		stream := newStream[carsvc.StreamCarsWithFilterResponse](ctx)
 
 		svc.EXPECT().
@@ -59,7 +59,7 @@ func TestStreamCarsWithFilter(t *testing.T) {
 		defer cancel()
 
 		svc := mocks.NewMockCarService(t)
-		h := NewCarStreamHandler(discardLogger(), svc, nil)
+		h := NewCarStreamHandler(discardLogger(), svc, nil, nil)
 		stream := newStream[carsvc.StreamCarsWithFilterResponse](ctx)
 
 		svc.EXPECT().List(mock.Anything, mock.Anything).Return(nil, errInternal)
@@ -72,7 +72,7 @@ func TestStreamCarsWithFilter(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 
 		svc := mocks.NewMockCarService(t)
-		h := NewCarStreamHandler(discardLogger(), svc, nil)
+		h := NewCarStreamHandler(discardLogger(), svc, nil, nil)
 		stream := newStream[carsvc.StreamCarsWithFilterResponse](ctx)
 
 		highFuel := float32(80)
@@ -96,6 +96,89 @@ func TestStreamCarsWithFilter(t *testing.T) {
 	})
 }
 
+func TestStreamCarStatusUpdates(t *testing.T) {
+	carID := "c0000000-0000-4000-4000-000000000001"
+
+	t.Run("sends updates from channel", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		svc := mocks.NewMockCarService(t)
+		sub := mocks.NewMockStatusSubscriber(t)
+		h := NewCarStreamHandler(discardLogger(), svc, nil, sub)
+		stream := newStream[carsvc.StreamCarStatusUpdatesResponse](ctx)
+
+		svc.EXPECT().Get(mock.Anything, carID).Return(model.Car{ID: carID}, nil)
+
+		ch := make(chan model.CarStatusUpdate, 1)
+		ch <- model.CarStatusUpdate{
+			CarID:      carID,
+			FromStatus: model.CarStatusAvailable,
+			ToStatus:   model.CarStatusReserved,
+		}
+		close(ch)
+
+		sub.EXPECT().SubscribeStatusUpdates(carID).Return((<-chan model.CarStatusUpdate)(ch), func() {})
+
+		err := h.StreamCarStatusUpdates(&carsvc.StreamCarStatusUpdatesRequest{CarId: carID}, stream)
+		assert.NoError(t, err)
+		assert.Len(t, stream.msgs, 1)
+		assert.Equal(t, "available", stream.msgs[0].FromStatus)
+		assert.Equal(t, "reserved", stream.msgs[0].ToStatus)
+	})
+
+	t.Run("car not found maps to NotFound", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		svc := mocks.NewMockCarService(t)
+		h := NewCarStreamHandler(discardLogger(), svc, nil, nil)
+		stream := newStream[carsvc.StreamCarStatusUpdatesResponse](ctx)
+
+		svc.EXPECT().Get(mock.Anything, carID).Return(model.Car{}, model.ErrCarNotFound)
+
+		err := h.StreamCarStatusUpdates(&carsvc.StreamCarStatusUpdatesRequest{CarId: carID}, stream)
+		assert.Equal(t, codes.NotFound, grpcCode(err))
+	})
+
+	t.Run("closed channel causes normal exit", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		svc := mocks.NewMockCarService(t)
+		sub := mocks.NewMockStatusSubscriber(t)
+		h := NewCarStreamHandler(discardLogger(), svc, nil, sub)
+		stream := newStream[carsvc.StreamCarStatusUpdatesResponse](ctx)
+
+		svc.EXPECT().Get(mock.Anything, carID).Return(model.Car{ID: carID}, nil)
+
+		ch := make(chan model.CarStatusUpdate)
+		close(ch)
+		sub.EXPECT().SubscribeStatusUpdates(carID).Return((<-chan model.CarStatusUpdate)(ch), func() {})
+
+		err := h.StreamCarStatusUpdates(&carsvc.StreamCarStatusUpdatesRequest{CarId: carID}, stream)
+		assert.NoError(t, err)
+	})
+
+	t.Run("context cancellation stops the stream", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(context.Background())
+
+		svc := mocks.NewMockCarService(t)
+		sub := mocks.NewMockStatusSubscriber(t)
+		h := NewCarStreamHandler(discardLogger(), svc, nil, sub)
+		stream := newStream[carsvc.StreamCarStatusUpdatesResponse](ctx)
+
+		svc.EXPECT().Get(mock.Anything, carID).Return(model.Car{ID: carID}, nil)
+
+		ch := make(chan model.CarStatusUpdate)
+		sub.EXPECT().SubscribeStatusUpdates(carID).Return((<-chan model.CarStatusUpdate)(ch), func() {})
+
+		cancel()
+		err := h.StreamCarStatusUpdates(&carsvc.StreamCarStatusUpdatesRequest{CarId: carID}, stream)
+		assert.NoError(t, err)
+	})
+}
+
 func TestStreamCarTelemetry(t *testing.T) {
 	carID := "c0000000-0000-4000-8000-000000000001"
 
@@ -105,7 +188,7 @@ func TestStreamCarTelemetry(t *testing.T) {
 
 		svc := mocks.NewMockCarService(t)
 		sub := mocks.NewMockTelemetrySubscriber(t)
-		h := NewCarStreamHandler(discardLogger(), svc, sub)
+		h := NewCarStreamHandler(discardLogger(), svc, sub, nil)
 		stream := newStream[carsvc.StreamCarTelemetryResponse](ctx)
 
 		mileage := int64(50_000)
@@ -132,7 +215,7 @@ func TestStreamCarTelemetry(t *testing.T) {
 		defer cancel()
 
 		svc := mocks.NewMockCarService(t)
-		h := NewCarStreamHandler(discardLogger(), svc, nil)
+		h := NewCarStreamHandler(discardLogger(), svc, nil, nil)
 		stream := newStream[carsvc.StreamCarTelemetryResponse](ctx)
 
 		svc.EXPECT().Get(mock.Anything, carID).Return(model.Car{}, model.ErrCarNotFound)
@@ -147,7 +230,7 @@ func TestStreamCarTelemetry(t *testing.T) {
 
 		svc := mocks.NewMockCarService(t)
 		sub := mocks.NewMockTelemetrySubscriber(t)
-		h := NewCarStreamHandler(discardLogger(), svc, sub)
+		h := NewCarStreamHandler(discardLogger(), svc, sub, nil)
 		stream := newStream[carsvc.StreamCarTelemetryResponse](ctx)
 
 		svc.EXPECT().Get(mock.Anything, carID).Return(model.Car{ID: carID}, nil)
@@ -165,7 +248,7 @@ func TestStreamCarTelemetry(t *testing.T) {
 
 		svc := mocks.NewMockCarService(t)
 		sub := mocks.NewMockTelemetrySubscriber(t)
-		h := NewCarStreamHandler(discardLogger(), svc, sub)
+		h := NewCarStreamHandler(discardLogger(), svc, sub, nil)
 		stream := newStream[carsvc.StreamCarTelemetryResponse](ctx)
 
 		svc.EXPECT().Get(mock.Anything, carID).Return(model.Car{ID: carID}, nil)

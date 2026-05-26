@@ -12,6 +12,10 @@ type TelemetrySubscriber interface {
 	SubscribeUpdates(carID string) (<-chan model.TelemetryUpdate, func())
 }
 
+type StatusSubscriber interface {
+	SubscribeStatusUpdates(carID string) (<-chan model.CarStatusUpdate, func())
+}
+
 type Pinger interface {
 	Ping(ctx context.Context) error
 }

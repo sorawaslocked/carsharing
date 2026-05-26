@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"carsharing/car-service/internal/model"
@@ -28,6 +30,10 @@ type CarService struct {
 	objectStorage        ObjectStorage
 	eventPublisher       EventPublisher
 	carCreatedNotifier   CarCreatedNotifier
+
+	subsMu sync.RWMutex
+	subs   map[string]map[uint64]chan model.CarStatusUpdate
+	subSeq atomic.Uint64
 }
 
 func NewCarService(
@@ -51,6 +57,7 @@ func NewCarService(
 		telemetryReadingRepo: telemetryReadingRepo,
 		objectStorage:        objectStorage,
 		eventPublisher:       eventPublisher,
+		subs:                 make(map[string]map[uint64]chan model.CarStatusUpdate),
 	}
 }
 
@@ -289,6 +296,13 @@ func (s *CarService) UpdateCarStatus(ctx context.Context, id string, data valida
 			)
 		}
 	}
+
+	s.fanOutStatus(current.ID, model.CarStatusUpdate{
+		CarID:      current.ID,
+		FromStatus: current.Status,
+		ToStatus:   toStatus,
+		ChangedAt:  now,
+	})
 
 	log.Info("car status updated",
 		slog.String("carID", current.ID),
@@ -589,6 +603,40 @@ func (s *CarService) OnTripCancelled(ctx context.Context, event model.TripCancel
 	)
 
 	return nil
+}
+
+func (s *CarService) SubscribeStatusUpdates(carID string) (<-chan model.CarStatusUpdate, func()) {
+	id := s.subSeq.Add(1)
+	ch := make(chan model.CarStatusUpdate, 16)
+
+	s.subsMu.Lock()
+	if s.subs[carID] == nil {
+		s.subs[carID] = make(map[uint64]chan model.CarStatusUpdate)
+	}
+	s.subs[carID][id] = ch
+	s.subsMu.Unlock()
+
+	return ch, func() {
+		s.subsMu.Lock()
+		if m, ok := s.subs[carID]; ok {
+			delete(m, id)
+			if len(m) == 0 {
+				delete(s.subs, carID)
+			}
+		}
+		s.subsMu.Unlock()
+	}
+}
+
+func (s *CarService) fanOutStatus(carID string, update model.CarStatusUpdate) {
+	s.subsMu.RLock()
+	defer s.subsMu.RUnlock()
+	for _, ch := range s.subs[carID] {
+		select {
+		case ch <- update:
+		default:
+		}
+	}
 }
 
 func carFilter(filter validation.CarFilter) model.CarFilter {

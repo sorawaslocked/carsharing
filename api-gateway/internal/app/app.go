@@ -15,7 +15,6 @@ import (
 	httphandler "carsharing/api-gateway/internal/adapter/http/handler"
 	natssub "carsharing/api-gateway/internal/adapter/nats/subscriber"
 	redisadapter "carsharing/api-gateway/internal/adapter/redis"
-	wshandler "carsharing/api-gateway/internal/adapter/websocket/handler"
 	"carsharing/api-gateway/internal/config"
 	"carsharing/api-gateway/internal/service"
 	bookingsvc "carsharing/protos/gen/service/booking"
@@ -50,7 +49,6 @@ type App struct {
 	log                *slog.Logger
 	httpServer         *httpserver.Server
 	natsUserSubscriber *natssub.UserSubscriber
-	natsCarSubscriber  *natssub.CarSubscriber
 	closer             closer
 }
 
@@ -178,14 +176,6 @@ func New(cfg config.Config, log *slog.Logger) (*App, error) {
 		return nil, fmt.Errorf("nats user subscribe: %w", err)
 	}
 
-	carStatusHub := wshandler.NewCarStatusHub()
-
-	natsCarSub := natssub.NewCarSubscriber(natsConn, carStatusHub, log)
-	if err = natsCarSub.Subscribe(); err != nil {
-		cl.closeAll()
-		return nil, fmt.Errorf("nats car subscribe: %w", err)
-	}
-
 	healthCheckers := []httphandler.HealthChecker{
 		userHealthGrpcHandler,
 		carHealthGrpcHandler,
@@ -213,7 +203,6 @@ func New(cfg config.Config, log *slog.Logger) (*App, error) {
 		carService,
 		tripService,
 		userService,
-		carStatusHub,
 	)
 
 	return &App{
@@ -221,7 +210,6 @@ func New(cfg config.Config, log *slog.Logger) (*App, error) {
 		log:                pkglog.WithComponent(log, "app"),
 		httpServer:         httpServer,
 		natsUserSubscriber: natsUserSub,
-		natsCarSubscriber:  natsCarSub,
 		closer:             cl,
 	}, nil
 }
@@ -242,7 +230,6 @@ func (a *App) Run() {
 
 func (a *App) Stop() {
 	a.natsUserSubscriber.Close()
-	a.natsCarSubscriber.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

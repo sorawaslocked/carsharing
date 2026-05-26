@@ -21,15 +21,17 @@ type CarStreamHandler struct {
 	log                 *slog.Logger
 	carService          CarService
 	telemetrySubscriber TelemetrySubscriber
+	statusSubscriber    StatusSubscriber
 
 	carsvc.UnimplementedCarStreamServiceServer
 }
 
-func NewCarStreamHandler(log *slog.Logger, carService CarService, telemetrySubscriber TelemetrySubscriber) *CarStreamHandler {
+func NewCarStreamHandler(log *slog.Logger, carService CarService, telemetrySubscriber TelemetrySubscriber, statusSubscriber StatusSubscriber) *CarStreamHandler {
 	return &CarStreamHandler{
 		log:                 pkglog.WithComponent(log, "adapter.grpc.handler.CarStreamHandler"),
 		carService:          carService,
 		telemetrySubscriber: telemetrySubscriber,
+		statusSubscriber:    statusSubscriber,
 	}
 }
 
@@ -127,6 +129,35 @@ func (h *CarStreamHandler) StreamCarTelemetry(req *carsvc.StreamCarTelemetryRequ
 				}
 			}
 			if err := stream.Send(resp); err != nil {
+				return err
+			}
+		case <-ctx.Done():
+			return nil
+		}
+	}
+}
+
+func (h *CarStreamHandler) StreamCarStatusUpdates(req *carsvc.StreamCarStatusUpdatesRequest, stream grpc.ServerStreamingServer[carsvc.StreamCarStatusUpdatesResponse]) error {
+	ctx := stream.Context()
+
+	if _, err := h.carService.Get(ctx, req.CarId); err != nil {
+		return dto.FromErrorToStatusCode(err)
+	}
+
+	ch, unsub := h.statusSubscriber.SubscribeStatusUpdates(req.CarId)
+	defer unsub()
+
+	for {
+		select {
+		case update, ok := <-ch:
+			if !ok {
+				return nil
+			}
+			if err := stream.Send(&carsvc.StreamCarStatusUpdatesResponse{
+				FromStatus: update.FromStatus.String(),
+				ToStatus:   update.ToStatus.String(),
+				ChangedAt:  timestamppb.New(update.ChangedAt),
+			}); err != nil {
 				return err
 			}
 		case <-ctx.Done():

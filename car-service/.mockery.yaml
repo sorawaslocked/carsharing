@@ -32,3 +32,4 @@ packages:
       ZoneService:
       Pinger:
       TelemetrySubscriber:
+      StatusSubscriber:

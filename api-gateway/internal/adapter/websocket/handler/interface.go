@@ -9,6 +9,7 @@ import (
 type CarStreamService interface {
 	StreamCarsWithFilter(ctx context.Context, filter model.CarFilter, send func([]model.SlimCar) error) error
 	StreamCarTelemetry(ctx context.Context, carID string, send func(model.CarTelemetryEvent) error) error
+	StreamCarStatusUpdates(ctx context.Context, carID string, send func(model.CarStatusEvent) error) error
 }
 
 type TripStreamService interface {

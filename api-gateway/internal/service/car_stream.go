@@ -33,3 +33,16 @@ func (s *CarService) StreamCarTelemetry(ctx context.Context, carID string, send 
 
 	return nil
 }
+
+func (s *CarService) StreamCarStatusUpdates(ctx context.Context, carID string, send func(model.CarStatusEvent) error) error {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "StreamCarStatusUpdates"), utils.MetadataFromCtx(ctx))
+	log.Debug("starting stream")
+
+	if err := s.presenter.StreamCarStatusUpdates(ctx, carID, send); err != nil {
+		log.Warn("streaming car status updates", pkglog.Err(err))
+
+		return err
+	}
+
+	return nil
+}

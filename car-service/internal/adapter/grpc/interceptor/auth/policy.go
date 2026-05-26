@@ -29,8 +29,9 @@ func buildPolicies() map[string]methodPolicy {
 		carsvc.CarModelService_GetCarModelImageUploadData_FullMethodName: {allowedRoles: fleetRoles},
 
 		// CarStreamService — open to any authenticated caller.
-		carsvc.CarStreamService_StreamCarsWithFilter_FullMethodName: {},
-		carsvc.CarStreamService_StreamCarTelemetry_FullMethodName:   {},
+		carsvc.CarStreamService_StreamCarsWithFilter_FullMethodName:   {},
+		carsvc.CarStreamService_StreamCarTelemetry_FullMethodName:     {},
+		carsvc.CarStreamService_StreamCarStatusUpdates_FullMethodName: {},
 
 		// CarService — reads open to any authenticated caller; writes restricted to fleet roles.
 		carsvc.CarService_CreateCar_FullMethodName:              {allowedRoles: fleetRoles},

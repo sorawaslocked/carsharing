@@ -150,6 +150,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 		cfg.GRPC,
 		carModelService, carService, carInsuranceService, carMaintenanceService, zoneService,
 		telemetryService,
+		carService,
 		healthHandler,
 	)
 	if err != nil {

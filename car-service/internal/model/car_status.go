@@ -35,3 +35,10 @@ type CarStatusTransition struct {
 	Reason    *string
 	Metadata  map[string]any
 }
+
+type CarStatusUpdate struct {
+	CarID      string
+	FromStatus CarStatus
+	ToStatus   CarStatus
+	ChangedAt  time.Time
+}

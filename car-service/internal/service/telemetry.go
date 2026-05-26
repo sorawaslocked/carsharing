@@ -103,14 +103,14 @@ func (s *TelemetryService) Ping(_ context.Context) error {
 	active := s.activeStreams.Load()
 	last := s.lastSeenAt.Load()
 
-	if active == 0 {
-		if last == nil {
-			return model.ErrTelemetryNoStreamsConnected
-		}
-		return model.ErrTelemetryAllStreamsDisconnected{LastActivity: time.Since(*last).Round(time.Second)}
+	if active == 0 && last == nil {
+		return model.ErrTelemetryNoStreamsConnected
 	}
 
 	if last != nil && time.Since(*last) > s.stalenessThreshold {
+		if active == 0 {
+			return model.ErrTelemetryAllStreamsDisconnected{LastActivity: time.Since(*last).Round(time.Second)}
+		}
 		return model.ErrTelemetryStreamStale{SinceLastUpdate: time.Since(*last).Round(time.Second)}
 	}
 

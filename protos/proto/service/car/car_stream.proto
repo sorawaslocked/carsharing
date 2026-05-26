@@ -11,6 +11,7 @@ option go_package = "carsharing/protos/gen/service/car";
 service CarStreamService {
   rpc StreamCarsWithFilter(StreamCarsWithFilterRequest) returns (stream StreamCarsWithFilterResponse);
   rpc StreamCarTelemetry(StreamCarTelemetryRequest) returns (stream StreamCarTelemetryResponse);
+  rpc StreamCarStatusUpdates(StreamCarStatusUpdatesRequest) returns (stream StreamCarStatusUpdatesResponse);
 }
 
 message StreamCarsWithFilterRequest {
@@ -45,4 +46,15 @@ message StreamCarTelemetryResponse {
   base.Location  location      = 4;
 
   google.protobuf.Timestamp recorded_at = 5;
+}
+
+message StreamCarStatusUpdatesRequest {
+  string car_id = 1;
+}
+
+message StreamCarStatusUpdatesResponse {
+  string from_status = 1;
+  string to_status   = 2;
+
+  google.protobuf.Timestamp changed_at = 3;
 }

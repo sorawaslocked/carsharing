@@ -64,7 +64,7 @@ func TestTelemetryService_Ping(t *testing.T) {
 	t.Run("ErrTelemetryAllStreamsDisconnected when all streams previously active but now inactive", func(t *testing.T) {
 		svc := newTelemetrySvc(t, nil, nil, nil)
 		svc.totalStreams.Store(1)
-		past := time.Now().Add(-30 * time.Second)
+		past := time.Now().Add(-3 * time.Minute)
 		svc.lastSeenAt.Store(&past)
 
 		var err model.ErrTelemetryAllStreamsDisconnected

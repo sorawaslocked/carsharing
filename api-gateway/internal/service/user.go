@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"log/slog"
+	"time"
 
 	"carsharing/api-gateway/internal/model"
 	pkglog "carsharing/shared/pkg/log"
@@ -32,6 +33,7 @@ func NewUserService(presenter UserPresenter, tokenManager TokenManager, sessionC
 
 func (s *UserService) Create(ctx context.Context, data model.UserCreate) (string, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Create"), utils.MetadataFromCtx(ctx))
+	log.Debug("creating user")
 
 	id, err := s.presenter.Create(ctx, data)
 	if err != nil {
@@ -40,11 +42,14 @@ func (s *UserService) Create(ctx context.Context, data model.UserCreate) (string
 		return "", err
 	}
 
+	log.Debug("user created", slog.String("id", id))
+
 	return id, nil
 }
 
 func (s *UserService) Get(ctx context.Context, id string) (model.User, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Get"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting user")
 
 	user, err := s.presenter.Get(ctx, id)
 	if err != nil {
@@ -58,6 +63,7 @@ func (s *UserService) Get(ctx context.Context, id string) (model.User, error) {
 
 func (s *UserService) List(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "List"), utils.MetadataFromCtx(ctx))
+	log.Debug("listing users")
 
 	users, err := s.presenter.List(ctx, filter)
 	if err != nil {
@@ -71,6 +77,7 @@ func (s *UserService) List(ctx context.Context, filter model.UserFilter) ([]mode
 
 func (s *UserService) Update(ctx context.Context, id string, data model.UserUpdate) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Update"), utils.MetadataFromCtx(ctx))
+	log.Debug("updating user")
 
 	if err := s.presenter.Update(ctx, id, data); err != nil {
 		log.Warn("updating user", pkglog.Err(err))
@@ -83,6 +90,7 @@ func (s *UserService) Update(ctx context.Context, id string, data model.UserUpda
 
 func (s *UserService) Delete(ctx context.Context, id string) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Delete"), utils.MetadataFromCtx(ctx))
+	log.Debug("deleting user")
 
 	if err := s.presenter.Delete(ctx, id); err != nil {
 		log.Warn("deleting user", pkglog.Err(err))
@@ -95,6 +103,7 @@ func (s *UserService) Delete(ctx context.Context, id string) error {
 
 func (s *UserService) Register(ctx context.Context, data model.UserCreate) (string, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Register"), utils.MetadataFromCtx(ctx))
+	log.Debug("registering user")
 
 	id, err := s.presenter.Register(ctx, data)
 	if err != nil {
@@ -102,6 +111,8 @@ func (s *UserService) Register(ctx context.Context, data model.UserCreate) (stri
 
 		return "", err
 	}
+
+	log.Debug("user registered", slog.String("id", id))
 
 	return id, nil
 }
@@ -141,7 +152,7 @@ func (s *UserService) SignIn(ctx context.Context, creds model.Credentials) (mode
 			ExpiresIn: accessTokenExp.Unix(),
 		}, model.RefreshToken{
 			Token:     refreshToken,
-			ExpiresIn: refreshTokenExp.Unix(),
+			ExpiresIn: time.Until(refreshTokenExp),
 		}, nil
 }
 
@@ -190,7 +201,7 @@ func (s *UserService) RefreshToken(ctx context.Context, refreshToken string) (mo
 			ExpiresIn: newAccessTokenExp.Unix(),
 		}, model.RefreshToken{
 			Token:     newRefreshToken,
-			ExpiresIn: newRefreshTokenExp.Unix(),
+			ExpiresIn: time.Until(newRefreshTokenExp),
 		}, nil
 }
 

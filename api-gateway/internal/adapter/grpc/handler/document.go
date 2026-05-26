@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"log/slog"
 
 	"carsharing/api-gateway/internal/adapter/grpc/dto"
 	"carsharing/api-gateway/internal/model"
@@ -15,6 +16,7 @@ import (
 
 func (h *UserHandler) CreateDocument(ctx context.Context, objectKey, imageType string) (string, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CreateDocument"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling user service")
 
 	res, err := h.client.CreateDocument(ctx, &usersvc.CreateDocumentRequest{
 		ObjectKey: objectKey,
@@ -26,11 +28,14 @@ func (h *UserHandler) CreateDocument(ctx context.Context, objectKey, imageType s
 		return "", dto.FromGrpcErr(err)
 	}
 
+	log.Debug("document created", slog.String("id", res.GetId()))
+
 	return res.GetId(), nil
 }
 
 func (h *UserHandler) GetDocumentImageUploadData(ctx context.Context, imageType string) (sharedmodel.ImageUploadData, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetDocumentImageUploadData"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling user service")
 
 	res, err := h.client.GetUploadDocumentData(ctx, &usersvc.GetUploadDocumentDataRequest{ImageType: imageType})
 	if err != nil {
@@ -44,6 +49,7 @@ func (h *UserHandler) GetDocumentImageUploadData(ctx context.Context, imageType 
 
 func (h *UserHandler) GetProfileImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetProfileImageUploadData"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling user service")
 
 	res, err := h.client.GetProfileImageUploadData(ctx, &emptypb.Empty{})
 	if err != nil {
@@ -57,6 +63,7 @@ func (h *UserHandler) GetProfileImageUploadData(ctx context.Context) (sharedmode
 
 func (h *UserHandler) ListDocuments(ctx context.Context, filter model.DocumentFilter) ([]model.Document, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "ListDocuments"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling user service")
 
 	req := &usersvc.ListDocumentsRequest{
 		UserId:    filter.UserID,
@@ -88,6 +95,7 @@ func (h *UserHandler) ListDocuments(ctx context.Context, filter model.DocumentFi
 
 func (h *UserHandler) CheckDocument(ctx context.Context, docID, status string, reason *string) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CheckDocument"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling user service")
 
 	_, err := h.client.CheckDocument(ctx, &usersvc.CheckDocumentRequest{
 		DocId:  docID,

@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"log/slog"
+
 	"carsharing/api-gateway/internal/adapter/http/dto"
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
@@ -22,6 +24,7 @@ import (
 // @Router       /users/documents [post]
 func (h *UserHandler) CreateDocument(c *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CreateDocument"), utils.MetadataFromCtx(c))
+	log.Debug("creating document")
 
 	imageType, objectKey, err := dto.FromCreateDocumentRequest(c)
 	if err != nil {
@@ -39,6 +42,8 @@ func (h *UserHandler) CreateDocument(c *gin.Context) {
 		return
 	}
 
+	log.Debug("document created", slog.String("id", id))
+
 	dto.Created(c, gin.H{"id": id})
 }
 
@@ -54,6 +59,7 @@ func (h *UserHandler) CreateDocument(c *gin.Context) {
 // @Router       /users/profile/image-upload [get]
 func (h *UserHandler) GetProfileImageUploadData(c *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetProfileImageUploadData"), utils.MetadataFromCtx(c))
+	log.Debug("getting profile image upload data")
 
 	data, err := h.svc.GetProfileImageUploadData(c)
 	if err != nil {
@@ -82,6 +88,7 @@ func (h *UserHandler) GetProfileImageUploadData(c *gin.Context) {
 // @Router       /users/documents/upload [post]
 func (h *UserHandler) GetUploadDocumentData(c *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetUploadDocumentData"), utils.MetadataFromCtx(c))
+	log.Debug("getting document upload data")
 
 	imageType, err := dto.FromGetUploadDocumentDataRequest(c)
 	if err != nil {
@@ -122,6 +129,7 @@ func (h *UserHandler) GetUploadDocumentData(c *gin.Context) {
 // @Router       /users/{id}/documents [get]
 func (h *UserHandler) ListDocuments(c *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "ListDocuments"), utils.MetadataFromCtx(c))
+	log.Debug("listing documents")
 
 	filter, err := dto.DocumentFilterFromCtx(c)
 	if err != nil {
@@ -164,6 +172,7 @@ func (h *UserHandler) ListDocuments(c *gin.Context) {
 // @Router       /users/documents/check/{id} [post]
 func (h *UserHandler) CheckDocument(c *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CheckDocument"), utils.MetadataFromCtx(c))
+	log.Debug("checking document")
 
 	docID, err := dto.IDParam(c)
 	if err != nil {

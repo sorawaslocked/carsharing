@@ -28,6 +28,7 @@ func NewCarMaintenanceHandler(client carsvc.CarMaintenanceServiceClient, logger 
 
 func (h *CarMaintenanceHandler) CreateTemplate(ctx context.Context, data model.CarMaintenanceTemplateCreate) (string, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CreateTemplate"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	res, err := h.client.CreateMaintenanceTemplate(ctx, &carsvc.CreateMaintenanceTemplateRequest{
 		Name:        data.Name,
@@ -43,11 +44,14 @@ func (h *CarMaintenanceHandler) CreateTemplate(ctx context.Context, data model.C
 		return "", dto.FromGrpcErr(err)
 	}
 
+	log.Debug("maintenance template created", slog.String("id", res.GetId()))
+
 	return res.GetId(), nil
 }
 
 func (h *CarMaintenanceHandler) GetTemplate(ctx context.Context, id string) (model.CarMaintenanceTemplate, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetTemplate"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	res, err := h.client.GetMaintenanceTemplate(ctx, &carsvc.GetMaintenanceTemplateRequest{Id: id})
 	if err != nil {
@@ -61,6 +65,7 @@ func (h *CarMaintenanceHandler) GetTemplate(ctx context.Context, id string) (mod
 
 func (h *CarMaintenanceHandler) ListTemplates(ctx context.Context, filter model.CarMaintenanceTemplateFilter) ([]model.CarMaintenanceTemplate, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "ListTemplates"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	req := &carsvc.ListMaintenanceTemplatesRequest{}
 	if filter.Pagination != nil {
@@ -87,6 +92,7 @@ func (h *CarMaintenanceHandler) ListTemplates(ctx context.Context, filter model.
 
 func (h *CarMaintenanceHandler) UpdateTemplate(ctx context.Context, id string, data model.CarMaintenanceTemplateUpdate) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "UpdateTemplate"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	_, err := h.client.UpdateMaintenanceTemplate(ctx, &carsvc.UpdateMaintenanceTemplateRequest{
 		Id:          id,
@@ -108,6 +114,7 @@ func (h *CarMaintenanceHandler) UpdateTemplate(ctx context.Context, id string, d
 
 func (h *CarMaintenanceHandler) DeleteTemplate(ctx context.Context, id string) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "DeleteTemplate"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	_, err := h.client.DeleteMaintenanceTemplate(ctx, &carsvc.DeleteMaintenanceTemplateRequest{Id: id})
 	if err != nil {
@@ -121,6 +128,7 @@ func (h *CarMaintenanceHandler) DeleteTemplate(ctx context.Context, id string) e
 
 func (h *CarMaintenanceHandler) ListRecords(ctx context.Context, filter model.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "ListRecords"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	req := &carsvc.ListMaintenanceRecordsRequest{
 		CarId:      filter.CarID,
@@ -151,6 +159,7 @@ func (h *CarMaintenanceHandler) ListRecords(ctx context.Context, filter model.Ca
 
 func (h *CarMaintenanceHandler) CompleteRecord(ctx context.Context, recordID string, data model.CarMaintenanceRecordComplete) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CompleteRecord"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	_, err := h.client.CompleteMaintenanceRecord(ctx, &carsvc.CompleteMaintenanceRecordRequest{
 		RecordId:              recordID,
@@ -170,6 +179,7 @@ func (h *CarMaintenanceHandler) CompleteRecord(ctx context.Context, recordID str
 
 func (h *CarMaintenanceHandler) GetReceiptImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetReceiptImageUploadData"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	res, err := h.client.GetMaintenanceReceiptImageUploadData(ctx, &emptypb.Empty{})
 	if err != nil {

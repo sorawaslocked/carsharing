@@ -9,7 +9,7 @@ import (
 
 	"carsharing/api-gateway/internal/config"
 	"carsharing/api-gateway/internal/model"
-	"carsharing/shared/pkg/log"
+	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 
 	"github.com/redis/go-redis/v9"
@@ -30,19 +30,19 @@ func NewUserCache(rdb *redis.Client, userProvider UserProvider, cfg config.Cache
 		cfg:          cfg,
 	}
 
-	c.log = log.WithComponent(logger, "redis.UserCache")
+	c.log = pkglog.WithComponent(logger, "redis.UserCache")
 
 	return c
 }
 
 func (c *UserCache) Close() error {
 	const method = "Close"
-	logger := log.WithMethod(c.log, method)
+	log := pkglog.WithMethod(c.log, method)
 
-	logger.Info("closing connection")
+	log.Info("closing connection")
 	err := c.rdb.Close()
 	if err != nil {
-		logger.Error("closing connection", log.Err(err))
+		log.Error("closing connection", pkglog.Err(err))
 
 		return ErrCloseFailed
 	}
@@ -73,12 +73,12 @@ func allMetadataKeys(userID string) []string {
 
 func (c *UserCache) GetRoles(ctx context.Context, userID string) ([]string, error) {
 	const method = "GetRoles"
-	logger := log.WithMethod(c.log, method)
-	logger = log.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMethod(c.log, method)
+	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
 	roles, err := c.rdb.SMembers(ctx, metadataKey(userID, "roles")).Result()
 	if err != nil {
-		logger.Error("getting roles from redis", log.Err(err))
+		log.Error("getting roles from redis", pkglog.Err(err))
 
 		return nil, ErrReadFailed
 	}
@@ -87,10 +87,10 @@ func (c *UserCache) GetRoles(ctx context.Context, userID string) ([]string, erro
 		return roles, nil
 	}
 
-	logger.Info("cache miss, restoring from provider")
+	log.Info("cache miss, restoring from provider")
 	user, err := c.restore(ctx, userID)
 	if err != nil {
-		logger.Error("restoring from provider", log.Err(err))
+		log.Error("restoring from provider", pkglog.Err(err))
 
 		return nil, ErrWriteFailed
 	}
@@ -100,14 +100,14 @@ func (c *UserCache) GetRoles(ctx context.Context, userID string) ([]string, erro
 
 func (c *UserCache) IsDocumentVerified(ctx context.Context, userID string) (bool, error) {
 	const method = "IsDocumentVerified"
-	logger := log.WithMethod(c.log, method)
-	logger = log.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMethod(c.log, method)
+	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
 	isDocumentVerified, err := c.getBool(ctx, userID, "doc_verified", func(u model.User) bool {
 		return u.IsDocumentVerified
 	})
 	if err != nil {
-		logger.Error("getting document verified from redis", log.Err(err))
+		log.Error("getting document verified from redis", pkglog.Err(err))
 
 		return false, ErrReadFailed
 	}
@@ -117,14 +117,14 @@ func (c *UserCache) IsDocumentVerified(ctx context.Context, userID string) (bool
 
 func (c *UserCache) IsEmailVerified(ctx context.Context, userID string) (bool, error) {
 	const method = "IsEmailVerified"
-	logger := log.WithMethod(c.log, method)
-	logger = log.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMethod(c.log, method)
+	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
 	isEmailVerified, err := c.getBool(ctx, userID, "email_verified", func(u model.User) bool {
 		return u.IsEmailVerified
 	})
 	if err != nil {
-		logger.Error("getting email verified from redis", log.Err(err))
+		log.Error("getting email verified from redis", pkglog.Err(err))
 
 		return false, ErrReadFailed
 	}
@@ -134,14 +134,14 @@ func (c *UserCache) IsEmailVerified(ctx context.Context, userID string) (bool, e
 
 func (c *UserCache) IsSuspended(ctx context.Context, userID string) (bool, error) {
 	const method = "IsSuspended"
-	logger := log.WithMethod(c.log, method)
-	logger = log.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMethod(c.log, method)
+	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
 	isSuspended, err := c.getBool(ctx, userID, "suspended", func(u model.User) bool {
 		return u.IsSuspended
 	})
 	if err != nil {
-		logger.Error("getting suspended from redis", log.Err(err))
+		log.Error("getting suspended from redis", pkglog.Err(err))
 
 		return false, ErrReadFailed
 	}
@@ -151,66 +151,78 @@ func (c *UserCache) IsSuspended(ctx context.Context, userID string) (bool, error
 
 func (c *UserCache) IsSignedIn(ctx context.Context, userID, deviceID string) (bool, error) {
 	const method = "IsSignedIn"
-	logger := log.WithMethod(c.log, method)
-	logger = log.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMethod(c.log, method)
+	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
-	isLoggedIn, err := c.rdb.Get(ctx, sessionKey(userID, deviceID)).Result()
+	key := sessionKey(userID, deviceID)
+	log.Debug("checking session", slog.String("key", key))
+
+	isLoggedIn, err := c.rdb.Get(ctx, key).Result()
 	if errors.Is(err, redis.Nil) {
+		log.Debug("session key not found in redis")
+
 		return false, nil
 	}
 	if err != nil {
-		logger.Error("getting session from redis", log.Err(err))
+		log.Error("getting session from redis", pkglog.Err(err))
 
 		return false, ErrReadFailed
 	}
 
-	return isLoggedIn == "1", nil
+	result := isLoggedIn == "1"
+	log.Debug("session found", slog.Bool("isSignedIn", result))
+
+	return result, nil
 }
 
 func (c *UserCache) SetSignedIn(ctx context.Context, userID, deviceID string, loggedIn bool) error {
 	const method = "SetSignedIn"
-	logger := log.WithMethod(c.log, method)
-	logger = log.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMethod(c.log, method)
+	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
 	key := sessionKey(userID, deviceID)
-	indexKey := sessionIndexKey(userID)
+	log.Debug("setting session", slog.String("key", key), slog.Bool("loggedIn", loggedIn))
 
 	if !loggedIn {
 		pipe := c.rdb.Pipeline()
 		pipe.Del(ctx, key)
-		pipe.SRem(ctx, indexKey, deviceID)
+		pipe.SRem(ctx, sessionIndexKey(userID), deviceID)
 		_, err := pipe.Exec(ctx)
 		if err != nil {
-			logger.Error("deleting session from redis", log.Err(err))
+			log.Error("deleting session from redis", pkglog.Err(err))
 
 			return ErrDeleteFailed
 		}
+
+		log.Debug("session deleted")
 
 		return nil
 	}
 
 	pipe := c.rdb.Pipeline()
 	pipe.Set(ctx, key, "1", c.cfg.SessionTTL)
-	pipe.SAdd(ctx, indexKey, deviceID)
-	pipe.Expire(ctx, indexKey, c.cfg.SessionTTL)
+	pipe.SAdd(ctx, sessionIndexKey(userID), deviceID)
+	pipe.Expire(ctx, sessionIndexKey(userID), c.cfg.SessionTTL)
 	_, err := pipe.Exec(ctx)
 	if err != nil {
-		logger.Error("setting session in redis", log.Err(err))
+		log.Error("setting session in redis", pkglog.Err(err))
 
 		return ErrWriteFailed
 	}
+
+	log.Debug("session set", slog.Duration("ttl", c.cfg.SessionTTL))
 
 	return nil
 }
 
 func (c *UserCache) OnUserCreated(ctx context.Context, userID string) error {
 	const method = "OnUserCreated"
-	logger := log.WithMethod(c.log, method)
-	logger = log.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMethod(c.log, method)
+	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
 	_, err := c.restore(ctx, userID)
 	if err != nil {
-		logger.Error("restoring from provider", log.Err(err))
+		log.Error("restoring from provider", pkglog.Err(err))
 
 		return ErrWriteFailed
 	}
@@ -220,12 +232,12 @@ func (c *UserCache) OnUserCreated(ctx context.Context, userID string) error {
 
 func (c *UserCache) OnUserUpdated(ctx context.Context, userID string, isSecurityUpdate bool) error {
 	const method = "OnUserUpdated"
-	logger := log.WithMethod(c.log, method)
-	logger = log.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMethod(c.log, method)
+	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
 	_, err := c.restore(ctx, userID)
 	if err != nil {
-		logger.Error("restoring from provider", log.Err(err))
+		log.Error("restoring from provider", pkglog.Err(err))
 
 		return ErrWriteFailed
 	}
@@ -233,7 +245,7 @@ func (c *UserCache) OnUserUpdated(ctx context.Context, userID string, isSecurity
 	if isSecurityUpdate {
 		err = c.deleteAllSessions(ctx, userID)
 		if err != nil {
-			logger.Error("deleting sessions from redis", log.Err(err))
+			log.Error("deleting sessions from redis", pkglog.Err(err))
 
 			return ErrDeleteFailed
 		}
@@ -244,19 +256,19 @@ func (c *UserCache) OnUserUpdated(ctx context.Context, userID string, isSecurity
 
 func (c *UserCache) OnUserDeleted(ctx context.Context, userID string) error {
 	const method = "OnUserDeleted"
-	logger := log.WithMethod(c.log, method)
-	logger = log.WithMetadata(logger, utils.MetadataFromCtx(ctx))
+	log := pkglog.WithMethod(c.log, method)
+	log = pkglog.WithMetadata(log, utils.MetadataFromCtx(ctx))
 
 	err := c.deleteMetadata(ctx, userID)
 	if err != nil {
-		logger.Error("deleting metadata from redis", log.Err(err))
+		log.Error("deleting metadata from redis", pkglog.Err(err))
 
 		return ErrDeleteFailed
 	}
 
 	err = c.deleteAllSessions(ctx, userID)
 	if err != nil {
-		logger.Error("deleting sessions from redis", log.Err(err))
+		log.Error("deleting sessions from redis", pkglog.Err(err))
 
 		return ErrDeleteFailed
 	}

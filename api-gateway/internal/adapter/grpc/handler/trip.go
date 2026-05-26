@@ -29,6 +29,7 @@ func NewTripHandler(client tripsvc.TripServiceClient, streamClient tripsvc.TripS
 
 func (h *TripHandler) Start(ctx context.Context, bookingID string) (string, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Start"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling trip service")
 
 	res, err := h.client.StartTrip(ctx, &tripsvc.StartTripRequest{BookingId: bookingID})
 	if err != nil {
@@ -37,11 +38,14 @@ func (h *TripHandler) Start(ctx context.Context, bookingID string) (string, erro
 		return "", dto.FromGrpcErr(err)
 	}
 
+	log.Debug("trip created", slog.String("id", res.GetId()))
+
 	return res.GetId(), nil
 }
 
 func (h *TripHandler) Get(ctx context.Context, id string) (model.Trip, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling trip service")
 
 	res, err := h.client.GetTrip(ctx, &tripsvc.GetTripRequest{Id: id})
 	if err != nil {
@@ -55,6 +59,7 @@ func (h *TripHandler) Get(ctx context.Context, id string) (model.Trip, error) {
 
 func (h *TripHandler) List(ctx context.Context, filter model.TripFilter) ([]model.Trip, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling trip service")
 
 	req := &tripsvc.ListTripsRequest{
 		UserId: filter.UserID,
@@ -91,6 +96,7 @@ func (h *TripHandler) List(ctx context.Context, filter model.TripFilter) ([]mode
 
 func (h *TripHandler) End(ctx context.Context, id string) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "End"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling trip service")
 
 	_, err := h.client.EndTrip(ctx, &tripsvc.EndTripRequest{Id: id})
 	if err != nil {
@@ -104,6 +110,7 @@ func (h *TripHandler) End(ctx context.Context, id string) error {
 
 func (h *TripHandler) Cancel(ctx context.Context, id string, reason *string) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Cancel"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling trip service")
 
 	_, err := h.client.CancelTrip(ctx, &tripsvc.CancelTripRequest{Id: id, Reason: reason})
 	if err != nil {
@@ -117,6 +124,7 @@ func (h *TripHandler) Cancel(ctx context.Context, id string, reason *string) err
 
 func (h *TripHandler) GetSummary(ctx context.Context, id string) (model.TripSummary, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetSummary"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling trip service")
 
 	res, err := h.client.GetTripSummary(ctx, &tripsvc.GetTripSummaryRequest{Id: id})
 	if err != nil {
@@ -130,6 +138,7 @@ func (h *TripHandler) GetSummary(ctx context.Context, id string) (model.TripSumm
 
 func (h *TripHandler) GetStatusHistory(ctx context.Context, id string, filter model.TripStatusReadingFilter) ([]model.TripStatusReading, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetStatusHistory"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling trip service")
 
 	req := &tripsvc.GetTripStatusHistoryRequest{Id: id}
 	if filter.From != nil {

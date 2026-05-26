@@ -1,12 +1,15 @@
 package middleware
 
 import (
+	"log/slog"
 	"strings"
 	"time"
 
 	"carsharing/api-gateway/internal/adapter/http/dto"
 	"carsharing/api-gateway/internal/model"
 	sharedmodel "carsharing/shared/model"
+	pkglog "carsharing/shared/pkg/log"
+	"carsharing/shared/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,24 +27,32 @@ type Authentication struct {
 	tokenParser          TokenParser
 	userPermissionsCache UserPermissionsCache
 	userSessionCache     UserSessionCache
+	log                  *slog.Logger
 }
 
 func NewAuthentication(
 	tokenParser TokenParser,
 	userPermissionsCache UserPermissionsCache,
 	userSessionCache UserSessionCache,
+	logger *slog.Logger,
 ) *Authentication {
 	return &Authentication{
 		tokenParser:          tokenParser,
 		userPermissionsCache: userPermissionsCache,
 		userSessionCache:     userSessionCache,
+		log:                  pkglog.WithComponent(logger, "middleware.Authentication"),
 	}
 }
 
 func (a *Authentication) Middleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		log := pkglog.WithMetadata(pkglog.WithMethod(a.log, "Middleware"), utils.MetadataFromCtx(c))
+
+		log.Debug("authenticating request")
+
 		header, err := authHeader(c)
 		if err != nil {
+			log.Debug("missing authorization header")
 			dto.FromError(c, err)
 			c.Abort()
 
@@ -50,22 +61,27 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 
 		userID, exp, err := a.parseClaims(c, header)
 		if err != nil {
+			log.Warn("parsing token claims", pkglog.Err(err))
 			dto.FromError(c, err)
 			c.Abort()
 
 			return
 		}
 
+		log.Debug("token parsed", slog.String("userID", userID))
+
 		deviceID := c.GetString(ctxDeviceIDKey)
 
 		isSignedIn, err := a.userSessionCache.IsSignedIn(c, userID, deviceID)
 		if err != nil {
+			log.Error("checking session", pkglog.Err(err))
 			dto.FromError(c, err)
 			c.Abort()
 
 			return
 		}
 		if !isSignedIn {
+			log.Debug("session not found", slog.String("userID", userID), slog.String("deviceID", deviceID))
 			dto.FromError(c, model.ErrUnauthorized)
 			c.Abort()
 
@@ -74,6 +90,7 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 
 		rawRoles, err := a.userPermissionsCache.GetRoles(c, userID)
 		if err != nil {
+			log.Error("getting roles", pkglog.Err(err))
 			dto.FromError(c, model.ErrInternalServerError)
 			c.Abort()
 
@@ -86,6 +103,7 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 
 		isDocumentVerified, err := a.userPermissionsCache.IsDocumentVerified(c, userID)
 		if err != nil {
+			log.Error("getting document verified", pkglog.Err(err))
 			dto.FromError(c, model.ErrInternalServerError)
 			c.Abort()
 
@@ -94,6 +112,7 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 
 		isEmailVerified, err := a.userPermissionsCache.IsEmailVerified(c, userID)
 		if err != nil {
+			log.Error("getting email verified", pkglog.Err(err))
 			dto.FromError(c, model.ErrInternalServerError)
 			c.Abort()
 
@@ -102,6 +121,7 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 
 		isSuspended, err := a.userPermissionsCache.IsSuspended(c, userID)
 		if err != nil {
+			log.Error("getting suspended", pkglog.Err(err))
 			dto.FromError(c, model.ErrInternalServerError)
 			c.Abort()
 
@@ -114,6 +134,8 @@ func (a *Authentication) Middleware() gin.HandlerFunc {
 		c.Set(ctxUserEmailVerifiedKey, isEmailVerified)
 		c.Set(ctxUserSuspendedKey, isSuspended)
 		c.Set(ctxTokenExpKey, exp)
+
+		log.Debug("authentication complete", slog.String("userID", userID))
 
 		c.Next()
 	}

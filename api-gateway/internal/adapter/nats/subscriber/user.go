@@ -24,11 +24,11 @@ type UserSubscriber struct {
 	subs    []*nc.Subscription
 }
 
-func NewUserSubscriber(conn *nc.Conn, handler UserEventHandler, logger *slog.Logger) *UserSubscriber {
+func NewUserSubscriber(conn *nc.Conn, handler UserEventHandler, log *slog.Logger) *UserSubscriber {
 	return &UserSubscriber{
 		conn:    conn,
 		handler: handler,
-		log:     pkglog.WithComponent(logger, "nats.UserSubscriber"),
+		log:     pkglog.WithComponent(log, "nats.UserSubscriber"),
 	}
 }
 
@@ -44,12 +44,12 @@ func (s *UserSubscriber) Subscribe() error {
 		{subjectUserDeleted, s.handleUserDeleted},
 	}
 
-	logger := pkglog.WithMethod(s.log, "Subscribe")
+	log := pkglog.WithMethod(s.log, "Subscribe")
 
 	for _, e := range entries {
 		sub, err := s.conn.Subscribe(e.subject, e.handler)
 		if err != nil {
-			logger.Error("subscribing to subject",
+			log.Error("subscribing to subject",
 				slog.String("subject", e.subject),
 				pkglog.Err(err),
 			)
@@ -58,19 +58,19 @@ func (s *UserSubscriber) Subscribe() error {
 		}
 
 		s.subs = append(s.subs, sub)
-		logger.Info("subscribed", slog.String("subject", e.subject))
+		log.Info("subscribed", slog.String("subject", e.subject))
 	}
 
 	return nil
 }
 
 func (s *UserSubscriber) Close() {
-	logger := pkglog.WithMethod(s.log, "Close")
+	log := pkglog.WithMethod(s.log, "Close")
 
-	logger.Info("draining nats connection")
+	log.Info("draining nats connection")
 
 	if err := s.conn.Drain(); err != nil {
-		logger.Error("draining nats connection", pkglog.Err(err))
+		log.Error("draining nats connection", pkglog.Err(err))
 		s.conn.Close()
 	}
 
@@ -78,16 +78,16 @@ func (s *UserSubscriber) Close() {
 }
 
 func (s *UserSubscriber) handleUserCreated(msg *nc.Msg) {
-	logger := pkglog.WithMethod(s.log, "handleUserCreated")
+	log := pkglog.WithMethod(s.log, "handleUserCreated")
 
 	var event eventuserpb.UserCreatedEvent
 	if err := proto.Unmarshal(msg.Data, &event); err != nil {
-		logger.Error("unmarshalling event", pkglog.Err(err))
+		log.Error("unmarshalling event", pkglog.Err(err))
 		return
 	}
 
 	if err := s.handler.OnUserCreated(context.Background(), event.GetId()); err != nil {
-		logger.Error("handling event",
+		log.Error("handling event",
 			slog.String("userID", event.GetId()),
 			pkglog.Err(err),
 		)
@@ -95,16 +95,16 @@ func (s *UserSubscriber) handleUserCreated(msg *nc.Msg) {
 }
 
 func (s *UserSubscriber) handleUserUpdated(msg *nc.Msg) {
-	logger := pkglog.WithMethod(s.log, "handleUserUpdated")
+	log := pkglog.WithMethod(s.log, "handleUserUpdated")
 
 	var event eventuserpb.UserUpdatedEvent
 	if err := proto.Unmarshal(msg.Data, &event); err != nil {
-		logger.Error("unmarshalling event", pkglog.Err(err))
+		log.Error("unmarshalling event", pkglog.Err(err))
 		return
 	}
 
 	if err := s.handler.OnUserUpdated(context.Background(), event.GetId(), event.GetIsSecurityUpdate()); err != nil {
-		logger.Error("handling event",
+		log.Error("handling event",
 			slog.String("userID", event.GetId()),
 			pkglog.Err(err),
 		)
@@ -112,16 +112,16 @@ func (s *UserSubscriber) handleUserUpdated(msg *nc.Msg) {
 }
 
 func (s *UserSubscriber) handleUserDeleted(msg *nc.Msg) {
-	logger := pkglog.WithMethod(s.log, "handleUserDeleted")
+	log := pkglog.WithMethod(s.log, "handleUserDeleted")
 
 	var event eventuserpb.UserDeletedEvent
 	if err := proto.Unmarshal(msg.Data, &event); err != nil {
-		logger.Error("unmarshalling event", pkglog.Err(err))
+		log.Error("unmarshalling event", pkglog.Err(err))
 		return
 	}
 
 	if err := s.handler.OnUserDeleted(context.Background(), event.GetId()); err != nil {
-		logger.Error("handling event",
+		log.Error("handling event",
 			slog.String("userID", event.GetId()),
 			pkglog.Err(err),
 		)

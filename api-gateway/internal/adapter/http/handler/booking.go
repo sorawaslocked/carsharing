@@ -37,6 +37,7 @@ func NewBookingHandler(svc BookingService, log *slog.Logger) *BookingHandler {
 // @Router       /bookings [post]
 func (h *BookingHandler) Create(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
+	log.Debug("creating booking")
 
 	data, err := dto.FromBookingCreateRequest(ctx)
 	if err != nil {
@@ -53,6 +54,8 @@ func (h *BookingHandler) Create(ctx *gin.Context) {
 
 		return
 	}
+
+	log.Debug("booking created", slog.String("id", id))
 
 	dto.Created(ctx, gin.H{"id": id})
 }
@@ -71,6 +74,7 @@ func (h *BookingHandler) Create(ctx *gin.Context) {
 // @Router       /bookings/{id} [get]
 func (h *BookingHandler) Get(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting booking")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -110,6 +114,7 @@ func (h *BookingHandler) Get(ctx *gin.Context) {
 // @Router       /bookings [get]
 func (h *BookingHandler) List(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
+	log.Debug("listing bookings")
 
 	filter, err := dto.BookingFilterFromCtx(ctx)
 	if err != nil {
@@ -150,6 +155,7 @@ func (h *BookingHandler) List(ctx *gin.Context) {
 // @Router       /bookings/{id}/cancel [post]
 func (h *BookingHandler) Cancel(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Cancel"), utils.MetadataFromCtx(ctx))
+	log.Debug("cancelling booking")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -186,6 +192,7 @@ func (h *BookingHandler) Cancel(ctx *gin.Context) {
 // @Router       /bookings/{id}/status [patch]
 func (h *BookingHandler) UpdateStatus(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "UpdateStatus"), utils.MetadataFromCtx(ctx))
+	log.Debug("updating booking status")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -231,6 +238,7 @@ func (h *BookingHandler) UpdateStatus(ctx *gin.Context) {
 // @Router       /bookings/{id}/status-history [get]
 func (h *BookingHandler) GetStatusHistory(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetStatusHistory"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting booking status history")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {

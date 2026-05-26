@@ -36,6 +36,7 @@ func NewCarMaintenanceHandler(svc CarMaintenanceService, log *slog.Logger) *CarM
 // @Router       /car-maintenance/template [post]
 func (h *CarMaintenanceHandler) CreateTemplate(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CreateTemplate"), utils.MetadataFromCtx(ctx))
+	log.Debug("creating maintenance template")
 
 	data, err := dto.FromCarMaintenanceTemplateCreateRequest(ctx)
 	if err != nil {
@@ -52,6 +53,8 @@ func (h *CarMaintenanceHandler) CreateTemplate(ctx *gin.Context) {
 
 		return
 	}
+
+	log.Debug("maintenance template created", slog.String("id", id))
 
 	dto.Ok(ctx, gin.H{"id": id})
 }
@@ -70,6 +73,7 @@ func (h *CarMaintenanceHandler) CreateTemplate(ctx *gin.Context) {
 // @Router       /car-maintenance/template/{id} [get]
 func (h *CarMaintenanceHandler) GetTemplate(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetTemplate"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting maintenance template")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -104,6 +108,7 @@ func (h *CarMaintenanceHandler) GetTemplate(ctx *gin.Context) {
 // @Router       /car-maintenance/template [get]
 func (h *CarMaintenanceHandler) ListTemplates(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "ListTemplates"), utils.MetadataFromCtx(ctx))
+	log.Debug("listing maintenance templates")
 
 	filter, err := dto.CarMaintenanceTemplateFilterFromCtx(ctx)
 	if err != nil {
@@ -145,6 +150,7 @@ func (h *CarMaintenanceHandler) ListTemplates(ctx *gin.Context) {
 // @Router       /car-maintenance/template/{id} [patch]
 func (h *CarMaintenanceHandler) UpdateTemplate(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "UpdateTemplate"), utils.MetadataFromCtx(ctx))
+	log.Debug("updating maintenance template")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -185,6 +191,7 @@ func (h *CarMaintenanceHandler) UpdateTemplate(ctx *gin.Context) {
 // @Router       /car-maintenance/template/{id} [delete]
 func (h *CarMaintenanceHandler) DeleteTemplate(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "DeleteTemplate"), utils.MetadataFromCtx(ctx))
+	log.Debug("deleting maintenance template")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -222,6 +229,7 @@ func (h *CarMaintenanceHandler) DeleteTemplate(ctx *gin.Context) {
 // @Router       /car-maintenance/records [get]
 func (h *CarMaintenanceHandler) GetRecords(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetRecords"), utils.MetadataFromCtx(ctx))
+	log.Debug("listing maintenance records")
 
 	filter, err := dto.CarMaintenanceRecordFilterFromCtx(ctx)
 	if err != nil {
@@ -264,6 +272,7 @@ func (h *CarMaintenanceHandler) GetRecords(ctx *gin.Context) {
 // @Router       /car-maintenance/records/complete/{id} [post]
 func (h *CarMaintenanceHandler) CompleteRecord(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "CompleteRecord"), utils.MetadataFromCtx(ctx))
+	log.Debug("completing maintenance record")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -301,6 +310,7 @@ func (h *CarMaintenanceHandler) CompleteRecord(ctx *gin.Context) {
 // @Router       /car-maintenance/records/receipt-image-upload [get]
 func (h *CarMaintenanceHandler) GetReceiptImageUploadUrl(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetReceiptImageUploadUrl"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting maintenance receipt image upload url")
 
 	uploadData, err := h.svc.GetReceiptImageUploadData(ctx)
 	if err != nil {

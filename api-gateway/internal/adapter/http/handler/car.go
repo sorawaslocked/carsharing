@@ -37,6 +37,7 @@ func NewCarHandler(svc CarService, log *slog.Logger) *CarHandler {
 // @Router       /cars [post]
 func (h *CarHandler) Create(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
+	log.Debug("creating car")
 
 	data, err := dto.FromCarCreateRequest(ctx)
 	if err != nil {
@@ -53,6 +54,8 @@ func (h *CarHandler) Create(ctx *gin.Context) {
 
 		return
 	}
+
+	log.Debug("car created", slog.String("id", id))
 
 	dto.Created(ctx, gin.H{"id": id})
 }
@@ -71,6 +74,7 @@ func (h *CarHandler) Create(ctx *gin.Context) {
 // @Router       /cars/{id} [get]
 func (h *CarHandler) Get(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting car")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -119,6 +123,7 @@ func (h *CarHandler) Get(ctx *gin.Context) {
 // @Router       /cars [get]
 func (h *CarHandler) List(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
+	log.Debug("listing cars")
 
 	filter, err := dto.CarFilterFromCtx(ctx)
 	if err != nil {
@@ -160,6 +165,7 @@ func (h *CarHandler) List(ctx *gin.Context) {
 // @Router       /cars/{id} [patch]
 func (h *CarHandler) Update(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Update"), utils.MetadataFromCtx(ctx))
+	log.Debug("updating car")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -200,6 +206,7 @@ func (h *CarHandler) Update(ctx *gin.Context) {
 // @Router       /cars/{id} [delete]
 func (h *CarHandler) Delete(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Delete"), utils.MetadataFromCtx(ctx))
+	log.Debug("deleting car")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -236,6 +243,7 @@ func (h *CarHandler) Delete(ctx *gin.Context) {
 // @Router       /cars/{id}/telemetry [patch]
 func (h *CarHandler) UpdateTelemetry(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "UpdateTelemetry"), utils.MetadataFromCtx(ctx))
+	log.Debug("updating car telemetry")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -279,6 +287,7 @@ func (h *CarHandler) UpdateTelemetry(ctx *gin.Context) {
 // @Router       /cars/{id}/status [patch]
 func (h *CarHandler) UpdateStatus(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "UpdateStatus"), utils.MetadataFromCtx(ctx))
+	log.Debug("updating car status")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -324,6 +333,7 @@ func (h *CarHandler) UpdateStatus(ctx *gin.Context) {
 // @Router       /cars/{id}/status-history [get]
 func (h *CarHandler) GetCarStatusHistory(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetCarStatusHistory"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting car status history")
 
 	carID, err := dto.IDParam(ctx)
 	if err != nil {
@@ -375,6 +385,7 @@ func (h *CarHandler) GetCarStatusHistory(ctx *gin.Context) {
 // @Router       /cars/{id}/telemetry-history [get]
 func (h *CarHandler) GetCarTelemetryHistory(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetCarTelemetryHistory"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting car telemetry history")
 
 	carID, err := dto.IDParam(ctx)
 	if err != nil {
@@ -419,6 +430,7 @@ func (h *CarHandler) GetCarTelemetryHistory(ctx *gin.Context) {
 // @Router       /cars/image-upload [get]
 func (h *CarHandler) GetImageUploadUrl(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetImageUploadUrl"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting car image upload url")
 
 	uploadData, err := h.svc.GetImageUploadData(ctx)
 	if err != nil {

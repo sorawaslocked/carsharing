@@ -37,6 +37,7 @@ func NewCarInsuranceHandler(svc CarInsuranceService, log *slog.Logger) *CarInsur
 // @Router       /car-insurances [post]
 func (h *CarInsuranceHandler) Create(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
+	log.Debug("creating car insurance")
 
 	data, err := dto.FromCarInsuranceCreateRequest(ctx)
 	if err != nil {
@@ -53,6 +54,8 @@ func (h *CarInsuranceHandler) Create(ctx *gin.Context) {
 
 		return
 	}
+
+	log.Debug("car insurance created", slog.String("id", id))
 
 	dto.Ok(ctx, gin.H{"id": id})
 }
@@ -71,6 +74,7 @@ func (h *CarInsuranceHandler) Create(ctx *gin.Context) {
 // @Router       /car-insurances/{id} [get]
 func (h *CarInsuranceHandler) Get(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting car insurance")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -110,6 +114,7 @@ func (h *CarInsuranceHandler) Get(ctx *gin.Context) {
 // @Router       /car-insurances [get]
 func (h *CarInsuranceHandler) List(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
+	log.Debug("listing car insurances")
 
 	filter, err := dto.CarInsuranceFilterFromCtx(ctx)
 	if err != nil {
@@ -151,6 +156,7 @@ func (h *CarInsuranceHandler) List(ctx *gin.Context) {
 // @Router       /car-insurances/{id} [patch]
 func (h *CarInsuranceHandler) Update(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Update"), utils.MetadataFromCtx(ctx))
+	log.Debug("updating car insurance")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -191,6 +197,7 @@ func (h *CarInsuranceHandler) Update(ctx *gin.Context) {
 // @Router       /car-insurances/{id} [delete]
 func (h *CarInsuranceHandler) Delete(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Delete"), utils.MetadataFromCtx(ctx))
+	log.Debug("deleting car insurance")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -221,6 +228,7 @@ func (h *CarInsuranceHandler) Delete(ctx *gin.Context) {
 // @Router       /car-insurances/image-upload [get]
 func (h *CarInsuranceHandler) GetImageUploadUrl(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetImageUploadUrl"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting car insurance image upload url")
 
 	uploadData, err := h.svc.GetImageUploadData(ctx)
 	if err != nil {

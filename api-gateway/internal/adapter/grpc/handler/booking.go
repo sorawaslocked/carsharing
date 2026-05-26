@@ -27,6 +27,7 @@ func NewBookingHandler(client bookingsvc.BookingServiceClient, logger *slog.Logg
 
 func (h *BookingHandler) Create(ctx context.Context, data model.BookingCreate) (string, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling booking service")
 
 	req := &bookingsvc.CreateBookingRequest{
 		UserId:        data.UserID,
@@ -44,11 +45,14 @@ func (h *BookingHandler) Create(ctx context.Context, data model.BookingCreate) (
 		return "", dto.FromGrpcErr(err)
 	}
 
+	log.Debug("booking created", slog.String("id", res.GetId()))
+
 	return res.GetId(), nil
 }
 
 func (h *BookingHandler) Get(ctx context.Context, id string) (model.Booking, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling booking service")
 
 	res, err := h.client.GetBooking(ctx, &bookingsvc.GetBookingRequest{Id: id})
 	if err != nil {
@@ -62,6 +66,7 @@ func (h *BookingHandler) Get(ctx context.Context, id string) (model.Booking, err
 
 func (h *BookingHandler) List(ctx context.Context, filter model.BookingFilter) ([]model.Booking, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling booking service")
 
 	req := &bookingsvc.ListBookingsRequest{
 		UserId:        filter.UserID,
@@ -93,6 +98,7 @@ func (h *BookingHandler) List(ctx context.Context, filter model.BookingFilter) (
 
 func (h *BookingHandler) Cancel(ctx context.Context, id string) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Cancel"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling booking service")
 
 	_, err := h.client.CancelBooking(ctx, &bookingsvc.CancelBookingRequest{Id: id})
 	if err != nil {
@@ -106,6 +112,7 @@ func (h *BookingHandler) Cancel(ctx context.Context, id string) error {
 
 func (h *BookingHandler) UpdateStatus(ctx context.Context, id string, data model.BookingStatusUpdate) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "UpdateStatus"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling booking service")
 
 	_, err := h.client.UpdateBookingStatus(ctx, &bookingsvc.UpdateBookingStatusRequest{
 		Id:     id,
@@ -123,6 +130,7 @@ func (h *BookingHandler) UpdateStatus(ctx context.Context, id string, data model
 
 func (h *BookingHandler) GetStatusHistory(ctx context.Context, id string, filter model.BookingStatusReadingFilter) ([]model.BookingStatusReading, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetStatusHistory"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling booking service")
 
 	req := &bookingsvc.GetBookingStatusHistoryRequest{Id: id}
 	if filter.From != nil || filter.To != nil {

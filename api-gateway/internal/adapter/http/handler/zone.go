@@ -37,6 +37,7 @@ func NewZoneHandler(svc ZoneService, log *slog.Logger) *ZoneHandler {
 // @Router       /zones [post]
 func (h *ZoneHandler) Create(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
+	log.Debug("creating zone")
 
 	data, err := dto.FromZoneCreateRequest(ctx)
 	if err != nil {
@@ -53,6 +54,8 @@ func (h *ZoneHandler) Create(ctx *gin.Context) {
 
 		return
 	}
+
+	log.Debug("zone created", slog.String("id", id))
 
 	dto.Ok(ctx, gin.H{"id": id})
 }
@@ -71,6 +74,7 @@ func (h *ZoneHandler) Create(ctx *gin.Context) {
 // @Router       /zones/{id} [get]
 func (h *ZoneHandler) Get(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting zone")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -106,6 +110,7 @@ func (h *ZoneHandler) Get(ctx *gin.Context) {
 // @Router       /zones [get]
 func (h *ZoneHandler) List(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
+	log.Debug("listing zones")
 
 	filter, err := dto.ZoneFilterFromCtx(ctx)
 	if err != nil {
@@ -147,6 +152,7 @@ func (h *ZoneHandler) List(ctx *gin.Context) {
 // @Router       /zones/{id} [patch]
 func (h *ZoneHandler) Update(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Update"), utils.MetadataFromCtx(ctx))
+	log.Debug("updating zone")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -187,6 +193,7 @@ func (h *ZoneHandler) Update(ctx *gin.Context) {
 // @Router       /zones/{id} [delete]
 func (h *ZoneHandler) Delete(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Delete"), utils.MetadataFromCtx(ctx))
+	log.Debug("deleting zone")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {

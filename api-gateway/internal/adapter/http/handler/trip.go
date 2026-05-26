@@ -39,6 +39,7 @@ func NewTripHandler(svc TripService, log *slog.Logger) *TripHandler {
 // @Router       /trips [post]
 func (h *TripHandler) Start(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Start"), utils.MetadataFromCtx(ctx))
+	log.Debug("starting trip")
 
 	bookingID, err := dto.FromTripStartRequest(ctx)
 	if err != nil {
@@ -55,6 +56,8 @@ func (h *TripHandler) Start(ctx *gin.Context) {
 
 		return
 	}
+
+	log.Debug("trip created", slog.String("id", id))
 
 	dto.Created(ctx, gin.H{"id": id})
 }
@@ -74,6 +77,7 @@ func (h *TripHandler) Start(ctx *gin.Context) {
 // @Router       /trips/{id} [get]
 func (h *TripHandler) Get(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting trip")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -114,6 +118,7 @@ func (h *TripHandler) Get(ctx *gin.Context) {
 // @Router       /trips [get]
 func (h *TripHandler) List(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
+	log.Debug("listing trips")
 
 	filter, err := dto.TripFilterFromCtx(ctx)
 	if err != nil {
@@ -156,6 +161,7 @@ func (h *TripHandler) List(ctx *gin.Context) {
 // @Router       /trips/{id}/end [post]
 func (h *TripHandler) End(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "End"), utils.MetadataFromCtx(ctx))
+	log.Debug("ending trip")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -194,6 +200,7 @@ func (h *TripHandler) End(ctx *gin.Context) {
 // @Router       /trips/{id}/cancel [post]
 func (h *TripHandler) Cancel(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Cancel"), utils.MetadataFromCtx(ctx))
+	log.Debug("cancelling trip")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -237,6 +244,7 @@ func (h *TripHandler) Cancel(ctx *gin.Context) {
 // @Router       /trips/{id}/summary [get]
 func (h *TripHandler) GetSummary(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetSummary"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting trip summary")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -277,6 +285,7 @@ func (h *TripHandler) GetSummary(ctx *gin.Context) {
 // @Router       /trips/{id}/status-history [get]
 func (h *TripHandler) GetStatusHistory(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetStatusHistory"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting trip status history")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {

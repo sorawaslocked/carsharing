@@ -15,6 +15,7 @@ import (
 
 func (h *CarHandler) StreamCarsWithFilter(ctx context.Context, filter model.CarFilter, send func([]model.SlimCar) error) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "StreamCarsWithFilter"), utils.MetadataFromCtx(ctx))
+	log.Debug("starting stream")
 
 	req := &carsvc.StreamCarsWithFilterRequest{
 		Brand:        filter.Brand,
@@ -47,6 +48,7 @@ func (h *CarHandler) StreamCarsWithFilter(ctx context.Context, filter model.CarF
 		log.Warn("streaming cars with filter", pkglog.Err(err))
 		return dto.FromGrpcErr(err)
 	}
+	log.Debug("stream opened")
 
 	for {
 		msg, err := stream.Recv()
@@ -82,6 +84,7 @@ func (h *CarHandler) StreamCarsWithFilter(ctx context.Context, filter model.CarF
 
 func (h *CarHandler) StreamCarTelemetry(ctx context.Context, carID string, send func(model.CarTelemetryEvent) error) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "StreamCarTelemetry"), utils.MetadataFromCtx(ctx))
+	log.Debug("starting stream")
 
 	req := &carsvc.StreamCarTelemetryRequest{CarId: carID}
 
@@ -93,6 +96,7 @@ func (h *CarHandler) StreamCarTelemetry(ctx context.Context, carID string, send 
 		log.Warn("streaming car telemetry", pkglog.Err(err))
 		return dto.FromGrpcErr(err)
 	}
+	log.Debug("stream opened")
 
 	for {
 		msg, err := stream.Recv()

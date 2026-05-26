@@ -10,6 +10,7 @@ import (
 
 func (s *TripService) StreamTripLiveFeed(ctx context.Context, tripID string, send func(model.TripLiveFeed) error) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "StreamTripLiveFeed"), utils.MetadataFromCtx(ctx))
+	log.Debug("starting stream")
 
 	if err := s.presenter.StreamTripLiveFeed(ctx, tripID, send); err != nil {
 		log.Warn("streaming trip live feed", pkglog.Err(err))

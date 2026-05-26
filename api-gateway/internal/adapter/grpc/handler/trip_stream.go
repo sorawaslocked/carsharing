@@ -14,6 +14,7 @@ import (
 
 func (h *TripHandler) StreamTripLiveFeed(ctx context.Context, tripID string, send func(model.TripLiveFeed) error) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "StreamTripLiveFeed"), utils.MetadataFromCtx(ctx))
+	log.Debug("starting stream")
 
 	stream, err := h.streamClient.StreamTripLiveFeed(ctx, &tripsvc.StreamTripLiveFeedRequest{TripId: tripID})
 	if err != nil {
@@ -21,6 +22,7 @@ func (h *TripHandler) StreamTripLiveFeed(ctx context.Context, tripID string, sen
 
 		return dto.FromGrpcErr(err)
 	}
+	log.Debug("stream opened")
 
 	for {
 		msg, err := stream.Recv()

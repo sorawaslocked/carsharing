@@ -3,6 +3,7 @@ package handler
 import (
 	"log/slog"
 	"net/http"
+	"time"
 
 	"carsharing/api-gateway/internal/adapter/http/dto"
 	"carsharing/api-gateway/internal/config"
@@ -480,13 +481,12 @@ func (h *UserHandler) CheckActivationCode(c *gin.Context) {
 	dto.NoContent(c)
 }
 
-func (h *UserHandler) setRefreshCookies(c *gin.Context, refreshToken string, expiresIn int64) {
+func (h *UserHandler) setRefreshCookies(c *gin.Context, refreshToken string, ttl time.Duration) {
 	const path = "/api/v1/auth"
-	maxAge := int(expiresIn)
 	const httpOnly = true
 
 	c.SetSameSite(http.SameSiteNoneMode)
-	c.SetCookie("refresh_token", refreshToken, maxAge, path, h.cookie.Domain, h.cookie.Secure, httpOnly)
+	c.SetCookie("refresh_token", refreshToken, int(ttl.Seconds()), path, h.cookie.Domain, h.cookie.Secure, httpOnly)
 }
 
 func (h *UserHandler) clearRefreshCookies(c *gin.Context) {

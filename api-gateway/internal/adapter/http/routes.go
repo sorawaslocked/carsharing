@@ -34,7 +34,7 @@ func (s *Server) setupRoutes(
 		}
 	}
 
-	authentication := middleware.NewAuthentication(tokenManager, userPermissionsCache, userSessionCache)
+	authentication := middleware.NewAuthentication(tokenManager, userPermissionsCache, userSessionCache, s.log)
 
 	protectedV1 := s.router.Group("/api/v1")
 	protectedV1.Use(authentication.Middleware())

@@ -37,6 +37,7 @@ func NewCarModelHandler(svc CarModelService, log *slog.Logger) *CarModelHandler 
 // @Router       /car-models [post]
 func (h *CarModelHandler) Create(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
+	log.Debug("creating car model")
 
 	data, err := dto.FromCarModelCreateRequest(ctx)
 	if err != nil {
@@ -53,6 +54,8 @@ func (h *CarModelHandler) Create(ctx *gin.Context) {
 
 		return
 	}
+
+	log.Debug("car model created", slog.String("id", id))
 
 	dto.Created(ctx, gin.H{"id": id})
 }
@@ -71,6 +74,7 @@ func (h *CarModelHandler) Create(ctx *gin.Context) {
 // @Router       /car-models/{id} [get]
 func (h *CarModelHandler) Get(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting car model")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -113,6 +117,7 @@ func (h *CarModelHandler) Get(ctx *gin.Context) {
 // @Router       /car-models [get]
 func (h *CarModelHandler) List(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
+	log.Debug("listing car models")
 
 	filter, err := dto.CarModelFilterFromCtx(ctx)
 	if err != nil {
@@ -154,6 +159,7 @@ func (h *CarModelHandler) List(ctx *gin.Context) {
 // @Router       /car-models/{id} [patch]
 func (h *CarModelHandler) Update(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Update"), utils.MetadataFromCtx(ctx))
+	log.Debug("updating car model")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -194,6 +200,7 @@ func (h *CarModelHandler) Update(ctx *gin.Context) {
 // @Router       /car-models/{id} [delete]
 func (h *CarModelHandler) Delete(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Delete"), utils.MetadataFromCtx(ctx))
+	log.Debug("deleting car model")
 
 	id, err := dto.IDParam(ctx)
 	if err != nil {
@@ -225,6 +232,7 @@ func (h *CarModelHandler) Delete(ctx *gin.Context) {
 // @Router       /car-models/image-upload [get]
 func (h *CarModelHandler) GetImageUploadUrl(ctx *gin.Context) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetImageUploadUrl"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting car model image upload url")
 
 	uploadData, err := h.svc.GetImageUploadData(ctx)
 	if err != nil {

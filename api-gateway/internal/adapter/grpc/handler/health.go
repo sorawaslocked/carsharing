@@ -33,6 +33,7 @@ func NewHealthHandler(name string, client healthClient, logger *slog.Logger) *He
 
 func (h *HealthHandler) Health(ctx context.Context) (model.ServiceHealth, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Health"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling health service")
 
 	res, err := h.client.Health(ctx, &emptypb.Empty{})
 	if err != nil {

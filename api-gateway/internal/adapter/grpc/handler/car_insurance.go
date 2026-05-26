@@ -29,6 +29,7 @@ func NewCarInsuranceHandler(client carsvc.CarInsuranceServiceClient, logger *slo
 
 func (h *CarInsuranceHandler) Create(ctx context.Context, data model.CarInsuranceCreate) (string, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	res, err := h.client.CreateCarInsurance(ctx, &carsvc.CreateCarInsuranceRequest{
 		CarId:     data.CarID,
@@ -46,11 +47,14 @@ func (h *CarInsuranceHandler) Create(ctx context.Context, data model.CarInsuranc
 		return "", dto.FromGrpcErr(err)
 	}
 
+	log.Debug("car insurance created", slog.String("id", res.GetId()))
+
 	return res.GetId(), nil
 }
 
 func (h *CarInsuranceHandler) Get(ctx context.Context, id string) (model.CarInsurance, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	res, err := h.client.GetCarInsurance(ctx, &carsvc.GetCarInsuranceRequest{Id: id})
 	if err != nil {
@@ -64,6 +68,7 @@ func (h *CarInsuranceHandler) Get(ctx context.Context, id string) (model.CarInsu
 
 func (h *CarInsuranceHandler) List(ctx context.Context, filter model.CarInsuranceFilter) ([]model.CarInsurance, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	req := &carsvc.ListCarInsurancesRequest{
 		CarId:              filter.CarID,
@@ -95,6 +100,7 @@ func (h *CarInsuranceHandler) List(ctx context.Context, filter model.CarInsuranc
 
 func (h *CarInsuranceHandler) Update(ctx context.Context, id string, data model.CarInsuranceUpdate) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Update"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	req := &carsvc.UpdateCarInsuranceRequest{
 		Id:        id,
@@ -124,6 +130,7 @@ func (h *CarInsuranceHandler) Update(ctx context.Context, id string, data model.
 
 func (h *CarInsuranceHandler) Delete(ctx context.Context, id string) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Delete"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	_, err := h.client.DeleteCarInsurance(ctx, &carsvc.DeleteCarInsuranceRequest{Id: id})
 	if err != nil {
@@ -137,6 +144,7 @@ func (h *CarInsuranceHandler) Delete(ctx context.Context, id string) error {
 
 func (h *CarInsuranceHandler) GetImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetImageUploadData"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	res, err := h.client.GetCarInsuranceImageUploadData(ctx, &emptypb.Empty{})
 	if err != nil {

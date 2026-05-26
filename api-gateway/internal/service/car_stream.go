@@ -10,6 +10,7 @@ import (
 
 func (s *CarService) StreamCarsWithFilter(ctx context.Context, filter model.CarFilter, send func([]model.SlimCar) error) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "StreamCarsWithFilter"), utils.MetadataFromCtx(ctx))
+	log.Debug("starting stream")
 
 	if err := s.presenter.StreamCarsWithFilter(ctx, filter, send); err != nil {
 		log.Warn("streaming cars with filter", pkglog.Err(err))
@@ -22,6 +23,7 @@ func (s *CarService) StreamCarsWithFilter(ctx context.Context, filter model.CarF
 
 func (s *CarService) StreamCarTelemetry(ctx context.Context, carID string, send func(model.CarTelemetryEvent) error) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "StreamCarTelemetry"), utils.MetadataFromCtx(ctx))
+	log.Debug("starting stream")
 
 	if err := s.presenter.StreamCarTelemetry(ctx, carID, send); err != nil {
 		log.Warn("streaming car telemetry", pkglog.Err(err))

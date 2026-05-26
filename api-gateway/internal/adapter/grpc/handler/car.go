@@ -32,6 +32,7 @@ func NewCarHandler(client carsvc.CarServiceClient, streamClient carsvc.CarStream
 
 func (h *CarHandler) Create(ctx context.Context, data model.CarCreate) (string, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	req := &carsvc.CreateCarRequest{
 		ModelId:          data.ModelID,
@@ -57,11 +58,14 @@ func (h *CarHandler) Create(ctx context.Context, data model.CarCreate) (string, 
 		return "", dto.FromGrpcErr(err)
 	}
 
+	log.Debug("car created", slog.String("id", res.GetId()))
+
 	return res.GetId(), nil
 }
 
 func (h *CarHandler) Get(ctx context.Context, id string) (model.Car, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	res, err := h.client.GetCar(ctx, &carsvc.GetCarRequest{Id: id})
 	if err != nil {
@@ -75,6 +79,7 @@ func (h *CarHandler) Get(ctx context.Context, id string) (model.Car, error) {
 
 func (h *CarHandler) List(ctx context.Context, filter model.CarFilter) ([]model.Car, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	req := &carsvc.ListCarsRequest{
 		Brand:        filter.Brand,
@@ -120,6 +125,7 @@ func (h *CarHandler) List(ctx context.Context, filter model.CarFilter) ([]model.
 
 func (h *CarHandler) Update(ctx context.Context, id string, data model.CarUpdate) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Update"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	req := &carsvc.UpdateCarRequest{
 		Id:           id,
@@ -145,6 +151,7 @@ func (h *CarHandler) Update(ctx context.Context, id string, data model.CarUpdate
 
 func (h *CarHandler) Delete(ctx context.Context, id string) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Delete"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	_, err := h.client.DeleteCar(ctx, &carsvc.DeleteCarRequest{Id: id})
 	if err != nil {
@@ -158,6 +165,7 @@ func (h *CarHandler) Delete(ctx context.Context, id string) error {
 
 func (h *CarHandler) UpdateTelemetry(ctx context.Context, carID string, data model.CarTelemetryUpdate) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "UpdateTelemetry"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	req := &carsvc.UpdateCarTelemetryRequest{
 		Id:           carID,
@@ -188,6 +196,7 @@ func (h *CarHandler) UpdateTelemetry(ctx context.Context, carID string, data mod
 
 func (h *CarHandler) UpdateStatus(ctx context.Context, carID string, data model.CarStatusUpdate) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "UpdateStatus"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	req := &carsvc.UpdateCarStatusRequest{
 		Id:     carID,
@@ -213,6 +222,7 @@ func (h *CarHandler) UpdateStatus(ctx context.Context, carID string, data model.
 
 func (h *CarHandler) GetCarStatusHistory(ctx context.Context, carID string, filter model.CarStatusReadingFilter) ([]model.CarStatusReading, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetCarStatusHistory"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	req := &carsvc.GetCarStatusHistoryRequest{CarId: carID}
 	if filter.TimeRange != nil {
@@ -249,6 +259,7 @@ func (h *CarHandler) GetCarStatusHistory(ctx context.Context, carID string, filt
 
 func (h *CarHandler) GetCarTelemetryHistory(ctx context.Context, carID string, filter model.CarTelemetryReadingFilter) ([]model.CarTelemetryReading, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetCarTelemetryHistory"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	req := &carsvc.GetCarTelemetryHistoryRequest{CarId: carID}
 	if filter.TimeRange != nil {
@@ -285,6 +296,7 @@ func (h *CarHandler) GetCarTelemetryHistory(ctx context.Context, carID string, f
 
 func (h *CarHandler) GetImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "GetImageUploadData"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	res, err := h.client.GetCarImageUploadData(ctx, &emptypb.Empty{})
 	if err != nil {

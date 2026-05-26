@@ -29,6 +29,7 @@ func NewUserHandler(client usersvc.UserServiceClient, logger *slog.Logger) *User
 
 func (h *UserHandler) Create(ctx context.Context, data model.UserCreate) (string, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling user service")
 
 	req := &usersvc.CreateUserRequest{
 		Email:       data.Email,
@@ -51,11 +52,14 @@ func (h *UserHandler) Create(ctx context.Context, data model.UserCreate) (string
 		return "", dto.FromGrpcErr(err)
 	}
 
+	log.Debug("user created", slog.String("id", res.GetId()))
+
 	return res.GetId(), nil
 }
 
 func (h *UserHandler) Get(ctx context.Context, id string) (model.User, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling user service")
 
 	res, err := h.client.GetUser(ctx, &usersvc.GetUserRequest{Id: id})
 	if err != nil {
@@ -69,6 +73,7 @@ func (h *UserHandler) Get(ctx context.Context, id string) (model.User, error) {
 
 func (h *UserHandler) List(ctx context.Context, filter model.UserFilter) ([]model.User, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling user service")
 
 	req := &usersvc.ListUsersRequest{
 		Email:              filter.Email,
@@ -103,6 +108,7 @@ func (h *UserHandler) List(ctx context.Context, filter model.UserFilter) ([]mode
 
 func (h *UserHandler) Update(ctx context.Context, id string, data model.UserUpdate) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Update"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling user service")
 
 	req := &usersvc.UpdateUserRequest{
 		Id:                 id,
@@ -136,6 +142,7 @@ func (h *UserHandler) Update(ctx context.Context, id string, data model.UserUpda
 
 func (h *UserHandler) Delete(ctx context.Context, id string) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Delete"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling user service")
 
 	_, err := h.client.DeleteUser(ctx, &usersvc.DeleteUserRequest{Id: id})
 	if err != nil {
@@ -149,6 +156,7 @@ func (h *UserHandler) Delete(ctx context.Context, id string) error {
 
 func (h *UserHandler) Register(ctx context.Context, data model.UserCreate) (string, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Register"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling user service")
 
 	req := &usersvc.RegisterRequest{
 		Email:       data.Email,
@@ -170,6 +178,8 @@ func (h *UserHandler) Register(ctx context.Context, data model.UserCreate) (stri
 
 		return "", dto.FromGrpcErr(err)
 	}
+
+	log.Debug("user registered", slog.String("id", res.GetId()))
 
 	return res.GetId(), nil
 }
@@ -223,6 +233,7 @@ func (h *UserHandler) CheckActivationCode(ctx context.Context, code string) erro
 
 func (h *UserHandler) StreamDocumentAnalyzed(ctx context.Context, userID *string, passed *bool, send func(model.DocumentAnalyzedEvent) error) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "StreamDocumentAnalyzed"), utils.MetadataFromCtx(ctx))
+	log.Debug("starting stream")
 
 	stream, err := h.client.StreamDocumentAnalyzed(ctx, &usersvc.StreamDocumentAnalyzedRequest{
 		UserId: userID,
@@ -235,6 +246,7 @@ func (h *UserHandler) StreamDocumentAnalyzed(ctx context.Context, userID *string
 		log.Warn("streaming document analyzed", pkglog.Err(err))
 		return dto.FromGrpcErr(err)
 	}
+	log.Debug("stream opened")
 
 	for {
 		msg, err := stream.Recv()

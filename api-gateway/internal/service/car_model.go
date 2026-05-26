@@ -24,6 +24,7 @@ func NewCarModelService(presenter CarModelPresenter, log *slog.Logger) *CarModel
 
 func (s *CarModelService) Create(ctx context.Context, data model.CarModelCreate) (string, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Create"), utils.MetadataFromCtx(ctx))
+	log.Debug("creating car model")
 
 	id, err := s.presenter.Create(ctx, data)
 	if err != nil {
@@ -32,11 +33,14 @@ func (s *CarModelService) Create(ctx context.Context, data model.CarModelCreate)
 		return "", err
 	}
 
+	log.Debug("car model created", slog.String("id", id))
+
 	return id, nil
 }
 
 func (s *CarModelService) Get(ctx context.Context, id string) (model.CarModel, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Get"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting car model")
 
 	carModel, err := s.presenter.Get(ctx, id)
 	if err != nil {
@@ -50,6 +54,7 @@ func (s *CarModelService) Get(ctx context.Context, id string) (model.CarModel, e
 
 func (s *CarModelService) List(ctx context.Context, filter model.CarModelFilter) ([]model.CarModel, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "List"), utils.MetadataFromCtx(ctx))
+	log.Debug("listing car models")
 
 	carModels, err := s.presenter.List(ctx, filter)
 	if err != nil {
@@ -63,6 +68,7 @@ func (s *CarModelService) List(ctx context.Context, filter model.CarModelFilter)
 
 func (s *CarModelService) Update(ctx context.Context, id string, data model.CarModelUpdate) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Update"), utils.MetadataFromCtx(ctx))
+	log.Debug("updating car model")
 
 	if err := s.presenter.Update(ctx, id, data); err != nil {
 		log.Warn("updating car model", pkglog.Err(err))
@@ -75,6 +81,7 @@ func (s *CarModelService) Update(ctx context.Context, id string, data model.CarM
 
 func (s *CarModelService) Delete(ctx context.Context, id string) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Delete"), utils.MetadataFromCtx(ctx))
+	log.Debug("deleting car model")
 
 	if err := s.presenter.Delete(ctx, id); err != nil {
 		log.Warn("deleting car model", pkglog.Err(err))
@@ -87,6 +94,7 @@ func (s *CarModelService) Delete(ctx context.Context, id string) error {
 
 func (s *CarModelService) GetImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetImageUploadData"), utils.MetadataFromCtx(ctx))
+	log.Debug("getting car model image upload data")
 
 	data, err := s.presenter.GetImageUploadData(ctx)
 	if err != nil {

@@ -88,5 +88,5 @@ type AccessToken struct {
 
 type RefreshToken struct {
 	Token     string
-	ExpiresIn int64
+	ExpiresIn time.Duration
 }

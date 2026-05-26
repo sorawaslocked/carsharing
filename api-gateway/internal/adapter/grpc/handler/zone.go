@@ -25,6 +25,7 @@ func NewZoneHandler(client carsvc.ZoneServiceClient, logger *slog.Logger) *ZoneH
 
 func (h *ZoneHandler) Create(ctx context.Context, data model.ZoneCreate) (string, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Create"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	res, err := h.client.CreateZone(ctx, &carsvc.CreateZoneRequest{
 		Name:            data.Name,
@@ -38,11 +39,14 @@ func (h *ZoneHandler) Create(ctx context.Context, data model.ZoneCreate) (string
 		return "", dto.FromGrpcErr(err)
 	}
 
+	log.Debug("zone created", slog.String("id", res.GetId()))
+
 	return res.GetId(), nil
 }
 
 func (h *ZoneHandler) Get(ctx context.Context, id string) (model.Zone, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Get"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	res, err := h.client.GetZone(ctx, &carsvc.GetZoneRequest{Id: id})
 	if err != nil {
@@ -56,6 +60,7 @@ func (h *ZoneHandler) Get(ctx context.Context, id string) (model.Zone, error) {
 
 func (h *ZoneHandler) List(ctx context.Context, filter model.ZoneFilter) ([]model.Zone, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "List"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	res, err := h.client.ListZones(ctx, &carsvc.ListZonesRequest{
 		Type:     filter.Type,
@@ -77,6 +82,7 @@ func (h *ZoneHandler) List(ctx context.Context, filter model.ZoneFilter) ([]mode
 
 func (h *ZoneHandler) Update(ctx context.Context, id string, data model.ZoneUpdate) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Update"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	_, err := h.client.UpdateZone(ctx, &carsvc.UpdateZoneRequest{
 		Id:              id,
@@ -97,6 +103,7 @@ func (h *ZoneHandler) Update(ctx context.Context, id string, data model.ZoneUpda
 
 func (h *ZoneHandler) Delete(ctx context.Context, id string) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "Delete"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
 
 	_, err := h.client.DeleteZone(ctx, &carsvc.DeleteZoneRequest{Id: id})
 	if err != nil {

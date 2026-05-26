@@ -320,6 +320,110 @@ func (x *StreamCarTelemetryResponse) GetRecordedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+type StreamCarStatusUpdatesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CarId         string                 `protobuf:"bytes,1,opt,name=car_id,json=carId,proto3" json:"car_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamCarStatusUpdatesRequest) Reset() {
+	*x = StreamCarStatusUpdatesRequest{}
+	mi := &file_service_car_car_stream_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamCarStatusUpdatesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamCarStatusUpdatesRequest) ProtoMessage() {}
+
+func (x *StreamCarStatusUpdatesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_service_car_car_stream_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamCarStatusUpdatesRequest.ProtoReflect.Descriptor instead.
+func (*StreamCarStatusUpdatesRequest) Descriptor() ([]byte, []int) {
+	return file_service_car_car_stream_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *StreamCarStatusUpdatesRequest) GetCarId() string {
+	if x != nil {
+		return x.CarId
+	}
+	return ""
+}
+
+type StreamCarStatusUpdatesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FromStatus    string                 `protobuf:"bytes,1,opt,name=from_status,json=fromStatus,proto3" json:"from_status,omitempty"`
+	ToStatus      string                 `protobuf:"bytes,2,opt,name=to_status,json=toStatus,proto3" json:"to_status,omitempty"`
+	ChangedAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=changed_at,json=changedAt,proto3" json:"changed_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamCarStatusUpdatesResponse) Reset() {
+	*x = StreamCarStatusUpdatesResponse{}
+	mi := &file_service_car_car_stream_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamCarStatusUpdatesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamCarStatusUpdatesResponse) ProtoMessage() {}
+
+func (x *StreamCarStatusUpdatesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_service_car_car_stream_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamCarStatusUpdatesResponse.ProtoReflect.Descriptor instead.
+func (*StreamCarStatusUpdatesResponse) Descriptor() ([]byte, []int) {
+	return file_service_car_car_stream_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *StreamCarStatusUpdatesResponse) GetFromStatus() string {
+	if x != nil {
+		return x.FromStatus
+	}
+	return ""
+}
+
+func (x *StreamCarStatusUpdatesResponse) GetToStatus() string {
+	if x != nil {
+		return x.ToStatus
+	}
+	return ""
+}
+
+func (x *StreamCarStatusUpdatesResponse) GetChangedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ChangedAt
+	}
+	return nil
+}
+
 var File_service_car_car_stream_proto protoreflect.FileDescriptor
 
 const file_service_car_car_stream_proto_rawDesc = "" +
@@ -370,10 +474,19 @@ const file_service_car_car_stream_proto_rawDesc = "" +
 	"\vrecorded_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"recordedAtB\r\n" +
 	"\v_fuel_levelB\x10\n" +
-	"\x0e_battery_level2\xea\x01\n" +
+	"\x0e_battery_level\"6\n" +
+	"\x1dStreamCarStatusUpdatesRequest\x12\x15\n" +
+	"\x06car_id\x18\x01 \x01(\tR\x05carId\"\x99\x01\n" +
+	"\x1eStreamCarStatusUpdatesResponse\x12\x1f\n" +
+	"\vfrom_status\x18\x01 \x01(\tR\n" +
+	"fromStatus\x12\x1b\n" +
+	"\tto_status\x18\x02 \x01(\tR\btoStatus\x129\n" +
+	"\n" +
+	"changed_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tchangedAt2\xdf\x02\n" +
 	"\x10CarStreamService\x12m\n" +
 	"\x14StreamCarsWithFilter\x12(.service.car.StreamCarsWithFilterRequest\x1a).service.car.StreamCarsWithFilterResponse0\x01\x12g\n" +
-	"\x12StreamCarTelemetry\x12&.service.car.StreamCarTelemetryRequest\x1a'.service.car.StreamCarTelemetryResponse0\x01B#Z!carsharing/protos/gen/service/carb\x06proto3"
+	"\x12StreamCarTelemetry\x12&.service.car.StreamCarTelemetryRequest\x1a'.service.car.StreamCarTelemetryResponse0\x01\x12s\n" +
+	"\x16StreamCarStatusUpdates\x12*.service.car.StreamCarStatusUpdatesRequest\x1a+.service.car.StreamCarStatusUpdatesResponse0\x01B#Z!carsharing/protos/gen/service/carb\x06proto3"
 
 var (
 	file_service_car_car_stream_proto_rawDescOnce sync.Once
@@ -387,30 +500,35 @@ func file_service_car_car_stream_proto_rawDescGZIP() []byte {
 	return file_service_car_car_stream_proto_rawDescData
 }
 
-var file_service_car_car_stream_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_service_car_car_stream_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_service_car_car_stream_proto_goTypes = []any{
-	(*StreamCarsWithFilterRequest)(nil),  // 0: service.car.StreamCarsWithFilterRequest
-	(*StreamCarsWithFilterResponse)(nil), // 1: service.car.StreamCarsWithFilterResponse
-	(*StreamCarTelemetryRequest)(nil),    // 2: service.car.StreamCarTelemetryRequest
-	(*StreamCarTelemetryResponse)(nil),   // 3: service.car.StreamCarTelemetryResponse
-	(*base.Location)(nil),                // 4: base.Location
-	(*car.SlimCar)(nil),                  // 5: base.car.SlimCar
-	(*timestamppb.Timestamp)(nil),        // 6: google.protobuf.Timestamp
+	(*StreamCarsWithFilterRequest)(nil),    // 0: service.car.StreamCarsWithFilterRequest
+	(*StreamCarsWithFilterResponse)(nil),   // 1: service.car.StreamCarsWithFilterResponse
+	(*StreamCarTelemetryRequest)(nil),      // 2: service.car.StreamCarTelemetryRequest
+	(*StreamCarTelemetryResponse)(nil),     // 3: service.car.StreamCarTelemetryResponse
+	(*StreamCarStatusUpdatesRequest)(nil),  // 4: service.car.StreamCarStatusUpdatesRequest
+	(*StreamCarStatusUpdatesResponse)(nil), // 5: service.car.StreamCarStatusUpdatesResponse
+	(*base.Location)(nil),                  // 6: base.Location
+	(*car.SlimCar)(nil),                    // 7: base.car.SlimCar
+	(*timestamppb.Timestamp)(nil),          // 8: google.protobuf.Timestamp
 }
 var file_service_car_car_stream_proto_depIdxs = []int32{
-	4, // 0: service.car.StreamCarsWithFilterRequest.location:type_name -> base.Location
-	5, // 1: service.car.StreamCarsWithFilterResponse.car:type_name -> base.car.SlimCar
-	4, // 2: service.car.StreamCarTelemetryResponse.location:type_name -> base.Location
-	6, // 3: service.car.StreamCarTelemetryResponse.recorded_at:type_name -> google.protobuf.Timestamp
-	0, // 4: service.car.CarStreamService.StreamCarsWithFilter:input_type -> service.car.StreamCarsWithFilterRequest
-	2, // 5: service.car.CarStreamService.StreamCarTelemetry:input_type -> service.car.StreamCarTelemetryRequest
-	1, // 6: service.car.CarStreamService.StreamCarsWithFilter:output_type -> service.car.StreamCarsWithFilterResponse
-	3, // 7: service.car.CarStreamService.StreamCarTelemetry:output_type -> service.car.StreamCarTelemetryResponse
-	6, // [6:8] is the sub-list for method output_type
-	4, // [4:6] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	6, // 0: service.car.StreamCarsWithFilterRequest.location:type_name -> base.Location
+	7, // 1: service.car.StreamCarsWithFilterResponse.car:type_name -> base.car.SlimCar
+	6, // 2: service.car.StreamCarTelemetryResponse.location:type_name -> base.Location
+	8, // 3: service.car.StreamCarTelemetryResponse.recorded_at:type_name -> google.protobuf.Timestamp
+	8, // 4: service.car.StreamCarStatusUpdatesResponse.changed_at:type_name -> google.protobuf.Timestamp
+	0, // 5: service.car.CarStreamService.StreamCarsWithFilter:input_type -> service.car.StreamCarsWithFilterRequest
+	2, // 6: service.car.CarStreamService.StreamCarTelemetry:input_type -> service.car.StreamCarTelemetryRequest
+	4, // 7: service.car.CarStreamService.StreamCarStatusUpdates:input_type -> service.car.StreamCarStatusUpdatesRequest
+	1, // 8: service.car.CarStreamService.StreamCarsWithFilter:output_type -> service.car.StreamCarsWithFilterResponse
+	3, // 9: service.car.CarStreamService.StreamCarTelemetry:output_type -> service.car.StreamCarTelemetryResponse
+	5, // 10: service.car.CarStreamService.StreamCarStatusUpdates:output_type -> service.car.StreamCarStatusUpdatesResponse
+	8, // [8:11] is the sub-list for method output_type
+	5, // [5:8] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_service_car_car_stream_proto_init() }
@@ -426,7 +544,7 @@ func file_service_car_car_stream_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_service_car_car_stream_proto_rawDesc), len(file_service_car_car_stream_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

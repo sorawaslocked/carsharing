@@ -38,6 +38,7 @@ type (
 	HTTPServer struct {
 		Host         string     `yaml:"host" env:"HTTP_SERVER_HOST" env-required:"true"`
 		Port         int        `yaml:"port" env:"HTTP_SERVER_PORT" env-required:"true"`
+		SwaggerHost  string     `yaml:"swagger_host" env:"SWAGGER_HOST" env-default:"localhost:4000"`
 		ReadTimeout  string     `yaml:"read_timeout" env:"HTTP_SERVER_READ_TIMEOUT" env-default:"30s"`
 		WriteTimeout string     `yaml:"write_timeout" env:"HTTP_SERVER_WRITE_TIMEOUT" env-default:"30s"`
 		IdleTimeout  string     `yaml:"idle_timeout" env:"HTTP_SERVER_IDLE_TIMEOUT" env-default:"60s"`

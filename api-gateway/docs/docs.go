@@ -4422,7 +4422,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "WebSocket stream of status transition events for a single car, delivered via NATS. Streams until token expiry or disconnect.",
+                "description": "WebSocket stream of status transition events for a single car. Streams until token expiry or disconnect.",
                 "produces": [
                     "application/json"
                 ],
@@ -4448,6 +4448,9 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "unauthorized"
+                    },
+                    "404": {
+                        "description": "car not found"
                     },
                     "500": {
                         "description": "internal server error"
@@ -4542,32 +4545,34 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "WebSocket feed that pushes a single message when the specified document has been analyzed, then closes.",
+                "description": "WebSocket stream of DocumentAnalyzedEvents from the user service. Accepts optional userId and passed query params to filter events.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "users"
                 ],
-                "summary": "Document verification updates",
+                "summary": "Document analyzed stream",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Document ID to watch",
-                        "name": "docID",
-                        "in": "query",
-                        "required": true
+                        "description": "Filter by user ID",
+                        "name": "userId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by pass/fail result",
+                        "name": "passed",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "101": {
-                        "description": "WebSocket message (one-shot, then closes)",
+                        "description": "Streamed WebSocket message format",
                         "schema": {
                             "$ref": "#/definitions/wsdto.DocumentAnalyzedMessage"
                         }
-                    },
-                    "400": {
-                        "description": "bad request"
                     },
                     "401": {
                         "description": "unauthorized"
@@ -6959,6 +6964,9 @@ const docTemplate = `{
                 },
                 "passed": {
                     "type": "boolean"
+                },
+                "userId": {
+                    "type": "string"
                 }
             }
         },
@@ -7041,8 +7049,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:4000",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "Car Rental API Gateway",
-	Description:      "API Gateway for the Kazakhstan carsharing platform. Handles auth, users, fleet, zones, insurance, and maintenance.",
+	Title:            "Carsharing API Gateway",
+	Description:      "API Gateway for the Kazakhstan carsharing platform.\nProvides REST and WebSocket endpoints for: authentication, user management,\nfleet (cars, models, telemetry, status), bookings, trips, zones,\npricing rules, car insurance, and maintenance. Real-time updates are\navailable via WebSocket at /api/v1/ws.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

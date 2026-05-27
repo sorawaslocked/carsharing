@@ -1,7 +1,6 @@
 package http
 
 import (
-	_ "carsharing/api-gateway/docs"
 	"carsharing/api-gateway/internal/adapter/http/middleware"
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"

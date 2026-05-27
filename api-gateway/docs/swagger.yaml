@@ -1427,6 +1427,8 @@ definitions:
         type: string
       passed:
         type: boolean
+      userId:
+        type: string
     type: object
   wsdto.DocumentDefect:
     properties:
@@ -1473,12 +1475,16 @@ info:
   contact:
     email: support@carrental.kz
     name: API Support
-  description: API Gateway for the Kazakhstan carsharing platform. Handles auth, users,
-    fleet, zones, insurance, and maintenance.
+  description: |-
+    API Gateway for the Kazakhstan carsharing platform.
+    Provides REST and WebSocket endpoints for: authentication, user management,
+    fleet (cars, models, telemetry, status), bookings, trips, zones,
+    pricing rules, car insurance, and maintenance. Real-time updates are
+    available via WebSocket at /api/v1/ws.
   license:
     name: Proprietary
   termsOfService: http://swagger.io/terms/
-  title: Car Rental API Gateway
+  title: Carsharing API Gateway
   version: "1.0"
 paths:
   /auth/refresh-token:
@@ -4355,8 +4361,8 @@ paths:
       - cars
   /ws/cars/{id}/status:
     get:
-      description: WebSocket stream of status transition events for a single car,
-        delivered via NATS. Streams until token expiry or disconnect.
+      description: WebSocket stream of status transition events for a single car.
+        Streams until token expiry or disconnect.
       parameters:
       - description: Car ID
         in: path
@@ -4372,6 +4378,8 @@ paths:
             $ref: '#/definitions/wsdto.CarStatusMessage'
         "401":
           description: unauthorized
+        "404":
+          description: car not found
         "500":
           description: internal server error
       security:
@@ -4433,30 +4441,31 @@ paths:
       - trips
   /ws/users/documents:
     get:
-      description: WebSocket feed that pushes a single message when the specified
-        document has been analyzed, then closes.
+      description: WebSocket stream of DocumentAnalyzedEvents from the user service.
+        Accepts optional userId and passed query params to filter events.
       parameters:
-      - description: Document ID to watch
+      - description: Filter by user ID
         in: query
-        name: docID
-        required: true
+        name: userId
         type: string
+      - description: Filter by pass/fail result
+        in: query
+        name: passed
+        type: boolean
       produces:
       - application/json
       responses:
         "101":
-          description: WebSocket message (one-shot, then closes)
+          description: Streamed WebSocket message format
           schema:
             $ref: '#/definitions/wsdto.DocumentAnalyzedMessage'
-        "400":
-          description: bad request
         "401":
           description: unauthorized
         "500":
           description: internal server error
       security:
       - BearerAuth: []
-      summary: Document verification updates
+      summary: Document analyzed stream
       tags:
       - users
   /zones:

@@ -25,6 +25,7 @@ const (
 	CarMaintenanceService_ListMaintenanceTemplates_FullMethodName             = "/service.car.CarMaintenanceService/ListMaintenanceTemplates"
 	CarMaintenanceService_UpdateMaintenanceTemplate_FullMethodName            = "/service.car.CarMaintenanceService/UpdateMaintenanceTemplate"
 	CarMaintenanceService_DeleteMaintenanceTemplate_FullMethodName            = "/service.car.CarMaintenanceService/DeleteMaintenanceTemplate"
+	CarMaintenanceService_AssignCarTemplate_FullMethodName                    = "/service.car.CarMaintenanceService/AssignCarTemplate"
 	CarMaintenanceService_ListMaintenanceRecords_FullMethodName               = "/service.car.CarMaintenanceService/ListMaintenanceRecords"
 	CarMaintenanceService_CompleteMaintenanceRecord_FullMethodName            = "/service.car.CarMaintenanceService/CompleteMaintenanceRecord"
 	CarMaintenanceService_GetMaintenanceReceiptImageUploadData_FullMethodName = "/service.car.CarMaintenanceService/GetMaintenanceReceiptImageUploadData"
@@ -39,6 +40,7 @@ type CarMaintenanceServiceClient interface {
 	ListMaintenanceTemplates(ctx context.Context, in *ListMaintenanceTemplatesRequest, opts ...grpc.CallOption) (*ListMaintenanceTemplatesResponse, error)
 	UpdateMaintenanceTemplate(ctx context.Context, in *UpdateMaintenanceTemplateRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteMaintenanceTemplate(ctx context.Context, in *DeleteMaintenanceTemplateRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	AssignCarTemplate(ctx context.Context, in *AssignCarTemplateRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListMaintenanceRecords(ctx context.Context, in *ListMaintenanceRecordsRequest, opts ...grpc.CallOption) (*ListMaintenanceRecordsResponse, error)
 	CompleteMaintenanceRecord(ctx context.Context, in *CompleteMaintenanceRecordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetMaintenanceReceiptImageUploadData(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetMaintenanceReceiptImageUploadDataResponse, error)
@@ -102,6 +104,16 @@ func (c *carMaintenanceServiceClient) DeleteMaintenanceTemplate(ctx context.Cont
 	return out, nil
 }
 
+func (c *carMaintenanceServiceClient) AssignCarTemplate(ctx context.Context, in *AssignCarTemplateRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, CarMaintenanceService_AssignCarTemplate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *carMaintenanceServiceClient) ListMaintenanceRecords(ctx context.Context, in *ListMaintenanceRecordsRequest, opts ...grpc.CallOption) (*ListMaintenanceRecordsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListMaintenanceRecordsResponse)
@@ -141,6 +153,7 @@ type CarMaintenanceServiceServer interface {
 	ListMaintenanceTemplates(context.Context, *ListMaintenanceTemplatesRequest) (*ListMaintenanceTemplatesResponse, error)
 	UpdateMaintenanceTemplate(context.Context, *UpdateMaintenanceTemplateRequest) (*emptypb.Empty, error)
 	DeleteMaintenanceTemplate(context.Context, *DeleteMaintenanceTemplateRequest) (*emptypb.Empty, error)
+	AssignCarTemplate(context.Context, *AssignCarTemplateRequest) (*emptypb.Empty, error)
 	ListMaintenanceRecords(context.Context, *ListMaintenanceRecordsRequest) (*ListMaintenanceRecordsResponse, error)
 	CompleteMaintenanceRecord(context.Context, *CompleteMaintenanceRecordRequest) (*emptypb.Empty, error)
 	GetMaintenanceReceiptImageUploadData(context.Context, *emptypb.Empty) (*GetMaintenanceReceiptImageUploadDataResponse, error)
@@ -168,6 +181,9 @@ func (UnimplementedCarMaintenanceServiceServer) UpdateMaintenanceTemplate(contex
 }
 func (UnimplementedCarMaintenanceServiceServer) DeleteMaintenanceTemplate(context.Context, *DeleteMaintenanceTemplateRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteMaintenanceTemplate not implemented")
+}
+func (UnimplementedCarMaintenanceServiceServer) AssignCarTemplate(context.Context, *AssignCarTemplateRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method AssignCarTemplate not implemented")
 }
 func (UnimplementedCarMaintenanceServiceServer) ListMaintenanceRecords(context.Context, *ListMaintenanceRecordsRequest) (*ListMaintenanceRecordsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListMaintenanceRecords not implemented")
@@ -289,6 +305,24 @@ func _CarMaintenanceService_DeleteMaintenanceTemplate_Handler(srv interface{}, c
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CarMaintenanceService_AssignCarTemplate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssignCarTemplateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CarMaintenanceServiceServer).AssignCarTemplate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CarMaintenanceService_AssignCarTemplate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CarMaintenanceServiceServer).AssignCarTemplate(ctx, req.(*AssignCarTemplateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CarMaintenanceService_ListMaintenanceRecords_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListMaintenanceRecordsRequest)
 	if err := dec(in); err != nil {
@@ -369,6 +403,10 @@ var CarMaintenanceService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteMaintenanceTemplate",
 			Handler:    _CarMaintenanceService_DeleteMaintenanceTemplate_Handler,
+		},
+		{
+			MethodName: "AssignCarTemplate",
+			Handler:    _CarMaintenanceService_AssignCarTemplate_Handler,
 		},
 		{
 			MethodName: "ListMaintenanceRecords",

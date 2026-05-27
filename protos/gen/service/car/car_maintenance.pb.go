@@ -12,6 +12,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -652,6 +653,74 @@ func (x *CompleteMaintenanceRecordRequest) GetNotes() string {
 	return ""
 }
 
+type AssignCarTemplateRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CarId         string                 `protobuf:"bytes,1,opt,name=car_id,json=carId,proto3" json:"car_id,omitempty"`
+	TemplateId    string                 `protobuf:"bytes,2,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
+	InitialKm     *int64                 `protobuf:"varint,3,opt,name=initial_km,json=initialKm,proto3,oneof" json:"initial_km,omitempty"`
+	InitialDate   *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=initial_date,json=initialDate,proto3,oneof" json:"initial_date,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AssignCarTemplateRequest) Reset() {
+	*x = AssignCarTemplateRequest{}
+	mi := &file_service_car_car_maintenance_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssignCarTemplateRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssignCarTemplateRequest) ProtoMessage() {}
+
+func (x *AssignCarTemplateRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_service_car_car_maintenance_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssignCarTemplateRequest.ProtoReflect.Descriptor instead.
+func (*AssignCarTemplateRequest) Descriptor() ([]byte, []int) {
+	return file_service_car_car_maintenance_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *AssignCarTemplateRequest) GetCarId() string {
+	if x != nil {
+		return x.CarId
+	}
+	return ""
+}
+
+func (x *AssignCarTemplateRequest) GetTemplateId() string {
+	if x != nil {
+		return x.TemplateId
+	}
+	return ""
+}
+
+func (x *AssignCarTemplateRequest) GetInitialKm() int64 {
+	if x != nil && x.InitialKm != nil {
+		return *x.InitialKm
+	}
+	return 0
+}
+
+func (x *AssignCarTemplateRequest) GetInitialDate() *timestamppb.Timestamp {
+	if x != nil {
+		return x.InitialDate
+	}
+	return nil
+}
+
 type GetMaintenanceReceiptImageUploadDataResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UploadData    *base.ImageUploadData  `protobuf:"bytes,1,opt,name=upload_data,json=uploadData,proto3" json:"upload_data,omitempty"`
@@ -661,7 +730,7 @@ type GetMaintenanceReceiptImageUploadDataResponse struct {
 
 func (x *GetMaintenanceReceiptImageUploadDataResponse) Reset() {
 	*x = GetMaintenanceReceiptImageUploadDataResponse{}
-	mi := &file_service_car_car_maintenance_proto_msgTypes[11]
+	mi := &file_service_car_car_maintenance_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -673,7 +742,7 @@ func (x *GetMaintenanceReceiptImageUploadDataResponse) String() string {
 func (*GetMaintenanceReceiptImageUploadDataResponse) ProtoMessage() {}
 
 func (x *GetMaintenanceReceiptImageUploadDataResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_car_car_maintenance_proto_msgTypes[11]
+	mi := &file_service_car_car_maintenance_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -686,7 +755,7 @@ func (x *GetMaintenanceReceiptImageUploadDataResponse) ProtoReflect() protorefle
 
 // Deprecated: Use GetMaintenanceReceiptImageUploadDataResponse.ProtoReflect.Descriptor instead.
 func (*GetMaintenanceReceiptImageUploadDataResponse) Descriptor() ([]byte, []int) {
-	return file_service_car_car_maintenance_proto_rawDescGZIP(), []int{11}
+	return file_service_car_car_maintenance_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *GetMaintenanceReceiptImageUploadDataResponse) GetUploadData() *base.ImageUploadData {
@@ -700,7 +769,7 @@ var File_service_car_car_maintenance_proto protoreflect.FileDescriptor
 
 const file_service_car_car_maintenance_proto_rawDesc = "" +
 	"\n" +
-	"!service/car/car_maintenance.proto\x12\vservice.car\x1a\x1ebase/car/car_maintenance.proto\x1a\x11base/common.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xfe\x01\n" +
+	"!service/car/car_maintenance.proto\x12\vservice.car\x1a\x1ebase/car/car_maintenance.proto\x1a\x11base/common.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xfe\x01\n" +
 	" CreateMaintenanceTemplateRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12$\n" +
 	"\vkm_interval\x18\x02 \x01(\x05H\x00R\n" +
@@ -762,16 +831,26 @@ const file_service_car_car_maintenance_proto_rawDesc = "" +
 	"cost_tenge\x18\x03 \x01(\x05R\tcostTenge\x12,\n" +
 	"\x12receipt_image_keys\x18\x04 \x03(\tR\x10receiptImageKeys\x12\x19\n" +
 	"\x05notes\x18\x05 \x01(\tH\x00R\x05notes\x88\x01\x01B\b\n" +
-	"\x06_notes\"f\n" +
+	"\x06_notes\"\xda\x01\n" +
+	"\x18AssignCarTemplateRequest\x12\x15\n" +
+	"\x06car_id\x18\x01 \x01(\tR\x05carId\x12\x1f\n" +
+	"\vtemplate_id\x18\x02 \x01(\tR\n" +
+	"templateId\x12\"\n" +
+	"\n" +
+	"initial_km\x18\x03 \x01(\x03H\x00R\tinitialKm\x88\x01\x01\x12B\n" +
+	"\finitial_date\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampH\x01R\vinitialDate\x88\x01\x01B\r\n" +
+	"\v_initial_kmB\x0f\n" +
+	"\r_initial_date\"f\n" +
 	",GetMaintenanceReceiptImageUploadDataResponse\x126\n" +
 	"\vupload_data\x18\x01 \x01(\v2\x15.base.ImageUploadDataR\n" +
-	"uploadData2\x99\a\n" +
+	"uploadData2\xed\a\n" +
 	"\x15CarMaintenanceService\x12z\n" +
 	"\x19CreateMaintenanceTemplate\x12-.service.car.CreateMaintenanceTemplateRequest\x1a..service.car.CreateMaintenanceTemplateResponse\x12q\n" +
 	"\x16GetMaintenanceTemplate\x12*.service.car.GetMaintenanceTemplateRequest\x1a+.service.car.GetMaintenanceTemplateResponse\x12w\n" +
 	"\x18ListMaintenanceTemplates\x12,.service.car.ListMaintenanceTemplatesRequest\x1a-.service.car.ListMaintenanceTemplatesResponse\x12b\n" +
 	"\x19UpdateMaintenanceTemplate\x12-.service.car.UpdateMaintenanceTemplateRequest\x1a\x16.google.protobuf.Empty\x12b\n" +
-	"\x19DeleteMaintenanceTemplate\x12-.service.car.DeleteMaintenanceTemplateRequest\x1a\x16.google.protobuf.Empty\x12q\n" +
+	"\x19DeleteMaintenanceTemplate\x12-.service.car.DeleteMaintenanceTemplateRequest\x1a\x16.google.protobuf.Empty\x12R\n" +
+	"\x11AssignCarTemplate\x12%.service.car.AssignCarTemplateRequest\x1a\x16.google.protobuf.Empty\x12q\n" +
 	"\x16ListMaintenanceRecords\x12*.service.car.ListMaintenanceRecordsRequest\x1a+.service.car.ListMaintenanceRecordsResponse\x12b\n" +
 	"\x19CompleteMaintenanceRecord\x12-.service.car.CompleteMaintenanceRecordRequest\x1a\x16.google.protobuf.Empty\x12y\n" +
 	"$GetMaintenanceReceiptImageUploadData\x12\x16.google.protobuf.Empty\x1a9.service.car.GetMaintenanceReceiptImageUploadDataResponseB#Z!carsharing/protos/gen/service/carb\x06proto3"
@@ -788,7 +867,7 @@ func file_service_car_car_maintenance_proto_rawDescGZIP() []byte {
 	return file_service_car_car_maintenance_proto_rawDescData
 }
 
-var file_service_car_car_maintenance_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_service_car_car_maintenance_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_service_car_car_maintenance_proto_goTypes = []any{
 	(*CreateMaintenanceTemplateRequest)(nil),             // 0: service.car.CreateMaintenanceTemplateRequest
 	(*CreateMaintenanceTemplateResponse)(nil),            // 1: service.car.CreateMaintenanceTemplateResponse
@@ -801,41 +880,46 @@ var file_service_car_car_maintenance_proto_goTypes = []any{
 	(*ListMaintenanceRecordsRequest)(nil),                // 8: service.car.ListMaintenanceRecordsRequest
 	(*ListMaintenanceRecordsResponse)(nil),               // 9: service.car.ListMaintenanceRecordsResponse
 	(*CompleteMaintenanceRecordRequest)(nil),             // 10: service.car.CompleteMaintenanceRecordRequest
-	(*GetMaintenanceReceiptImageUploadDataResponse)(nil), // 11: service.car.GetMaintenanceReceiptImageUploadDataResponse
-	(*car.CarMaintenanceTemplate)(nil),                   // 12: base.car.CarMaintenanceTemplate
-	(*base.Pagination)(nil),                              // 13: base.Pagination
-	(*car.CarMaintenanceRecord)(nil),                     // 14: base.car.CarMaintenanceRecord
-	(*base.ImageUploadData)(nil),                         // 15: base.ImageUploadData
-	(*emptypb.Empty)(nil),                                // 16: google.protobuf.Empty
+	(*AssignCarTemplateRequest)(nil),                     // 11: service.car.AssignCarTemplateRequest
+	(*GetMaintenanceReceiptImageUploadDataResponse)(nil), // 12: service.car.GetMaintenanceReceiptImageUploadDataResponse
+	(*car.CarMaintenanceTemplate)(nil),                   // 13: base.car.CarMaintenanceTemplate
+	(*base.Pagination)(nil),                              // 14: base.Pagination
+	(*car.CarMaintenanceRecord)(nil),                     // 15: base.car.CarMaintenanceRecord
+	(*timestamppb.Timestamp)(nil),                        // 16: google.protobuf.Timestamp
+	(*base.ImageUploadData)(nil),                         // 17: base.ImageUploadData
+	(*emptypb.Empty)(nil),                                // 18: google.protobuf.Empty
 }
 var file_service_car_car_maintenance_proto_depIdxs = []int32{
-	12, // 0: service.car.GetMaintenanceTemplateResponse.template:type_name -> base.car.CarMaintenanceTemplate
-	13, // 1: service.car.ListMaintenanceTemplatesRequest.pagination:type_name -> base.Pagination
-	12, // 2: service.car.ListMaintenanceTemplatesResponse.templates:type_name -> base.car.CarMaintenanceTemplate
-	13, // 3: service.car.ListMaintenanceRecordsRequest.pagination:type_name -> base.Pagination
-	14, // 4: service.car.ListMaintenanceRecordsResponse.records:type_name -> base.car.CarMaintenanceRecord
-	15, // 5: service.car.GetMaintenanceReceiptImageUploadDataResponse.upload_data:type_name -> base.ImageUploadData
-	0,  // 6: service.car.CarMaintenanceService.CreateMaintenanceTemplate:input_type -> service.car.CreateMaintenanceTemplateRequest
-	2,  // 7: service.car.CarMaintenanceService.GetMaintenanceTemplate:input_type -> service.car.GetMaintenanceTemplateRequest
-	4,  // 8: service.car.CarMaintenanceService.ListMaintenanceTemplates:input_type -> service.car.ListMaintenanceTemplatesRequest
-	6,  // 9: service.car.CarMaintenanceService.UpdateMaintenanceTemplate:input_type -> service.car.UpdateMaintenanceTemplateRequest
-	7,  // 10: service.car.CarMaintenanceService.DeleteMaintenanceTemplate:input_type -> service.car.DeleteMaintenanceTemplateRequest
-	8,  // 11: service.car.CarMaintenanceService.ListMaintenanceRecords:input_type -> service.car.ListMaintenanceRecordsRequest
-	10, // 12: service.car.CarMaintenanceService.CompleteMaintenanceRecord:input_type -> service.car.CompleteMaintenanceRecordRequest
-	16, // 13: service.car.CarMaintenanceService.GetMaintenanceReceiptImageUploadData:input_type -> google.protobuf.Empty
-	1,  // 14: service.car.CarMaintenanceService.CreateMaintenanceTemplate:output_type -> service.car.CreateMaintenanceTemplateResponse
-	3,  // 15: service.car.CarMaintenanceService.GetMaintenanceTemplate:output_type -> service.car.GetMaintenanceTemplateResponse
-	5,  // 16: service.car.CarMaintenanceService.ListMaintenanceTemplates:output_type -> service.car.ListMaintenanceTemplatesResponse
-	16, // 17: service.car.CarMaintenanceService.UpdateMaintenanceTemplate:output_type -> google.protobuf.Empty
-	16, // 18: service.car.CarMaintenanceService.DeleteMaintenanceTemplate:output_type -> google.protobuf.Empty
-	9,  // 19: service.car.CarMaintenanceService.ListMaintenanceRecords:output_type -> service.car.ListMaintenanceRecordsResponse
-	16, // 20: service.car.CarMaintenanceService.CompleteMaintenanceRecord:output_type -> google.protobuf.Empty
-	11, // 21: service.car.CarMaintenanceService.GetMaintenanceReceiptImageUploadData:output_type -> service.car.GetMaintenanceReceiptImageUploadDataResponse
-	14, // [14:22] is the sub-list for method output_type
-	6,  // [6:14] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	13, // 0: service.car.GetMaintenanceTemplateResponse.template:type_name -> base.car.CarMaintenanceTemplate
+	14, // 1: service.car.ListMaintenanceTemplatesRequest.pagination:type_name -> base.Pagination
+	13, // 2: service.car.ListMaintenanceTemplatesResponse.templates:type_name -> base.car.CarMaintenanceTemplate
+	14, // 3: service.car.ListMaintenanceRecordsRequest.pagination:type_name -> base.Pagination
+	15, // 4: service.car.ListMaintenanceRecordsResponse.records:type_name -> base.car.CarMaintenanceRecord
+	16, // 5: service.car.AssignCarTemplateRequest.initial_date:type_name -> google.protobuf.Timestamp
+	17, // 6: service.car.GetMaintenanceReceiptImageUploadDataResponse.upload_data:type_name -> base.ImageUploadData
+	0,  // 7: service.car.CarMaintenanceService.CreateMaintenanceTemplate:input_type -> service.car.CreateMaintenanceTemplateRequest
+	2,  // 8: service.car.CarMaintenanceService.GetMaintenanceTemplate:input_type -> service.car.GetMaintenanceTemplateRequest
+	4,  // 9: service.car.CarMaintenanceService.ListMaintenanceTemplates:input_type -> service.car.ListMaintenanceTemplatesRequest
+	6,  // 10: service.car.CarMaintenanceService.UpdateMaintenanceTemplate:input_type -> service.car.UpdateMaintenanceTemplateRequest
+	7,  // 11: service.car.CarMaintenanceService.DeleteMaintenanceTemplate:input_type -> service.car.DeleteMaintenanceTemplateRequest
+	11, // 12: service.car.CarMaintenanceService.AssignCarTemplate:input_type -> service.car.AssignCarTemplateRequest
+	8,  // 13: service.car.CarMaintenanceService.ListMaintenanceRecords:input_type -> service.car.ListMaintenanceRecordsRequest
+	10, // 14: service.car.CarMaintenanceService.CompleteMaintenanceRecord:input_type -> service.car.CompleteMaintenanceRecordRequest
+	18, // 15: service.car.CarMaintenanceService.GetMaintenanceReceiptImageUploadData:input_type -> google.protobuf.Empty
+	1,  // 16: service.car.CarMaintenanceService.CreateMaintenanceTemplate:output_type -> service.car.CreateMaintenanceTemplateResponse
+	3,  // 17: service.car.CarMaintenanceService.GetMaintenanceTemplate:output_type -> service.car.GetMaintenanceTemplateResponse
+	5,  // 18: service.car.CarMaintenanceService.ListMaintenanceTemplates:output_type -> service.car.ListMaintenanceTemplatesResponse
+	18, // 19: service.car.CarMaintenanceService.UpdateMaintenanceTemplate:output_type -> google.protobuf.Empty
+	18, // 20: service.car.CarMaintenanceService.DeleteMaintenanceTemplate:output_type -> google.protobuf.Empty
+	18, // 21: service.car.CarMaintenanceService.AssignCarTemplate:output_type -> google.protobuf.Empty
+	9,  // 22: service.car.CarMaintenanceService.ListMaintenanceRecords:output_type -> service.car.ListMaintenanceRecordsResponse
+	18, // 23: service.car.CarMaintenanceService.CompleteMaintenanceRecord:output_type -> google.protobuf.Empty
+	12, // 24: service.car.CarMaintenanceService.GetMaintenanceReceiptImageUploadData:output_type -> service.car.GetMaintenanceReceiptImageUploadDataResponse
+	16, // [16:25] is the sub-list for method output_type
+	7,  // [7:16] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_service_car_car_maintenance_proto_init() }
@@ -848,13 +932,14 @@ func file_service_car_car_maintenance_proto_init() {
 	file_service_car_car_maintenance_proto_msgTypes[6].OneofWrappers = []any{}
 	file_service_car_car_maintenance_proto_msgTypes[8].OneofWrappers = []any{}
 	file_service_car_car_maintenance_proto_msgTypes[10].OneofWrappers = []any{}
+	file_service_car_car_maintenance_proto_msgTypes[11].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_service_car_car_maintenance_proto_rawDesc), len(file_service_car_car_maintenance_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

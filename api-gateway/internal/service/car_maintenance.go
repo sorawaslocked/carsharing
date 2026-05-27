@@ -119,6 +119,19 @@ func (s *CarMaintenanceService) CompleteRecord(ctx context.Context, recordID str
 	return nil
 }
 
+func (s *CarMaintenanceService) AssignTemplate(ctx context.Context, data model.CarMaintenanceTemplateAssign) error {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "AssignTemplate"), utils.MetadataFromCtx(ctx))
+	log.Debug("assigning maintenance template")
+
+	if err := s.presenter.AssignTemplate(ctx, data); err != nil {
+		log.Warn("assigning maintenance template", pkglog.Err(err))
+
+		return err
+	}
+
+	return nil
+}
+
 func (s *CarMaintenanceService) GetReceiptImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetReceiptImageUploadData"), utils.MetadataFromCtx(ctx))
 	log.Debug("getting maintenance receipt image upload data")

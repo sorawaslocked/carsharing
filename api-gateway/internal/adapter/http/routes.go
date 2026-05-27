@@ -110,6 +110,7 @@ func (s *Server) setupRoutes(
 				template := carMaintenance.Group("/template")
 				{
 					template.POST("", s.carMaintenanceHandler.CreateTemplate)
+					template.POST("/assign", s.carMaintenanceHandler.AssignTemplate)
 					template.GET("/:id", s.carMaintenanceHandler.GetTemplate)
 					template.GET("", s.carMaintenanceHandler.ListTemplates)
 					template.PATCH("/:id", s.carMaintenanceHandler.UpdateTemplate)
@@ -180,6 +181,7 @@ func (s *Server) setupRoutes(
 			wsVerified.GET("/cars/:id/telemetry", s.carWsHandler.Telemetry)
 			wsVerified.GET("/cars/:id/status", s.carWsHandler.Status)
 			wsVerified.GET("/trips/:id", s.tripWsHandler.LiveFeed)
+			wsVerified.GET("/car-maintenance/events", s.carMaintenanceWsHandler.MaintenanceEvents)
 		}
 	}
 

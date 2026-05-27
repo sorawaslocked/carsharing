@@ -113,6 +113,7 @@ func New(cfg config.Config, log *slog.Logger) (*App, error) {
 	carModelGrpcClient := carsvc.NewCarModelServiceClient(carServiceGrpcConn)
 	carInsuranceGrpcClient := carsvc.NewCarInsuranceServiceClient(carServiceGrpcConn)
 	carMaintenanceGrpcClient := carsvc.NewCarMaintenanceServiceClient(carServiceGrpcConn)
+	carMaintenanceStreamGrpcClient := carsvc.NewCarMaintenanceStreamServiceClient(carServiceGrpcConn)
 	zoneGrpcClient := carsvc.NewZoneServiceClient(carServiceGrpcConn)
 	pricingRuleGrpcClient := bookingsvc.NewPricingRuleServiceClient(bookingServiceGrpcConn)
 	bookingGrpcClient := bookingsvc.NewBookingServiceClient(bookingServiceGrpcConn)
@@ -128,7 +129,7 @@ func New(cfg config.Config, log *slog.Logger) (*App, error) {
 	carHealthGrpcHandler := grpchandler.NewHealthHandler("car-service", carHealthGrpcClient, log)
 	carModelGrpcHandler := grpchandler.NewCarModelHandler(carModelGrpcClient, log)
 	carInsuranceGrpcHandler := grpchandler.NewCarInsuranceHandler(carInsuranceGrpcClient, log)
-	carMaintenanceGrpcHandler := grpchandler.NewCarMaintenanceHandler(carMaintenanceGrpcClient, log)
+	carMaintenanceGrpcHandler := grpchandler.NewCarMaintenanceHandler(carMaintenanceGrpcClient, carMaintenanceStreamGrpcClient, log)
 	zoneGrpcHandler := grpchandler.NewZoneHandler(zoneGrpcClient, log)
 	pricingRuleGrpcHandler := grpchandler.NewPricingRuleHandler(pricingRuleGrpcClient, log)
 	bookingGrpcHandler := grpchandler.NewBookingHandler(bookingGrpcClient, log)
@@ -203,6 +204,7 @@ func New(cfg config.Config, log *slog.Logger) (*App, error) {
 		carService,
 		tripService,
 		userService,
+		carMaintenanceService,
 	)
 
 	return &App{

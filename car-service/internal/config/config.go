@@ -17,6 +17,10 @@ type TelemetryConfig struct {
 	StalenessThreshold time.Duration `yaml:"staleness_threshold" env-default:"2m"`
 }
 
+type MaintenanceConfig struct {
+	EvaluationInterval time.Duration `yaml:"evaluation_interval" env-default:"1h"`
+}
+
 type Config struct {
 	Env             string                   `yaml:"env"              env:"ENV"             env-default:"local"`
 	Version         string                   `yaml:"version"          env:"VERSION"         env-default:"1.0.0"`
@@ -27,6 +31,7 @@ type Config struct {
 	MinIO           pkgminio.Config          `yaml:"minio"`
 	TelemetryStream pkggrpc.ClientConfig     `yaml:"telemetry_stream"`
 	Telemetry       TelemetryConfig          `yaml:"telemetry"`
+	Maintenance     MaintenanceConfig        `yaml:"maintenance"`
 }
 
 func MustLoad() Config {

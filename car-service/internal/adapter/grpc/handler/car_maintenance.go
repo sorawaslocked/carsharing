@@ -75,6 +75,14 @@ func (h *CarMaintenanceHandler) DeleteMaintenanceTemplate(ctx context.Context, r
 	return &emptypb.Empty{}, nil
 }
 
+func (h *CarMaintenanceHandler) AssignCarTemplate(ctx context.Context, req *carsvc.AssignCarTemplateRequest) (*emptypb.Empty, error) {
+	if err := h.maintenanceService.AssignCarTemplate(ctx, dto.FromAssignCarTemplateRequest(req)); err != nil {
+		return nil, dto.FromErrorToStatusCode(err)
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
 func (h *CarMaintenanceHandler) ListMaintenanceRecords(ctx context.Context, req *carsvc.ListMaintenanceRecordsRequest) (*carsvc.ListMaintenanceRecordsResponse, error) {
 	filterInput := dto.FromListMaintenanceRecordsRequest(req)
 

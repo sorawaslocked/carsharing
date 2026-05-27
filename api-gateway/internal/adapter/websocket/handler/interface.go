@@ -19,3 +19,7 @@ type TripStreamService interface {
 type DocumentStreamService interface {
 	StreamDocumentAnalyzed(ctx context.Context, userID *string, passed *bool, send func(model.DocumentAnalyzedEvent) error) error
 }
+
+type CarMaintenanceStreamService interface {
+	StreamMaintenanceEvents(ctx context.Context, send func(model.CarMaintenanceEvent) error) error
+}

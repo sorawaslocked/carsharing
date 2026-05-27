@@ -3,6 +3,7 @@ package dto
 import (
 	"carsharing/api-gateway/internal/model"
 	basecarpb "carsharing/protos/gen/base/car"
+	carsvc "carsharing/protos/gen/service/car"
 )
 
 func CarMaintenanceTemplateFromProto(t *basecarpb.CarMaintenanceTemplate) model.CarMaintenanceTemplate {
@@ -15,6 +16,19 @@ func CarMaintenanceTemplateFromProto(t *basecarpb.CarMaintenanceTemplate) model.
 		WarnPct:     t.GetWarnPct(),
 		PullPct:     t.GetPullPct(),
 	}
+}
+
+func CarMaintenanceEventFromProto(e *carsvc.MaintenanceEvent) model.CarMaintenanceEvent {
+	event := model.CarMaintenanceEvent{
+		CarID:      e.GetCarId(),
+		TemplateID: e.GetTemplateId(),
+		RecordID:   e.GetRecordId(),
+		EventType:  e.GetEventType(),
+	}
+	if t := e.GetOccurredAt(); t != nil {
+		event.OccurredAt = t.AsTime()
+	}
+	return event
 }
 
 func CarMaintenanceRecordFromProto(r *basecarpb.CarMaintenanceRecord) model.CarMaintenanceRecord {

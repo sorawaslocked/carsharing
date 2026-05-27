@@ -211,6 +211,42 @@ func (h *CarMaintenanceHandler) DeleteTemplate(ctx *gin.Context) {
 	dto.NoContent(ctx)
 }
 
+// AssignTemplate godoc
+// @Summary      Assign a maintenance template to a car
+// @Description  Seeds the service state baseline for a (car, template) pair. Optionally accepts an initial KM and date to reflect prior service history.
+// @Tags         car-maintenance
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        body  body  dto.CarMaintenanceTemplateAssignRequest  true  "Assignment payload"
+// @Success      204
+// @Failure      400  {object}  dto.ErrorResponse
+// @Failure      401  {object}  dto.ErrorResponse
+// @Failure      404  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
+// @Router       /car-maintenance/template/assign [post]
+func (h *CarMaintenanceHandler) AssignTemplate(ctx *gin.Context) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "AssignTemplate"), utils.MetadataFromCtx(ctx))
+	log.Debug("assigning maintenance template")
+
+	data, err := dto.FromCarMaintenanceTemplateAssignRequest(ctx)
+	if err != nil {
+		dto.MalformedJson(ctx)
+
+		return
+	}
+
+	if err = h.svc.AssignTemplate(ctx, data); err != nil {
+		log.Warn("assigning maintenance template", pkglog.Err(err))
+
+		dto.FromError(ctx, err)
+
+		return
+	}
+
+	dto.NoContent(ctx)
+}
+
 // GetRecords godoc
 // @Summary      List maintenance records
 // @Description  Returns work orders for cars. Filter by car, template, or status (pending, in_progress, completed).

@@ -112,6 +112,7 @@ type CarMaintenanceService interface {
 	ListTemplates(ctx context.Context, filter model.CarMaintenanceTemplateFilter) ([]model.CarMaintenanceTemplate, error)
 	UpdateTemplate(ctx context.Context, id string, data model.CarMaintenanceTemplateUpdate) error
 	DeleteTemplate(ctx context.Context, id string) error
+	AssignTemplate(ctx context.Context, data model.CarMaintenanceTemplateAssign) error
 
 	ListRecords(ctx context.Context, filter model.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error)
 	CompleteRecord(ctx context.Context, recordID string, data model.CarMaintenanceRecordComplete) error

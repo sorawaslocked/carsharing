@@ -1,6 +1,10 @@
 package validation
 
-import sharedvalidation "carsharing/shared/validation"
+import (
+	"time"
+
+	sharedvalidation "carsharing/shared/validation"
+)
 
 type CarMaintenanceTemplateFilter struct {
 	IsMandatory *bool `validate:"omitempty"`
@@ -37,4 +41,11 @@ type CarMaintenanceRecordComplete struct {
 	CostTenge        int32    `validate:"min=0"`
 	Notes            *string  `validate:"omitempty,min=1,max=1000"`
 	ReceiptImageKeys []string `validate:"omitempty,max=10,dive,min=1"`
+}
+
+type CarTemplateAssign struct {
+	CarID       string     `validate:"required,uuid"`
+	TemplateID  string     `validate:"required,uuid"`
+	InitialKM   *int32     `validate:"omitempty,min=0"`
+	InitialDate *time.Time `validate:"omitempty"`
 }

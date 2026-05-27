@@ -14,23 +14,24 @@ import (
 )
 
 type Server struct {
-	router                *gin.Engine
-	httpCfg               config.HTTPServer
-	log                   *slog.Logger
-	healthHandler         *handler.HealthHandler
-	userHandler           *handler.UserHandler
-	carModelHandler       *handler.CarModelHandler
-	carHandler            *handler.CarHandler
-	carInsuranceHandler   *handler.CarInsuranceHandler
-	carMaintenanceHandler *handler.CarMaintenanceHandler
-	pricingRuleHandler    *handler.PricingRuleHandler
-	zoneHandler           *handler.ZoneHandler
-	bookingHandler        *handler.BookingHandler
-	tripHandler           *handler.TripHandler
-	dashboardHandler      *handler.DashboardHandler
-	userWsHandler         *wshandler.UserWsHandler
-	carWsHandler          *wshandler.CarWsHandler
-	tripWsHandler         *wshandler.TripWsHandler
+	router                  *gin.Engine
+	httpCfg                 config.HTTPServer
+	log                     *slog.Logger
+	healthHandler           *handler.HealthHandler
+	userHandler             *handler.UserHandler
+	carModelHandler         *handler.CarModelHandler
+	carHandler              *handler.CarHandler
+	carInsuranceHandler     *handler.CarInsuranceHandler
+	carMaintenanceHandler   *handler.CarMaintenanceHandler
+	pricingRuleHandler      *handler.PricingRuleHandler
+	zoneHandler             *handler.ZoneHandler
+	bookingHandler          *handler.BookingHandler
+	tripHandler             *handler.TripHandler
+	dashboardHandler        *handler.DashboardHandler
+	userWsHandler           *wshandler.UserWsHandler
+	carWsHandler            *wshandler.CarWsHandler
+	tripWsHandler           *wshandler.TripWsHandler
+	carMaintenanceWsHandler *wshandler.CarMaintenanceWsHandler
 }
 
 func New(
@@ -53,6 +54,7 @@ func New(
 	carStreamService wshandler.CarStreamService,
 	tripStreamService wshandler.TripStreamService,
 	documentStreamService wshandler.DocumentStreamService,
+	maintenanceStreamService wshandler.CarMaintenanceStreamService,
 ) *Server {
 	httpLog := log.With(
 		slog.String("httpServerHost", httpCfg.Host),
@@ -80,25 +82,27 @@ func New(
 	userWsHandler := wshandler.NewUserWsHandler(documentStreamService, log)
 	carWsHandler := wshandler.NewCarWsHandler(carStreamService, log)
 	tripWsHandler := wshandler.NewTripWsHandler(tripStreamService, log)
+	carMaintenanceWsHandler := wshandler.NewCarMaintenanceWsHandler(maintenanceStreamService, log)
 
 	server := &Server{
-		router:                router,
-		httpCfg:               httpCfg,
-		log:                   httpLog,
-		userHandler:           userHandler,
-		healthHandler:         healthHandler,
-		carModelHandler:       carModelHandler,
-		carHandler:            carHandler,
-		carInsuranceHandler:   carInsuranceHandler,
-		carMaintenanceHandler: carMaintenanceHandler,
-		pricingRuleHandler:    pricingRuleHandler,
-		zoneHandler:           zoneHandler,
-		bookingHandler:        bookingHandler,
-		tripHandler:           tripHandler,
-		dashboardHandler:      dashboardHandler,
-		userWsHandler:         userWsHandler,
-		carWsHandler:          carWsHandler,
-		tripWsHandler:         tripWsHandler,
+		router:                  router,
+		httpCfg:                 httpCfg,
+		log:                     httpLog,
+		userHandler:             userHandler,
+		healthHandler:           healthHandler,
+		carModelHandler:         carModelHandler,
+		carHandler:              carHandler,
+		carInsuranceHandler:     carInsuranceHandler,
+		carMaintenanceHandler:   carMaintenanceHandler,
+		pricingRuleHandler:      pricingRuleHandler,
+		zoneHandler:             zoneHandler,
+		bookingHandler:          bookingHandler,
+		tripHandler:             tripHandler,
+		dashboardHandler:        dashboardHandler,
+		userWsHandler:           userWsHandler,
+		carWsHandler:            carWsHandler,
+		tripWsHandler:           tripWsHandler,
+		carMaintenanceWsHandler: carMaintenanceWsHandler,
 	}
 
 	server.setupMiddleware()

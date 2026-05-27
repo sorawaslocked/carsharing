@@ -112,7 +112,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	carService := service.NewCarService(log, validate, carModelRepo, carRepo, zoneRepo, statusReadingRepo, telemetryReadingRepo, objectStorage, carPublisher, telemetryService)
 
 	carInsuranceService := service.NewCarInsuranceService(log, validate, carInsuranceRepo, objectStorage)
-	carMaintenanceService := service.NewCarMaintenanceService(log, validate, templateRepo, recordRepo, serviceStateRepo, carRepo, carService, objectStorage)
+	carMaintenanceService := service.NewCarMaintenanceService(log, validate, templateRepo, recordRepo, serviceStateRepo, carRepo, carService, objectStorage, cfg.Maintenance.EvaluationInterval)
 	zoneService := service.NewZoneService(log, validate, zoneRepo)
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -123,6 +123,8 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	}
 	cl.add(telemetryService.Stop)
 	cl.add(cancel)
+
+	carMaintenanceService.StartBackgroundEvaluation(ctx)
 
 	bookingSubscriber := natssubscriber.NewBookingSubscriber(log, ncSub, carService)
 	if err = bookingSubscriber.Subscribe(); err != nil {
@@ -150,6 +152,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 		carModelService, carService, carInsuranceService, carMaintenanceService, zoneService,
 		telemetryService,
 		carService,
+		carMaintenanceService,
 		healthHandler,
 	)
 	if err != nil {

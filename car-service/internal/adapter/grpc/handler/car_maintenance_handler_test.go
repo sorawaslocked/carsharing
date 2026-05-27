@@ -220,6 +220,65 @@ func TestCarMaintenanceHandlerCompleteMaintenanceRecord(t *testing.T) {
 	})
 }
 
+func TestCarMaintenanceHandlerAssignCarTemplate(t *testing.T) {
+	ctx := context.Background()
+	carID := "car-abc-123"
+	tmplID := "tmpl-abc-456"
+
+	t.Run("returns empty on success", func(t *testing.T) {
+		svc := mocks.NewMockCarMaintenanceService(t)
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
+
+		svc.EXPECT().AssignCarTemplate(ctx, mock.MatchedBy(func(in validation.CarTemplateAssign) bool {
+			return in.CarID == carID && in.TemplateID == tmplID
+		})).Return(nil)
+
+		resp, err := h.AssignCarTemplate(ctx, &carsvc.AssignCarTemplateRequest{CarId: carID, TemplateId: tmplID})
+		assert.NoError(t, err)
+		assert.IsType(t, &emptypb.Empty{}, resp)
+	})
+
+	t.Run("service error maps to gRPC Internal", func(t *testing.T) {
+		svc := mocks.NewMockCarMaintenanceService(t)
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
+
+		svc.EXPECT().AssignCarTemplate(ctx, mock.Anything).Return(errInternal)
+
+		_, err := h.AssignCarTemplate(ctx, &carsvc.AssignCarTemplateRequest{CarId: carID, TemplateId: tmplID})
+		assert.Equal(t, codes.Internal, grpcCode(err))
+	})
+
+	t.Run("validation error maps to gRPC InvalidArgument", func(t *testing.T) {
+		svc := mocks.NewMockCarMaintenanceService(t)
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
+
+		svc.EXPECT().AssignCarTemplate(ctx, mock.Anything).Return(validation.Errors{"car_id": validation.ErrRequiredField})
+
+		_, err := h.AssignCarTemplate(ctx, &carsvc.AssignCarTemplateRequest{})
+		assert.Equal(t, codes.InvalidArgument, grpcCode(err))
+	})
+
+	t.Run("car not found maps to gRPC NotFound", func(t *testing.T) {
+		svc := mocks.NewMockCarMaintenanceService(t)
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
+
+		svc.EXPECT().AssignCarTemplate(ctx, mock.Anything).Return(model.ErrCarNotFound)
+
+		_, err := h.AssignCarTemplate(ctx, &carsvc.AssignCarTemplateRequest{CarId: carID, TemplateId: tmplID})
+		assert.Equal(t, codes.NotFound, grpcCode(err))
+	})
+
+	t.Run("template not found maps to gRPC NotFound", func(t *testing.T) {
+		svc := mocks.NewMockCarMaintenanceService(t)
+		h := NewCarMaintenanceHandler(discardLogger(), svc)
+
+		svc.EXPECT().AssignCarTemplate(ctx, mock.Anything).Return(model.ErrCarMaintenanceTemplateNotFound)
+
+		_, err := h.AssignCarTemplate(ctx, &carsvc.AssignCarTemplateRequest{CarId: carID, TemplateId: tmplID})
+		assert.Equal(t, codes.NotFound, grpcCode(err))
+	})
+}
+
 func TestCarMaintenanceHandlerGetMaintenanceReceiptImageUploadData(t *testing.T) {
 	ctx := context.Background()
 

@@ -59,6 +59,22 @@ func FromListMaintenanceRecordsRequest(req *carsvc.ListMaintenanceRecordsRequest
 	return filter
 }
 
+func FromAssignCarTemplateRequest(req *carsvc.AssignCarTemplateRequest) validation.CarTemplateAssign {
+	data := validation.CarTemplateAssign{
+		CarID:      req.CarId,
+		TemplateID: req.TemplateId,
+	}
+	if req.InitialKm != nil {
+		km := int32(*req.InitialKm)
+		data.InitialKM = &km
+	}
+	if req.InitialDate != nil {
+		t := req.InitialDate.AsTime()
+		data.InitialDate = &t
+	}
+	return data
+}
+
 func FromCompleteMaintenanceRecordRequest(req *carsvc.CompleteMaintenanceRecordRequest) validation.CarMaintenanceRecordComplete {
 	return validation.CarMaintenanceRecordComplete{
 		CompletedKM:      req.MileageAtCompletionKm,

@@ -57,9 +57,14 @@ type CarMaintenanceService interface {
 	ListTemplates(ctx context.Context, filterInput validation.CarMaintenanceTemplateFilter) ([]model.CarMaintenanceTemplate, error)
 	UpdateTemplate(ctx context.Context, id string, updateInput validation.CarMaintenanceTemplateUpdate) error
 	DeleteTemplate(ctx context.Context, id string) error
+	AssignCarTemplate(ctx context.Context, data validation.CarTemplateAssign) error
 	ListRecords(ctx context.Context, filterInput validation.CarMaintenanceRecordFilter) ([]model.CarMaintenanceRecord, error)
 	CompleteRecord(ctx context.Context, id string, completeInput validation.CarMaintenanceRecordComplete) error
 	GetReceiptImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error)
+}
+
+type MaintenanceEventSubscriber interface {
+	SubscribeMaintenanceEvents() (<-chan model.CarMaintenanceEvent, func())
 }
 
 type ZoneService interface {

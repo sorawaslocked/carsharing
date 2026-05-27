@@ -21,6 +21,7 @@ func NewServer(
 	zoneService handler.ZoneService,
 	telemetrySubscriber handler.TelemetrySubscriber,
 	statusSubscriber handler.StatusSubscriber,
+	maintenanceEventSubscriber handler.MaintenanceEventSubscriber,
 	healthHandler *handler.HealthHandler,
 ) (*grpc.Server, error) {
 	baseInterceptor := interceptor.NewBaseInterceptor()
@@ -51,6 +52,7 @@ func NewServer(
 	carsvc.RegisterCarMaintenanceServiceServer(s, handler.NewCarMaintenanceHandler(log, carMaintenanceService))
 	carsvc.RegisterZoneServiceServer(s, handler.NewZoneHandler(log, zoneService))
 	carsvc.RegisterCarStreamServiceServer(s, handler.NewCarStreamHandler(log, carService, telemetrySubscriber, statusSubscriber))
+	carsvc.RegisterCarMaintenanceStreamServiceServer(s, handler.NewCarMaintenanceStreamHandler(log, maintenanceEventSubscriber))
 	carsvc.RegisterHealthServiceServer(s, healthHandler)
 
 	return s, nil

@@ -2,6 +2,8 @@ package handler
 
 import (
 	"context"
+	"errors"
+	"io"
 	"log/slog"
 
 	"carsharing/api-gateway/internal/adapter/grpc/dto"
@@ -12,17 +14,20 @@ import (
 	pkglog "carsharing/shared/pkg/log"
 	"carsharing/shared/pkg/utils"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type CarMaintenanceHandler struct {
-	client carsvc.CarMaintenanceServiceClient
-	log    *slog.Logger
+	client       carsvc.CarMaintenanceServiceClient
+	streamClient carsvc.CarMaintenanceStreamServiceClient
+	log          *slog.Logger
 }
 
-func NewCarMaintenanceHandler(client carsvc.CarMaintenanceServiceClient, logger *slog.Logger) *CarMaintenanceHandler {
+func NewCarMaintenanceHandler(client carsvc.CarMaintenanceServiceClient, streamClient carsvc.CarMaintenanceStreamServiceClient, logger *slog.Logger) *CarMaintenanceHandler {
 	return &CarMaintenanceHandler{
-		client: client,
-		log:    pkglog.WithComponent(logger, "grpc.CarMaintenanceHandler"),
+		client:       client,
+		streamClient: streamClient,
+		log:          pkglog.WithComponent(logger, "grpc.CarMaintenanceHandler"),
 	}
 }
 
@@ -175,6 +180,65 @@ func (h *CarMaintenanceHandler) CompleteRecord(ctx context.Context, recordID str
 	}
 
 	return nil
+}
+
+func (h *CarMaintenanceHandler) AssignTemplate(ctx context.Context, data model.CarMaintenanceTemplateAssign) error {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "AssignTemplate"), utils.MetadataFromCtx(ctx))
+	log.Debug("calling car service")
+
+	req := &carsvc.AssignCarTemplateRequest{
+		CarId:      data.CarID,
+		TemplateId: data.TemplateID,
+	}
+	if data.InitialKM != nil {
+		km := int64(*data.InitialKM)
+		req.InitialKm = &km
+	}
+	if data.InitialDate != nil {
+		req.InitialDate = timestamppb.New(*data.InitialDate)
+	}
+
+	_, err := h.client.AssignCarTemplate(ctx, req)
+	if err != nil {
+		log.Warn("assigning car template", pkglog.Err(err))
+
+		return dto.FromGrpcErr(err)
+	}
+
+	return nil
+}
+
+func (h *CarMaintenanceHandler) StreamMaintenanceEvents(ctx context.Context, send func(model.CarMaintenanceEvent) error) error {
+	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "StreamMaintenanceEvents"), utils.MetadataFromCtx(ctx))
+	log.Debug("starting stream")
+
+	stream, err := h.streamClient.StreamMaintenanceEvents(ctx, &emptypb.Empty{})
+	if err != nil {
+		if ctx.Err() != nil {
+			return nil
+		}
+		log.Warn("streaming maintenance events", pkglog.Err(err))
+		return dto.FromGrpcErr(err)
+	}
+	log.Debug("stream opened")
+
+	for {
+		msg, err := stream.Recv()
+		if errors.Is(err, io.EOF) {
+			return nil
+		}
+		if err != nil {
+			if ctx.Err() != nil {
+				return nil
+			}
+			log.Warn("receiving maintenance events stream", pkglog.Err(err))
+			return dto.FromGrpcErr(err)
+		}
+
+		if err = send(dto.CarMaintenanceEventFromProto(msg)); err != nil {
+			return err
+		}
+	}
 }
 
 func (h *CarMaintenanceHandler) GetReceiptImageUploadData(ctx context.Context) (sharedmodel.ImageUploadData, error) {

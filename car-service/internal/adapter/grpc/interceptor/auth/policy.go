@@ -66,8 +66,12 @@ func buildPolicies() map[string]methodPolicy {
 		carsvc.CarMaintenanceService_ListMaintenanceTemplates_FullMethodName:             {allowedRoles: fleetRoles},
 		carsvc.CarMaintenanceService_UpdateMaintenanceTemplate_FullMethodName:            {allowedRoles: fleetRoles},
 		carsvc.CarMaintenanceService_DeleteMaintenanceTemplate_FullMethodName:            {allowedRoles: fleetRoles},
+		carsvc.CarMaintenanceService_AssignCarTemplate_FullMethodName:                    {allowedRoles: fleetRoles},
 		carsvc.CarMaintenanceService_ListMaintenanceRecords_FullMethodName:               {allowedRoles: fleetRoles},
 		carsvc.CarMaintenanceService_CompleteMaintenanceRecord_FullMethodName:            {allowedRoles: fleetRoles},
 		carsvc.CarMaintenanceService_GetMaintenanceReceiptImageUploadData_FullMethodName: {allowedRoles: fleetRoles},
+
+		// CarMaintenanceStreamService — restricted to fleet roles.
+		carsvc.CarMaintenanceStreamService_StreamMaintenanceEvents_FullMethodName: {allowedRoles: fleetRoles},
 	}
 }

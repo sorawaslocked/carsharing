@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"carsharing/car-service/internal/model"
@@ -19,12 +21,17 @@ type CarMaintenanceService struct {
 	log      *slog.Logger
 	validate *validator.Validate
 
-	templateRepo     CarMaintenanceTemplateRepository
-	recordRepo       CarMaintenanceRecordRepository
-	serviceStateRepo CarServiceStateRepository
-	carRepo          CarRepository
-	carService       *CarService
-	objectStorage    ObjectStorage
+	templateRepo       CarMaintenanceTemplateRepository
+	recordRepo         CarMaintenanceRecordRepository
+	serviceStateRepo   CarServiceStateRepository
+	carRepo            CarRepository
+	carService         *CarService
+	objectStorage      ObjectStorage
+	evaluationInterval time.Duration
+
+	subsMu sync.RWMutex
+	subs   map[uint64]chan model.CarMaintenanceEvent
+	subSeq atomic.Uint64
 }
 
 func NewCarMaintenanceService(
@@ -36,16 +43,78 @@ func NewCarMaintenanceService(
 	carRepo CarRepository,
 	carService *CarService,
 	objectStorage ObjectStorage,
+	evaluationInterval time.Duration,
 ) *CarMaintenanceService {
 	return &CarMaintenanceService{
-		log:              pkglog.WithComponent(log, "service.CarMaintenanceService"),
-		validate:         validate,
-		templateRepo:     templateRepo,
-		recordRepo:       recordRepo,
-		serviceStateRepo: serviceStateRepo,
-		carRepo:          carRepo,
-		carService:       carService,
-		objectStorage:    objectStorage,
+		log:                pkglog.WithComponent(log, "service.CarMaintenanceService"),
+		validate:           validate,
+		templateRepo:       templateRepo,
+		recordRepo:         recordRepo,
+		serviceStateRepo:   serviceStateRepo,
+		carRepo:            carRepo,
+		carService:         carService,
+		objectStorage:      objectStorage,
+		evaluationInterval: evaluationInterval,
+		subs:               make(map[uint64]chan model.CarMaintenanceEvent),
+	}
+}
+
+func (s *CarMaintenanceService) SubscribeMaintenanceEvents() (<-chan model.CarMaintenanceEvent, func()) {
+	id := s.subSeq.Add(1)
+	ch := make(chan model.CarMaintenanceEvent, 16)
+
+	s.subsMu.Lock()
+	s.subs[id] = ch
+	s.subsMu.Unlock()
+
+	return ch, func() {
+		s.subsMu.Lock()
+		delete(s.subs, id)
+		s.subsMu.Unlock()
+	}
+}
+
+func (s *CarMaintenanceService) fanOutMaintenance(event model.CarMaintenanceEvent) {
+	s.subsMu.RLock()
+	defer s.subsMu.RUnlock()
+	for _, ch := range s.subs {
+		select {
+		case ch <- event:
+		default:
+		}
+	}
+}
+
+func (s *CarMaintenanceService) StartBackgroundEvaluation(ctx context.Context) {
+	go func() {
+		ticker := time.NewTicker(s.evaluationInterval)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ticker.C:
+				s.evaluateAll(ctx)
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+}
+
+func (s *CarMaintenanceService) evaluateAll(ctx context.Context) {
+	cars, err := s.carRepo.Find(ctx, model.CarFilter{
+		Pagination: &sharedmodel.Pagination{Limit: 10_000},
+	})
+	if err != nil {
+		s.log.Error("background evaluation: listing cars", pkglog.Err(err))
+		return
+	}
+	for _, car := range cars {
+		if err := s.EvaluateCarMaintenance(ctx, car.ID); err != nil {
+			s.log.Error("background evaluation: evaluating car",
+				slog.String("carID", car.ID),
+				pkglog.Err(err),
+			)
+		}
 	}
 }
 
@@ -298,6 +367,51 @@ func (s *CarMaintenanceService) GetReceiptImageUploadData(ctx context.Context) (
 	return data, nil
 }
 
+func (s *CarMaintenanceService) AssignCarTemplate(ctx context.Context, data validation.CarTemplateAssign) error {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "AssignCarTemplate"), utils.MetadataFromCtx(ctx))
+
+	if err := validation.ValidateInput(s.validate, data); err != nil {
+		return err
+	}
+
+	if _, err := s.carRepo.FindByID(ctx, data.CarID); err != nil {
+		if !errors.Is(err, model.ErrCarNotFound) {
+			log.Error("repo: finding car by id", pkglog.Err(err))
+		}
+		return err
+	}
+
+	if _, err := s.templateRepo.FindByID(ctx, data.TemplateID); err != nil {
+		if !errors.Is(err, model.ErrCarMaintenanceTemplateNotFound) {
+			log.Error("repo: finding maintenance template by id", pkglog.Err(err))
+		}
+		return err
+	}
+
+	state := model.CarServiceState{
+		CarID:      data.CarID,
+		TemplateID: data.TemplateID,
+	}
+	if data.InitialKM != nil {
+		state.LastKM = *data.InitialKM
+	}
+	if data.InitialDate != nil {
+		state.LastDate = data.InitialDate
+	}
+
+	if err := s.serviceStateRepo.Upsert(ctx, state); err != nil {
+		log.Error("repo: upserting car service state", pkglog.Err(err))
+		return err
+	}
+
+	log.Info("car assigned to maintenance template",
+		slog.String("carID", data.CarID),
+		slog.String("templateID", data.TemplateID),
+	)
+
+	return nil
+}
+
 func (s *CarMaintenanceService) EvaluateCarMaintenance(ctx context.Context, carID string) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "EvaluateCarMaintenance"), utils.MetadataFromCtx(ctx))
 	log = log.With(slog.String("carID", carID))
@@ -334,13 +448,34 @@ func (s *CarMaintenanceService) EvaluateCarMaintenance(ctx context.Context, carI
 
 		switch {
 		case pct >= template.PullPct:
-			if err = s.createWorkOrder(ctx, car, template, "urgent"); err != nil {
-				log.Error("failed to create urgent work order",
+			open, err := s.hasPendingRecord(ctx, car.ID, template.ID)
+			if err != nil {
+				log.Error("repo: checking for pending record",
+					slog.String("templateID", template.ID),
+					pkglog.Err(err),
+				)
+				continue
+			}
+			if open {
+				continue
+			}
+
+			recordID, err := s.createWorkOrder(ctx, car, template, "pull")
+			if err != nil {
+				log.Error("failed to create pull work order",
 					slog.String("templateName", template.Name),
 					pkglog.Err(err),
 				)
 				continue
 			}
+
+			s.fanOutMaintenance(model.CarMaintenanceEvent{
+				CarID:      car.ID,
+				TemplateID: template.ID,
+				RecordID:   recordID,
+				EventType:  "pull",
+				OccurredAt: time.Now(),
+			})
 
 			if err = s.carService.UpdateCarStatus(
 				ctx, carID,
@@ -353,19 +488,55 @@ func (s *CarMaintenanceService) EvaluateCarMaintenance(ctx context.Context, carI
 			}
 
 		case pct >= template.WarnPct:
-			if err = s.createWorkOrder(ctx, car, template, "scheduled"); err != nil {
-				log.Error("failed to create scheduled work order",
+			open, err := s.hasPendingRecord(ctx, car.ID, template.ID)
+			if err != nil {
+				log.Error("repo: checking for pending record",
+					slog.String("templateID", template.ID),
+					pkglog.Err(err),
+				)
+				continue
+			}
+			if open {
+				continue
+			}
+
+			recordID, err := s.createWorkOrder(ctx, car, template, "warn")
+			if err != nil {
+				log.Error("failed to create warn work order",
 					slog.String("templateName", template.Name),
 					pkglog.Err(err),
 				)
+				continue
 			}
+
+			s.fanOutMaintenance(model.CarMaintenanceEvent{
+				CarID:      car.ID,
+				TemplateID: template.ID,
+				RecordID:   recordID,
+				EventType:  "warn",
+				OccurredAt: time.Now(),
+			})
 		}
 	}
 
 	return nil
 }
 
-func (s *CarMaintenanceService) createWorkOrder(ctx context.Context, car model.Car, template model.CarMaintenanceTemplate, priority string) error {
+func (s *CarMaintenanceService) hasPendingRecord(ctx context.Context, carID, templateID string) (bool, error) {
+	pendingStatus := model.MaintenanceRecordStatusPending
+	existing, err := s.recordRepo.Find(ctx, model.CarMaintenanceRecordFilter{
+		CarID:      &carID,
+		TemplateID: &templateID,
+		Status:     &pendingStatus,
+		Pagination: &sharedmodel.Pagination{Limit: 1},
+	})
+	if err != nil {
+		return false, err
+	}
+	return len(existing) > 0, nil
+}
+
+func (s *CarMaintenanceService) createWorkOrder(ctx context.Context, car model.Car, template model.CarMaintenanceTemplate, eventType string) (string, error) {
 	var dueBy *time.Time
 	if template.DayInterval != nil {
 		t := time.Now().AddDate(0, 0, int(*template.DayInterval))
@@ -373,7 +544,7 @@ func (s *CarMaintenanceService) createWorkOrder(ctx context.Context, car model.C
 	}
 
 	now := time.Now()
-	_, err := s.recordRepo.Insert(ctx, model.CarMaintenanceRecord{
+	recordID, err := s.recordRepo.Insert(ctx, model.CarMaintenanceRecord{
 		CarID:              car.ID,
 		TemplateID:         template.ID,
 		Status:             model.MaintenanceRecordStatusPending,
@@ -383,16 +554,16 @@ func (s *CarMaintenanceService) createWorkOrder(ctx context.Context, car model.C
 		UpdatedAt:          now,
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	s.log.Info("work order created",
 		slog.String("carID", car.ID),
 		slog.String("template", template.Name),
-		slog.String("priority", priority),
+		slog.String("eventType", eventType),
 	)
 
-	return nil
+	return recordID, nil
 }
 
 func maintenanceTemplateFilter(filter validation.CarMaintenanceTemplateFilter) model.CarMaintenanceTemplateFilter {

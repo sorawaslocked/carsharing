@@ -45,6 +45,13 @@ type CarMaintenanceRecord struct {
 	CreatedAt               time.Time  `json:"createdAt"`
 }
 
+type CarMaintenanceTemplateAssignRequest struct {
+	CarID       string     `json:"carID" binding:"required"`
+	TemplateID  string     `json:"templateID" binding:"required"`
+	InitialKM   *int32     `json:"initialKM"`
+	InitialDate *time.Time `json:"initialDate"`
+}
+
 type CarMaintenanceTemplateCreateRequest struct {
 	Name        string  `json:"name" binding:"required"`
 	KmInterval  *int32  `json:"kmInterval"`
@@ -68,6 +75,20 @@ type CarMaintenanceRecordCompleteRequest struct {
 	CostTenge               int32    `json:"costTenge" validate:"min=0"`
 	ReceiptImageStorageKeys []string `json:"receiptImageStorageKeys"`
 	Notes                   *string  `json:"notes"`
+}
+
+func FromCarMaintenanceTemplateAssignRequest(ctx *gin.Context) (model.CarMaintenanceTemplateAssign, error) {
+	var req CarMaintenanceTemplateAssignRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		return model.CarMaintenanceTemplateAssign{}, err
+	}
+
+	return model.CarMaintenanceTemplateAssign{
+		CarID:       req.CarID,
+		TemplateID:  req.TemplateID,
+		InitialKM:   req.InitialKM,
+		InitialDate: req.InitialDate,
+	}, nil
 }
 
 func FromCarMaintenanceTemplateCreateRequest(ctx *gin.Context) (model.CarMaintenanceTemplateCreate, error) {

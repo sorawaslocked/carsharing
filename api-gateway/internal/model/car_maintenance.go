@@ -1,8 +1,9 @@
 package model
 
-import sharedmodel "carsharing/shared/model"
-
-import "time"
+import (
+	sharedmodel "carsharing/shared/model"
+	"time"
+)
 
 type CarMaintenanceTemplate struct {
 	ID   string
@@ -73,4 +74,19 @@ type CarMaintenanceRecordComplete struct {
 	CostTenge             int32
 	ReceiptImageKeys      []string
 	Notes                 *string
+}
+
+type CarMaintenanceTemplateAssign struct {
+	CarID       string
+	TemplateID  string
+	InitialKM   *int32
+	InitialDate *time.Time
+}
+
+type CarMaintenanceEvent struct {
+	CarID      string
+	TemplateID string
+	RecordID   string
+	EventType  string
+	OccurredAt time.Time
 }

@@ -80,6 +80,14 @@ type CarMaintenanceEvaluation struct {
 	Action     string
 }
 
+type CarMaintenanceEvent struct {
+	CarID      string
+	TemplateID string
+	RecordID   string
+	EventType  string // "warn" or "pull"
+	OccurredAt time.Time
+}
+
 type CarMaintenanceTemplateFilter struct {
 	IsMandatory *bool
 

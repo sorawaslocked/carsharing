@@ -26,6 +26,7 @@ func newTestCarMaintenanceService(
 	return NewCarMaintenanceService(
 		discardLogger(), newTestValidator(t),
 		templateRepo, recordRepo, serviceStateRepo, carRepo, carService, objectStorage,
+		time.Hour,
 	)
 }
 
@@ -522,6 +523,11 @@ func TestEvaluateCarMaintenance(t *testing.T) {
 			Return(model.Car{ID: carID, MileageKM: 10_000, Status: model.CarStatusAvailable}, nil)
 		stateRepo.EXPECT().FindAll(ctx, mock.Anything).Return([]model.CarServiceState{state}, nil)
 		templateRepo.EXPECT().FindByID(ctx, templateID).Return(template, nil)
+		recordRepo.EXPECT().Find(ctx, mock.MatchedBy(func(f model.CarMaintenanceRecordFilter) bool {
+			return f.CarID != nil && *f.CarID == carID &&
+				f.TemplateID != nil && *f.TemplateID == templateID &&
+				f.Status != nil && *f.Status == model.MaintenanceRecordStatusPending
+		})).Return([]model.CarMaintenanceRecord{}, nil)
 		recordRepo.EXPECT().Insert(ctx, mock.MatchedBy(func(r model.CarMaintenanceRecord) bool {
 			return r.CarID == carID && r.TemplateID == templateID &&
 				r.Status == model.MaintenanceRecordStatusPending
@@ -551,6 +557,11 @@ func TestEvaluateCarMaintenance(t *testing.T) {
 			Return(model.Car{ID: carID, MileageKM: 8_500, Status: model.CarStatusAvailable}, nil)
 		stateRepo.EXPECT().FindAll(ctx, mock.Anything).Return([]model.CarServiceState{state}, nil)
 		templateRepo.EXPECT().FindByID(ctx, templateID).Return(template, nil)
+		recordRepo.EXPECT().Find(ctx, mock.MatchedBy(func(f model.CarMaintenanceRecordFilter) bool {
+			return f.CarID != nil && *f.CarID == carID &&
+				f.TemplateID != nil && *f.TemplateID == templateID &&
+				f.Status != nil && *f.Status == model.MaintenanceRecordStatusPending
+		})).Return([]model.CarMaintenanceRecord{}, nil)
 		recordRepo.EXPECT().Insert(ctx, mock.Anything).Return("rec-warn", nil)
 		// no carRepo.Update expected: status must NOT change
 

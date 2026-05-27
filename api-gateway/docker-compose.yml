@@ -13,6 +13,7 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       NATS_SUBSCRIBER_USERNAME: ""
       NATS_SUBSCRIBER_PASSWORD: ""
+      SWAGGER_HOST: ${SWAGGER_HOST}
     depends_on:
       redis:
         condition: service_healthy

@@ -5,6 +5,7 @@ package service.car;
 import "base/car/car_maintenance.proto";
 import "base/common.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "carsharing/protos/gen/service/car";
 
@@ -14,6 +15,8 @@ service CarMaintenanceService {
   rpc ListMaintenanceTemplates(ListMaintenanceTemplatesRequest) returns (ListMaintenanceTemplatesResponse);
   rpc UpdateMaintenanceTemplate(UpdateMaintenanceTemplateRequest) returns (google.protobuf.Empty);
   rpc DeleteMaintenanceTemplate(DeleteMaintenanceTemplateRequest) returns (google.protobuf.Empty);
+
+  rpc AssignCarTemplate(AssignCarTemplateRequest) returns (google.protobuf.Empty);
 
   rpc ListMaintenanceRecords(ListMaintenanceRecordsRequest) returns (ListMaintenanceRecordsResponse);
   rpc CompleteMaintenanceRecord(CompleteMaintenanceRecordRequest) returns (google.protobuf.Empty);
@@ -85,6 +88,14 @@ message CompleteMaintenanceRecordRequest {
   int32           cost_tenge               = 3;
   repeated string receipt_image_keys       = 4;
   optional string notes                    = 5;
+}
+
+message AssignCarTemplateRequest {
+  string car_id      = 1;
+  string template_id = 2;
+
+  optional int64                     initial_km   = 3;
+  optional google.protobuf.Timestamp initial_date = 4;
 }
 
 message GetMaintenanceReceiptImageUploadDataResponse {

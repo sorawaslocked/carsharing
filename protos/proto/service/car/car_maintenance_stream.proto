@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package service.car;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "carsharing/protos/gen/service/car";
+
+service CarMaintenanceStreamService {
+  rpc StreamMaintenanceEvents(google.protobuf.Empty) returns (stream MaintenanceEvent);
+}
+
+message MaintenanceEvent {
+  string car_id      = 1;
+  string template_id = 2;
+  string record_id   = 3;
+  string event_type  = 4; // "warn" or "pull"
+
+  google.protobuf.Timestamp occurred_at = 5;
+}

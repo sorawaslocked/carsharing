@@ -106,7 +106,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 	zoneRepo := postgres.NewZoneRepository(log, pool)
 
 	telemetryStreamClient := grpcclient.NewTelemetryStreamClient(telematicsConn, log)
-	telemetryService := service.NewTelemetryService(log, validate, telemetryStreamClient, telemetryReadingRepo, carRepo, cfg.Telemetry.StalenessThreshold)
+	telemetryService := service.NewTelemetryService(log, validate, telemetryStreamClient, telemetryReadingRepo, carRepo)
 
 	carModelService := service.NewCarModelService(log, validate, carModelRepo, objectStorage)
 	carService := service.NewCarService(log, validate, carModelRepo, carRepo, zoneRepo, statusReadingRepo, telemetryReadingRepo, objectStorage, carPublisher, telemetryService)
@@ -143,7 +143,7 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 		"nats-publisher":  natsadapter.NewPinger(log, ncPub),
 		"nats-subscriber": natsadapter.NewPinger(log, ncSub),
 		"minio":           minioadapter.NewPinger(log, minioClient),
-		"telemetry":       telemetryService,
+		"telemetry":       grpcserver.NewPinger(log, telematicsConn),
 	}, cfg.Version)
 
 	grpcSrv, err := grpcserver.NewServer(

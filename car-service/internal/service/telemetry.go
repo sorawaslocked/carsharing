@@ -23,15 +23,10 @@ type TelemetryService struct {
 	streamClient         TelemetryStreamClient
 	telemetryReadingRepo TelemetryReadingRepository
 	carRepo              CarRepository
-	stalenessThreshold   time.Duration
 
 	mu  sync.Mutex
 	ctx context.Context
 	wg  sync.WaitGroup
-
-	totalStreams  atomic.Int32
-	activeStreams atomic.Int32
-	lastSeenAt    atomic.Pointer[time.Time]
 
 	subsMu sync.RWMutex
 	subs   map[string]map[uint64]chan model.TelemetryUpdate
@@ -44,7 +39,6 @@ func NewTelemetryService(
 	streamClient TelemetryStreamClient,
 	telemetryReadingRepo TelemetryReadingRepository,
 	carRepo CarRepository,
-	stalenessThreshold time.Duration,
 ) *TelemetryService {
 	return &TelemetryService{
 		log:                  pkglog.WithComponent(log, "service.TelemetryService"),
@@ -52,7 +46,6 @@ func NewTelemetryService(
 		streamClient:         streamClient,
 		telemetryReadingRepo: telemetryReadingRepo,
 		carRepo:              carRepo,
-		stalenessThreshold:   stalenessThreshold,
 		subs:                 make(map[string]map[uint64]chan model.TelemetryUpdate),
 	}
 }
@@ -75,7 +68,6 @@ func (s *TelemetryService) Start(ctx context.Context) error {
 	log.Info("subscribing to telemetry streams", slog.Int("cars", len(cars)))
 
 	for _, car := range cars {
-		s.totalStreams.Add(1)
 		s.wg.Add(1)
 		go func(c model.Car) {
 			defer s.wg.Done()
@@ -91,32 +83,6 @@ func (s *TelemetryService) Stop() {
 	s.wg.Wait()
 }
 
-// Ping implements the health Pinger interface. Returns an error if all streams
-// are disconnected or if connected streams have not delivered data within the
-// staleness threshold.
-func (s *TelemetryService) Ping(_ context.Context) error {
-	total := s.totalStreams.Load()
-	if total == 0 {
-		return nil
-	}
-
-	active := s.activeStreams.Load()
-	last := s.lastSeenAt.Load()
-
-	if active == 0 && last == nil {
-		return model.ErrTelemetryNoStreamsConnected
-	}
-
-	if last != nil && time.Since(*last) > s.stalenessThreshold {
-		if active == 0 {
-			return model.ErrTelemetryAllStreamsDisconnected{LastActivity: time.Since(*last).Round(time.Second)}
-		}
-		return model.ErrTelemetryStreamStale{SinceLastUpdate: time.Since(*last).Round(time.Second)}
-	}
-
-	return nil
-}
-
 // OnCarCreated starts a telemetry stream goroutine for a newly created car.
 func (s *TelemetryService) OnCarCreated(car model.Car) {
 	s.mu.Lock()
@@ -130,7 +96,6 @@ func (s *TelemetryService) OnCarCreated(car model.Car) {
 		return
 	}
 
-	s.totalStreams.Add(1)
 	s.wg.Add(1)
 	go func() {
 		defer s.wg.Done()
@@ -194,14 +159,12 @@ func (s *TelemetryService) subscribeToCarStream(ctx context.Context, car model.C
 			continue
 		}
 
-		s.activeStreams.Add(1)
 		for update := range ch {
 			if err := s.applyUpdate(ctx, log, update); err != nil {
 				log.Error("failed to apply telemetry update", pkglog.Err(err))
 			}
 			s.fanOut(update.CarID, update)
 		}
-		s.activeStreams.Add(-1)
 
 		if ctx.Err() != nil {
 			return
@@ -261,8 +224,6 @@ func (s *TelemetryService) applyUpdate(ctx context.Context, log *slog.Logger, up
 		log.Error("repo: updating car", pkglog.Err(err))
 		return err
 	}
-
-	s.lastSeenAt.Store(&now)
 
 	log.Info("telemetry update applied",
 		slog.Int64("mileageKM", update.MileageKM),

@@ -41,56 +41,7 @@ func blockingStreamClient() *mockStreamClient {
 
 func newTelemetrySvc(t *testing.T, client TelemetryStreamClient, telemetryRepo TelemetryReadingRepository, carRepo CarRepository) *TelemetryService {
 	t.Helper()
-	return NewTelemetryService(discardLogger(), newTestValidator(t), client, telemetryRepo, carRepo, 2*time.Minute)
-}
-
-// --- Ping ---
-
-func TestTelemetryService_Ping(t *testing.T) {
-	ctx := context.Background()
-
-	t.Run("healthy when no streams configured", func(t *testing.T) {
-		svc := newTelemetrySvc(t, nil, nil, nil)
-		assert.NoError(t, svc.Ping(ctx))
-	})
-
-	t.Run("ErrTelemetryNoStreamsConnected when streams configured but none ever connected", func(t *testing.T) {
-		svc := newTelemetrySvc(t, nil, nil, nil)
-		svc.totalStreams.Store(1)
-
-		assert.ErrorIs(t, svc.Ping(ctx), model.ErrTelemetryNoStreamsConnected)
-	})
-
-	t.Run("ErrTelemetryAllStreamsDisconnected when all streams previously active but now inactive", func(t *testing.T) {
-		svc := newTelemetrySvc(t, nil, nil, nil)
-		svc.totalStreams.Store(1)
-		past := time.Now().Add(-3 * time.Minute)
-		svc.lastSeenAt.Store(&past)
-
-		var err model.ErrTelemetryAllStreamsDisconnected
-		assert.ErrorAs(t, svc.Ping(ctx), &err)
-	})
-
-	t.Run("ErrTelemetryStreamStale when active but no updates within threshold", func(t *testing.T) {
-		svc := NewTelemetryService(discardLogger(), newTestValidator(t), nil, nil, nil, 1*time.Minute)
-		svc.totalStreams.Store(1)
-		svc.activeStreams.Store(1)
-		stale := time.Now().Add(-2 * time.Minute)
-		svc.lastSeenAt.Store(&stale)
-
-		var err model.ErrTelemetryStreamStale
-		assert.ErrorAs(t, svc.Ping(ctx), &err)
-	})
-
-	t.Run("healthy when active streams have recent data", func(t *testing.T) {
-		svc := newTelemetrySvc(t, nil, nil, nil)
-		svc.totalStreams.Store(1)
-		svc.activeStreams.Store(1)
-		now := time.Now()
-		svc.lastSeenAt.Store(&now)
-
-		assert.NoError(t, svc.Ping(ctx))
-	})
+	return NewTelemetryService(discardLogger(), newTestValidator(t), client, telemetryRepo, carRepo)
 }
 
 // --- Start ---
@@ -117,7 +68,6 @@ func TestTelemetryService_Start(t *testing.T) {
 
 		err := svc.Start(ctx)
 		require.NoError(t, err)
-		assert.Equal(t, int32(2), svc.totalStreams.Load())
 
 		cancel()
 		svc.Stop()
@@ -129,10 +79,7 @@ func TestTelemetryService_Start(t *testing.T) {
 func TestTelemetryService_OnCarCreated(t *testing.T) {
 	t.Run("warns and skips when called before Start", func(t *testing.T) {
 		svc := newTelemetrySvc(t, nil, nil, nil)
-
 		svc.OnCarCreated(model.Car{ID: "c-1"})
-
-		assert.Equal(t, int32(0), svc.totalStreams.Load())
 	})
 
 	t.Run("starts goroutine after Start context is set", func(t *testing.T) {
@@ -144,8 +91,6 @@ func TestTelemetryService_OnCarCreated(t *testing.T) {
 		svc.mu.Unlock()
 
 		svc.OnCarCreated(model.Car{ID: "c-1"})
-
-		assert.Equal(t, int32(1), svc.totalStreams.Load())
 
 		cancel()
 		svc.Stop()
@@ -234,7 +179,6 @@ func TestTelemetryService_applyUpdate(t *testing.T) {
 
 		err := svc.applyUpdate(ctx, discardLogger(), update)
 		assert.NoError(t, err)
-		assert.NotNil(t, svc.lastSeenAt.Load())
 	})
 
 	t.Run("rejects mileage regression", func(t *testing.T) {

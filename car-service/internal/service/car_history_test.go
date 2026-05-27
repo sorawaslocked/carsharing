@@ -16,7 +16,7 @@ import (
 
 func newTestCarServiceHistory(t *testing.T, statusRepo CarStatusReadingRepository, telemetryRepo TelemetryReadingRepository) *CarService {
 	t.Helper()
-	return NewCarService(discardLogger(), newTestValidator(t), nil, nil, nil, statusRepo, telemetryRepo, nil, nil)
+	return NewCarService(discardLogger(), newTestValidator(t), nil, nil, nil, statusRepo, telemetryRepo, nil, nil, noopCarCreatedNotifier{})
 }
 
 func TestListCarStatusHistory(t *testing.T) {

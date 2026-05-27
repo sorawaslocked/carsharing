@@ -29,11 +29,9 @@ func newTestCarMaintenanceService(
 	)
 }
 
-// newTestCarServiceForMaintenance builds a CarService backed by the given carRepo
-// with no status-log repo and no event publisher (both are nil-safe in UpdateCarStatus).
-func newTestCarServiceForMaintenance(t *testing.T, carRepo CarRepository) *CarService {
+func newTestCarServiceForMaintenance(t *testing.T, carRepo CarRepository, statusRepo CarStatusReadingRepository, eventPub EventPublisher) *CarService {
 	t.Helper()
-	return NewCarService(discardLogger(), newTestValidator(t), nil, carRepo, nil, nil, nil, nil, nil)
+	return NewCarService(discardLogger(), newTestValidator(t), nil, carRepo, nil, statusRepo, nil, nil, eventPub, noopCarCreatedNotifier{})
 }
 
 // ── maintenancePct ────────────────────────────────────────────────────────────
@@ -354,7 +352,9 @@ func TestCarMaintenanceServiceCompleteRecord(t *testing.T) {
 		recordRepo := mocks.NewMockCarMaintenanceRecordRepository(t)
 		stateRepo := mocks.NewMockCarServiceStateRepository(t)
 		carRepo := mocks.NewMockCarRepository(t)
-		carService := newTestCarServiceForMaintenance(t, carRepo)
+		statusRepo := mocks.NewMockCarStatusReadingRepository(t)
+		eventPub := mocks.NewMockEventPublisher(t)
+		carService := newTestCarServiceForMaintenance(t, carRepo, statusRepo, eventPub)
 		svc := newTestCarMaintenanceService(t, templateRepo, recordRepo, stateRepo, nil, carService, nil)
 
 		kmInterval := int32(5_000)
@@ -380,13 +380,14 @@ func TestCarMaintenanceServiceCompleteRecord(t *testing.T) {
 					s.LastKM == 50_000 && s.NextDueKM != nil && s.NextDueDate != nil
 			}),
 		).Return(nil)
-		// carService.UpdateCarStatus → FindByID + Update
 		carRepo.EXPECT().FindByID(ctx, carID).Return(
 			model.Car{ID: carID, Status: model.CarStatusMaintenance}, nil,
 		)
 		carRepo.EXPECT().Update(ctx, carID, mock.MatchedBy(func(u model.CarUpdate) bool {
 			return u.Status != nil && *u.Status == model.CarStatusAvailable
 		})).Return(nil)
+		statusRepo.EXPECT().Insert(ctx, mock.Anything).Return(nil)
+		eventPub.EXPECT().PublishCarStatusUpdated(ctx, carID, string(model.CarStatusMaintenance), string(model.CarStatusAvailable)).Return(nil)
 
 		err := svc.CompleteRecord(ctx, recordID, validation.CarMaintenanceRecordComplete{
 			CompletedKM: 50_000,
@@ -400,7 +401,9 @@ func TestCarMaintenanceServiceCompleteRecord(t *testing.T) {
 		recordRepo := mocks.NewMockCarMaintenanceRecordRepository(t)
 		stateRepo := mocks.NewMockCarServiceStateRepository(t)
 		carRepo := mocks.NewMockCarRepository(t)
-		carService := newTestCarServiceForMaintenance(t, carRepo)
+		statusRepo := mocks.NewMockCarStatusReadingRepository(t)
+		eventPub := mocks.NewMockEventPublisher(t)
+		carService := newTestCarServiceForMaintenance(t, carRepo, statusRepo, eventPub)
 		svc := newTestCarMaintenanceService(t, templateRepo, recordRepo, stateRepo, nil, carService, nil)
 
 		kmInterval := int32(5_000)
@@ -421,6 +424,8 @@ func TestCarMaintenanceServiceCompleteRecord(t *testing.T) {
 			model.Car{ID: carID, Status: model.CarStatusMaintenance}, nil,
 		)
 		carRepo.EXPECT().Update(ctx, carID, mock.Anything).Return(nil)
+		statusRepo.EXPECT().Insert(ctx, mock.Anything).Return(nil)
+		eventPub.EXPECT().PublishCarStatusUpdated(ctx, carID, string(model.CarStatusMaintenance), string(model.CarStatusAvailable)).Return(nil)
 
 		err := svc.CompleteRecord(ctx, recordID, validation.CarMaintenanceRecordComplete{CompletedKM: 10_000})
 		assert.NoError(t, err)
@@ -507,7 +512,9 @@ func TestEvaluateCarMaintenance(t *testing.T) {
 		recordRepo := mocks.NewMockCarMaintenanceRecordRepository(t)
 		stateRepo := mocks.NewMockCarServiceStateRepository(t)
 		carRepo := mocks.NewMockCarRepository(t)
-		carService := newTestCarServiceForMaintenance(t, carRepo)
+		statusRepo := mocks.NewMockCarStatusReadingRepository(t)
+		eventPub := mocks.NewMockEventPublisher(t)
+		carService := newTestCarServiceForMaintenance(t, carRepo, statusRepo, eventPub)
 		svc := newTestCarMaintenanceService(t, templateRepo, recordRepo, stateRepo, carRepo, carService, nil)
 
 		// mileage 10 000 km since lastKM=0, interval=10 000 → pct=1.0 >= pullPct=1.0
@@ -519,12 +526,13 @@ func TestEvaluateCarMaintenance(t *testing.T) {
 			return r.CarID == carID && r.TemplateID == templateID &&
 				r.Status == model.MaintenanceRecordStatusPending
 		})).Return("rec-new", nil)
-		// carService.UpdateCarStatus → FindByID again + Update
 		carRepo.EXPECT().FindByID(ctx, carID).
 			Return(model.Car{ID: carID, Status: model.CarStatusAvailable}, nil)
 		carRepo.EXPECT().Update(ctx, carID, mock.MatchedBy(func(u model.CarUpdate) bool {
 			return u.Status != nil && *u.Status == model.CarStatusMaintenance
 		})).Return(nil)
+		statusRepo.EXPECT().Insert(ctx, mock.Anything).Return(nil)
+		eventPub.EXPECT().PublishCarStatusUpdated(ctx, carID, string(model.CarStatusAvailable), string(model.CarStatusMaintenance)).Return(nil)
 
 		err := svc.EvaluateCarMaintenance(ctx, carID)
 		assert.NoError(t, err)
@@ -535,7 +543,7 @@ func TestEvaluateCarMaintenance(t *testing.T) {
 		recordRepo := mocks.NewMockCarMaintenanceRecordRepository(t)
 		stateRepo := mocks.NewMockCarServiceStateRepository(t)
 		carRepo := mocks.NewMockCarRepository(t)
-		carService := newTestCarServiceForMaintenance(t, carRepo)
+		carService := newTestCarServiceForMaintenance(t, carRepo, nil, nil)
 		svc := newTestCarMaintenanceService(t, templateRepo, recordRepo, stateRepo, carRepo, carService, nil)
 
 		// mileage 8 500 → pct=0.85 >= warnPct=0.8 but < pullPct=1.0
@@ -554,7 +562,7 @@ func TestEvaluateCarMaintenance(t *testing.T) {
 		templateRepo := mocks.NewMockCarMaintenanceTemplateRepository(t)
 		stateRepo := mocks.NewMockCarServiceStateRepository(t)
 		carRepo := mocks.NewMockCarRepository(t)
-		carService := newTestCarServiceForMaintenance(t, carRepo)
+		carService := newTestCarServiceForMaintenance(t, carRepo, nil, nil)
 		svc := newTestCarMaintenanceService(t, templateRepo, nil, stateRepo, carRepo, carService, nil)
 
 		// mileage 5 000 → pct=0.5 < warnPct=0.8
@@ -571,7 +579,7 @@ func TestEvaluateCarMaintenance(t *testing.T) {
 	t.Run("no service states returns no error and does nothing", func(t *testing.T) {
 		stateRepo := mocks.NewMockCarServiceStateRepository(t)
 		carRepo := mocks.NewMockCarRepository(t)
-		carService := newTestCarServiceForMaintenance(t, carRepo)
+		carService := newTestCarServiceForMaintenance(t, carRepo, nil, nil)
 		svc := newTestCarMaintenanceService(t, nil, nil, stateRepo, carRepo, carService, nil)
 
 		carRepo.EXPECT().FindByID(ctx, carID).
@@ -584,7 +592,7 @@ func TestEvaluateCarMaintenance(t *testing.T) {
 
 	t.Run("car not found returns ErrCarNotFound", func(t *testing.T) {
 		carRepo := mocks.NewMockCarRepository(t)
-		carService := newTestCarServiceForMaintenance(t, carRepo)
+		carService := newTestCarServiceForMaintenance(t, carRepo, nil, nil)
 		svc := newTestCarMaintenanceService(t, nil, nil, nil, carRepo, carService, nil)
 
 		carRepo.EXPECT().FindByID(ctx, carID).Return(model.Car{}, model.ErrCarNotFound)
@@ -597,7 +605,7 @@ func TestEvaluateCarMaintenance(t *testing.T) {
 		templateRepo := mocks.NewMockCarMaintenanceTemplateRepository(t)
 		stateRepo := mocks.NewMockCarServiceStateRepository(t)
 		carRepo := mocks.NewMockCarRepository(t)
-		carService := newTestCarServiceForMaintenance(t, carRepo)
+		carService := newTestCarServiceForMaintenance(t, carRepo, nil, nil)
 		svc := newTestCarMaintenanceService(t, templateRepo, nil, stateRepo, carRepo, carService, nil)
 
 		carRepo.EXPECT().FindByID(ctx, carID).

@@ -46,6 +46,7 @@ func NewCarService(
 	telemetryReadingRepo TelemetryReadingRepository,
 	objectStorage ObjectStorage,
 	eventPublisher EventPublisher,
+	carCreatedNotifier CarCreatedNotifier,
 ) *CarService {
 	return &CarService{
 		log:                  pkglog.WithComponent(log, "service.CarService"),
@@ -57,12 +58,9 @@ func NewCarService(
 		telemetryReadingRepo: telemetryReadingRepo,
 		objectStorage:        objectStorage,
 		eventPublisher:       eventPublisher,
+		carCreatedNotifier:   carCreatedNotifier,
 		subs:                 make(map[string]map[uint64]chan model.CarStatusUpdate),
 	}
-}
-
-func (s *CarService) SetCarCreatedNotifier(n CarCreatedNotifier) {
-	s.carCreatedNotifier = n
 }
 
 func (s *CarService) Create(ctx context.Context, data validation.CarCreate) (string, error) {
@@ -124,9 +122,7 @@ func (s *CarService) Create(ctx context.Context, data validation.CarCreate) (str
 	}
 
 	car.ID = id
-	if s.carCreatedNotifier != nil {
-		s.carCreatedNotifier.OnCarCreated(car)
-	}
+	s.carCreatedNotifier.OnCarCreated(car)
 
 	return id, nil
 }
@@ -268,33 +264,29 @@ func (s *CarService) UpdateCarStatus(ctx context.Context, id string, data valida
 		actorID = md.UserID
 	}
 
-	if s.statusReadingRepo != nil {
-		if err = s.statusReadingRepo.Insert(ctx, model.CarStatusReading{
-			CarID:      current.ID,
-			FromStatus: current.Status,
-			ToStatus:   toStatus,
-			ActorType:  actorType,
-			ActorID:    actorID,
-			Reason:     data.Reason,
-			Metadata:   data.Metadata,
-			RecordedAt: now,
-		}); err != nil {
-			log.Error("repo: inserting status log entry",
-				slog.String("carID", current.ID),
-				slog.String("from", current.Status.String()),
-				slog.String("to", toStatus.String()),
-				pkglog.Err(err),
-			)
-		}
+	if err = s.statusReadingRepo.Insert(ctx, model.CarStatusReading{
+		CarID:      current.ID,
+		FromStatus: current.Status,
+		ToStatus:   toStatus,
+		ActorType:  actorType,
+		ActorID:    actorID,
+		Reason:     data.Reason,
+		Metadata:   data.Metadata,
+		RecordedAt: now,
+	}); err != nil {
+		log.Error("repo: inserting status log entry",
+			slog.String("carID", current.ID),
+			slog.String("from", current.Status.String()),
+			slog.String("to", toStatus.String()),
+			pkglog.Err(err),
+		)
 	}
 
-	if s.eventPublisher != nil {
-		if err := s.eventPublisher.PublishCarStatusUpdated(ctx, current.ID, current.Status.String(), toStatus.String()); err != nil {
-			log.Error("event: publishing car status updated",
-				slog.String("carID", current.ID),
-				pkglog.Err(err),
-			)
-		}
+	if err := s.eventPublisher.PublishCarStatusUpdated(ctx, current.ID, current.Status.String(), toStatus.String()); err != nil {
+		log.Error("event: publishing car status updated",
+			slog.String("carID", current.ID),
+			pkglog.Err(err),
+		)
 	}
 
 	s.fanOutStatus(current.ID, model.CarStatusUpdate{
@@ -370,10 +362,8 @@ func (s *CarService) UpdateCarTelemetry(ctx context.Context, id string, update v
 		Metadata:     update.Metadata,
 		RecordedAt:   now,
 	}
-	if s.telemetryReadingRepo != nil {
-		if err := s.telemetryReadingRepo.Insert(ctx, reading); err != nil {
-			log.Error("repo: inserting telemetry reading", pkglog.Err(err))
-		}
+	if err := s.telemetryReadingRepo.Insert(ctx, reading); err != nil {
+		log.Error("repo: inserting telemetry reading", pkglog.Err(err))
 	}
 
 	return nil

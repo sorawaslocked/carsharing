@@ -39,6 +39,8 @@ func (s *Server) setupRoutes(
 	protectedV1.Use(authentication.Middleware())
 	protectedV1.Use(middleware.SuspensionChecker())
 	{
+		protectedV1.GET("/dashboard", s.dashboardHandler.Get)
+
 		auth := protectedV1.Group("/auth")
 		{
 			auth.POST("/sign-out", s.userHandler.SignOut)

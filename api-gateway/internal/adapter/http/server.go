@@ -27,6 +27,7 @@ type Server struct {
 	zoneHandler           *handler.ZoneHandler
 	bookingHandler        *handler.BookingHandler
 	tripHandler           *handler.TripHandler
+	dashboardHandler      *handler.DashboardHandler
 	userWsHandler         *wshandler.UserWsHandler
 	carWsHandler          *wshandler.CarWsHandler
 	tripWsHandler         *wshandler.TripWsHandler
@@ -73,6 +74,7 @@ func New(
 	zoneHandler := handler.NewZoneHandler(zoneService, log)
 	bookingHandler := handler.NewBookingHandler(bookingService, log)
 	tripHandler := handler.NewTripHandler(tripService, log)
+	dashboardHandler := handler.NewDashboardHandler(userService, carService, bookingService, tripService, carInsuranceService, carMaintenanceService, log)
 
 	// WebSocket handlers
 	userWsHandler := wshandler.NewUserWsHandler(documentStreamService, log)
@@ -93,6 +95,7 @@ func New(
 		zoneHandler:           zoneHandler,
 		bookingHandler:        bookingHandler,
 		tripHandler:           tripHandler,
+		dashboardHandler:      dashboardHandler,
 		userWsHandler:         userWsHandler,
 		carWsHandler:          carWsHandler,
 		tripWsHandler:         tripWsHandler,

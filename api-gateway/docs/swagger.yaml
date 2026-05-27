@@ -53,6 +53,11 @@ definitions:
     - carID
     - pricingRuleID
     type: object
+  dto.BookingStats:
+    properties:
+      active:
+        type: integer
+    type: object
   dto.BookingStatusReading:
     properties:
       actorID:
@@ -793,6 +798,21 @@ definitions:
     - imageType
     - objectKey
     type: object
+  dto.DashboardResponse:
+    properties:
+      bookings:
+        $ref: '#/definitions/dto.BookingStats'
+      fleet:
+        $ref: '#/definitions/dto.FleetStats'
+      insurance:
+        $ref: '#/definitions/dto.InsuranceStats'
+      maintenance:
+        $ref: '#/definitions/dto.MaintenanceStats'
+      trips:
+        $ref: '#/definitions/dto.TripStats'
+      users:
+        $ref: '#/definitions/dto.UserStats'
+    type: object
   dto.DependencyHealthResponse:
     properties:
       error:
@@ -850,6 +870,23 @@ definitions:
       error:
         $ref: '#/definitions/dto.ErrorDetail'
     type: object
+  dto.FleetStats:
+    properties:
+      available:
+        type: integer
+      inUse:
+        type: integer
+      maintenance:
+        type: integer
+      outOfService:
+        type: integer
+      reserved:
+        type: integer
+      retired:
+        type: integer
+      total:
+        type: integer
+    type: object
   dto.GetUploadDocumentDataRequest:
     properties:
       imageType:
@@ -888,6 +925,13 @@ definitions:
       uploadData:
         $ref: '#/definitions/dto.ImageUploadData'
     type: object
+  dto.InsuranceStats:
+    properties:
+      active:
+        type: integer
+      expiringIn30Days:
+        type: integer
+    type: object
   dto.LoginRequest:
     properties:
       email:
@@ -898,6 +942,15 @@ definitions:
         type: string
     required:
     - password
+    type: object
+  dto.MaintenanceStats:
+    properties:
+      inProgress:
+        type: integer
+      overdue:
+        type: integer
+      pending:
+        type: integer
     type: object
   dto.PricingRule:
     properties:
@@ -1149,6 +1202,11 @@ definitions:
     required:
     - bookingID
     type: object
+  dto.TripStats:
+    properties:
+      active:
+        type: integer
+    type: object
   dto.TripStatusReading:
     properties:
       actorID:
@@ -1270,6 +1328,19 @@ definitions:
     properties:
       user:
         $ref: '#/definitions/dto.User'
+    type: object
+  dto.UserStats:
+    properties:
+      active:
+        type: integer
+      fullyVerified:
+        type: integer
+      pendingVerification:
+        type: integer
+      suspended:
+        type: integer
+      total:
+        type: integer
     type: object
   dto.UserUpdateRequest:
     properties:
@@ -3158,6 +3229,30 @@ paths:
       summary: Get pre-signed image upload URL for car photos
       tags:
       - cars
+  /dashboard:
+    get:
+      description: Returns current-state counts for users, fleet, bookings, trips,
+        insurance, and maintenance.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DashboardResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Dashboard stats
+      tags:
+      - dashboard
   /health:
     get:
       description: Returns the health status of the API gateway and all upstream services.

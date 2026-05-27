@@ -2569,6 +2569,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/dashboard": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns current-state counts for users, fleet, bookings, trips, insurance, and maintenance.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dashboard"
+                ],
+                "summary": "Dashboard stats",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.DashboardResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/health": {
             "get": {
                 "description": "Returns the health status of the API gateway and all upstream services.",
@@ -4961,6 +4998,14 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.BookingStats": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.BookingStatusReading": {
             "type": "object",
             "properties": {
@@ -6027,6 +6072,29 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.DashboardResponse": {
+            "type": "object",
+            "properties": {
+                "bookings": {
+                    "$ref": "#/definitions/dto.BookingStats"
+                },
+                "fleet": {
+                    "$ref": "#/definitions/dto.FleetStats"
+                },
+                "insurance": {
+                    "$ref": "#/definitions/dto.InsuranceStats"
+                },
+                "maintenance": {
+                    "$ref": "#/definitions/dto.MaintenanceStats"
+                },
+                "trips": {
+                    "$ref": "#/definitions/dto.TripStats"
+                },
+                "users": {
+                    "$ref": "#/definitions/dto.UserStats"
+                }
+            }
+        },
         "dto.DependencyHealthResponse": {
             "type": "object",
             "properties": {
@@ -6112,6 +6180,32 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.FleetStats": {
+            "type": "object",
+            "properties": {
+                "available": {
+                    "type": "integer"
+                },
+                "inUse": {
+                    "type": "integer"
+                },
+                "maintenance": {
+                    "type": "integer"
+                },
+                "outOfService": {
+                    "type": "integer"
+                },
+                "reserved": {
+                    "type": "integer"
+                },
+                "retired": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.GetUploadDocumentDataRequest": {
             "type": "object",
             "required": [
@@ -6170,6 +6264,17 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.InsuranceStats": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "integer"
+                },
+                "expiringIn30Days": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.LoginRequest": {
             "type": "object",
             "required": [
@@ -6184,6 +6289,20 @@ const docTemplate = `{
                 },
                 "phoneNumber": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.MaintenanceStats": {
+            "type": "object",
+            "properties": {
+                "inProgress": {
+                    "type": "integer"
+                },
+                "overdue": {
+                    "type": "integer"
+                },
+                "pending": {
+                    "type": "integer"
                 }
             }
         },
@@ -6547,6 +6666,14 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.TripStats": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.TripStatusReading": {
             "type": "object",
             "properties": {
@@ -6728,6 +6855,26 @@ const docTemplate = `{
             "properties": {
                 "user": {
                     "$ref": "#/definitions/dto.User"
+                }
+            }
+        },
+        "dto.UserStats": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "integer"
+                },
+                "fullyVerified": {
+                    "type": "integer"
+                },
+                "pendingVerification": {
+                    "type": "integer"
+                },
+                "suspended": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         },

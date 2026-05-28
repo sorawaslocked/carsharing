@@ -3,7 +3,7 @@ package validation
 import sharedmodel "carsharing/shared/model"
 
 type Pagination struct {
-	Limit  int64 `validate:"min=1,max=200"`
+	Limit  int64 `validate:"min=1,max=10000"`
 	Offset int64 `validate:"min=0"`
 }
 

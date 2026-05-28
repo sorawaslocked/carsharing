@@ -120,7 +120,10 @@ func (s *UserService) Register(ctx context.Context, data model.UserCreate) (stri
 func (s *UserService) SignIn(ctx context.Context, creds model.Credentials) (model.AccessToken, model.RefreshToken, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "SignIn"), utils.MetadataFromCtx(ctx))
 
-	deviceID := ctx.Value(ctxDeviceIDKey).(string)
+	deviceID, ok := ctx.Value(ctxDeviceIDKey).(string)
+	if !ok || deviceID == "" {
+		return model.AccessToken{}, model.RefreshToken{}, model.ErrInvalidArgument
+	}
 
 	id, err := s.presenter.SignIn(ctx, creds)
 	if err != nil {
@@ -159,7 +162,10 @@ func (s *UserService) SignIn(ctx context.Context, creds model.Credentials) (mode
 func (s *UserService) RefreshToken(ctx context.Context, refreshToken string) (model.AccessToken, model.RefreshToken, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "RefreshToken"), utils.MetadataFromCtx(ctx))
 
-	deviceID := ctx.Value(ctxDeviceIDKey).(string)
+	deviceID, ok := ctx.Value(ctxDeviceIDKey).(string)
+	if !ok || deviceID == "" {
+		return model.AccessToken{}, model.RefreshToken{}, model.ErrInvalidArgument
+	}
 
 	id, _, err := s.tokenManager.ParseToken(ctx, refreshToken)
 	if err != nil {
@@ -208,7 +214,10 @@ func (s *UserService) RefreshToken(ctx context.Context, refreshToken string) (mo
 func (s *UserService) SignOut(ctx context.Context) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "SignOut"), utils.MetadataFromCtx(ctx))
 
-	deviceID := ctx.Value(ctxDeviceIDKey).(string)
+	deviceID, ok := ctx.Value(ctxDeviceIDKey).(string)
+	if !ok || deviceID == "" {
+		return model.ErrInvalidArgument
+	}
 	userID := ctx.Value(ctxUserIDKey).(string)
 
 	if err := s.sessionCache.SetSignedIn(ctx, userID, deviceID, false); err != nil {

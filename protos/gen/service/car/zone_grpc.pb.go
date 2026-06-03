@@ -20,11 +20,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ZoneService_CreateZone_FullMethodName = "/service.car.ZoneService/CreateZone"
-	ZoneService_GetZone_FullMethodName    = "/service.car.ZoneService/GetZone"
-	ZoneService_ListZones_FullMethodName  = "/service.car.ZoneService/ListZones"
-	ZoneService_UpdateZone_FullMethodName = "/service.car.ZoneService/UpdateZone"
-	ZoneService_DeleteZone_FullMethodName = "/service.car.ZoneService/DeleteZone"
+	ZoneService_CreateZone_FullMethodName     = "/service.car.ZoneService/CreateZone"
+	ZoneService_GetZone_FullMethodName        = "/service.car.ZoneService/GetZone"
+	ZoneService_ListZones_FullMethodName      = "/service.car.ZoneService/ListZones"
+	ZoneService_UpdateZone_FullMethodName     = "/service.car.ZoneService/UpdateZone"
+	ZoneService_DeleteZone_FullMethodName     = "/service.car.ZoneService/DeleteZone"
+	ZoneService_GetZonePricing_FullMethodName = "/service.car.ZoneService/GetZonePricing"
 )
 
 // ZoneServiceClient is the client API for ZoneService service.
@@ -36,6 +37,7 @@ type ZoneServiceClient interface {
 	ListZones(ctx context.Context, in *ListZonesRequest, opts ...grpc.CallOption) (*ListZonesResponse, error)
 	UpdateZone(ctx context.Context, in *UpdateZoneRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteZone(ctx context.Context, in *DeleteZoneRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetZonePricing(ctx context.Context, in *GetZonePricingRequest, opts ...grpc.CallOption) (*GetZonePricingResponse, error)
 }
 
 type zoneServiceClient struct {
@@ -96,6 +98,16 @@ func (c *zoneServiceClient) DeleteZone(ctx context.Context, in *DeleteZoneReques
 	return out, nil
 }
 
+func (c *zoneServiceClient) GetZonePricing(ctx context.Context, in *GetZonePricingRequest, opts ...grpc.CallOption) (*GetZonePricingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetZonePricingResponse)
+	err := c.cc.Invoke(ctx, ZoneService_GetZonePricing_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ZoneServiceServer is the server API for ZoneService service.
 // All implementations must embed UnimplementedZoneServiceServer
 // for forward compatibility.
@@ -105,6 +117,7 @@ type ZoneServiceServer interface {
 	ListZones(context.Context, *ListZonesRequest) (*ListZonesResponse, error)
 	UpdateZone(context.Context, *UpdateZoneRequest) (*emptypb.Empty, error)
 	DeleteZone(context.Context, *DeleteZoneRequest) (*emptypb.Empty, error)
+	GetZonePricing(context.Context, *GetZonePricingRequest) (*GetZonePricingResponse, error)
 	mustEmbedUnimplementedZoneServiceServer()
 }
 
@@ -129,6 +142,9 @@ func (UnimplementedZoneServiceServer) UpdateZone(context.Context, *UpdateZoneReq
 }
 func (UnimplementedZoneServiceServer) DeleteZone(context.Context, *DeleteZoneRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteZone not implemented")
+}
+func (UnimplementedZoneServiceServer) GetZonePricing(context.Context, *GetZonePricingRequest) (*GetZonePricingResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetZonePricing not implemented")
 }
 func (UnimplementedZoneServiceServer) mustEmbedUnimplementedZoneServiceServer() {}
 func (UnimplementedZoneServiceServer) testEmbeddedByValue()                     {}
@@ -241,6 +257,24 @@ func _ZoneService_DeleteZone_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ZoneService_GetZonePricing_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetZonePricingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ZoneServiceServer).GetZonePricing(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ZoneService_GetZonePricing_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ZoneServiceServer).GetZonePricing(ctx, req.(*GetZonePricingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ZoneService_ServiceDesc is the grpc.ServiceDesc for ZoneService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -267,6 +301,10 @@ var ZoneService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteZone",
 			Handler:    _ZoneService_DeleteZone_Handler,
+		},
+		{
+			MethodName: "GetZonePricing",
+			Handler:    _ZoneService_GetZonePricing_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

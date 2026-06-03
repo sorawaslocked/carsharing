@@ -26,7 +26,6 @@ type PricingRule struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	CarModelId        *string                `protobuf:"bytes,2,opt,name=car_model_id,json=carModelId,proto3,oneof" json:"car_model_id,omitempty"`
-	ZoneId            *string                `protobuf:"bytes,3,opt,name=zone_id,json=zoneId,proto3,oneof" json:"zone_id,omitempty"`
 	CarClass          *string                `protobuf:"bytes,4,opt,name=car_class,json=carClass,proto3,oneof" json:"car_class,omitempty"`
 	Type              string                 `protobuf:"bytes,5,opt,name=type,proto3" json:"type,omitempty"`
 	RateTenge         int32                  `protobuf:"varint,6,opt,name=rate_tenge,json=rateTenge,proto3" json:"rate_tenge,omitempty"`
@@ -82,13 +81,6 @@ func (x *PricingRule) GetId() string {
 func (x *PricingRule) GetCarModelId() string {
 	if x != nil && x.CarModelId != nil {
 		return *x.CarModelId
-	}
-	return ""
-}
-
-func (x *PricingRule) GetZoneId() string {
-	if x != nil && x.ZoneId != nil {
-		return *x.ZoneId
 	}
 	return ""
 }
@@ -174,30 +166,27 @@ var File_base_booking_pricing_rule_proto protoreflect.FileDescriptor
 
 const file_base_booking_pricing_rule_proto_rawDesc = "" +
 	"\n" +
-	"\x1fbase/booking/pricing_rule.proto\x12\fbase.booking\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc7\x05\n" +
+	"\x1fbase/booking/pricing_rule.proto\x12\fbase.booking\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9d\x05\n" +
 	"\vPricingRule\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12%\n" +
 	"\fcar_model_id\x18\x02 \x01(\tH\x00R\n" +
-	"carModelId\x88\x01\x01\x12\x1c\n" +
-	"\azone_id\x18\x03 \x01(\tH\x01R\x06zoneId\x88\x01\x01\x12 \n" +
-	"\tcar_class\x18\x04 \x01(\tH\x02R\bcarClass\x88\x01\x01\x12\x12\n" +
+	"carModelId\x88\x01\x01\x12 \n" +
+	"\tcar_class\x18\x04 \x01(\tH\x01R\bcarClass\x88\x01\x01\x12\x12\n" +
 	"\x04type\x18\x05 \x01(\tR\x04type\x12\x1d\n" +
 	"\n" +
 	"rate_tenge\x18\x06 \x01(\x05R\trateTenge\x12.\n" +
-	"\x11rate_per_km_tenge\x18\a \x01(\x05H\x03R\x0eratePerKmTenge\x88\x01\x01\x12&\n" +
-	"\ffree_minutes\x18\b \x01(\x05H\x04R\vfreeMinutes\x88\x01\x01\x12-\n" +
-	"\x10min_charge_tenge\x18\t \x01(\x05H\x05R\x0eminChargeTenge\x88\x01\x01\x12,\n" +
+	"\x11rate_per_km_tenge\x18\a \x01(\x05H\x02R\x0eratePerKmTenge\x88\x01\x01\x12&\n" +
+	"\ffree_minutes\x18\b \x01(\x05H\x03R\vfreeMinutes\x88\x01\x01\x12-\n" +
+	"\x10min_charge_tenge\x18\t \x01(\x05H\x04R\x0eminChargeTenge\x88\x01\x01\x12,\n" +
 	"\x0fovertime_policy\x18\n" +
-	" \x01(\tH\x06R\x0eovertimePolicy\x88\x01\x01\x123\n" +
-	"\x13overtime_rate_tenge\x18\v \x01(\x05H\aR\x11overtimeRateTenge\x88\x01\x01\x12\x1b\n" +
+	" \x01(\tH\x05R\x0eovertimePolicy\x88\x01\x01\x123\n" +
+	"\x13overtime_rate_tenge\x18\v \x01(\x05H\x06R\x11overtimeRateTenge\x88\x01\x01\x12\x1b\n" +
 	"\tis_active\x18\f \x01(\bR\bisActive\x129\n" +
 	"\n" +
 	"created_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
 	"updated_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\x0f\n" +
-	"\r_car_model_idB\n" +
-	"\n" +
-	"\b_zone_idB\f\n" +
+	"\r_car_model_idB\f\n" +
 	"\n" +
 	"_car_classB\x14\n" +
 	"\x12_rate_per_km_tengeB\x0f\n" +

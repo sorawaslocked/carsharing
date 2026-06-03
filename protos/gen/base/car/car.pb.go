@@ -37,7 +37,6 @@ type Car struct {
 	BatteryLevel     *float32               `protobuf:"fixed32,9,opt,name=battery_level,json=batteryLevel,proto3,oneof" json:"battery_level,omitempty"`
 	Location         *base.Location         `protobuf:"bytes,10,opt,name=location,proto3" json:"location,omitempty"`
 	TelemetryId      string                 `protobuf:"bytes,11,opt,name=telemetry_id,json=telemetryId,proto3" json:"telemetry_id,omitempty"`
-	ZoneId           *string                `protobuf:"bytes,12,opt,name=zone_id,json=zoneId,proto3,oneof" json:"zone_id,omitempty"`
 	FuelStatus       string                 `protobuf:"bytes,13,opt,name=fuel_status,json=fuelStatus,proto3" json:"fuel_status,omitempty"`
 	Status           string                 `protobuf:"bytes,14,opt,name=status,proto3" json:"status,omitempty"`
 	IsRetired        bool                   `protobuf:"varint,15,opt,name=is_retired,json=isRetired,proto3" json:"is_retired,omitempty"`
@@ -153,13 +152,6 @@ func (x *Car) GetLocation() *base.Location {
 func (x *Car) GetTelemetryId() string {
 	if x != nil {
 		return x.TelemetryId
-	}
-	return ""
-}
-
-func (x *Car) GetZoneId() string {
-	if x != nil && x.ZoneId != nil {
-		return *x.ZoneId
 	}
 	return ""
 }
@@ -556,7 +548,7 @@ var File_base_car_car_proto protoreflect.FileDescriptor
 
 const file_base_car_car_proto_rawDesc = "" +
 	"\n" +
-	"\x12base/car/car.proto\x12\bbase.car\x1a\x11base/common.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/protobuf/struct.proto\"\x81\x06\n" +
+	"\x12base/car/car.proto\x12\bbase.car\x1a\x11base/common.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xd7\x05\n" +
 	"\x03Car\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
 	"\bmodel_id\x18\x02 \x01(\tR\amodelId\x12\x10\n" +
@@ -571,14 +563,13 @@ const file_base_car_car_proto_rawDesc = "" +
 	"\rbattery_level\x18\t \x01(\x02H\x01R\fbatteryLevel\x88\x01\x01\x12*\n" +
 	"\blocation\x18\n" +
 	" \x01(\v2\x0e.base.LocationR\blocation\x12!\n" +
-	"\ftelemetry_id\x18\v \x01(\tR\vtelemetryId\x12\x1c\n" +
-	"\azone_id\x18\f \x01(\tH\x02R\x06zoneId\x88\x01\x01\x12\x1f\n" +
+	"\ftelemetry_id\x18\v \x01(\tR\vtelemetryId\x12\x1f\n" +
 	"\vfuel_status\x18\r \x01(\tR\n" +
 	"fuelStatus\x12\x16\n" +
 	"\x06status\x18\x0e \x01(\tR\x06status\x12\x1d\n" +
 	"\n" +
 	"is_retired\x18\x0f \x01(\bR\tisRetired\x12\x19\n" +
-	"\x05notes\x18\x10 \x01(\tH\x03R\x05notes\x88\x01\x01\x12\x1d\n" +
+	"\x05notes\x18\x10 \x01(\tH\x02R\x05notes\x88\x01\x01\x12\x1d\n" +
 	"\n" +
 	"image_urls\x18\x11 \x03(\tR\timageUrls\x12<\n" +
 	"\flast_seen_at\x18\x12 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
@@ -588,9 +579,7 @@ const file_base_car_car_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\r\n" +
 	"\v_fuel_levelB\x10\n" +
-	"\x0e_battery_levelB\n" +
-	"\n" +
-	"\b_zone_idB\b\n" +
+	"\x0e_battery_levelB\b\n" +
 	"\x06_notes\"\xe6\x01\n" +
 	"\aSlimCar\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +

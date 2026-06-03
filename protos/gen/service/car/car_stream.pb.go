@@ -36,7 +36,6 @@ type StreamCarsWithFilterRequest struct {
 	Location      *base.Location         `protobuf:"bytes,8,opt,name=location,proto3,oneof" json:"location,omitempty"`
 	RadiusM       *int32                 `protobuf:"varint,9,opt,name=radius_m,json=radiusM,proto3,oneof" json:"radius_m,omitempty"`
 	MinFuelLevel  *float32               `protobuf:"fixed32,10,opt,name=min_fuel_level,json=minFuelLevel,proto3,oneof" json:"min_fuel_level,omitempty"`
-	ZoneId        *string                `protobuf:"bytes,11,opt,name=zone_id,json=zoneId,proto3,oneof" json:"zone_id,omitempty"`
 	Status        *string                `protobuf:"bytes,12,opt,name=status,proto3,oneof" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -140,13 +139,6 @@ func (x *StreamCarsWithFilterRequest) GetMinFuelLevel() float32 {
 		return *x.MinFuelLevel
 	}
 	return 0
-}
-
-func (x *StreamCarsWithFilterRequest) GetZoneId() string {
-	if x != nil && x.ZoneId != nil {
-		return *x.ZoneId
-	}
-	return ""
 }
 
 func (x *StreamCarsWithFilterRequest) GetStatus() string {
@@ -428,7 +420,7 @@ var File_service_car_car_stream_proto protoreflect.FileDescriptor
 
 const file_service_car_car_stream_proto_rawDesc = "" +
 	"\n" +
-	"\x1cservice/car/car_stream.proto\x12\vservice.car\x1a\x11base/common.proto\x1a\x12base/car/car.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd1\x04\n" +
+	"\x1cservice/car/car_stream.proto\x12\vservice.car\x1a\x11base/common.proto\x1a\x12base/car/car.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xa7\x04\n" +
 	"\x1bStreamCarsWithFilterRequest\x12\x19\n" +
 	"\x05brand\x18\x01 \x01(\tH\x00R\x05brand\x88\x01\x01\x12\x19\n" +
 	"\x05model\x18\x02 \x01(\tH\x01R\x05model\x88\x01\x01\x12 \n" +
@@ -440,10 +432,9 @@ const file_service_car_car_stream_proto_rawDesc = "" +
 	"\blocation\x18\b \x01(\v2\x0e.base.LocationH\aR\blocation\x88\x01\x01\x12\x1e\n" +
 	"\bradius_m\x18\t \x01(\x05H\bR\aradiusM\x88\x01\x01\x12)\n" +
 	"\x0emin_fuel_level\x18\n" +
-	" \x01(\x02H\tR\fminFuelLevel\x88\x01\x01\x12\x1c\n" +
-	"\azone_id\x18\v \x01(\tH\n" +
-	"R\x06zoneId\x88\x01\x01\x12\x1b\n" +
-	"\x06status\x18\f \x01(\tH\vR\x06status\x88\x01\x01B\b\n" +
+	" \x01(\x02H\tR\fminFuelLevel\x88\x01\x01\x12\x1b\n" +
+	"\x06status\x18\f \x01(\tH\n" +
+	"R\x06status\x88\x01\x01B\b\n" +
 	"\x06_brandB\b\n" +
 	"\x06_modelB\f\n" +
 	"\n" +
@@ -456,9 +447,7 @@ const file_service_car_car_stream_proto_rawDesc = "" +
 	"_min_seatsB\v\n" +
 	"\t_locationB\v\n" +
 	"\t_radius_mB\x11\n" +
-	"\x0f_min_fuel_levelB\n" +
-	"\n" +
-	"\b_zone_idB\t\n" +
+	"\x0f_min_fuel_levelB\t\n" +
 	"\a_status\"C\n" +
 	"\x1cStreamCarsWithFilterResponse\x12#\n" +
 	"\x03car\x18\x01 \x03(\v2\x11.base.car.SlimCarR\x03car\"2\n" +

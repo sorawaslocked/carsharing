@@ -456,6 +456,102 @@ func (x *DeleteZoneRequest) GetId() string {
 	return ""
 }
 
+type GetZonePricingRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Latitude      float64                `protobuf:"fixed64,1,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude     float64                `protobuf:"fixed64,2,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetZonePricingRequest) Reset() {
+	*x = GetZonePricingRequest{}
+	mi := &file_service_car_zone_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetZonePricingRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetZonePricingRequest) ProtoMessage() {}
+
+func (x *GetZonePricingRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_service_car_zone_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetZonePricingRequest.ProtoReflect.Descriptor instead.
+func (*GetZonePricingRequest) Descriptor() ([]byte, []int) {
+	return file_service_car_zone_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *GetZonePricingRequest) GetLatitude() float64 {
+	if x != nil {
+		return x.Latitude
+	}
+	return 0
+}
+
+func (x *GetZonePricingRequest) GetLongitude() float64 {
+	if x != nil {
+		return x.Longitude
+	}
+	return 0
+}
+
+type GetZonePricingResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FeeAdjustment int32                  `protobuf:"varint,1,opt,name=fee_adjustment,json=feeAdjustment,proto3" json:"fee_adjustment,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetZonePricingResponse) Reset() {
+	*x = GetZonePricingResponse{}
+	mi := &file_service_car_zone_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetZonePricingResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetZonePricingResponse) ProtoMessage() {}
+
+func (x *GetZonePricingResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_service_car_zone_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetZonePricingResponse.ProtoReflect.Descriptor instead.
+func (*GetZonePricingResponse) Descriptor() ([]byte, []int) {
+	return file_service_car_zone_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *GetZonePricingResponse) GetFeeAdjustment() int32 {
+	if x != nil {
+		return x.FeeAdjustment
+	}
+	return 0
+}
+
 var File_service_car_zone_proto protoreflect.FileDescriptor
 
 const file_service_car_zone_proto_rawDesc = "" +
@@ -498,7 +594,12 @@ const file_service_car_zone_proto_rawDesc = "" +
 	"\n" +
 	"_is_active\"#\n" +
 	"\x11DeleteZoneRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id2\xfa\x02\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"Q\n" +
+	"\x15GetZonePricingRequest\x12\x1a\n" +
+	"\blatitude\x18\x01 \x01(\x01R\blatitude\x12\x1c\n" +
+	"\tlongitude\x18\x02 \x01(\x01R\tlongitude\"?\n" +
+	"\x16GetZonePricingResponse\x12%\n" +
+	"\x0efee_adjustment\x18\x01 \x01(\x05R\rfeeAdjustment2\xd5\x03\n" +
 	"\vZoneService\x12M\n" +
 	"\n" +
 	"CreateZone\x12\x1e.service.car.CreateZoneRequest\x1a\x1f.service.car.CreateZoneResponse\x12D\n" +
@@ -507,7 +608,8 @@ const file_service_car_zone_proto_rawDesc = "" +
 	"\n" +
 	"UpdateZone\x12\x1e.service.car.UpdateZoneRequest\x1a\x16.google.protobuf.Empty\x12D\n" +
 	"\n" +
-	"DeleteZone\x12\x1e.service.car.DeleteZoneRequest\x1a\x16.google.protobuf.EmptyB#Z!carsharing/protos/gen/service/carb\x06proto3"
+	"DeleteZone\x12\x1e.service.car.DeleteZoneRequest\x1a\x16.google.protobuf.Empty\x12Y\n" +
+	"\x0eGetZonePricing\x12\".service.car.GetZonePricingRequest\x1a#.service.car.GetZonePricingResponseB#Z!carsharing/protos/gen/service/carb\x06proto3"
 
 var (
 	file_service_car_zone_proto_rawDescOnce sync.Once
@@ -521,36 +623,40 @@ func file_service_car_zone_proto_rawDescGZIP() []byte {
 	return file_service_car_zone_proto_rawDescData
 }
 
-var file_service_car_zone_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_service_car_zone_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_service_car_zone_proto_goTypes = []any{
-	(*CreateZoneRequest)(nil),  // 0: service.car.CreateZoneRequest
-	(*CreateZoneResponse)(nil), // 1: service.car.CreateZoneResponse
-	(*GetZoneRequest)(nil),     // 2: service.car.GetZoneRequest
-	(*GetZoneResponse)(nil),    // 3: service.car.GetZoneResponse
-	(*ListZonesRequest)(nil),   // 4: service.car.ListZonesRequest
-	(*ListZonesResponse)(nil),  // 5: service.car.ListZonesResponse
-	(*UpdateZoneRequest)(nil),  // 6: service.car.UpdateZoneRequest
-	(*DeleteZoneRequest)(nil),  // 7: service.car.DeleteZoneRequest
-	(*car.Zone)(nil),           // 8: base.car.Zone
-	(*base.Pagination)(nil),    // 9: base.Pagination
-	(*emptypb.Empty)(nil),      // 10: google.protobuf.Empty
+	(*CreateZoneRequest)(nil),      // 0: service.car.CreateZoneRequest
+	(*CreateZoneResponse)(nil),     // 1: service.car.CreateZoneResponse
+	(*GetZoneRequest)(nil),         // 2: service.car.GetZoneRequest
+	(*GetZoneResponse)(nil),        // 3: service.car.GetZoneResponse
+	(*ListZonesRequest)(nil),       // 4: service.car.ListZonesRequest
+	(*ListZonesResponse)(nil),      // 5: service.car.ListZonesResponse
+	(*UpdateZoneRequest)(nil),      // 6: service.car.UpdateZoneRequest
+	(*DeleteZoneRequest)(nil),      // 7: service.car.DeleteZoneRequest
+	(*GetZonePricingRequest)(nil),  // 8: service.car.GetZonePricingRequest
+	(*GetZonePricingResponse)(nil), // 9: service.car.GetZonePricingResponse
+	(*car.Zone)(nil),               // 10: base.car.Zone
+	(*base.Pagination)(nil),        // 11: base.Pagination
+	(*emptypb.Empty)(nil),          // 12: google.protobuf.Empty
 }
 var file_service_car_zone_proto_depIdxs = []int32{
-	8,  // 0: service.car.GetZoneResponse.zone:type_name -> base.car.Zone
-	9,  // 1: service.car.ListZonesRequest.pagination:type_name -> base.Pagination
-	8,  // 2: service.car.ListZonesResponse.zones:type_name -> base.car.Zone
+	10, // 0: service.car.GetZoneResponse.zone:type_name -> base.car.Zone
+	11, // 1: service.car.ListZonesRequest.pagination:type_name -> base.Pagination
+	10, // 2: service.car.ListZonesResponse.zones:type_name -> base.car.Zone
 	0,  // 3: service.car.ZoneService.CreateZone:input_type -> service.car.CreateZoneRequest
 	2,  // 4: service.car.ZoneService.GetZone:input_type -> service.car.GetZoneRequest
 	4,  // 5: service.car.ZoneService.ListZones:input_type -> service.car.ListZonesRequest
 	6,  // 6: service.car.ZoneService.UpdateZone:input_type -> service.car.UpdateZoneRequest
 	7,  // 7: service.car.ZoneService.DeleteZone:input_type -> service.car.DeleteZoneRequest
-	1,  // 8: service.car.ZoneService.CreateZone:output_type -> service.car.CreateZoneResponse
-	3,  // 9: service.car.ZoneService.GetZone:output_type -> service.car.GetZoneResponse
-	5,  // 10: service.car.ZoneService.ListZones:output_type -> service.car.ListZonesResponse
-	10, // 11: service.car.ZoneService.UpdateZone:output_type -> google.protobuf.Empty
-	10, // 12: service.car.ZoneService.DeleteZone:output_type -> google.protobuf.Empty
-	8,  // [8:13] is the sub-list for method output_type
-	3,  // [3:8] is the sub-list for method input_type
+	8,  // 8: service.car.ZoneService.GetZonePricing:input_type -> service.car.GetZonePricingRequest
+	1,  // 9: service.car.ZoneService.CreateZone:output_type -> service.car.CreateZoneResponse
+	3,  // 10: service.car.ZoneService.GetZone:output_type -> service.car.GetZoneResponse
+	5,  // 11: service.car.ZoneService.ListZones:output_type -> service.car.ListZonesResponse
+	12, // 12: service.car.ZoneService.UpdateZone:output_type -> google.protobuf.Empty
+	12, // 13: service.car.ZoneService.DeleteZone:output_type -> google.protobuf.Empty
+	9,  // 14: service.car.ZoneService.GetZonePricing:output_type -> service.car.GetZonePricingResponse
+	9,  // [9:15] is the sub-list for method output_type
+	3,  // [3:9] is the sub-list for method input_type
 	3,  // [3:3] is the sub-list for extension type_name
 	3,  // [3:3] is the sub-list for extension extendee
 	0,  // [0:3] is the sub-list for field type_name
@@ -569,7 +675,7 @@ func file_service_car_zone_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_service_car_zone_proto_rawDesc), len(file_service_car_zone_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

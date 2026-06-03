@@ -27,7 +27,6 @@ const (
 type CreatePricingRuleRequest struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	ModelId           *string                `protobuf:"bytes,1,opt,name=model_id,json=modelId,proto3,oneof" json:"model_id,omitempty"`
-	ZoneId            *string                `protobuf:"bytes,2,opt,name=zone_id,json=zoneId,proto3,oneof" json:"zone_id,omitempty"`
 	Class             *string                `protobuf:"bytes,3,opt,name=class,proto3,oneof" json:"class,omitempty"`
 	Type              string                 `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`
 	RateTenge         int32                  `protobuf:"varint,5,opt,name=rate_tenge,json=rateTenge,proto3" json:"rate_tenge,omitempty"`
@@ -73,13 +72,6 @@ func (*CreatePricingRuleRequest) Descriptor() ([]byte, []int) {
 func (x *CreatePricingRuleRequest) GetModelId() string {
 	if x != nil && x.ModelId != nil {
 		return *x.ModelId
-	}
-	return ""
-}
-
-func (x *CreatePricingRuleRequest) GetZoneId() string {
-	if x != nil && x.ZoneId != nil {
-		return *x.ZoneId
 	}
 	return ""
 }
@@ -275,7 +267,6 @@ func (x *GetPricingRuleResponse) GetRule() *booking.PricingRule {
 type ListPricingRulesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ModelId       *string                `protobuf:"bytes,1,opt,name=model_id,json=modelId,proto3,oneof" json:"model_id,omitempty"`
-	ZoneId        *string                `protobuf:"bytes,2,opt,name=zone_id,json=zoneId,proto3,oneof" json:"zone_id,omitempty"`
 	Class         *string                `protobuf:"bytes,3,opt,name=class,proto3,oneof" json:"class,omitempty"`
 	Type          *string                `protobuf:"bytes,4,opt,name=type,proto3,oneof" json:"type,omitempty"`
 	IsActive      *bool                  `protobuf:"varint,5,opt,name=is_active,json=isActive,proto3,oneof" json:"is_active,omitempty"`
@@ -317,13 +308,6 @@ func (*ListPricingRulesRequest) Descriptor() ([]byte, []int) {
 func (x *ListPricingRulesRequest) GetModelId() string {
 	if x != nil && x.ModelId != nil {
 		return *x.ModelId
-	}
-	return ""
-}
-
-func (x *ListPricingRulesRequest) GetZoneId() string {
-	if x != nil && x.ZoneId != nil {
-		return *x.ZoneId
 	}
 	return ""
 }
@@ -404,7 +388,6 @@ type UpdatePricingRuleRequest struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	ModelId           *string                `protobuf:"bytes,2,opt,name=model_id,json=modelId,proto3,oneof" json:"model_id,omitempty"`
-	ZoneId            *string                `protobuf:"bytes,3,opt,name=zone_id,json=zoneId,proto3,oneof" json:"zone_id,omitempty"`
 	Class             *string                `protobuf:"bytes,4,opt,name=class,proto3,oneof" json:"class,omitempty"`
 	Type              *string                `protobuf:"bytes,5,opt,name=type,proto3,oneof" json:"type,omitempty"`
 	RateTenge         *int32                 `protobuf:"varint,6,opt,name=rate_tenge,json=rateTenge,proto3,oneof" json:"rate_tenge,omitempty"`
@@ -458,13 +441,6 @@ func (x *UpdatePricingRuleRequest) GetId() string {
 func (x *UpdatePricingRuleRequest) GetModelId() string {
 	if x != nil && x.ModelId != nil {
 		return *x.ModelId
-	}
-	return ""
-}
-
-func (x *UpdatePricingRuleRequest) GetZoneId() string {
-	if x != nil && x.ZoneId != nil {
-		return *x.ZoneId
 	}
 	return ""
 }
@@ -580,23 +556,20 @@ var File_service_booking_pricing_rule_proto protoreflect.FileDescriptor
 
 const file_service_booking_pricing_rule_proto_rawDesc = "" +
 	"\n" +
-	"\"service/booking/pricing_rule.proto\x12\x0fservice.booking\x1a\x1fbase/booking/pricing_rule.proto\x1a\x11base/common.proto\x1a\x1bgoogle/protobuf/empty.proto\"\x9b\x04\n" +
+	"\"service/booking/pricing_rule.proto\x12\x0fservice.booking\x1a\x1fbase/booking/pricing_rule.proto\x1a\x11base/common.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xf1\x03\n" +
 	"\x18CreatePricingRuleRequest\x12\x1e\n" +
-	"\bmodel_id\x18\x01 \x01(\tH\x00R\amodelId\x88\x01\x01\x12\x1c\n" +
-	"\azone_id\x18\x02 \x01(\tH\x01R\x06zoneId\x88\x01\x01\x12\x19\n" +
-	"\x05class\x18\x03 \x01(\tH\x02R\x05class\x88\x01\x01\x12\x12\n" +
+	"\bmodel_id\x18\x01 \x01(\tH\x00R\amodelId\x88\x01\x01\x12\x19\n" +
+	"\x05class\x18\x03 \x01(\tH\x01R\x05class\x88\x01\x01\x12\x12\n" +
 	"\x04type\x18\x04 \x01(\tR\x04type\x12\x1d\n" +
 	"\n" +
 	"rate_tenge\x18\x05 \x01(\x05R\trateTenge\x12.\n" +
-	"\x11rate_per_km_tenge\x18\x06 \x01(\x05H\x03R\x0eratePerKmTenge\x88\x01\x01\x12&\n" +
-	"\ffree_minutes\x18\a \x01(\x05H\x04R\vfreeMinutes\x88\x01\x01\x12-\n" +
-	"\x10min_charge_tenge\x18\b \x01(\x05H\x05R\x0eminChargeTenge\x88\x01\x01\x12,\n" +
-	"\x0fovertime_policy\x18\t \x01(\tH\x06R\x0eovertimePolicy\x88\x01\x01\x123\n" +
+	"\x11rate_per_km_tenge\x18\x06 \x01(\x05H\x02R\x0eratePerKmTenge\x88\x01\x01\x12&\n" +
+	"\ffree_minutes\x18\a \x01(\x05H\x03R\vfreeMinutes\x88\x01\x01\x12-\n" +
+	"\x10min_charge_tenge\x18\b \x01(\x05H\x04R\x0eminChargeTenge\x88\x01\x01\x12,\n" +
+	"\x0fovertime_policy\x18\t \x01(\tH\x05R\x0eovertimePolicy\x88\x01\x01\x123\n" +
 	"\x13overtime_rate_tenge\x18\n" +
-	" \x01(\x05H\aR\x11overtimeRateTenge\x88\x01\x01B\v\n" +
-	"\t_model_idB\n" +
-	"\n" +
-	"\b_zone_idB\b\n" +
+	" \x01(\x05H\x06R\x11overtimeRateTenge\x88\x01\x01B\v\n" +
+	"\t_model_idB\b\n" +
 	"\x06_classB\x14\n" +
 	"\x12_rate_per_km_tengeB\x0f\n" +
 	"\r_free_minutesB\x13\n" +
@@ -608,45 +581,38 @@ const file_service_booking_pricing_rule_proto_rawDesc = "" +
 	"\x15GetPricingRuleRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"G\n" +
 	"\x16GetPricingRuleResponse\x12-\n" +
-	"\x04rule\x18\x01 \x01(\v2\x19.base.booking.PricingRuleR\x04rule\"\xad\x02\n" +
+	"\x04rule\x18\x01 \x01(\v2\x19.base.booking.PricingRuleR\x04rule\"\x83\x02\n" +
 	"\x17ListPricingRulesRequest\x12\x1e\n" +
-	"\bmodel_id\x18\x01 \x01(\tH\x00R\amodelId\x88\x01\x01\x12\x1c\n" +
-	"\azone_id\x18\x02 \x01(\tH\x01R\x06zoneId\x88\x01\x01\x12\x19\n" +
-	"\x05class\x18\x03 \x01(\tH\x02R\x05class\x88\x01\x01\x12\x17\n" +
-	"\x04type\x18\x04 \x01(\tH\x03R\x04type\x88\x01\x01\x12 \n" +
-	"\tis_active\x18\x05 \x01(\bH\x04R\bisActive\x88\x01\x01\x125\n" +
+	"\bmodel_id\x18\x01 \x01(\tH\x00R\amodelId\x88\x01\x01\x12\x19\n" +
+	"\x05class\x18\x03 \x01(\tH\x01R\x05class\x88\x01\x01\x12\x17\n" +
+	"\x04type\x18\x04 \x01(\tH\x02R\x04type\x88\x01\x01\x12 \n" +
+	"\tis_active\x18\x05 \x01(\bH\x03R\bisActive\x88\x01\x01\x125\n" +
 	"\n" +
-	"pagination\x18\x06 \x01(\v2\x10.base.PaginationH\x05R\n" +
+	"pagination\x18\x06 \x01(\v2\x10.base.PaginationH\x04R\n" +
 	"pagination\x88\x01\x01B\v\n" +
-	"\t_model_idB\n" +
-	"\n" +
-	"\b_zone_idB\b\n" +
+	"\t_model_idB\b\n" +
 	"\x06_classB\a\n" +
 	"\x05_typeB\f\n" +
 	"\n" +
 	"_is_activeB\r\n" +
 	"\v_pagination\"K\n" +
 	"\x18ListPricingRulesResponse\x12/\n" +
-	"\x05rules\x18\x01 \x03(\v2\x19.base.booking.PricingRuleR\x05rules\"\xfd\x04\n" +
+	"\x05rules\x18\x01 \x03(\v2\x19.base.booking.PricingRuleR\x05rules\"\xd3\x04\n" +
 	"\x18UpdatePricingRuleRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
-	"\bmodel_id\x18\x02 \x01(\tH\x00R\amodelId\x88\x01\x01\x12\x1c\n" +
-	"\azone_id\x18\x03 \x01(\tH\x01R\x06zoneId\x88\x01\x01\x12\x19\n" +
-	"\x05class\x18\x04 \x01(\tH\x02R\x05class\x88\x01\x01\x12\x17\n" +
-	"\x04type\x18\x05 \x01(\tH\x03R\x04type\x88\x01\x01\x12\"\n" +
+	"\bmodel_id\x18\x02 \x01(\tH\x00R\amodelId\x88\x01\x01\x12\x19\n" +
+	"\x05class\x18\x04 \x01(\tH\x01R\x05class\x88\x01\x01\x12\x17\n" +
+	"\x04type\x18\x05 \x01(\tH\x02R\x04type\x88\x01\x01\x12\"\n" +
 	"\n" +
-	"rate_tenge\x18\x06 \x01(\x05H\x04R\trateTenge\x88\x01\x01\x12.\n" +
-	"\x11rate_per_km_tenge\x18\a \x01(\x05H\x05R\x0eratePerKmTenge\x88\x01\x01\x12&\n" +
-	"\ffree_minutes\x18\b \x01(\x05H\x06R\vfreeMinutes\x88\x01\x01\x12-\n" +
-	"\x10min_charge_tenge\x18\t \x01(\x05H\aR\x0eminChargeTenge\x88\x01\x01\x12,\n" +
+	"rate_tenge\x18\x06 \x01(\x05H\x03R\trateTenge\x88\x01\x01\x12.\n" +
+	"\x11rate_per_km_tenge\x18\a \x01(\x05H\x04R\x0eratePerKmTenge\x88\x01\x01\x12&\n" +
+	"\ffree_minutes\x18\b \x01(\x05H\x05R\vfreeMinutes\x88\x01\x01\x12-\n" +
+	"\x10min_charge_tenge\x18\t \x01(\x05H\x06R\x0eminChargeTenge\x88\x01\x01\x12,\n" +
 	"\x0fovertime_policy\x18\n" +
-	" \x01(\tH\bR\x0eovertimePolicy\x88\x01\x01\x123\n" +
-	"\x13overtime_rate_tenge\x18\v \x01(\x05H\tR\x11overtimeRateTenge\x88\x01\x01\x12 \n" +
-	"\tis_active\x18\f \x01(\bH\n" +
-	"R\bisActive\x88\x01\x01B\v\n" +
-	"\t_model_idB\n" +
-	"\n" +
-	"\b_zone_idB\b\n" +
+	" \x01(\tH\aR\x0eovertimePolicy\x88\x01\x01\x123\n" +
+	"\x13overtime_rate_tenge\x18\v \x01(\x05H\bR\x11overtimeRateTenge\x88\x01\x01\x12 \n" +
+	"\tis_active\x18\f \x01(\bH\tR\bisActive\x88\x01\x01B\v\n" +
+	"\t_model_idB\b\n" +
 	"\x06_classB\a\n" +
 	"\x05_typeB\r\n" +
 	"\v_rate_tengeB\x14\n" +

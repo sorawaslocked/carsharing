@@ -39,7 +39,6 @@ type CreateCarRequest struct {
 	FuelLevel        *float32               `protobuf:"fixed32,9,opt,name=fuel_level,json=fuelLevel,proto3,oneof" json:"fuel_level,omitempty"`
 	BatteryLevel     *float32               `protobuf:"fixed32,10,opt,name=battery_level,json=batteryLevel,proto3,oneof" json:"battery_level,omitempty"`
 	Location         *base.Location         `protobuf:"bytes,11,opt,name=location,proto3,oneof" json:"location,omitempty"`
-	ZoneId           *string                `protobuf:"bytes,12,opt,name=zone_id,json=zoneId,proto3,oneof" json:"zone_id,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -149,13 +148,6 @@ func (x *CreateCarRequest) GetLocation() *base.Location {
 		return x.Location
 	}
 	return nil
-}
-
-func (x *CreateCarRequest) GetZoneId() string {
-	if x != nil && x.ZoneId != nil {
-		return *x.ZoneId
-	}
-	return ""
 }
 
 type CreateCarResponse struct {
@@ -302,7 +294,6 @@ type ListCarsRequest struct {
 	Location      *base.Location         `protobuf:"bytes,8,opt,name=location,proto3,oneof" json:"location,omitempty"`
 	RadiusM       *int32                 `protobuf:"varint,9,opt,name=radius_m,json=radiusM,proto3,oneof" json:"radius_m,omitempty"`
 	MinFuelLevel  *float32               `protobuf:"fixed32,10,opt,name=min_fuel_level,json=minFuelLevel,proto3,oneof" json:"min_fuel_level,omitempty"`
-	ZoneId        *string                `protobuf:"bytes,11,opt,name=zone_id,json=zoneId,proto3,oneof" json:"zone_id,omitempty"`
 	Status        *string                `protobuf:"bytes,12,opt,name=status,proto3,oneof" json:"status,omitempty"`
 	IsRetired     *bool                  `protobuf:"varint,13,opt,name=is_retired,json=isRetired,proto3,oneof" json:"is_retired,omitempty"`
 	Pagination    *base.Pagination       `protobuf:"bytes,14,opt,name=pagination,proto3,oneof" json:"pagination,omitempty"`
@@ -410,13 +401,6 @@ func (x *ListCarsRequest) GetMinFuelLevel() float32 {
 	return 0
 }
 
-func (x *ListCarsRequest) GetZoneId() string {
-	if x != nil && x.ZoneId != nil {
-		return *x.ZoneId
-	}
-	return ""
-}
-
 func (x *ListCarsRequest) GetStatus() string {
 	if x != nil && x.Status != nil {
 		return *x.Status
@@ -489,7 +473,6 @@ type UpdateCarRequest struct {
 	LicensePlate  *string                `protobuf:"bytes,3,opt,name=license_plate,json=licensePlate,proto3,oneof" json:"license_plate,omitempty"`
 	Color         *string                `protobuf:"bytes,4,opt,name=color,proto3,oneof" json:"color,omitempty"`
 	TelemetryId   *string                `protobuf:"bytes,5,opt,name=telemetry_id,json=telemetryId,proto3,oneof" json:"telemetry_id,omitempty"`
-	ZoneId        *string                `protobuf:"bytes,6,opt,name=zone_id,json=zoneId,proto3,oneof" json:"zone_id,omitempty"`
 	IsRetired     *bool                  `protobuf:"varint,7,opt,name=is_retired,json=isRetired,proto3,oneof" json:"is_retired,omitempty"`
 	Notes         *string                `protobuf:"bytes,8,opt,name=notes,proto3,oneof" json:"notes,omitempty"`
 	ImageKeys     []string               `protobuf:"bytes,9,rep,name=image_keys,json=imageKeys,proto3" json:"image_keys,omitempty"`
@@ -558,13 +541,6 @@ func (x *UpdateCarRequest) GetColor() string {
 func (x *UpdateCarRequest) GetTelemetryId() string {
 	if x != nil && x.TelemetryId != nil {
 		return *x.TelemetryId
-	}
-	return ""
-}
-
-func (x *UpdateCarRequest) GetZoneId() string {
-	if x != nil && x.ZoneId != nil {
-		return *x.ZoneId
 	}
 	return ""
 }
@@ -1066,7 +1042,7 @@ var File_service_car_car_proto protoreflect.FileDescriptor
 
 const file_service_car_car_proto_rawDesc = "" +
 	"\n" +
-	"\x15service/car/car.proto\x12\vservice.car\x1a\x12base/car/car.proto\x1a\x11base/common.proto\x1a\x14service/common.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xf9\x03\n" +
+	"\x15service/car/car.proto\x12\vservice.car\x1a\x12base/car/car.proto\x1a\x11base/common.proto\x1a\x14service/common.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xcf\x03\n" +
 	"\x10CreateCarRequest\x12\x19\n" +
 	"\bmodel_id\x18\x01 \x01(\tR\amodelId\x12\x10\n" +
 	"\x03vin\x18\x02 \x01(\tR\x03vin\x12#\n" +
@@ -1081,21 +1057,18 @@ const file_service_car_car_proto_rawDesc = "" +
 	"fuel_level\x18\t \x01(\x02H\x02R\tfuelLevel\x88\x01\x01\x12(\n" +
 	"\rbattery_level\x18\n" +
 	" \x01(\x02H\x03R\fbatteryLevel\x88\x01\x01\x12/\n" +
-	"\blocation\x18\v \x01(\v2\x0e.base.LocationH\x04R\blocation\x88\x01\x01\x12\x1c\n" +
-	"\azone_id\x18\f \x01(\tH\x05R\x06zoneId\x88\x01\x01B\b\n" +
+	"\blocation\x18\v \x01(\v2\x0e.base.LocationH\x04R\blocation\x88\x01\x01B\b\n" +
 	"\x06_notesB\r\n" +
 	"\v_mileage_kmB\r\n" +
 	"\v_fuel_levelB\x10\n" +
 	"\x0e_battery_levelB\v\n" +
-	"\t_locationB\n" +
-	"\n" +
-	"\b_zone_id\"#\n" +
+	"\t_location\"#\n" +
 	"\x11CreateCarResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"\x1f\n" +
 	"\rGetCarRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"1\n" +
 	"\x0eGetCarResponse\x12\x1f\n" +
-	"\x03car\x18\x01 \x01(\v2\r.base.car.CarR\x03car\"\xbe\x05\n" +
+	"\x03car\x18\x01 \x01(\v2\r.base.car.CarR\x03car\"\x94\x05\n" +
 	"\x0fListCarsRequest\x12\x19\n" +
 	"\x05brand\x18\x01 \x01(\tH\x00R\x05brand\x88\x01\x01\x12\x19\n" +
 	"\x05model\x18\x02 \x01(\tH\x01R\x05model\x88\x01\x01\x12 \n" +
@@ -1107,14 +1080,13 @@ const file_service_car_car_proto_rawDesc = "" +
 	"\blocation\x18\b \x01(\v2\x0e.base.LocationH\aR\blocation\x88\x01\x01\x12\x1e\n" +
 	"\bradius_m\x18\t \x01(\x05H\bR\aradiusM\x88\x01\x01\x12)\n" +
 	"\x0emin_fuel_level\x18\n" +
-	" \x01(\x02H\tR\fminFuelLevel\x88\x01\x01\x12\x1c\n" +
-	"\azone_id\x18\v \x01(\tH\n" +
-	"R\x06zoneId\x88\x01\x01\x12\x1b\n" +
-	"\x06status\x18\f \x01(\tH\vR\x06status\x88\x01\x01\x12\"\n" +
+	" \x01(\x02H\tR\fminFuelLevel\x88\x01\x01\x12\x1b\n" +
+	"\x06status\x18\f \x01(\tH\n" +
+	"R\x06status\x88\x01\x01\x12\"\n" +
 	"\n" +
-	"is_retired\x18\r \x01(\bH\fR\tisRetired\x88\x01\x01\x125\n" +
+	"is_retired\x18\r \x01(\bH\vR\tisRetired\x88\x01\x01\x125\n" +
 	"\n" +
-	"pagination\x18\x0e \x01(\v2\x10.base.PaginationH\rR\n" +
+	"pagination\x18\x0e \x01(\v2\x10.base.PaginationH\fR\n" +
 	"pagination\x88\x01\x01B\b\n" +
 	"\x06_brandB\b\n" +
 	"\x06_modelB\f\n" +
@@ -1128,32 +1100,27 @@ const file_service_car_car_proto_rawDesc = "" +
 	"_min_seatsB\v\n" +
 	"\t_locationB\v\n" +
 	"\t_radius_mB\x11\n" +
-	"\x0f_min_fuel_levelB\n" +
-	"\n" +
-	"\b_zone_idB\t\n" +
+	"\x0f_min_fuel_levelB\t\n" +
 	"\a_statusB\r\n" +
 	"\v_is_retiredB\r\n" +
 	"\v_pagination\"5\n" +
 	"\x10ListCarsResponse\x12!\n" +
-	"\x04cars\x18\x01 \x03(\v2\r.base.car.CarR\x04cars\"\x8a\x03\n" +
+	"\x04cars\x18\x01 \x03(\v2\r.base.car.CarR\x04cars\"\xe0\x02\n" +
 	"\x10UpdateCarRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\bmodel_id\x18\x02 \x01(\tH\x00R\amodelId\x88\x01\x01\x12(\n" +
 	"\rlicense_plate\x18\x03 \x01(\tH\x01R\flicensePlate\x88\x01\x01\x12\x19\n" +
 	"\x05color\x18\x04 \x01(\tH\x02R\x05color\x88\x01\x01\x12&\n" +
-	"\ftelemetry_id\x18\x05 \x01(\tH\x03R\vtelemetryId\x88\x01\x01\x12\x1c\n" +
-	"\azone_id\x18\x06 \x01(\tH\x04R\x06zoneId\x88\x01\x01\x12\"\n" +
+	"\ftelemetry_id\x18\x05 \x01(\tH\x03R\vtelemetryId\x88\x01\x01\x12\"\n" +
 	"\n" +
-	"is_retired\x18\a \x01(\bH\x05R\tisRetired\x88\x01\x01\x12\x19\n" +
-	"\x05notes\x18\b \x01(\tH\x06R\x05notes\x88\x01\x01\x12\x1d\n" +
+	"is_retired\x18\a \x01(\bH\x04R\tisRetired\x88\x01\x01\x12\x19\n" +
+	"\x05notes\x18\b \x01(\tH\x05R\x05notes\x88\x01\x01\x12\x1d\n" +
 	"\n" +
 	"image_keys\x18\t \x03(\tR\timageKeysB\v\n" +
 	"\t_model_idB\x10\n" +
 	"\x0e_license_plateB\b\n" +
 	"\x06_colorB\x0f\n" +
-	"\r_telemetry_idB\n" +
-	"\n" +
-	"\b_zone_idB\r\n" +
+	"\r_telemetry_idB\r\n" +
 	"\v_is_retiredB\b\n" +
 	"\x06_notes\"\xd8\x02\n" +
 	"\x19UpdateCarTelemetryRequest\x12\x0e\n" +

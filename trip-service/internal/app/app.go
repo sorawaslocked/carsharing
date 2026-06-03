@@ -88,9 +88,10 @@ func New(log *slog.Logger, cfg config.Config) (*App, error) {
 
 	bookingClient := client.NewBookingClient(log, bookingConn)
 	telematicsClient := client.NewTelematicsClient(log, carConn, streamConn)
+	zoneClient := client.NewZoneClient(log, carConn)
 	publisher := natspub.NewPublisher(log, nc)
 
-	tripSvc := service.NewTripService(log, validate, transactor, tripRepo, summaryRepo, statusRepo, bookingClient, telematicsClient, publisher)
+	tripSvc := service.NewTripService(log, validate, transactor, tripRepo, summaryRepo, statusRepo, bookingClient, telematicsClient, zoneClient, publisher)
 
 	tripHandler := handler.NewTripHandler(log, tripSvc)
 	streamHandler := handler.NewTripStreamHandler(log, tripSvc)

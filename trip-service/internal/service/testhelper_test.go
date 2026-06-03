@@ -31,6 +31,7 @@ type deps struct {
 	statusRepo  *mocks.MockTripStatusReadingRepository
 	booking     *mocks.MockBookingClient
 	telematics  *mocks.MockTelematicsClient
+	zonePricing *mocks.MockZonePricingClient
 	publisher   *mocks.MockEventPublisher
 }
 
@@ -42,6 +43,7 @@ func newDeps(t *testing.T) *deps {
 		statusRepo:  mocks.NewMockTripStatusReadingRepository(t),
 		booking:     mocks.NewMockBookingClient(t),
 		telematics:  mocks.NewMockTelematicsClient(t),
+		zonePricing: mocks.NewMockZonePricingClient(t),
 		publisher:   mocks.NewMockEventPublisher(t),
 	}
 }
@@ -65,6 +67,7 @@ func newService(t *testing.T, d *deps) *service.TripService {
 		d.statusRepo,
 		d.booking,
 		d.telematics,
+		d.zonePricing,
 		d.publisher,
 	)
 }

@@ -269,6 +269,7 @@ func TestTripService_EndTrip_Success(t *testing.T) {
 	d.tripRepo.EXPECT().GetByID(mock.Anything, testTripID).Return(trip, nil)
 	d.telematics.EXPECT().GetLatestTelemetry(mock.Anything, testCarID).Return(tel, nil)
 	d.booking.EXPECT().GetBooking(mock.Anything, testBookingID).Return(booking, nil)
+	d.zonePricing.EXPECT().GetZonePricing(mock.Anything, tel.Location.Latitude, tel.Location.Longitude).Return(int32(0), nil)
 	d.tripRepo.EXPECT().Update(mock.Anything, testTripID, mock.MatchedBy(func(u model.TripUpdate) bool {
 		return u.Status != nil && *u.Status == model.TripStatusCompleted
 	})).Return(updated, nil)
@@ -279,6 +280,43 @@ func TestTripService_EndTrip_Success(t *testing.T) {
 	err := svc.EndTrip(ctx, testTripID)
 
 	require.NoError(t, err)
+}
+
+func TestTripService_EndTrip_ZoneInNoDropZone(t *testing.T) {
+	d := newDeps(t)
+	svc := newService(t, d)
+	ctx := ctxOwner(testUserID)
+	trip := sampleActiveTrip()
+	tel := sampleTelemetry()
+	booking := sampleBooking()
+
+	d.tripRepo.EXPECT().GetByID(mock.Anything, testTripID).Return(trip, nil)
+	d.telematics.EXPECT().GetLatestTelemetry(mock.Anything, testCarID).Return(tel, nil)
+	d.booking.EXPECT().GetBooking(mock.Anything, testBookingID).Return(booking, nil)
+	d.zonePricing.EXPECT().GetZonePricing(mock.Anything, tel.Location.Latitude, tel.Location.Longitude).Return(int32(0), model.ErrLocationInNoDropZone)
+
+	err := svc.EndTrip(ctx, testTripID)
+
+	assert.ErrorIs(t, err, model.ErrLocationInNoDropZone)
+}
+
+func TestTripService_EndTrip_ZonePricingError(t *testing.T) {
+	d := newDeps(t)
+	svc := newService(t, d)
+	ctx := ctxOwner(testUserID)
+	trip := sampleActiveTrip()
+	tel := sampleTelemetry()
+	booking := sampleBooking()
+	infraErr := errors.New("car service unavailable")
+
+	d.tripRepo.EXPECT().GetByID(mock.Anything, testTripID).Return(trip, nil)
+	d.telematics.EXPECT().GetLatestTelemetry(mock.Anything, testCarID).Return(tel, nil)
+	d.booking.EXPECT().GetBooking(mock.Anything, testBookingID).Return(booking, nil)
+	d.zonePricing.EXPECT().GetZonePricing(mock.Anything, tel.Location.Latitude, tel.Location.Longitude).Return(int32(0), infraErr)
+
+	err := svc.EndTrip(ctx, testTripID)
+
+	assert.ErrorIs(t, err, infraErr)
 }
 
 func TestTripService_EndTrip_InvalidID(t *testing.T) {
@@ -357,6 +395,7 @@ func TestTripService_EndTrip_PublishFailureIsNonFatal(t *testing.T) {
 	d.tripRepo.EXPECT().GetByID(mock.Anything, testTripID).Return(trip, nil)
 	d.telematics.EXPECT().GetLatestTelemetry(mock.Anything, testCarID).Return(tel, nil)
 	d.booking.EXPECT().GetBooking(mock.Anything, testBookingID).Return(booking, nil)
+	d.zonePricing.EXPECT().GetZonePricing(mock.Anything, tel.Location.Latitude, tel.Location.Longitude).Return(int32(0), nil)
 	d.tripRepo.EXPECT().Update(mock.Anything, testTripID, mock.Anything).Return(updated, nil)
 	d.statusRepo.EXPECT().Create(mock.Anything, mock.Anything).Return(model.TripStatusReading{}, nil)
 	d.summaryRepo.EXPECT().Create(mock.Anything, mock.Anything).Return(model.TripSummary{}, nil)
@@ -693,6 +732,7 @@ func TestTripService_EndTrip_Conflict(t *testing.T) {
 	d.tripRepo.EXPECT().GetByID(mock.Anything, testTripID).Return(trip, nil)
 	d.telematics.EXPECT().GetLatestTelemetry(mock.Anything, testCarID).Return(tel, nil)
 	d.booking.EXPECT().GetBooking(mock.Anything, testBookingID).Return(booking, nil)
+	d.zonePricing.EXPECT().GetZonePricing(mock.Anything, tel.Location.Latitude, tel.Location.Longitude).Return(int32(0), nil)
 	d.tripRepo.EXPECT().Update(mock.Anything, testTripID, mock.Anything).Return(model.Trip{}, model.ErrConflict)
 
 	err := svc.EndTrip(ctx, testTripID)

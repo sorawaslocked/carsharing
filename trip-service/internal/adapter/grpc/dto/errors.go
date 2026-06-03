@@ -31,7 +31,8 @@ func ToStatusError(err error) error {
 	case errors.Is(err, model.ErrBookingNotCreated),
 		errors.Is(err, model.ErrInvalidTripStatusTransition),
 		errors.Is(err, model.ErrTripNotActive),
-		errors.Is(err, model.ErrTripNotCompleted):
+		errors.Is(err, model.ErrTripNotCompleted),
+		errors.Is(err, model.ErrLocationInNoDropZone):
 		return status.Error(codes.FailedPrecondition, err.Error())
 	default:
 		return status.Error(codes.Internal, "internal server error")

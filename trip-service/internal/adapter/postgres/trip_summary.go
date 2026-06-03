@@ -38,14 +38,14 @@ func (r *TripSummaryRepo) Create(ctx context.Context, s model.TripSummaryCreate)
 		INSERT INTO trip_summaries (
 			trip_id, booking_id, started_at, ended_at,
 			duration_seconds, distance_traveled_km, pricing_snapshot,
-			base_cost_tenge, distance_cost_tenge, overtime_cost_tenge, total_cost_tenge
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+			base_cost_tenge, distance_cost_tenge, overtime_cost_tenge, zone_fee_adjustment_tenge, total_cost_tenge
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 		RETURNING %s`, dto.TripSummaryColumns)
 
 	summary, err := dto.ScanTripSummary(dbFromCtx(ctx, r.pool).QueryRow(ctx, q,
 		s.TripID, s.BookingID, s.StartedAt, s.EndedAt,
 		s.DurationSeconds, s.DistanceTraveledKM, snapJSON,
-		s.BaseCostTenge, s.DistanceCostTenge, s.OvertimeCostTenge, s.TotalCostTenge,
+		s.BaseCostTenge, s.DistanceCostTenge, s.OvertimeCostTenge, s.ZoneFeeAdjustmentTenge, s.TotalCostTenge,
 	))
 	if err != nil {
 		return model.TripSummary{}, mapSQLError(log, err, "creating trip summary")

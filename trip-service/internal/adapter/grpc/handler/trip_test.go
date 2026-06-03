@@ -17,6 +17,7 @@ import (
 
 	tripsvc "carsharing/protos/gen/service/trip"
 
+	sharedmodel "carsharing/shared/model"
 	"carsharing/trip-service/internal/adapter/grpc/handler"
 	handlermocks "carsharing/trip-service/internal/adapter/grpc/handler/mocks"
 	"carsharing/trip-service/internal/model"
@@ -59,6 +60,11 @@ func (f *fakeServerStream) SendHeader(metadata.MD) error { return nil }
 func (f *fakeServerStream) SetTrailer(metadata.MD)       {}
 func (f *fakeServerStream) SendMsg(interface{}) error    { return nil }
 func (f *fakeServerStream) RecvMsg(interface{}) error    { return nil }
+
+func adminCtx() context.Context {
+	ctx := context.Background()
+	return context.WithValue(ctx, "x-user-roles", []sharedmodel.Role{sharedmodel.RoleAdmin})
+}
 
 // ── TripHandler ───────────────────────────────────────────────────────────────
 
@@ -300,8 +306,9 @@ func TestTripHandler_GetTripStatusHistory_PermissionDenied(t *testing.T) {
 func TestTripStreamHandler_StreamTripLiveFeed_Success(t *testing.T) {
 	svc := handlermocks.NewMockTripService(t)
 	h := handler.NewTripStreamHandler(discardLogger(), svc)
-	stream := &fakeServerStream{ctx: context.Background()}
+	stream := &fakeServerStream{ctx: adminCtx()}
 
+	svc.EXPECT().GetTrip(mock.Anything, "trip-1").Return(sampleTrip(), nil)
 	svc.EXPECT().
 		StreamTripLiveFeed(mock.Anything, "trip-1", mock.Anything).
 		Run(func(ctx context.Context, tripID string, send func(model.TripLiveFeed) error) {
@@ -320,8 +327,9 @@ func TestTripStreamHandler_StreamTripLiveFeed_Success(t *testing.T) {
 func TestTripStreamHandler_StreamTripLiveFeed_EOFIsCleanClose(t *testing.T) {
 	svc := handlermocks.NewMockTripService(t)
 	h := handler.NewTripStreamHandler(discardLogger(), svc)
-	stream := &fakeServerStream{ctx: context.Background()}
+	stream := &fakeServerStream{ctx: adminCtx()}
 
+	svc.EXPECT().GetTrip(mock.Anything, "trip-1").Return(sampleTrip(), nil)
 	svc.EXPECT().StreamTripLiveFeed(mock.Anything, "trip-1", mock.Anything).Return(io.EOF)
 
 	err := h.StreamTripLiveFeed(&tripsvc.StreamTripLiveFeedRequest{TripId: "trip-1"}, stream)
@@ -332,8 +340,9 @@ func TestTripStreamHandler_StreamTripLiveFeed_EOFIsCleanClose(t *testing.T) {
 func TestTripStreamHandler_StreamTripLiveFeed_ServiceError(t *testing.T) {
 	svc := handlermocks.NewMockTripService(t)
 	h := handler.NewTripStreamHandler(discardLogger(), svc)
-	stream := &fakeServerStream{ctx: context.Background()}
+	stream := &fakeServerStream{ctx: adminCtx()}
 
+	svc.EXPECT().GetTrip(mock.Anything, "trip-1").Return(sampleTrip(), nil)
 	svc.EXPECT().StreamTripLiveFeed(mock.Anything, "trip-1", mock.Anything).Return(model.ErrTripNotActive)
 
 	err := h.StreamTripLiveFeed(&tripsvc.StreamTripLiveFeedRequest{TripId: "trip-1"}, stream)

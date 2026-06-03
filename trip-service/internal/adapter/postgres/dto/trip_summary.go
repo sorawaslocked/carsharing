@@ -11,7 +11,7 @@ import (
 const TripSummaryColumns = `
 	trip_id, booking_id, started_at, ended_at,
 	duration_seconds, distance_traveled_km, pricing_snapshot,
-	base_cost_tenge, distance_cost_tenge, overtime_cost_tenge, total_cost_tenge`
+	base_cost_tenge, distance_cost_tenge, overtime_cost_tenge, zone_fee_adjustment_tenge, total_cost_tenge`
 
 type pricingSnapshotJSON struct {
 	RateTenge         int32   `json:"rate_tenge"`
@@ -49,17 +49,18 @@ func unmarshalPricingSnapshot(data []byte) (model.PricingSnapshot, error) {
 }
 
 type tripSummaryRow struct {
-	TripID             string
-	BookingID          string
-	StartedAt          time.Time
-	EndedAt            time.Time
-	DurationSeconds    int64
-	DistanceTraveledKM float64
-	PricingSnapshot    []byte
-	BaseCostTenge      int32
-	DistanceCostTenge  int32
-	OvertimeCostTenge  int32
-	TotalCostTenge     int32
+	TripID                 string
+	BookingID              string
+	StartedAt              time.Time
+	EndedAt                time.Time
+	DurationSeconds        int64
+	DistanceTraveledKM     float64
+	PricingSnapshot        []byte
+	BaseCostTenge          int32
+	DistanceCostTenge      int32
+	OvertimeCostTenge      int32
+	ZoneFeeAdjustmentTenge int32
+	TotalCostTenge         int32
 }
 
 func ScanTripSummary(s scanner) (model.TripSummary, error) {
@@ -67,7 +68,7 @@ func ScanTripSummary(s scanner) (model.TripSummary, error) {
 	err := s.Scan(
 		&r.TripID, &r.BookingID, &r.StartedAt, &r.EndedAt,
 		&r.DurationSeconds, &r.DistanceTraveledKM, &r.PricingSnapshot,
-		&r.BaseCostTenge, &r.DistanceCostTenge, &r.OvertimeCostTenge, &r.TotalCostTenge,
+		&r.BaseCostTenge, &r.DistanceCostTenge, &r.OvertimeCostTenge, &r.ZoneFeeAdjustmentTenge, &r.TotalCostTenge,
 	)
 	if err != nil {
 		return model.TripSummary{}, err
@@ -79,16 +80,17 @@ func ScanTripSummary(s scanner) (model.TripSummary, error) {
 	}
 
 	return model.TripSummary{
-		TripID:             r.TripID,
-		BookingID:          r.BookingID,
-		StartedAt:          r.StartedAt,
-		EndedAt:            r.EndedAt,
-		DurationSeconds:    r.DurationSeconds,
-		DistanceTraveledKM: r.DistanceTraveledKM,
-		PricingSnapshot:    ps,
-		BaseCostTenge:      r.BaseCostTenge,
-		DistanceCostTenge:  r.DistanceCostTenge,
-		OvertimeCostTenge:  r.OvertimeCostTenge,
-		TotalCostTenge:     r.TotalCostTenge,
+		TripID:                 r.TripID,
+		BookingID:              r.BookingID,
+		StartedAt:              r.StartedAt,
+		EndedAt:                r.EndedAt,
+		DurationSeconds:        r.DurationSeconds,
+		DistanceTraveledKM:     r.DistanceTraveledKM,
+		PricingSnapshot:        ps,
+		BaseCostTenge:          r.BaseCostTenge,
+		DistanceCostTenge:      r.DistanceCostTenge,
+		OvertimeCostTenge:      r.OvertimeCostTenge,
+		ZoneFeeAdjustmentTenge: r.ZoneFeeAdjustmentTenge,
+		TotalCostTenge:         r.TotalCostTenge,
 	}, nil
 }

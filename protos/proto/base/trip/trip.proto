@@ -47,6 +47,7 @@ message TripSummary {
   int32 base_cost_tenge = 8;
   int32 distance_cost_tenge = 9;
   int32 overtime_cost_tenge = 10;
+  int32 zone_fee_adjustment_tenge = 12;
   int32 total_cost_tenge = 11;
 }
 

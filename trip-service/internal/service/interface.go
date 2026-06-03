@@ -36,6 +36,10 @@ type TelematicsClient interface {
 	StreamTelemetry(ctx context.Context, carID string, fn func(model.CarTelemetry) error) error
 }
 
+type ZonePricingClient interface {
+	GetZonePricing(ctx context.Context, lat, lng float64) (int32, error)
+}
+
 type EventPublisher interface {
 	PublishTripStarted(ctx context.Context, trip model.Trip) error
 	PublishTripEnded(ctx context.Context, trip model.Trip) error

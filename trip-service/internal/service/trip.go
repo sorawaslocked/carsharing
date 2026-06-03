@@ -27,6 +27,7 @@ type TripService struct {
 	statusRepo  TripStatusReadingRepository
 	booking     BookingClient
 	telematics  TelematicsClient
+	zonePricing ZonePricingClient
 	publisher   EventPublisher
 }
 
@@ -39,6 +40,7 @@ func NewTripService(
 	statusRepo TripStatusReadingRepository,
 	booking BookingClient,
 	telematics TelematicsClient,
+	zonePricing ZonePricingClient,
 	publisher EventPublisher,
 ) *TripService {
 	return &TripService{
@@ -50,6 +52,7 @@ func NewTripService(
 		statusRepo:  statusRepo,
 		booking:     booking,
 		telematics:  telematics,
+		zonePricing: zonePricing,
 		publisher:   publisher,
 	}
 }
@@ -214,14 +217,22 @@ func (s *TripService) EndTrip(ctx context.Context, id string) error {
 	durationSeconds := int64(now.Sub(trip.StartedAt).Seconds())
 	distanceKM := float64(telemetry.MileageKM - trip.StartMileageKM)
 
-	baseCost, distCost, overtimeCost := calculateCosts(booking.PricingSnapshot, booking.CommittedPeriods, durationSeconds, distanceKM)
-	totalCost := baseCost + distCost + overtimeCost
-
 	endLocation := sharedmodel.Location{
 		Latitude:  telemetry.Location.Latitude,
 		Longitude: telemetry.Location.Longitude,
 	}
 	endMileage := telemetry.MileageKM
+
+	feeAdjustment, err := s.zonePricing.GetZonePricing(ctx, endLocation.Latitude, endLocation.Longitude)
+	if err != nil {
+		if !errors.Is(err, model.ErrLocationInNoDropZone) {
+			log.Error("zone: getting zone pricing", pkglog.Err(err))
+		}
+		return err
+	}
+
+	baseCost, distCost, overtimeCost := calculateCosts(booking.PricingSnapshot, booking.CommittedPeriods, durationSeconds, distanceKM)
+	totalCost := baseCost + distCost + overtimeCost + feeAdjustment
 
 	actorID := trip.UserID
 	var updatedTrip model.Trip
@@ -253,17 +264,18 @@ func (s *TripService) EndTrip(ctx context.Context, id string) error {
 			return e
 		}
 		_, e = s.summaryRepo.Create(ctx, model.TripSummaryCreate{
-			TripID:             id,
-			BookingID:          trip.BookingID,
-			StartedAt:          trip.StartedAt,
-			EndedAt:            now,
-			DurationSeconds:    durationSeconds,
-			DistanceTraveledKM: distanceKM,
-			PricingSnapshot:    booking.PricingSnapshot,
-			BaseCostTenge:      baseCost,
-			DistanceCostTenge:  distCost,
-			OvertimeCostTenge:  overtimeCost,
-			TotalCostTenge:     totalCost,
+			TripID:                 id,
+			BookingID:              trip.BookingID,
+			StartedAt:              trip.StartedAt,
+			EndedAt:                now,
+			DurationSeconds:        durationSeconds,
+			DistanceTraveledKM:     distanceKM,
+			PricingSnapshot:        booking.PricingSnapshot,
+			BaseCostTenge:          baseCost,
+			DistanceCostTenge:      distCost,
+			OvertimeCostTenge:      overtimeCost,
+			ZoneFeeAdjustmentTenge: feeAdjustment,
+			TotalCostTenge:         totalCost,
 		})
 		return e
 	}); err != nil {

@@ -212,20 +212,21 @@ func (x *Trip) GetUpdatedAt() *timestamppb.Timestamp {
 }
 
 type TripSummary struct {
-	state              protoimpl.MessageState `protogen:"open.v1"`
-	TripId             string                 `protobuf:"bytes,1,opt,name=trip_id,json=tripId,proto3" json:"trip_id,omitempty"`
-	BookingId          string                 `protobuf:"bytes,2,opt,name=booking_id,json=bookingId,proto3" json:"booking_id,omitempty"`
-	StartedAt          *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
-	EndedAt            *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
-	DurationSeconds    int64                  `protobuf:"varint,5,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"`
-	DistanceTraveledKm float64                `protobuf:"fixed64,6,opt,name=distance_traveled_km,json=distanceTraveledKm,proto3" json:"distance_traveled_km,omitempty"`
-	PricingSnapshot    *base.PricingSnapshot  `protobuf:"bytes,7,opt,name=pricing_snapshot,json=pricingSnapshot,proto3" json:"pricing_snapshot,omitempty"`
-	BaseCostTenge      int32                  `protobuf:"varint,8,opt,name=base_cost_tenge,json=baseCostTenge,proto3" json:"base_cost_tenge,omitempty"`
-	DistanceCostTenge  int32                  `protobuf:"varint,9,opt,name=distance_cost_tenge,json=distanceCostTenge,proto3" json:"distance_cost_tenge,omitempty"`
-	OvertimeCostTenge  int32                  `protobuf:"varint,10,opt,name=overtime_cost_tenge,json=overtimeCostTenge,proto3" json:"overtime_cost_tenge,omitempty"`
-	TotalCostTenge     int32                  `protobuf:"varint,11,opt,name=total_cost_tenge,json=totalCostTenge,proto3" json:"total_cost_tenge,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"open.v1"`
+	TripId                 string                 `protobuf:"bytes,1,opt,name=trip_id,json=tripId,proto3" json:"trip_id,omitempty"`
+	BookingId              string                 `protobuf:"bytes,2,opt,name=booking_id,json=bookingId,proto3" json:"booking_id,omitempty"`
+	StartedAt              *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
+	EndedAt                *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
+	DurationSeconds        int64                  `protobuf:"varint,5,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"`
+	DistanceTraveledKm     float64                `protobuf:"fixed64,6,opt,name=distance_traveled_km,json=distanceTraveledKm,proto3" json:"distance_traveled_km,omitempty"`
+	PricingSnapshot        *base.PricingSnapshot  `protobuf:"bytes,7,opt,name=pricing_snapshot,json=pricingSnapshot,proto3" json:"pricing_snapshot,omitempty"`
+	BaseCostTenge          int32                  `protobuf:"varint,8,opt,name=base_cost_tenge,json=baseCostTenge,proto3" json:"base_cost_tenge,omitempty"`
+	DistanceCostTenge      int32                  `protobuf:"varint,9,opt,name=distance_cost_tenge,json=distanceCostTenge,proto3" json:"distance_cost_tenge,omitempty"`
+	OvertimeCostTenge      int32                  `protobuf:"varint,10,opt,name=overtime_cost_tenge,json=overtimeCostTenge,proto3" json:"overtime_cost_tenge,omitempty"`
+	ZoneFeeAdjustmentTenge int32                  `protobuf:"varint,12,opt,name=zone_fee_adjustment_tenge,json=zoneFeeAdjustmentTenge,proto3" json:"zone_fee_adjustment_tenge,omitempty"`
+	TotalCostTenge         int32                  `protobuf:"varint,11,opt,name=total_cost_tenge,json=totalCostTenge,proto3" json:"total_cost_tenge,omitempty"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *TripSummary) Reset() {
@@ -324,6 +325,13 @@ func (x *TripSummary) GetDistanceCostTenge() int32 {
 func (x *TripSummary) GetOvertimeCostTenge() int32 {
 	if x != nil {
 		return x.OvertimeCostTenge
+	}
+	return 0
+}
+
+func (x *TripSummary) GetZoneFeeAdjustmentTenge() int32 {
+	if x != nil {
+		return x.ZoneFeeAdjustmentTenge
 	}
 	return 0
 }
@@ -473,7 +481,7 @@ const file_base_trip_trip_proto_rawDesc = "" +
 	"\x15_distance_traveled_kmB\x13\n" +
 	"\x11_duration_secondsB\x13\n" +
 	"\x11_final_cost_tengeB\x10\n" +
-	"\x0e_cancel_reason\"\x88\x04\n" +
+	"\x0e_cancel_reason\"\xc3\x04\n" +
 	"\vTripSummary\x12\x17\n" +
 	"\atrip_id\x18\x01 \x01(\tR\x06tripId\x12\x1d\n" +
 	"\n" +
@@ -487,7 +495,8 @@ const file_base_trip_trip_proto_rawDesc = "" +
 	"\x0fbase_cost_tenge\x18\b \x01(\x05R\rbaseCostTenge\x12.\n" +
 	"\x13distance_cost_tenge\x18\t \x01(\x05R\x11distanceCostTenge\x12.\n" +
 	"\x13overtime_cost_tenge\x18\n" +
-	" \x01(\x05R\x11overtimeCostTenge\x12(\n" +
+	" \x01(\x05R\x11overtimeCostTenge\x129\n" +
+	"\x19zone_fee_adjustment_tenge\x18\f \x01(\x05R\x16zoneFeeAdjustmentTenge\x12(\n" +
 	"\x10total_cost_tenge\x18\v \x01(\x05R\x0etotalCostTenge\"\xa9\x02\n" +
 	"\x11TripStatusReading\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +

@@ -22,6 +22,9 @@ var (
 	ErrAlreadyExists           = errors.New("resource already exists")
 	ErrMileageRegression       = errors.New("incoming mileage value is lower than the current mileage")
 
+	// Zone business rule errors.
+	ErrLocationInNoDropZone = errors.New("location is within a no-drop zone")
+
 	// Entity-specific not-found errors.
 	ErrCarNotFound                    = errors.New("car not found")
 	ErrCarModelNotFound               = errors.New("car model not found")

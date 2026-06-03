@@ -74,3 +74,12 @@ func (h *ZoneHandler) DeleteZone(ctx context.Context, req *carsvc.DeleteZoneRequ
 
 	return &emptypb.Empty{}, nil
 }
+
+func (h *ZoneHandler) GetZonePricing(ctx context.Context, req *carsvc.GetZonePricingRequest) (*carsvc.GetZonePricingResponse, error) {
+	feeAdjustment, err := h.zoneService.GetZonePricing(ctx, dto.FromGetZonePricingRequest(req))
+	if err != nil {
+		return nil, dto.FromErrorToStatusCode(err)
+	}
+
+	return &carsvc.GetZonePricingResponse{FeeAdjustment: feeAdjustment}, nil
+}

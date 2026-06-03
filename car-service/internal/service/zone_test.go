@@ -174,6 +174,67 @@ func TestZoneServiceUpdate(t *testing.T) {
 	})
 }
 
+func TestZoneServiceGetZonePricing(t *testing.T) {
+	ctx := context.Background()
+	lat, lng := 51.1801, 71.4460
+
+	t.Run("no zone at location returns zero fee", func(t *testing.T) {
+		repo := mocks.NewMockZoneRepository(t)
+		svc := newTestZoneService(t, repo)
+
+		repo.EXPECT().FindByLocation(ctx, lat, lng).Return(nil, nil)
+
+		fee, err := svc.GetZonePricing(ctx, validation.ZoneGetPricing{Latitude: lat, Longitude: lng})
+		assert.NoError(t, err)
+		assert.Equal(t, int32(0), fee)
+	})
+
+	t.Run("operating zone returns fee adjustment", func(t *testing.T) {
+		repo := mocks.NewMockZoneRepository(t)
+		svc := newTestZoneService(t, repo)
+
+		zone := model.Zone{Type: model.ZoneTypeOperating, FeeAdjustment: 500}
+		repo.EXPECT().FindByLocation(ctx, lat, lng).Return(&zone, nil)
+
+		fee, err := svc.GetZonePricing(ctx, validation.ZoneGetPricing{Latitude: lat, Longitude: lng})
+		assert.NoError(t, err)
+		assert.Equal(t, int32(500), fee)
+	})
+
+	t.Run("parking hub returns negative fee adjustment", func(t *testing.T) {
+		repo := mocks.NewMockZoneRepository(t)
+		svc := newTestZoneService(t, repo)
+
+		zone := model.Zone{Type: model.ZoneParkingHub, FeeAdjustment: -200}
+		repo.EXPECT().FindByLocation(ctx, lat, lng).Return(&zone, nil)
+
+		fee, err := svc.GetZonePricing(ctx, validation.ZoneGetPricing{Latitude: lat, Longitude: lng})
+		assert.NoError(t, err)
+		assert.Equal(t, int32(-200), fee)
+	})
+
+	t.Run("no_drop zone returns ErrLocationInNoDropZone", func(t *testing.T) {
+		repo := mocks.NewMockZoneRepository(t)
+		svc := newTestZoneService(t, repo)
+
+		zone := model.Zone{Type: model.ZoneTypeNoDrop}
+		repo.EXPECT().FindByLocation(ctx, lat, lng).Return(&zone, nil)
+
+		_, err := svc.GetZonePricing(ctx, validation.ZoneGetPricing{Latitude: lat, Longitude: lng})
+		assert.ErrorIs(t, err, model.ErrLocationInNoDropZone)
+	})
+
+	t.Run("repo error is propagated", func(t *testing.T) {
+		repo := mocks.NewMockZoneRepository(t)
+		svc := newTestZoneService(t, repo)
+
+		repo.EXPECT().FindByLocation(ctx, lat, lng).Return(nil, model.ErrSql)
+
+		_, err := svc.GetZonePricing(ctx, validation.ZoneGetPricing{Latitude: lat, Longitude: lng})
+		assert.ErrorIs(t, err, model.ErrSql)
+	})
+}
+
 func TestZoneServiceDelete(t *testing.T) {
 	ctx := context.Background()
 	zoneID := "b0000000-0000-4000-8000-000000000001"

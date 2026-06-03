@@ -20,6 +20,10 @@ func FromErrorToStatusCode(err error) error {
 		return status.Error(codes.FailedPrecondition, err.Error())
 	}
 
+	if errors.Is(err, model.ErrLocationInNoDropZone) {
+		return status.Error(codes.FailedPrecondition, err.Error())
+	}
+
 	switch {
 	case errors.Is(err, model.ErrInvalidMetadata):
 		return status.Error(codes.InvalidArgument, err.Error())

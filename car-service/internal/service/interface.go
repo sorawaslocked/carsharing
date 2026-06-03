@@ -31,6 +31,7 @@ type CarStatusReadingRepository interface {
 type ZoneRepository interface {
 	Insert(ctx context.Context, zone model.Zone) (string, error)
 	FindByID(ctx context.Context, id string) (model.Zone, error)
+	FindByLocation(ctx context.Context, lat, lng float64) (*model.Zone, error)
 	Find(ctx context.Context, filter model.ZoneFilter) ([]model.Zone, error)
 	Update(ctx context.Context, id string, update model.ZoneUpdate) error
 	Delete(ctx context.Context, id string) error

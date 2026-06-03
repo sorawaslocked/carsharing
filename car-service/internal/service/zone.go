@@ -129,6 +129,30 @@ func (s *ZoneService) Update(ctx context.Context, id string, data validation.Zon
 	return nil
 }
 
+func (s *ZoneService) GetZonePricing(ctx context.Context, data validation.ZoneGetPricing) (int32, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "GetZonePricing"), utils.MetadataFromCtx(ctx))
+
+	if err := validation.ValidateInput(s.validate, data); err != nil {
+		return 0, err
+	}
+
+	zone, err := s.zoneRepo.FindByLocation(ctx, data.Latitude, data.Longitude)
+	if err != nil {
+		log.Error("repo: finding zone by location", pkglog.Err(err))
+		return 0, err
+	}
+
+	if zone == nil {
+		return 0, nil
+	}
+
+	if zone.Type == model.ZoneTypeNoDrop {
+		return 0, model.ErrLocationInNoDropZone
+	}
+
+	return zone.FeeAdjustment, nil
+}
+
 func (s *ZoneService) Delete(ctx context.Context, id string) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(s.log, "Delete"), utils.MetadataFromCtx(ctx))
 

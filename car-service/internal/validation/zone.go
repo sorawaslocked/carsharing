@@ -15,6 +15,11 @@ type ZoneCreate struct {
 	FeeAdjustment   int32  `validate:"min=-100000,max=100000"`
 }
 
+type ZoneGetPricing struct {
+	Latitude  float64 `validate:"latitude_range"`
+	Longitude float64 `validate:"longitude_range"`
+}
+
 type ZoneUpdate struct {
 	Name            *string `validate:"omitempty,min=1,max=100"`
 	Type            *string `validate:"omitempty,zonetype"`

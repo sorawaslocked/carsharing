@@ -10,6 +10,13 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+func FromGetZonePricingRequest(req *carsvc.GetZonePricingRequest) validation.ZoneGetPricing {
+	return validation.ZoneGetPricing{
+		Latitude:  req.Latitude,
+		Longitude: req.Longitude,
+	}
+}
+
 func FromCreateZoneRequest(req *carsvc.CreateZoneRequest) validation.ZoneCreate {
 	return validation.ZoneCreate{
 		Name:            req.Name,

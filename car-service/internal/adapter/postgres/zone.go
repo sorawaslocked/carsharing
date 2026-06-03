@@ -67,6 +67,33 @@ func (r *ZoneRepository) FindByID(ctx context.Context, id string) (model.Zone, e
 	return zone, nil
 }
 
+func (r *ZoneRepository) FindByLocation(ctx context.Context, lat, lng float64) (*model.Zone, error) {
+	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindByLocation"), utils.MetadataFromCtx(ctx))
+
+	q := `SELECT id, name, type, boundary_geo_json, fee_adjustment, is_active, created_at, updated_at
+		FROM zones
+		WHERE is_active = true
+		  AND ST_Contains(
+		    ST_GeomFromGeoJSON(boundary_geo_json),
+		    ST_SetSRID(ST_MakePoint($2, $1), 4326)
+		  )
+		ORDER BY CASE WHEN type = 'no_drop' THEN 0 ELSE 1 END
+		LIMIT 1`
+
+	row := r.pool.QueryRow(ctx, q, lat, lng)
+
+	zone, err := dto.ScanZoneRow(row)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+		log.Error("failed to find zone by location", pkglog.Err(err))
+		return nil, model.ErrSql
+	}
+
+	return &zone, nil
+}
+
 func (r *ZoneRepository) Find(ctx context.Context, filter model.ZoneFilter) ([]model.Zone, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Find"), utils.MetadataFromCtx(ctx))
 

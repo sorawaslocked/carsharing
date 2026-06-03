@@ -138,6 +138,44 @@ func TestZoneHandlerUpdateZone(t *testing.T) {
 	})
 }
 
+func TestZoneHandlerGetZonePricing(t *testing.T) {
+	ctx := context.Background()
+	req := &carsvc.GetZonePricingRequest{Latitude: 51.18, Longitude: 71.44}
+
+	t.Run("returns fee adjustment from service", func(t *testing.T) {
+		svc := mocks.NewMockZoneService(t)
+		h := NewZoneHandler(discardLogger(), svc)
+
+		svc.EXPECT().GetZonePricing(ctx, mock.MatchedBy(func(d validation.ZoneGetPricing) bool {
+			return d.Latitude == 51.18 && d.Longitude == 71.44
+		})).Return(int32(-200), nil)
+
+		resp, err := h.GetZonePricing(ctx, req)
+		assert.NoError(t, err)
+		assert.Equal(t, int32(-200), resp.FeeAdjustment)
+	})
+
+	t.Run("no_drop zone maps to gRPC FailedPrecondition", func(t *testing.T) {
+		svc := mocks.NewMockZoneService(t)
+		h := NewZoneHandler(discardLogger(), svc)
+
+		svc.EXPECT().GetZonePricing(ctx, mock.Anything).Return(int32(0), model.ErrLocationInNoDropZone)
+
+		_, err := h.GetZonePricing(ctx, req)
+		assert.Equal(t, codes.FailedPrecondition, grpcCode(err))
+	})
+
+	t.Run("service error maps to gRPC Internal", func(t *testing.T) {
+		svc := mocks.NewMockZoneService(t)
+		h := NewZoneHandler(discardLogger(), svc)
+
+		svc.EXPECT().GetZonePricing(ctx, mock.Anything).Return(int32(0), errInternal)
+
+		_, err := h.GetZonePricing(ctx, req)
+		assert.Equal(t, codes.Internal, grpcCode(err))
+	})
+}
+
 func TestZoneHandlerDeleteZone(t *testing.T) {
 	ctx := context.Background()
 	zoneID := "zone-123"

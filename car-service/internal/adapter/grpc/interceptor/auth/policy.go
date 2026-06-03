@@ -46,11 +46,12 @@ func buildPolicies() map[string]methodPolicy {
 		carsvc.CarService_GetCarTelemetryHistory_FullMethodName: {allowedRoles: fleetRoles},
 
 		// ZoneService — restricted to fleet roles.
-		carsvc.ZoneService_CreateZone_FullMethodName: {allowedRoles: fleetRoles},
-		carsvc.ZoneService_GetZone_FullMethodName:    {},
-		carsvc.ZoneService_ListZones_FullMethodName:  {},
-		carsvc.ZoneService_UpdateZone_FullMethodName: {allowedRoles: fleetRoles},
-		carsvc.ZoneService_DeleteZone_FullMethodName: {allowedRoles: fleetRoles},
+		carsvc.ZoneService_CreateZone_FullMethodName:     {allowedRoles: fleetRoles},
+		carsvc.ZoneService_GetZone_FullMethodName:        {},
+		carsvc.ZoneService_ListZones_FullMethodName:      {},
+		carsvc.ZoneService_UpdateZone_FullMethodName:     {allowedRoles: fleetRoles},
+		carsvc.ZoneService_DeleteZone_FullMethodName:     {allowedRoles: fleetRoles},
+		carsvc.ZoneService_GetZonePricing_FullMethodName: {},
 
 		// CarInsuranceService — restricted to fleet roles.
 		carsvc.CarInsuranceService_CreateCarInsurance_FullMethodName:             {allowedRoles: fleetRoles},

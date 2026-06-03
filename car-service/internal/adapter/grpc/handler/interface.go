@@ -73,4 +73,5 @@ type ZoneService interface {
 	List(ctx context.Context, filterInput validation.ZoneFilter) ([]model.Zone, error)
 	Update(ctx context.Context, id string, updateInput validation.ZoneUpdate) error
 	Delete(ctx context.Context, id string) error
+	GetZonePricing(ctx context.Context, data validation.ZoneGetPricing) (int32, error)
 }

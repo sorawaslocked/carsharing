@@ -292,6 +292,63 @@ func (_c *MockZoneService_Update_Call) RunAndReturn(run func(context.Context, st
 	return _c
 }
 
+// GetZonePricing provides a mock function with given fields: ctx, data
+func (_m *MockZoneService) GetZonePricing(ctx context.Context, data validation.ZoneGetPricing) (int32, error) {
+	ret := _m.Called(ctx, data)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetZonePricing")
+	}
+
+	var r0 int32
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, validation.ZoneGetPricing) (int32, error)); ok {
+		return rf(ctx, data)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, validation.ZoneGetPricing) int32); ok {
+		r0 = rf(ctx, data)
+	} else {
+		r0 = ret.Get(0).(int32)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, validation.ZoneGetPricing) error); ok {
+		r1 = rf(ctx, data)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockZoneService_GetZonePricing_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetZonePricing'
+type MockZoneService_GetZonePricing_Call struct {
+	*mock.Call
+}
+
+// GetZonePricing is a helper method to define mock.On call
+//   - ctx context.Context
+//   - data validation.ZoneGetPricing
+func (_e *MockZoneService_Expecter) GetZonePricing(ctx interface{}, data interface{}) *MockZoneService_GetZonePricing_Call {
+	return &MockZoneService_GetZonePricing_Call{Call: _e.mock.On("GetZonePricing", ctx, data)}
+}
+
+func (_c *MockZoneService_GetZonePricing_Call) Run(run func(ctx context.Context, data validation.ZoneGetPricing)) *MockZoneService_GetZonePricing_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(validation.ZoneGetPricing))
+	})
+	return _c
+}
+
+func (_c *MockZoneService_GetZonePricing_Call) Return(_a0 int32, _a1 error) *MockZoneService_GetZonePricing_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockZoneService_GetZonePricing_Call) RunAndReturn(run func(context.Context, validation.ZoneGetPricing) (int32, error)) *MockZoneService_GetZonePricing_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewMockZoneService creates a new instance of MockZoneService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewMockZoneService(t interface {

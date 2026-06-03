@@ -69,6 +69,66 @@ func (_c *MockZoneRepository_Delete_Call) RunAndReturn(run func(context.Context,
 	return _c
 }
 
+// FindByLocation provides a mock function with given fields: ctx, lat, lng
+func (_m *MockZoneRepository) FindByLocation(ctx context.Context, lat float64, lng float64) (*model.Zone, error) {
+	ret := _m.Called(ctx, lat, lng)
+
+	if len(ret) == 0 {
+		panic("no return value specified for FindByLocation")
+	}
+
+	var r0 *model.Zone
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, float64, float64) (*model.Zone, error)); ok {
+		return rf(ctx, lat, lng)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, float64, float64) *model.Zone); ok {
+		r0 = rf(ctx, lat, lng)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.Zone)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, float64, float64) error); ok {
+		r1 = rf(ctx, lat, lng)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockZoneRepository_FindByLocation_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindByLocation'
+type MockZoneRepository_FindByLocation_Call struct {
+	*mock.Call
+}
+
+// FindByLocation is a helper method to define mock.On call
+//   - ctx context.Context
+//   - lat float64
+//   - lng float64
+func (_e *MockZoneRepository_Expecter) FindByLocation(ctx interface{}, lat interface{}, lng interface{}) *MockZoneRepository_FindByLocation_Call {
+	return &MockZoneRepository_FindByLocation_Call{Call: _e.mock.On("FindByLocation", ctx, lat, lng)}
+}
+
+func (_c *MockZoneRepository_FindByLocation_Call) Run(run func(ctx context.Context, lat float64, lng float64)) *MockZoneRepository_FindByLocation_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(float64), args[2].(float64))
+	})
+	return _c
+}
+
+func (_c *MockZoneRepository_FindByLocation_Call) Return(_a0 *model.Zone, _a1 error) *MockZoneRepository_FindByLocation_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockZoneRepository_FindByLocation_Call) RunAndReturn(run func(context.Context, float64, float64) (*model.Zone, error)) *MockZoneRepository_FindByLocation_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Find provides a mock function with given fields: ctx, filter
 func (_m *MockZoneRepository) Find(ctx context.Context, filter model.ZoneFilter) ([]model.Zone, error) {
 	ret := _m.Called(ctx, filter)

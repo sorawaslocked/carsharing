@@ -17,11 +17,6 @@ func WhereClausesFromPricingRuleListFilter(filter model.PricingRuleListFilter, a
 		args = append(args, *filter.ModelID)
 		argNumber++
 	}
-	if filter.ZoneID != nil {
-		clauses = append(clauses, fmt.Sprintf("zone_id = $%d", argNumber))
-		args = append(args, *filter.ZoneID)
-		argNumber++
-	}
 	if filter.Class != nil {
 		clauses = append(clauses, fmt.Sprintf("class = $%d", argNumber))
 		args = append(args, *filter.Class)
@@ -49,11 +44,6 @@ func SetClausesFromPricingRuleUpdate(update model.PricingRuleUpdate) ([]string, 
 	if update.ModelID != nil {
 		clauses = append(clauses, fmt.Sprintf("model_id = $%d", argNumber))
 		args = append(args, *update.ModelID)
-		argNumber++
-	}
-	if update.ZoneID != nil {
-		clauses = append(clauses, fmt.Sprintf("zone_id = $%d", argNumber))
-		args = append(args, *update.ZoneID)
 		argNumber++
 	}
 	if update.Class != nil {

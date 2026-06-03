@@ -14,6 +14,7 @@ service ZoneService {
   rpc ListZones(ListZonesRequest) returns (ListZonesResponse);
   rpc UpdateZone(UpdateZoneRequest) returns (google.protobuf.Empty);
   rpc DeleteZone(DeleteZoneRequest) returns (google.protobuf.Empty);
+  rpc GetZonePricing(GetZonePricingRequest) returns (GetZonePricingResponse);
 }
 
 message CreateZoneRequest {
@@ -56,4 +57,13 @@ message UpdateZoneRequest {
 
 message DeleteZoneRequest {
   string id = 1;
+}
+
+message GetZonePricingRequest {
+  double latitude  = 1;
+  double longitude = 2;
+}
+
+message GetZonePricingResponse {
+  int32 fee_adjustment = 1;
 }

@@ -24,46 +24,21 @@ func newTestCarService(t *testing.T, carRepo CarRepository, statusLogRepo CarSta
 	v := validator.New()
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))
 	_ = validation.RegisterCustomValidators(v, log)
-	return NewCarService(log, v, nil, carRepo, nil, statusLogRepo, nil, nil, eventPub, noopCarCreatedNotifier{})
+	return NewCarService(log, v, nil, carRepo, statusLogRepo, nil, nil, eventPub, noopCarCreatedNotifier{})
 }
 
-func TestUpdateCarZoneCheck(t *testing.T) {
+func TestCarUpdate(t *testing.T) {
 	ctx := context.Background()
 	carID := "c0000000-0000-4000-8000-000000000001"
-	zoneID := "a0000000-0000-4000-8000-000000000001"
 
-	newSvc := func(t *testing.T, carRepo CarRepository, zoneRepo ZoneRepository) *CarService {
+	newSvc := func(t *testing.T, carRepo CarRepository) *CarService {
 		t.Helper()
-		return NewCarService(discardLogger(), newTestValidator(t), nil, carRepo, zoneRepo, nil, nil, nil, nil, noopCarCreatedNotifier{})
+		return NewCarService(discardLogger(), newTestValidator(t), nil, carRepo, nil, nil, nil, nil, noopCarCreatedNotifier{})
 	}
 
-	t.Run("valid zone check passes and car is updated", func(t *testing.T) {
+	t.Run("car updated successfully", func(t *testing.T) {
 		carRepo := mocks.NewMockCarRepository(t)
-		zoneRepo := mocks.NewMockZoneRepository(t)
-		svc := newSvc(t, carRepo, zoneRepo)
-
-		zoneRepo.EXPECT().FindByID(ctx, zoneID).Return(model.Zone{ID: zoneID}, nil)
-		carRepo.EXPECT().Update(ctx, carID, mock.MatchedBy(func(u model.CarUpdate) bool {
-			return u.ZoneID != nil && *u.ZoneID == zoneID
-		})).Return(nil)
-
-		err := svc.Update(ctx, carID, validation.CarUpdate{ZoneID: &zoneID})
-		assert.NoError(t, err)
-	})
-
-	t.Run("zone not found returns ErrZoneNotFound", func(t *testing.T) {
-		zoneRepo := mocks.NewMockZoneRepository(t)
-		svc := newSvc(t, nil, zoneRepo)
-
-		zoneRepo.EXPECT().FindByID(ctx, zoneID).Return(model.Zone{}, model.ErrZoneNotFound)
-
-		err := svc.Update(ctx, carID, validation.CarUpdate{ZoneID: &zoneID})
-		assert.ErrorIs(t, err, model.ErrZoneNotFound)
-	})
-
-	t.Run("no zone id skips zone check", func(t *testing.T) {
-		carRepo := mocks.NewMockCarRepository(t)
-		svc := newSvc(t, carRepo, nil)
+		svc := newSvc(t, carRepo)
 
 		carRepo.EXPECT().Update(ctx, carID, mock.Anything).Return(nil)
 
@@ -73,7 +48,7 @@ func TestUpdateCarZoneCheck(t *testing.T) {
 
 	t.Run("car not found returns ErrCarNotFound", func(t *testing.T) {
 		carRepo := mocks.NewMockCarRepository(t)
-		svc := newSvc(t, carRepo, nil)
+		svc := newSvc(t, carRepo)
 
 		carRepo.EXPECT().Update(ctx, carID, mock.Anything).Return(model.ErrCarNotFound)
 
@@ -240,11 +215,10 @@ func TestUpdateCarStatus(t *testing.T) {
 func TestCarServiceCreate(t *testing.T) {
 	ctx := context.Background()
 	modelID := "m0000000-0000-4000-8000-000000000001"
-	zoneID := "a0000000-0000-4000-8000-000000000002"
 
-	newSvc := func(t *testing.T, modelRepo CarModelRepository, carRepo CarRepository, zoneRepo ZoneRepository, notifier CarCreatedNotifier) *CarService {
+	newSvc := func(t *testing.T, modelRepo CarModelRepository, carRepo CarRepository, notifier CarCreatedNotifier) *CarService {
 		t.Helper()
-		return NewCarService(discardLogger(), newTestValidator(t), modelRepo, carRepo, zoneRepo, nil, nil, nil, nil, notifier)
+		return NewCarService(discardLogger(), newTestValidator(t), modelRepo, carRepo, nil, nil, nil, nil, notifier)
 	}
 
 	validInput := validation.CarCreate{
@@ -259,7 +233,7 @@ func TestCarServiceCreate(t *testing.T) {
 	t.Run("happy path returns inserted id", func(t *testing.T) {
 		modelRepo := mocks.NewMockCarModelRepository(t)
 		carRepo := mocks.NewMockCarRepository(t)
-		svc := newSvc(t, modelRepo, carRepo, nil, noopCarCreatedNotifier{})
+		svc := newSvc(t, modelRepo, carRepo, noopCarCreatedNotifier{})
 
 		modelRepo.EXPECT().FindByID(ctx, modelID).Return(model.CarModel{ID: modelID}, nil)
 		carRepo.EXPECT().Insert(ctx, mock.MatchedBy(func(c model.Car) bool {
@@ -273,7 +247,7 @@ func TestCarServiceCreate(t *testing.T) {
 
 	t.Run("car model not found returns ErrCarModelNotFound", func(t *testing.T) {
 		modelRepo := mocks.NewMockCarModelRepository(t)
-		svc := newSvc(t, modelRepo, nil, nil, noopCarCreatedNotifier{})
+		svc := newSvc(t, modelRepo, nil, noopCarCreatedNotifier{})
 
 		modelRepo.EXPECT().FindByID(ctx, modelID).Return(model.CarModel{}, model.ErrCarModelNotFound)
 
@@ -281,25 +255,10 @@ func TestCarServiceCreate(t *testing.T) {
 		assert.ErrorIs(t, err, model.ErrCarModelNotFound)
 	})
 
-	t.Run("zone not found returns ErrZoneNotFound", func(t *testing.T) {
-		modelRepo := mocks.NewMockCarModelRepository(t)
-		zoneRepo := mocks.NewMockZoneRepository(t)
-		svc := newSvc(t, modelRepo, nil, zoneRepo, noopCarCreatedNotifier{})
-
-		input := validInput
-		input.ZoneID = &zoneID
-
-		modelRepo.EXPECT().FindByID(ctx, modelID).Return(model.CarModel{ID: modelID}, nil)
-		zoneRepo.EXPECT().FindByID(ctx, zoneID).Return(model.Zone{}, model.ErrZoneNotFound)
-
-		_, err := svc.Create(ctx, input)
-		assert.ErrorIs(t, err, model.ErrZoneNotFound)
-	})
-
 	t.Run("duplicate VIN returns ErrDuplicateVIN", func(t *testing.T) {
 		modelRepo := mocks.NewMockCarModelRepository(t)
 		carRepo := mocks.NewMockCarRepository(t)
-		svc := newSvc(t, modelRepo, carRepo, nil, noopCarCreatedNotifier{})
+		svc := newSvc(t, modelRepo, carRepo, noopCarCreatedNotifier{})
 
 		modelRepo.EXPECT().FindByID(ctx, modelID).Return(model.CarModel{ID: modelID}, nil)
 		carRepo.EXPECT().Insert(ctx, mock.Anything).Return("", model.ErrDuplicateVIN)
@@ -311,7 +270,7 @@ func TestCarServiceCreate(t *testing.T) {
 	t.Run("duplicate license plate returns ErrDuplicateLicensePlate", func(t *testing.T) {
 		modelRepo := mocks.NewMockCarModelRepository(t)
 		carRepo := mocks.NewMockCarRepository(t)
-		svc := newSvc(t, modelRepo, carRepo, nil, noopCarCreatedNotifier{})
+		svc := newSvc(t, modelRepo, carRepo, noopCarCreatedNotifier{})
 
 		modelRepo.EXPECT().FindByID(ctx, modelID).Return(model.CarModel{ID: modelID}, nil)
 		carRepo.EXPECT().Insert(ctx, mock.Anything).Return("", model.ErrDuplicateLicensePlate)
@@ -321,7 +280,7 @@ func TestCarServiceCreate(t *testing.T) {
 	})
 
 	t.Run("validation rejects missing required fields", func(t *testing.T) {
-		svc := newSvc(t, nil, nil, nil, noopCarCreatedNotifier{})
+		svc := newSvc(t, nil, nil, noopCarCreatedNotifier{})
 
 		_, err := svc.Create(ctx, validation.CarCreate{})
 		assert.Error(t, err)
@@ -334,7 +293,7 @@ func TestCarServiceGet(t *testing.T) {
 
 	newSvc := func(t *testing.T, carRepo CarRepository, storage ObjectStorage) *CarService {
 		t.Helper()
-		return NewCarService(discardLogger(), newTestValidator(t), nil, carRepo, nil, nil, nil, storage, nil, noopCarCreatedNotifier{})
+		return NewCarService(discardLogger(), newTestValidator(t), nil, carRepo, nil, nil, storage, nil, noopCarCreatedNotifier{})
 	}
 
 	t.Run("returns car with no images", func(t *testing.T) {
@@ -398,7 +357,7 @@ func TestCarServiceDelete(t *testing.T) {
 
 	newSvc := func(t *testing.T, carRepo CarRepository) *CarService {
 		t.Helper()
-		return NewCarService(discardLogger(), newTestValidator(t), nil, carRepo, nil, nil, nil, nil, nil, noopCarCreatedNotifier{})
+		return NewCarService(discardLogger(), newTestValidator(t), nil, carRepo, nil, nil, nil, nil, noopCarCreatedNotifier{})
 	}
 
 	t.Run("happy path returns nil", func(t *testing.T) {
@@ -426,7 +385,7 @@ func TestCarServiceUpdateCarTelemetry(t *testing.T) {
 
 	newSvc := func(t *testing.T, carRepo CarRepository, telemetryRepo TelemetryReadingRepository) *CarService {
 		t.Helper()
-		return NewCarService(discardLogger(), newTestValidator(t), nil, carRepo, nil, nil, telemetryRepo, nil, nil, noopCarCreatedNotifier{})
+		return NewCarService(discardLogger(), newTestValidator(t), nil, carRepo, nil, telemetryRepo, nil, nil, noopCarCreatedNotifier{})
 	}
 
 	t.Run("happy path updates car telemetry", func(t *testing.T) {
@@ -469,7 +428,7 @@ func TestCarServiceGetImageUploadData(t *testing.T) {
 
 	newSvc := func(t *testing.T, storage ObjectStorage) *CarService {
 		t.Helper()
-		return NewCarService(discardLogger(), newTestValidator(t), nil, nil, nil, nil, nil, storage, nil, noopCarCreatedNotifier{})
+		return NewCarService(discardLogger(), newTestValidator(t), nil, nil, nil, nil, storage, nil, noopCarCreatedNotifier{})
 	}
 
 	t.Run("returns upload data from object storage", func(t *testing.T) {

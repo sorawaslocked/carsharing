@@ -29,18 +29,18 @@ func NewPricingRuleRepository(log *slog.Logger, pool *pgxpool.Pool) *PricingRule
 }
 
 const pricingRuleSelect = `
-    SELECT id, model_id, zone_id, class, type, rate_tenge, rate_per_km_tenge,
+    SELECT id, model_id, class, type, rate_tenge, rate_per_km_tenge,
            free_minutes, min_charge_tenge, overtime_policy, overtime_rate_tenge,
            is_active, created_at, updated_at
     FROM pricing_rules`
 
 func scanPricingRule(rs rowScanner) (model.PricingRule, error) {
 	var rule model.PricingRule
-	var modelID, zoneID, class, overtimePolicy *string
+	var modelID, class, overtimePolicy *string
 	var ratePerKM, freeMinutes, minCharge, overtimeRate *int32
 
 	if err := rs.Scan(
-		&rule.ID, &modelID, &zoneID, &class, &rule.Type, &rule.RateTenge,
+		&rule.ID, &modelID, &class, &rule.Type, &rule.RateTenge,
 		&ratePerKM, &freeMinutes, &minCharge, &overtimePolicy, &overtimeRate,
 		&rule.IsActive, &rule.CreatedAt, &rule.UpdatedAt,
 	); err != nil {
@@ -48,7 +48,6 @@ func scanPricingRule(rs rowScanner) (model.PricingRule, error) {
 	}
 
 	rule.ModelID = modelID
-	rule.ZoneID = zoneID
 	rule.Class = class
 	rule.OvertimePolicy = overtimePolicy
 	rule.RatePerKMTenge = ratePerKM
@@ -65,11 +64,11 @@ func (r *PricingRuleRepository) Create(ctx context.Context, data model.PricingRu
 	var id string
 	err := r.pool.QueryRow(ctx, `
         INSERT INTO pricing_rules
-            (model_id, zone_id, class, type, rate_tenge, rate_per_km_tenge, free_minutes, min_charge_tenge, overtime_policy, overtime_rate_tenge)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            (model_id, class, type, rate_tenge, rate_per_km_tenge, free_minutes, min_charge_tenge, overtime_policy, overtime_rate_tenge)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING id
     `,
-		data.ModelID, data.ZoneID, data.Class, data.Type, data.RateTenge,
+		data.ModelID, data.Class, data.Type, data.RateTenge,
 		data.RatePerKMTenge, data.FreeMinutes, data.MinChargeTenge,
 		data.OvertimePolicy, data.OvertimeRateTenge,
 	).Scan(&id)

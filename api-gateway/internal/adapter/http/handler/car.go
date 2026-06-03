@@ -111,7 +111,6 @@ func (h *CarHandler) Get(ctx *gin.Context) {
 // @Param        latitude      query     number   false  "Latitude for proximity search"
 // @Param        longitude     query     number   false  "Longitude for proximity search"
 // @Param        radiusM       query     integer  false  "Search radius in metres"
-// @Param        zoneId        query     string   false  "Filter by zone UUID"
 // @Param        minFuelLevel  query     number   false  "Minimum fuel level (0–100)"
 // @Param        status        query     string   false  "Car status"                             Enums(available, reserved, in_use, maintenance, out_of_service)
 // @Param        limit         query     integer  false  "Pagination limit"

@@ -18,7 +18,6 @@ type PricingRulesResponse struct {
 type PricingRule struct {
 	ID      string  `json:"id"`
 	ModelID *string `json:"modelID,omitempty"`
-	ZoneID  *string `json:"zoneID,omitempty"`
 	Class   *string `json:"class,omitempty" validate:"omitempty,oneof=economy compact comfort business luxury"`
 
 	Type      string `json:"type" validate:"oneof=by_minute by_hour by_day"`
@@ -38,7 +37,6 @@ type PricingRule struct {
 
 type PricingRuleCreateRequest struct {
 	ModelID *string `json:"modelID"`
-	ZoneID  *string `json:"zoneID"`
 	Class   *string `json:"class" validate:"omitempty,oneof=economy compact comfort business luxury"`
 
 	Type      string `json:"type" binding:"required,oneof=by_minute by_hour by_day"`
@@ -54,7 +52,6 @@ type PricingRuleCreateRequest struct {
 
 type PricingRuleUpdateRequest struct {
 	ModelID *string `json:"modelID"`
-	ZoneID  *string `json:"zoneID"`
 	Class   *string `json:"class" validate:"omitempty,oneof=economy compact comfort business luxury"`
 
 	Type      *string `json:"type" validate:"omitempty,oneof=by_minute by_hour by_day"`
@@ -77,7 +74,6 @@ func FromPricingRuleCreateRequest(ctx *gin.Context) (model.PricingRuleCreate, er
 	}
 	return model.PricingRuleCreate{
 		ModelID:           req.ModelID,
-		ZoneID:            req.ZoneID,
 		Class:             req.Class,
 		Type:              req.Type,
 		RateTenge:         req.RateTenge,
@@ -96,7 +92,6 @@ func FromPricingRuleUpdateRequest(ctx *gin.Context) (model.PricingRuleUpdate, er
 	}
 	return model.PricingRuleUpdate{
 		ModelID:           req.ModelID,
-		ZoneID:            req.ZoneID,
 		Class:             req.Class,
 		Type:              req.Type,
 		RateTenge:         req.RateTenge,
@@ -114,9 +109,6 @@ func PricingRuleFilterFromCtx(ctx *gin.Context) (model.PricingRuleFilter, error)
 
 	if v := ctx.Query("modelID"); v != "" {
 		f.ModelID = &v
-	}
-	if v := ctx.Query("zoneID"); v != "" {
-		f.ZoneID = &v
 	}
 	if v := ctx.Query("class"); v != "" {
 		f.Class = &v
@@ -143,7 +135,6 @@ func ToPricingRuleResponse(m model.PricingRule) PricingRule {
 	return PricingRule{
 		ID:                m.ID,
 		ModelID:           m.ModelID,
-		ZoneID:            m.ZoneID,
 		Class:             m.Class,
 		Type:              m.Type,
 		RateTenge:         m.RateTenge,

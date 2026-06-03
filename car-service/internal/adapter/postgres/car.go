@@ -48,15 +48,15 @@ func (r *CarRepository) Insert(ctx context.Context, car model.Car) (string, erro
 		car.ModelID, car.VIN, car.LicensePlate, car.Color,
 		car.YearManufactured, string(car.Status), car.TelemetryID, car.IsRetired,
 		car.MileageKM, car.FuelLevel, car.BatteryLevel,
-		car.Location.Latitude, car.Location.Longitude, car.ZoneID,
+		car.Location.Latitude, car.Location.Longitude,
 		car.Notes, dto.ImagesToKeys(car.Images), car.LastSeenAt,
 		car.CreatedAt, car.UpdatedAt,
 	}
 	q := `INSERT INTO cars
 			(model_id, vin, license_plate, color, year_manufactured, status, telemetry_id, is_retired,
-			 mileage_km, fuel_level, battery_level, latitude, longitude, zone_id,
+			 mileage_km, fuel_level, battery_level, latitude, longitude,
 			 notes, image_keys, last_seen_at, created_at, updated_at)
-		  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+		  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
 		  RETURNING id`
 
 	var id string
@@ -72,7 +72,7 @@ func (r *CarRepository) FindByID(ctx context.Context, id string) (model.Car, err
 	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "FindByID"), utils.MetadataFromCtx(ctx))
 
 	q := `SELECT id, model_id, vin, license_plate, color, year_manufactured, status, telemetry_id, is_retired,
-		mileage_km, fuel_level, battery_level, latitude, longitude, zone_id, notes, image_keys,
+		mileage_km, fuel_level, battery_level, latitude, longitude, notes, image_keys,
 		last_seen_at, created_at, updated_at FROM cars WHERE id = $1 LIMIT 1`
 
 	row := r.pool.QueryRow(ctx, q, id)
@@ -95,7 +95,7 @@ func (r *CarRepository) Find(ctx context.Context, filter model.CarFilter) ([]mod
 	join, where, args, n := buildCarFilter(filter, make([]any, 0), 0)
 
 	q := `SELECT c.id, c.model_id, c.vin, c.license_plate, c.color, c.year_manufactured, c.status, c.telemetry_id, c.is_retired,
-		c.mileage_km, c.fuel_level, c.battery_level, c.latitude, c.longitude, c.zone_id, c.notes, c.image_keys,
+		c.mileage_km, c.fuel_level, c.battery_level, c.latitude, c.longitude, c.notes, c.image_keys,
 		c.last_seen_at, c.created_at, c.updated_at FROM cars c` + join + where
 
 	if filter.Pagination != nil {

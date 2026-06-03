@@ -50,7 +50,6 @@ type Car struct {
 	Location     sharedmodel.Location
 
 	TelemetryID string
-	ZoneID      *string
 	FuelStatus  string
 	IsRetired   bool
 
@@ -84,7 +83,6 @@ type CarUpdate struct {
 	Location     *sharedmodel.Location
 
 	TelemetryID *string
-	ZoneID      *string
 	IsRetired   *bool
 
 	Status    *CarStatus

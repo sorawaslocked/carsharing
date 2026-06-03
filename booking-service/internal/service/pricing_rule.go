@@ -20,7 +20,6 @@ type PricingRuleService struct {
 	validate        *validator.Validate
 	ruleRepo        PricingRuleRepository
 	carModelChecker CarModelChecker
-	zoneChecker     ZoneChecker
 }
 
 func NewPricingRuleService(
@@ -28,14 +27,12 @@ func NewPricingRuleService(
 	validate *validator.Validate,
 	ruleRepo PricingRuleRepository,
 	carModelChecker CarModelChecker,
-	zoneChecker ZoneChecker,
 ) *PricingRuleService {
 	return &PricingRuleService{
 		log:             pkglog.WithComponent(log, "service.PricingRuleService"),
 		validate:        validate,
 		ruleRepo:        ruleRepo,
 		carModelChecker: carModelChecker,
-		zoneChecker:     zoneChecker,
 	}
 }
 
@@ -57,20 +54,8 @@ func (s *PricingRuleService) Create(ctx context.Context, data validation.Pricing
 		}
 	}
 
-	if data.ZoneID != nil {
-		exists, err := s.zoneChecker.Exists(ctx, *data.ZoneID)
-		if err != nil {
-			log.Error("checking zone existence", pkglog.Err(err))
-			return "", err
-		}
-		if !exists {
-			return "", model.ErrZoneNotFound
-		}
-	}
-
 	ruleData := model.PricingRuleCreate{
 		ModelID:           data.ModelID,
-		ZoneID:            data.ZoneID,
 		Class:             data.Class,
 		Type:              data.Type,
 		RateTenge:         data.RateTenge,
@@ -146,20 +131,8 @@ func (s *PricingRuleService) Update(ctx context.Context, id string, data validat
 		}
 	}
 
-	if data.ZoneID != nil {
-		exists, err := s.zoneChecker.Exists(ctx, *data.ZoneID)
-		if err != nil {
-			log.Error("checking zone existence", pkglog.Err(err))
-			return err
-		}
-		if !exists {
-			return model.ErrZoneNotFound
-		}
-	}
-
 	repoUpdate := model.PricingRuleUpdate{
 		ModelID:           data.ModelID,
-		ZoneID:            data.ZoneID,
 		Class:             data.Class,
 		Type:              data.Type,
 		RateTenge:         data.RateTenge,
@@ -204,7 +177,6 @@ func pricingRuleListFilter(f validation.PricingRuleListFilter) model.PricingRule
 	}
 	return model.PricingRuleListFilter{
 		ModelID:    f.ModelID,
-		ZoneID:     f.ZoneID,
 		Class:      f.Class,
 		Type:       f.Type,
 		IsActive:   f.IsActive,

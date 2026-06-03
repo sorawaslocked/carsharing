@@ -24,7 +24,6 @@ func (h *CarHandler) StreamCarsWithFilter(ctx context.Context, filter model.CarF
 		Transmission: filter.Transmission,
 		BodyType:     filter.BodyType,
 		Class:        filter.Class,
-		ZoneId:       filter.ZoneID,
 		Status:       filter.Status,
 		RadiusM:      filter.RadiusM,
 		MinFuelLevel: filter.MinFuelLevel,

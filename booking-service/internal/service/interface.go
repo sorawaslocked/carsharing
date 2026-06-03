@@ -39,7 +39,3 @@ type CarChecker interface {
 type CarModelChecker interface {
 	Exists(ctx context.Context, modelID string) (bool, error)
 }
-
-type ZoneChecker interface {
-	Exists(ctx context.Context, zoneID string) (bool, error)
-}

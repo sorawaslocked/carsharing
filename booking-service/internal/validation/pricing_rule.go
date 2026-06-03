@@ -6,7 +6,6 @@ import (
 
 type PricingRuleCreate struct {
 	ModelID           *string `validate:"omitempty,uuid4"`
-	ZoneID            *string `validate:"omitempty,uuid4"`
 	Class             *string `validate:"omitempty,carclass"`
 	Type              string  `validate:"required,pricing_rule_type"`
 	RateTenge         int32   `validate:"required,min=1"`
@@ -19,7 +18,6 @@ type PricingRuleCreate struct {
 
 type PricingRuleUpdate struct {
 	ModelID           *string `validate:"omitempty,uuid4"`
-	ZoneID            *string `validate:"omitempty,uuid4"`
 	Class             *string `validate:"omitempty,carclass"`
 	Type              *string `validate:"omitempty,pricing_rule_type"`
 	RateTenge         *int32  `validate:"omitempty,min=1"`
@@ -33,7 +31,6 @@ type PricingRuleUpdate struct {
 
 type PricingRuleListFilter struct {
 	ModelID    *string `validate:"omitempty,uuid4"`
-	ZoneID     *string `validate:"omitempty,uuid4"`
 	Class      *string `validate:"omitempty,carclass"`
 	Type       *string `validate:"omitempty,pricing_rule_type"`
 	IsActive   *bool

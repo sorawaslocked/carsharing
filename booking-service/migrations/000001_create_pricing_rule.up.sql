@@ -1,7 +1,6 @@
 CREATE TABLE IF NOT EXISTS pricing_rules (
     id                  UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
     model_id            UUID,
-    zone_id             UUID,
     class               TEXT,
     type                TEXT        NOT NULL,
     rate_tenge          INT         NOT NULL,

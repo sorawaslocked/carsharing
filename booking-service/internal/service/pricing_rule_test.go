@@ -15,7 +15,7 @@ import (
 )
 
 func newRuleSvc(repo *mocks.MockPricingRuleRepository) *service.PricingRuleService {
-	return service.NewPricingRuleService(discardLogger(), newValidator(), repo, nil, nil)
+	return service.NewPricingRuleService(discardLogger(), newValidator(), repo, nil)
 }
 
 var validPricingRuleCreate = validation.PricingRuleCreate{Type: "by_minute", RateTenge: 100}

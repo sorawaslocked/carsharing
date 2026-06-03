@@ -39,7 +39,6 @@ type Car struct {
 	Location         location  `json:"location"`
 	TelemetryID      string    `json:"telemetryId"`
 	FuelStatus       string    `json:"fuelStatus"`
-	ZoneID           *string   `json:"zoneID,omitempty"`
 	Status           string    `json:"status" validate:"oneof=available reserved in_use maintenance out_of_service"`
 	IsRetired        bool      `json:"isRetired"`
 	Notes            *string   `json:"notes,omitempty"`
@@ -83,7 +82,6 @@ type CarCreateRequest struct {
 	Color            string   `json:"color" binding:"required"`
 	YearManufactured int16    `json:"yearManufactured" binding:"required"`
 	TelemetryID      string   `json:"telemetryId" binding:"required"`
-	ZoneID           *string  `json:"zoneID"`
 	MileageKM        *int64   `json:"mileageKm"`
 	FuelLevel        *float32 `json:"fuelLevel"`
 	BatteryLevel     *float32 `json:"batteryLevel"`
@@ -97,7 +95,6 @@ type CarUpdateRequest struct {
 	LicensePlate *string  `json:"licensePlate"`
 	Color        *string  `json:"color"`
 	TelemetryID  *string  `json:"telemetryId"`
-	ZoneID       *string  `json:"zoneID"`
 	IsRetired    *bool    `json:"isRetired"`
 	Notes        *string  `json:"notes"`
 	ImageKeys    []string `json:"imageKeys"`
@@ -132,7 +129,6 @@ func FromCarCreateRequest(ctx *gin.Context) (model.CarCreate, error) {
 		Color:            req.Color,
 		YearManufactured: req.YearManufactured,
 		TelemetryID:      req.TelemetryID,
-		ZoneID:           req.ZoneID,
 		MileageKM:        req.MileageKM,
 		FuelLevel:        req.FuelLevel,
 		BatteryLevel:     req.BatteryLevel,
@@ -158,7 +154,6 @@ func FromCarUpdateRequest(ctx *gin.Context) (model.CarUpdate, error) {
 		LicensePlate: req.LicensePlate,
 		Color:        req.Color,
 		TelemetryID:  req.TelemetryID,
-		ZoneID:       req.ZoneID,
 		IsRetired:    req.IsRetired,
 		Notes:        req.Notes,
 		ImageKeys:    req.ImageKeys,
@@ -253,9 +248,6 @@ func CarFilterFromCtx(ctx *gin.Context) (model.CarFilter, error) {
 		radiusM := int32(vInt)
 		f.RadiusM = &radiusM
 	}
-	if v := ctx.Query("zoneId"); v != "" {
-		f.ZoneID = &v
-	}
 	if v := ctx.Query("minFuelLevel"); v != "" {
 		vFloat, err := strconv.ParseFloat(v, 32)
 		if err != nil {
@@ -345,7 +337,6 @@ func ToCarResponse(m model.Car) Car {
 		},
 		TelemetryID:      m.TelemetryID,
 		FuelStatus:       m.FuelStatus,
-		ZoneID:           m.ZoneID,
 		Status:           m.Status,
 		IsRetired:        m.IsRetired,
 		Notes:            m.Notes,

@@ -39,7 +39,6 @@ message CreateCarRequest {
   optional float         fuel_level    = 9;
   optional float         battery_level = 10;
   optional base.Location location      = 11;
-  optional string        zone_id       = 12;
 }
 
 message CreateCarResponse {
@@ -65,7 +64,6 @@ message ListCarsRequest {
   optional base.Location   location       = 8;
   optional int32           radius_m       = 9;
   optional float           min_fuel_level = 10;
-  optional string          zone_id        = 11;
   optional string          status         = 12;
   optional bool            is_retired     = 13;
   optional base.Pagination pagination     = 14;
@@ -82,7 +80,6 @@ message UpdateCarRequest {
   optional string  license_plate = 3;
   optional string  color         = 4;
   optional string  telemetry_id = 5;
-  optional string  zone_id       = 6;
   optional bool    is_retired    = 7;
   optional string  notes         = 8;
   repeated string  image_keys    = 9;

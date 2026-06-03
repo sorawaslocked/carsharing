@@ -15,5 +15,3 @@ CREATE TABLE zones (
 
 CREATE INDEX idx_zones_type      ON zones (type);
 CREATE INDEX idx_zones_is_active ON zones (is_active);
-
-ALTER TABLE cars ADD COLUMN zone_id UUID REFERENCES zones (id);

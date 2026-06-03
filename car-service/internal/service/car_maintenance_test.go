@@ -32,7 +32,7 @@ func newTestCarMaintenanceService(
 
 func newTestCarServiceForMaintenance(t *testing.T, carRepo CarRepository, statusRepo CarStatusReadingRepository, eventPub EventPublisher) *CarService {
 	t.Helper()
-	return NewCarService(discardLogger(), newTestValidator(t), nil, carRepo, nil, statusRepo, nil, nil, eventPub, noopCarCreatedNotifier{})
+	return NewCarService(discardLogger(), newTestValidator(t), nil, carRepo, statusRepo, nil, nil, eventPub, noopCarCreatedNotifier{})
 }
 
 // ── maintenancePct ────────────────────────────────────────────────────────────

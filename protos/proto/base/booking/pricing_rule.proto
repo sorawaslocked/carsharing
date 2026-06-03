@@ -9,7 +9,6 @@ option go_package = "carsharing/protos/gen/base/booking";
 message PricingRule {
   string id = 1;
   optional string car_model_id = 2;
-  optional string zone_id = 3;
   optional string car_class = 4;
 
   string type = 5;

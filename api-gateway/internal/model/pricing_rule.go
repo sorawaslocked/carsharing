@@ -8,7 +8,6 @@ type PricingRule struct {
 	ID string
 
 	ModelID *string
-	ZoneID  *string
 	Class   *string
 
 	Type      string
@@ -29,7 +28,6 @@ type PricingRule struct {
 
 type PricingRuleFilter struct {
 	ModelID  *string
-	ZoneID   *string
 	Class    *string
 	Type     *string
 	IsActive *bool
@@ -39,7 +37,6 @@ type PricingRuleFilter struct {
 
 type PricingRuleCreate struct {
 	ModelID *string
-	ZoneID  *string
 	Class   *string
 
 	Type      string
@@ -55,7 +52,6 @@ type PricingRuleCreate struct {
 
 type PricingRuleUpdate struct {
 	ModelID *string
-	ZoneID  *string
 	Class   *string
 
 	Type      *string

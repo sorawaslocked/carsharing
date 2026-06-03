@@ -23,7 +23,7 @@ func NewPricingRuleHandler(svc PricingRuleService, log *slog.Logger) *PricingRul
 
 // Create (PricingRule) godoc
 // @Summary      Create a pricing rule
-// @Description  Defines a new pricing rule. Nil scope fields (modelID, zoneID, class) act as wildcards and apply to all values of that dimension.
+// @Description  Defines a new pricing rule. Nil scope fields (modelID, class) act as wildcards and apply to all values of that dimension.
 // @Tags         pricing-rules
 // @Accept       json
 // @Produce      json
@@ -98,7 +98,6 @@ func (h *PricingRuleHandler) Get(ctx *gin.Context) {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        modelID   query     string   false  "Filter by car model UUID"
-// @Param        zoneID    query     string   false  "Filter by zone UUID"
 // @Param        class     query     string   false  "Filter by car class"   Enums(economy, compact, comfort, business, luxury)
 // @Param        type      query     string   false  "Filter by pricing type" Enums(by_minute, by_hour, by_day)
 // @Param        isActive  query     boolean  false  "Filter by active status"

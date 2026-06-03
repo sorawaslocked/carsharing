@@ -22,7 +22,6 @@ message Car {
   base.Location  location      = 10;
 
   string          telemetry_id = 11;
-  optional string zone_id       = 12;
   string          fuel_status   = 13;
   string          status        = 14;
   bool            is_retired    = 15;

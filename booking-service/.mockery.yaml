@@ -10,7 +10,6 @@ packages:
       EventPublisher:
       CarChecker:
       CarModelChecker:
-      ZoneChecker:
     config:
       dir: internal/service/mocks
       outpkg: mocks

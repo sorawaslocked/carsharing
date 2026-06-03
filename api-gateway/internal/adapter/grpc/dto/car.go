@@ -21,7 +21,6 @@ func CarFromProto(c *basecarpb.Car) model.Car {
 		BatteryLevel:     c.BatteryLevel,
 		Location:         LocationFromProto(c.GetLocation()),
 		TelemetryID:      c.GetTelemetryId(),
-		ZoneID:           c.ZoneId,
 		FuelStatus:       c.GetFuelStatus(),
 		Status:           c.GetStatus(),
 		IsRetired:        c.GetIsRetired(),

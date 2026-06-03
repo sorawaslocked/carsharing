@@ -13,7 +13,6 @@ func PricingRuleToProto(r model.PricingRule) *basebookingpb.PricingRule {
 	return &basebookingpb.PricingRule{
 		Id:                r.ID,
 		CarModelId:        r.ModelID,
-		ZoneId:            r.ZoneID,
 		CarClass:          r.Class,
 		Type:              r.Type,
 		RateTenge:         r.RateTenge,
@@ -31,7 +30,6 @@ func PricingRuleToProto(r model.PricingRule) *basebookingpb.PricingRule {
 func PricingRuleCreateFromProto(req *servicebookingpb.CreatePricingRuleRequest) validation.PricingRuleCreate {
 	return validation.PricingRuleCreate{
 		ModelID:           req.ModelId,
-		ZoneID:            req.ZoneId,
 		Class:             req.Class,
 		Type:              req.Type,
 		RateTenge:         req.RateTenge,
@@ -46,7 +44,6 @@ func PricingRuleCreateFromProto(req *servicebookingpb.CreatePricingRuleRequest) 
 func PricingRuleUpdateFromProto(req *servicebookingpb.UpdatePricingRuleRequest) validation.PricingRuleUpdate {
 	return validation.PricingRuleUpdate{
 		ModelID:           req.ModelId,
-		ZoneID:            req.ZoneId,
 		Class:             req.Class,
 		Type:              req.Type,
 		RateTenge:         req.RateTenge,
@@ -62,7 +59,6 @@ func PricingRuleUpdateFromProto(req *servicebookingpb.UpdatePricingRuleRequest) 
 func PricingRuleListFilterFromProto(req *servicebookingpb.ListPricingRulesRequest) validation.PricingRuleListFilter {
 	filter := validation.PricingRuleListFilter{
 		ModelID:  req.ModelId,
-		ZoneID:   req.ZoneId,
 		Class:    req.Class,
 		Type:     req.Type,
 		IsActive: req.IsActive,

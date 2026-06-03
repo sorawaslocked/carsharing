@@ -27,7 +27,6 @@ message StreamCarsWithFilterRequest {
   optional int32         radius_m = 9;
 
   optional float  min_fuel_level = 10;
-  optional string zone_id        = 11;
   optional string status         = 12;
 }
 

@@ -8,7 +8,6 @@ import (
 func PricingRuleFromProto(r *basebookingpb.PricingRule) model.PricingRule {
 	rule := model.PricingRule{
 		ID:                r.GetId(),
-		ZoneID:            r.ZoneId,
 		Type:              r.GetType(),
 		RateTenge:         r.GetRateTenge(),
 		RatePerKMTenge:    r.RatePerKmTenge,

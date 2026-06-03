@@ -29,7 +29,6 @@ func (h *PricingRuleHandler) Create(ctx context.Context, data model.PricingRuleC
 
 	req := &bookingsvc.CreatePricingRuleRequest{
 		ModelId:           data.ModelID,
-		ZoneId:            data.ZoneID,
 		Class:             data.Class,
 		Type:              data.Type,
 		RateTenge:         data.RateTenge,
@@ -68,7 +67,6 @@ func (h *PricingRuleHandler) List(ctx context.Context, filter model.PricingRuleF
 
 	req := &bookingsvc.ListPricingRulesRequest{
 		ModelId:  filter.ModelID,
-		ZoneId:   filter.ZoneID,
 		Class:    filter.Class,
 		Type:     filter.Type,
 		IsActive: filter.IsActive,
@@ -101,7 +99,6 @@ func (h *PricingRuleHandler) Update(ctx context.Context, id string, data model.P
 	_, err := h.client.UpdatePricingRule(ctx, &bookingsvc.UpdatePricingRuleRequest{
 		Id:                id,
 		ModelId:           data.ModelID,
-		ZoneId:            data.ZoneID,
 		Class:             data.Class,
 		Type:              data.Type,
 		RateTenge:         data.RateTenge,

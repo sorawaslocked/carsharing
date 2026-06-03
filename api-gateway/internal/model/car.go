@@ -20,7 +20,6 @@ type Car struct {
 	Location     sharedmodel.Location
 
 	TelemetryID string
-	ZoneID      *string
 	FuelStatus  string
 	Status      string
 	IsRetired   bool
@@ -46,7 +45,6 @@ type CarFilter struct {
 	RadiusM      *int32
 	MinFuelLevel *float32
 
-	ZoneID    *string
 	Status    *string
 	IsRetired *bool
 
@@ -61,7 +59,6 @@ type CarCreate struct {
 	YearManufactured int16
 
 	TelemetryID string
-	ZoneID      *string
 
 	MileageKM    *int64
 	FuelLevel    *float32
@@ -77,7 +74,6 @@ type CarUpdate struct {
 	Color        *string
 
 	TelemetryID *string
-	ZoneID      *string
 
 	IsRetired *bool
 	Notes     *string

@@ -24,7 +24,6 @@ type CarService struct {
 
 	carModelRepo         CarModelRepository
 	carRepo              CarRepository
-	zoneRepo             ZoneRepository
 	statusReadingRepo    CarStatusReadingRepository
 	telemetryReadingRepo TelemetryReadingRepository
 	objectStorage        ObjectStorage
@@ -41,7 +40,6 @@ func NewCarService(
 	validate *validator.Validate,
 	carModelRepo CarModelRepository,
 	carRepo CarRepository,
-	zoneRepo ZoneRepository,
 	statusReadingRepo CarStatusReadingRepository,
 	telemetryReadingRepo TelemetryReadingRepository,
 	objectStorage ObjectStorage,
@@ -53,7 +51,6 @@ func NewCarService(
 		validate:             validate,
 		carModelRepo:         carModelRepo,
 		carRepo:              carRepo,
-		zoneRepo:             zoneRepo,
 		statusReadingRepo:    statusReadingRepo,
 		telemetryReadingRepo: telemetryReadingRepo,
 		objectStorage:        objectStorage,
@@ -77,15 +74,6 @@ func (s *CarService) Create(ctx context.Context, data validation.CarCreate) (str
 		return "", err
 	}
 
-	if data.ZoneID != nil {
-		if _, err := s.zoneRepo.FindByID(ctx, *data.ZoneID); err != nil {
-			if !errors.Is(err, model.ErrZoneNotFound) {
-				log.Error("repo: finding zone by id", pkglog.Err(err))
-			}
-			return "", err
-		}
-	}
-
 	now := time.Now()
 
 	car := model.Car{
@@ -95,7 +83,6 @@ func (s *CarService) Create(ctx context.Context, data validation.CarCreate) (str
 		Color:            data.Color,
 		YearManufactured: data.YearManufactured,
 		TelemetryID:      data.TelemetryID,
-		ZoneID:           data.ZoneID,
 		FuelLevel:        data.FuelLevel,
 		BatteryLevel:     data.BatteryLevel,
 		Notes:            data.Notes,
@@ -192,21 +179,11 @@ func (s *CarService) Update(ctx context.Context, id string, data validation.CarU
 		return err
 	}
 
-	if data.ZoneID != nil {
-		if _, err := s.zoneRepo.FindByID(ctx, *data.ZoneID); err != nil {
-			if !errors.Is(err, model.ErrZoneNotFound) {
-				log.Error("repo: finding zone by id", pkglog.Err(err))
-			}
-			return err
-		}
-	}
-
 	if err := s.carRepo.Update(ctx, id, model.CarUpdate{
 		ModelID:      data.ModelID,
 		LicensePlate: data.LicensePlate,
 		Color:        data.Color,
 		TelemetryID:  data.TelemetryID,
-		ZoneID:       data.ZoneID,
 		IsRetired:    data.IsRetired,
 		Notes:        data.Notes,
 		ImageKeys:    data.ImageKeys,

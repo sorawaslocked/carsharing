@@ -38,7 +38,6 @@ type PricingSnapshot struct {
 type PricingRule struct {
 	ID                string
 	ModelID           *string
-	ZoneID            *string
 	Class             *string
 	Type              string
 	RateTenge         int32
@@ -54,7 +53,6 @@ type PricingRule struct {
 
 type PricingRuleCreate struct {
 	ModelID           *string
-	ZoneID            *string
 	Class             *string
 	Type              string
 	RateTenge         int32
@@ -67,7 +65,6 @@ type PricingRuleCreate struct {
 
 type PricingRuleUpdate struct {
 	ModelID           *string
-	ZoneID            *string
 	Class             *string
 	Type              *string
 	RateTenge         *int32
@@ -81,7 +78,6 @@ type PricingRuleUpdate struct {
 
 type PricingRuleListFilter struct {
 	ModelID    *string
-	ZoneID     *string
 	Class      *string
 	Type       *string
 	IsActive   *bool

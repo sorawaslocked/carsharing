@@ -1,18 +1,18 @@
 basePath: /api/v1
 definitions:
-  carsharing_api-gateway_internal_adapter_http_dto.AccessTokenData:
+  dto.AccessTokenData:
     properties:
       expiresIn:
         type: integer
       token:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.AccessTokenResponse:
+  dto.AccessTokenResponse:
     properties:
       accessToken:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.AccessTokenData'
+        $ref: '#/definitions/dto.AccessTokenData'
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.Booking:
+  dto.Booking:
     properties:
       carID:
         type: string
@@ -27,7 +27,7 @@ definitions:
       pricingRuleID:
         type: string
       pricingSnapshot:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.PricingSnapshot'
+        $ref: '#/definitions/dto.PricingSnapshot'
       status:
         enum:
         - created
@@ -40,7 +40,7 @@ definitions:
       userID:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.BookingCreateRequest:
+  dto.BookingCreateRequest:
     properties:
       carID:
         type: string
@@ -53,12 +53,12 @@ definitions:
     - carID
     - pricingRuleID
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.BookingStats:
+  dto.BookingStats:
     properties:
       active:
         type: integer
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.BookingStatusReading:
+  dto.BookingStatusReading:
     properties:
       actorID:
         type: string
@@ -91,7 +91,7 @@ definitions:
         - cancelled
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.BookingStatusUpdateRequest:
+  dto.BookingStatusUpdateRequest:
     properties:
       reason:
         maxLength: 500
@@ -107,7 +107,7 @@ definitions:
     required:
     - status
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.Car:
+  dto.Car:
     properties:
       batteryLevel:
         type: number
@@ -132,7 +132,7 @@ definitions:
       licensePlate:
         type: string
       location:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.location'
+        $ref: '#/definitions/dto.location'
       mileageKm:
         type: integer
       modelID:
@@ -155,10 +155,8 @@ definitions:
         type: string
       yearManufactured:
         type: integer
-      zoneID:
-        type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarCreateRequest:
+  dto.CarCreateRequest:
     properties:
       batteryLevel:
         type: number
@@ -184,8 +182,6 @@ definitions:
         type: string
       yearManufactured:
         type: integer
-      zoneID:
-        type: string
     required:
     - color
     - licensePlate
@@ -194,7 +190,7 @@ definitions:
     - vin
     - yearManufactured
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarInsurance:
+  dto.CarInsurance:
     properties:
       carID:
         type: string
@@ -233,7 +229,7 @@ definitions:
       updatedAt:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarInsuranceCreateRequest:
+  dto.CarInsuranceCreateRequest:
     properties:
       carID:
         type: string
@@ -263,12 +259,12 @@ definitions:
     - startsAt
     - type
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarInsuranceResponse:
+  dto.CarInsuranceResponse:
     properties:
       insurance:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarInsurance'
+        $ref: '#/definitions/dto.CarInsurance'
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarInsuranceUpdateRequest:
+  dto.CarInsuranceUpdateRequest:
     properties:
       costTenge:
         minimum: 0
@@ -294,14 +290,14 @@ definitions:
         - cancelled
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarInsurancesResponse:
+  dto.CarInsurancesResponse:
     properties:
       insurances:
         items:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarInsurance'
+          $ref: '#/definitions/dto.CarInsurance'
         type: array
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceRecord:
+  dto.CarMaintenanceRecord:
     properties:
       assignedTo:
         type: string
@@ -336,7 +332,7 @@ definitions:
       templateID:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceRecordCompleteRequest:
+  dto.CarMaintenanceRecordCompleteRequest:
     properties:
       completedKm:
         minimum: 0
@@ -351,14 +347,14 @@ definitions:
           type: string
         type: array
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceRecordsResponse:
+  dto.CarMaintenanceRecordsResponse:
     properties:
       records:
         items:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceRecord'
+          $ref: '#/definitions/dto.CarMaintenanceRecord'
         type: array
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplate:
+  dto.CarMaintenanceTemplate:
     properties:
       dayInterval:
         type: integer
@@ -375,7 +371,7 @@ definitions:
       warnPct:
         type: number
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateAssignRequest:
+  dto.CarMaintenanceTemplateAssignRequest:
     properties:
       carID:
         type: string
@@ -389,7 +385,7 @@ definitions:
     - carID
     - templateID
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateCreateRequest:
+  dto.CarMaintenanceTemplateCreateRequest:
     properties:
       dayInterval:
         type: integer
@@ -406,12 +402,12 @@ definitions:
     required:
     - name
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateItemResponse:
+  dto.CarMaintenanceTemplateItemResponse:
     properties:
       template:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplate'
+        $ref: '#/definitions/dto.CarMaintenanceTemplate'
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateUpdateRequest:
+  dto.CarMaintenanceTemplateUpdateRequest:
     properties:
       dayInterval:
         type: integer
@@ -426,14 +422,14 @@ definitions:
       warnPct:
         type: number
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplatesResponse:
+  dto.CarMaintenanceTemplatesResponse:
     properties:
       templates:
         items:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplate'
+          $ref: '#/definitions/dto.CarMaintenanceTemplate'
         type: array
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarModel:
+  dto.CarModel:
     properties:
       bodyType:
         enum:
@@ -493,7 +489,7 @@ definitions:
       year:
         type: integer
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarModelCreateRequest:
+  dto.CarModelCreateRequest:
     properties:
       bodyType:
         enum:
@@ -554,12 +550,12 @@ definitions:
     - transmission
     - year
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarModelGetResponse:
+  dto.CarModelGetResponse:
     properties:
       carModel:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarModel'
+        $ref: '#/definitions/dto.CarModel'
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarModelUpdateRequest:
+  dto.CarModelUpdateRequest:
     properties:
       bodyType:
         enum:
@@ -613,26 +609,26 @@ definitions:
       year:
         type: integer
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarModelsResponse:
+  dto.CarModelsResponse:
     properties:
       carModels:
         items:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarModel'
+          $ref: '#/definitions/dto.CarModel'
         type: array
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarResponse:
+  dto.CarResponse:
     properties:
       car:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.Car'
+        $ref: '#/definitions/dto.Car'
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarStatusHistoryResponse:
+  dto.CarStatusHistoryResponse:
     properties:
       statusHistory:
         items:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarStatusReading'
+          $ref: '#/definitions/dto.CarStatusReading'
         type: array
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarStatusReading:
+  dto.CarStatusReading:
     properties:
       actorID:
         type: string
@@ -670,7 +666,7 @@ definitions:
         - out_of_service
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarStatusUpdateRequest:
+  dto.CarStatusUpdateRequest:
     properties:
       metadata:
         additionalProperties: {}
@@ -689,14 +685,14 @@ definitions:
     - reason
     - status
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarTelemetryHistoryResponse:
+  dto.CarTelemetryHistoryResponse:
     properties:
       telemetryHistory:
         items:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarTelemetryReading'
+          $ref: '#/definitions/dto.CarTelemetryReading'
         type: array
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarTelemetryReading:
+  dto.CarTelemetryReading:
     properties:
       actorID:
         type: string
@@ -717,7 +713,7 @@ definitions:
       id:
         type: string
       location:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.location'
+        $ref: '#/definitions/dto.location'
       metadata:
         additionalProperties: {}
         type: object
@@ -728,7 +724,7 @@ definitions:
       recordedAt:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarTelemetryUpdateRequest:
+  dto.CarTelemetryUpdateRequest:
     properties:
       batteryLevel:
         type: number
@@ -748,7 +744,7 @@ definitions:
     required:
     - reason
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarUpdateRequest:
+  dto.CarUpdateRequest:
     properties:
       color:
         type: string
@@ -766,24 +762,22 @@ definitions:
         type: string
       telemetryId:
         type: string
-      zoneID:
-        type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CarsResponse:
+  dto.CarsResponse:
     properties:
       cars:
         items:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.Car'
+          $ref: '#/definitions/dto.Car'
         type: array
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CheckActivationCodeRequest:
+  dto.CheckActivationCodeRequest:
     properties:
       code:
         type: string
     required:
     - code
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CheckDocumentRequest:
+  dto.CheckDocumentRequest:
     properties:
       error:
         type: string
@@ -797,7 +791,7 @@ definitions:
     required:
     - status
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.CreateDocumentRequest:
+  dto.CreateDocumentRequest:
     properties:
       imageType:
         enum:
@@ -812,22 +806,22 @@ definitions:
     - imageType
     - objectKey
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.DashboardResponse:
+  dto.DashboardResponse:
     properties:
       bookings:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.BookingStats'
+        $ref: '#/definitions/dto.BookingStats'
       fleet:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.FleetStats'
+        $ref: '#/definitions/dto.FleetStats'
       insurance:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.InsuranceStats'
+        $ref: '#/definitions/dto.InsuranceStats'
       maintenance:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.MaintenanceStats'
+        $ref: '#/definitions/dto.MaintenanceStats'
       trips:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.TripStats'
+        $ref: '#/definitions/dto.TripStats'
       users:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.UserStats'
+        $ref: '#/definitions/dto.UserStats'
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.DependencyHealthResponse:
+  dto.DependencyHealthResponse:
     properties:
       error:
         type: string
@@ -838,7 +832,7 @@ definitions:
       status:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.Document:
+  dto.Document:
     properties:
       createdAt:
         type: string
@@ -867,24 +861,24 @@ definitions:
       userID:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.DocumentsResponse:
+  dto.DocumentsResponse:
     properties:
       documents:
         items:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.Document'
+          $ref: '#/definitions/dto.Document'
         type: array
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.ErrorDetail:
+  dto.ErrorDetail:
     properties:
       message:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse:
+  dto.ErrorResponse:
     properties:
       error:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorDetail'
+        $ref: '#/definitions/dto.ErrorDetail'
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.FleetStats:
+  dto.FleetStats:
     properties:
       available:
         type: integer
@@ -901,7 +895,7 @@ definitions:
       total:
         type: integer
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.GetUploadDocumentDataRequest:
+  dto.GetUploadDocumentDataRequest:
     properties:
       imageType:
         enum:
@@ -913,40 +907,40 @@ definitions:
     required:
     - imageType
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.HealthResponse:
+  dto.HealthResponse:
     properties:
       services:
         items:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ServiceHealthResponse'
+          $ref: '#/definitions/dto.ServiceHealthResponse'
         type: array
       status:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.IDResponse:
+  dto.IDResponse:
     properties:
       id:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.ImageUploadData:
+  dto.ImageUploadData:
     properties:
       objectKey:
         type: string
       presignedPutURL:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.ImageUploadResponse:
+  dto.ImageUploadResponse:
     properties:
       uploadData:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ImageUploadData'
+        $ref: '#/definitions/dto.ImageUploadData'
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.InsuranceStats:
+  dto.InsuranceStats:
     properties:
       active:
         type: integer
       expiringIn30Days:
         type: integer
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.LoginRequest:
+  dto.LoginRequest:
     properties:
       email:
         type: string
@@ -957,7 +951,7 @@ definitions:
     required:
     - password
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.MaintenanceStats:
+  dto.MaintenanceStats:
     properties:
       inProgress:
         type: integer
@@ -966,7 +960,7 @@ definitions:
       pending:
         type: integer
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.PricingRule:
+  dto.PricingRule:
     properties:
       class:
         enum:
@@ -1009,10 +1003,8 @@ definitions:
         type: string
       updatedAt:
         type: string
-      zoneID:
-        type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.PricingRuleCreateRequest:
+  dto.PricingRuleCreateRequest:
     properties:
       class:
         enum:
@@ -1047,18 +1039,16 @@ definitions:
         - by_hour
         - by_day
         type: string
-      zoneID:
-        type: string
     required:
     - rateTenge
     - type
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.PricingRuleResponse:
+  dto.PricingRuleResponse:
     properties:
       rule:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.PricingRule'
+        $ref: '#/definitions/dto.PricingRule'
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.PricingRuleUpdateRequest:
+  dto.PricingRuleUpdateRequest:
     properties:
       class:
         enum:
@@ -1095,17 +1085,15 @@ definitions:
         - by_hour
         - by_day
         type: string
-      zoneID:
-        type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.PricingRulesResponse:
+  dto.PricingRulesResponse:
     properties:
       rules:
         items:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.PricingRule'
+          $ref: '#/definitions/dto.PricingRule'
         type: array
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.PricingSnapshot:
+  dto.PricingSnapshot:
     properties:
       freeMinutes:
         type: integer
@@ -1120,7 +1108,7 @@ definitions:
       rateTenge:
         type: integer
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.RegisterRequest:
+  dto.RegisterRequest:
     properties:
       birthDate:
         type: string
@@ -1144,11 +1132,11 @@ definitions:
     - password
     - passwordConfirmation
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.ServiceHealthResponse:
+  dto.ServiceHealthResponse:
     properties:
       dependencies:
         items:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.DependencyHealthResponse'
+          $ref: '#/definitions/dto.DependencyHealthResponse'
         type: array
       name:
         type: string
@@ -1159,7 +1147,7 @@ definitions:
       version:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.Trip:
+  dto.Trip:
     properties:
       bookingID:
         type: string
@@ -1176,7 +1164,7 @@ definitions:
       endFuelLevel:
         type: number
       endLocation:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.location'
+        $ref: '#/definitions/dto.location'
       endMileageKM:
         type: integer
       endedAt:
@@ -1188,7 +1176,7 @@ definitions:
       startFuelLevel:
         type: number
       startLocation:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.location'
+        $ref: '#/definitions/dto.location'
       startMileageKM:
         type: integer
       startedAt:
@@ -1204,24 +1192,24 @@ definitions:
       userID:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.TripCancelRequest:
+  dto.TripCancelRequest:
     properties:
       reason:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.TripStartRequest:
+  dto.TripStartRequest:
     properties:
       bookingID:
         type: string
     required:
     - bookingID
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.TripStats:
+  dto.TripStats:
     properties:
       active:
         type: integer
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.TripStatusReading:
+  dto.TripStatusReading:
     properties:
       actorID:
         type: string
@@ -1248,7 +1236,7 @@ definitions:
       tripID:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.TripSummary:
+  dto.TripSummary:
     properties:
       baseCostTenge:
         type: integer
@@ -1265,15 +1253,17 @@ definitions:
       overtimeCostTenge:
         type: integer
       pricingSnapshot:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.PricingSnapshot'
+        $ref: '#/definitions/dto.PricingSnapshot'
       startedAt:
         type: string
       totalCostTenge:
         type: integer
       tripID:
         type: string
+      zoneFeeAdjustmentTenge:
+        type: integer
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.User:
+  dto.User:
     properties:
       birthDate:
         type: string
@@ -1304,7 +1294,7 @@ definitions:
       updatedAt:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.UserCreateRequest:
+  dto.UserCreateRequest:
     properties:
       birthDate:
         type: string
@@ -1321,7 +1311,7 @@ definitions:
       phoneNumber:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.UserProfileUpdateRequest:
+  dto.UserProfileUpdateRequest:
     properties:
       birthDate:
         type: string
@@ -1338,12 +1328,12 @@ definitions:
       profileImageKey:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.UserResponse:
+  dto.UserResponse:
     properties:
       user:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.User'
+        $ref: '#/definitions/dto.User'
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.UserStats:
+  dto.UserStats:
     properties:
       active:
         type: integer
@@ -1356,7 +1346,7 @@ definitions:
       total:
         type: integer
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.UserUpdateRequest:
+  dto.UserUpdateRequest:
     properties:
       birthDate:
         type: string
@@ -1385,14 +1375,14 @@ definitions:
           type: string
         type: array
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.UsersResponse:
+  dto.UsersResponse:
     properties:
       users:
         items:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.User'
+          $ref: '#/definitions/dto.User'
         type: array
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.Zone:
+  dto.Zone:
     properties:
       boundary:
         type: string
@@ -1416,7 +1406,7 @@ definitions:
       updatedAt:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.ZoneCreateRequest:
+  dto.ZoneCreateRequest:
     properties:
       boundary:
         type: string
@@ -1436,12 +1426,12 @@ definitions:
     - name
     - type
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.ZoneResponse:
+  dto.ZoneResponse:
     properties:
       zone:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.Zone'
+        $ref: '#/definitions/dto.Zone'
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.ZoneUpdateRequest:
+  dto.ZoneUpdateRequest:
     properties:
       boundary:
         type: string
@@ -1459,28 +1449,28 @@ definitions:
         - surcharge
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.ZonesResponse:
+  dto.ZonesResponse:
     properties:
       zones:
         items:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.Zone'
+          $ref: '#/definitions/dto.Zone'
         type: array
     type: object
-  carsharing_api-gateway_internal_adapter_http_dto.location:
+  dto.location:
     properties:
       latitude:
         type: number
       longitude:
         type: number
     type: object
-  carsharing_api-gateway_internal_adapter_websocket_dto.CarFleetMessage:
+  wsdto.CarFleetMessage:
     properties:
       cars:
         items:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.SlimCar'
+          $ref: '#/definitions/wsdto.SlimCar'
         type: array
     type: object
-  carsharing_api-gateway_internal_adapter_websocket_dto.CarMaintenanceEventMessage:
+  wsdto.CarMaintenanceEventMessage:
     properties:
       carID:
         type: string
@@ -1493,7 +1483,7 @@ definitions:
       templateID:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_websocket_dto.CarStatusMessage:
+  wsdto.CarStatusMessage:
     properties:
       carID:
         type: string
@@ -1502,24 +1492,24 @@ definitions:
       toStatus:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_websocket_dto.CarTelemetryMessage:
+  wsdto.CarTelemetryMessage:
     properties:
       batteryLevel:
         type: number
       fuelLevel:
         type: number
       location:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.SlimCarLocation'
+        $ref: '#/definitions/wsdto.SlimCarLocation'
       mileageKm:
         type: integer
       recordedAt:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_websocket_dto.DocumentAnalyzedMessage:
+  wsdto.DocumentAnalyzedMessage:
     properties:
       defects:
         items:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.DocumentDefect'
+          $ref: '#/definitions/wsdto.DocumentDefect'
         type: array
       documentId:
         type: string
@@ -1528,14 +1518,14 @@ definitions:
       userId:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_websocket_dto.DocumentDefect:
+  wsdto.DocumentDefect:
     properties:
       description:
         type: string
       type:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_websocket_dto.SlimCar:
+  wsdto.SlimCar:
     properties:
       color:
         type: string
@@ -1546,20 +1536,20 @@ definitions:
       licensePlate:
         type: string
       location:
-        $ref: '#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.SlimCarLocation'
+        $ref: '#/definitions/wsdto.SlimCarLocation'
       modelID:
         type: string
       status:
         type: string
     type: object
-  carsharing_api-gateway_internal_adapter_websocket_dto.SlimCarLocation:
+  wsdto.SlimCarLocation:
     properties:
       latitude:
         type: number
       longitude:
         type: number
     type: object
-  carsharing_api-gateway_internal_adapter_websocket_dto.TripLiveFeedMessage:
+  wsdto.TripLiveFeedMessage:
     properties:
       currentCostTenge:
         type: integer
@@ -1595,15 +1585,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.AccessTokenResponse'
+            $ref: '#/definitions/dto.AccessTokenResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       summary: Refresh access token
       tags:
       - auth
@@ -1620,26 +1610,26 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.RegisterRequest'
+          $ref: '#/definitions/dto.RegisterRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse'
+            $ref: '#/definitions/dto.IDResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       summary: Register a new user
       tags:
       - auth
@@ -1656,26 +1646,26 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.LoginRequest'
+          $ref: '#/definitions/dto.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.AccessTokenResponse'
+            $ref: '#/definitions/dto.AccessTokenResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       summary: Sign in
       tags:
       - auth
@@ -1690,11 +1680,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Sign out
@@ -1740,20 +1730,20 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.Booking'
+              $ref: '#/definitions/dto.Booking'
             type: array
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: List bookings
@@ -1770,30 +1760,30 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.BookingCreateRequest'
+          $ref: '#/definitions/dto.BookingCreateRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse'
+            $ref: '#/definitions/dto.IDResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create a booking
@@ -1813,23 +1803,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.Booking'
+            $ref: '#/definitions/dto.Booking'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get booking by ID
@@ -1852,19 +1842,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Cancel a booking
@@ -1887,7 +1877,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.BookingStatusUpdateRequest'
+          $ref: '#/definitions/dto.BookingStatusUpdateRequest'
       produces:
       - application/json
       responses:
@@ -1896,19 +1886,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update booking status (admin)
@@ -1946,24 +1936,24 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.BookingStatusReading'
+              $ref: '#/definitions/dto.BookingStatusReading'
             type: array
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get booking status history
@@ -2011,19 +2001,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarInsurancesResponse'
+            $ref: '#/definitions/dto.CarInsurancesResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: List insurance records
@@ -2041,30 +2031,30 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarInsuranceCreateRequest'
+          $ref: '#/definitions/dto.CarInsuranceCreateRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse'
+            $ref: '#/definitions/dto.IDResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create car insurance record
@@ -2086,19 +2076,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete insurance record
@@ -2117,23 +2107,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarInsuranceResponse'
+            $ref: '#/definitions/dto.CarInsuranceResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get insurance record by ID
@@ -2153,7 +2143,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarInsuranceUpdateRequest'
+          $ref: '#/definitions/dto.CarInsuranceUpdateRequest'
       produces:
       - application/json
       responses:
@@ -2162,19 +2152,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update insurance record
@@ -2188,15 +2178,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ImageUploadResponse'
+            $ref: '#/definitions/dto.ImageUploadResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get pre-signed upload URL for insurance document images
@@ -2237,19 +2227,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceRecordsResponse'
+            $ref: '#/definitions/dto.CarMaintenanceRecordsResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: List maintenance records
@@ -2272,7 +2262,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceRecordCompleteRequest'
+          $ref: '#/definitions/dto.CarMaintenanceRecordCompleteRequest'
       produces:
       - application/json
       responses:
@@ -2281,19 +2271,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Complete a maintenance work order
@@ -2307,15 +2297,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ImageUploadResponse'
+            $ref: '#/definitions/dto.ImageUploadResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get pre-signed upload URL for maintenance receipts
@@ -2338,19 +2328,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplatesResponse'
+            $ref: '#/definitions/dto.CarMaintenanceTemplatesResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: List maintenance templates
@@ -2368,26 +2358,26 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateCreateRequest'
+          $ref: '#/definitions/dto.CarMaintenanceTemplateCreateRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse'
+            $ref: '#/definitions/dto.IDResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create maintenance template
@@ -2409,19 +2399,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete maintenance template
@@ -2440,23 +2430,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateItemResponse'
+            $ref: '#/definitions/dto.CarMaintenanceTemplateItemResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get maintenance template by ID
@@ -2476,7 +2466,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateUpdateRequest'
+          $ref: '#/definitions/dto.CarMaintenanceTemplateUpdateRequest'
       produces:
       - application/json
       responses:
@@ -2485,19 +2475,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update maintenance template
@@ -2515,7 +2505,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateAssignRequest'
+          $ref: '#/definitions/dto.CarMaintenanceTemplateAssignRequest'
       produces:
       - application/json
       responses:
@@ -2524,19 +2514,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Assign a maintenance template to a car
@@ -2611,19 +2601,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarModelsResponse'
+            $ref: '#/definitions/dto.CarModelsResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: List car models
@@ -2642,30 +2632,30 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarModelCreateRequest'
+          $ref: '#/definitions/dto.CarModelCreateRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse'
+            $ref: '#/definitions/dto.IDResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create car model
@@ -2687,19 +2677,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete car model
@@ -2718,23 +2708,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarModelGetResponse'
+            $ref: '#/definitions/dto.CarModelGetResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get car model by ID
@@ -2754,7 +2744,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarModelUpdateRequest'
+          $ref: '#/definitions/dto.CarModelUpdateRequest'
       produces:
       - application/json
       responses:
@@ -2763,19 +2753,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update car model
@@ -2791,15 +2781,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ImageUploadResponse'
+            $ref: '#/definitions/dto.ImageUploadResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get pre-signed image upload URL
@@ -2874,10 +2864,6 @@ paths:
         in: query
         name: radiusM
         type: integer
-      - description: Filter by zone UUID
-        in: query
-        name: zoneId
-        type: string
       - description: Minimum fuel level (0–100)
         in: query
         name: minFuelLevel
@@ -2906,19 +2892,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarsResponse'
+            $ref: '#/definitions/dto.CarsResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: List available cars
@@ -2936,30 +2922,30 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarCreateRequest'
+          $ref: '#/definitions/dto.CarCreateRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse'
+            $ref: '#/definitions/dto.IDResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Register a car in the fleet
@@ -2981,19 +2967,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete car
@@ -3012,23 +2998,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarResponse'
+            $ref: '#/definitions/dto.CarResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get car by ID
@@ -3048,7 +3034,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarUpdateRequest'
+          $ref: '#/definitions/dto.CarUpdateRequest'
       produces:
       - application/json
       responses:
@@ -3057,19 +3043,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update car
@@ -3093,7 +3079,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarStatusUpdateRequest'
+          $ref: '#/definitions/dto.CarStatusUpdateRequest'
       produces:
       - application/json
       responses:
@@ -3102,19 +3088,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update car status (admin)
@@ -3151,23 +3137,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarStatusHistoryResponse'
+            $ref: '#/definitions/dto.CarStatusHistoryResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get car status change history
@@ -3191,7 +3177,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarTelemetryUpdateRequest'
+          $ref: '#/definitions/dto.CarTelemetryUpdateRequest'
       produces:
       - application/json
       responses:
@@ -3200,19 +3186,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update car telemetry (admin)
@@ -3249,23 +3235,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarTelemetryHistoryResponse'
+            $ref: '#/definitions/dto.CarTelemetryHistoryResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get car telemetry history
@@ -3281,15 +3267,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ImageUploadResponse'
+            $ref: '#/definitions/dto.ImageUploadResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get pre-signed image upload URL for car photos
@@ -3305,15 +3291,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.DashboardResponse'
+            $ref: '#/definitions/dto.DashboardResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Dashboard stats
@@ -3328,7 +3314,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.HealthResponse'
+            $ref: '#/definitions/dto.HealthResponse'
       summary: Gateway health
       tags:
       - health
@@ -3339,10 +3325,6 @@ paths:
       - description: Filter by car model UUID
         in: query
         name: modelID
-        type: string
-      - description: Filter by zone UUID
-        in: query
-        name: zoneID
         type: string
       - description: Filter by car class
         enum:
@@ -3380,19 +3362,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.PricingRulesResponse'
+            $ref: '#/definitions/dto.PricingRulesResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: List pricing rules
@@ -3401,38 +3383,38 @@ paths:
     post:
       consumes:
       - application/json
-      description: Defines a new pricing rule. Nil scope fields (modelID, zoneID,
-        class) act as wildcards and apply to all values of that dimension.
+      description: Defines a new pricing rule. Nil scope fields (modelID, class) act
+        as wildcards and apply to all values of that dimension.
       parameters:
       - description: Pricing rule create payload
         in: body
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.PricingRuleCreateRequest'
+          $ref: '#/definitions/dto.PricingRuleCreateRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse'
+            $ref: '#/definitions/dto.IDResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create a pricing rule
@@ -3454,19 +3436,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete pricing rule
@@ -3485,23 +3467,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.PricingRuleResponse'
+            $ref: '#/definitions/dto.PricingRuleResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get pricing rule by ID
@@ -3522,7 +3504,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.PricingRuleUpdateRequest'
+          $ref: '#/definitions/dto.PricingRuleUpdateRequest'
       produces:
       - application/json
       responses:
@@ -3531,19 +3513,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update pricing rule
@@ -3592,20 +3574,20 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.Trip'
+              $ref: '#/definitions/dto.Trip'
             type: array
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: List trips
@@ -3622,38 +3604,38 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.TripStartRequest'
+          $ref: '#/definitions/dto.TripStartRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse'
+            $ref: '#/definitions/dto.IDResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Start a trip
@@ -3673,27 +3655,27 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.Trip'
+            $ref: '#/definitions/dto.Trip'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get trip by ID
@@ -3714,7 +3696,7 @@ paths:
         in: body
         name: body
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.TripCancelRequest'
+          $ref: '#/definitions/dto.TripCancelRequest'
       produces:
       - application/json
       responses:
@@ -3723,27 +3705,27 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Cancel a trip
@@ -3767,27 +3749,27 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: End a trip
@@ -3825,28 +3807,28 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.TripStatusReading'
+              $ref: '#/definitions/dto.TripStatusReading'
             type: array
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get trip status history
@@ -3867,31 +3849,31 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.TripSummary'
+            $ref: '#/definitions/dto.TripSummary'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get trip summary
@@ -3943,19 +3925,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.UsersResponse'
+            $ref: '#/definitions/dto.UsersResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get users with filter
@@ -3972,30 +3954,30 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.UserCreateRequest'
+          $ref: '#/definitions/dto.UserCreateRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse'
+            $ref: '#/definitions/dto.IDResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create user (admin)
@@ -4018,19 +4000,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete user
@@ -4050,23 +4032,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.UserResponse'
+            $ref: '#/definitions/dto.UserResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get user by ID
@@ -4087,7 +4069,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.UserUpdateRequest'
+          $ref: '#/definitions/dto.UserUpdateRequest'
       produces:
       - application/json
       responses:
@@ -4096,19 +4078,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update user
@@ -4163,23 +4145,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.DocumentsResponse'
+            $ref: '#/definitions/dto.DocumentsResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: List documents for a user
@@ -4197,7 +4179,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CheckActivationCodeRequest'
+          $ref: '#/definitions/dto.CheckActivationCodeRequest'
       produces:
       - application/json
       responses:
@@ -4206,15 +4188,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Check activation code
@@ -4231,11 +4213,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Send activation code
@@ -4253,26 +4235,26 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CreateDocumentRequest'
+          $ref: '#/definitions/dto.CreateDocumentRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse'
+            $ref: '#/definitions/dto.IDResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create document record
@@ -4295,7 +4277,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CheckDocumentRequest'
+          $ref: '#/definitions/dto.CheckDocumentRequest'
       produces:
       - application/json
       responses:
@@ -4304,19 +4286,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Review a document
@@ -4334,26 +4316,26 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.GetUploadDocumentDataRequest'
+          $ref: '#/definitions/dto.GetUploadDocumentDataRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ImageUploadResponse'
+            $ref: '#/definitions/dto.ImageUploadResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get document upload URL
@@ -4368,15 +4350,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.UserResponse'
+            $ref: '#/definitions/dto.UserResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get current user profile
@@ -4393,7 +4375,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.UserProfileUpdateRequest'
+          $ref: '#/definitions/dto.UserProfileUpdateRequest'
       produces:
       - application/json
       responses:
@@ -4402,19 +4384,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update current user profile
@@ -4430,15 +4412,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ImageUploadResponse'
+            $ref: '#/definitions/dto.ImageUploadResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get profile image upload URL
@@ -4454,7 +4436,7 @@ paths:
         "101":
           description: Streamed WebSocket message format
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.CarMaintenanceEventMessage'
+            $ref: '#/definitions/wsdto.CarMaintenanceEventMessage'
         "401":
           description: unauthorized
         "500":
@@ -4528,7 +4510,7 @@ paths:
         "101":
           description: Streamed WebSocket message format
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.CarFleetMessage'
+            $ref: '#/definitions/wsdto.CarFleetMessage'
         "400":
           description: bad request
         "401":
@@ -4556,7 +4538,7 @@ paths:
         "101":
           description: Streamed WebSocket message format
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.CarStatusMessage'
+            $ref: '#/definitions/wsdto.CarStatusMessage'
         "401":
           description: unauthorized
         "404":
@@ -4584,7 +4566,7 @@ paths:
         "101":
           description: Streamed WebSocket message format
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.CarTelemetryMessage'
+            $ref: '#/definitions/wsdto.CarTelemetryMessage'
         "401":
           description: unauthorized
         "500":
@@ -4610,7 +4592,7 @@ paths:
         "101":
           description: Streamed WebSocket message format
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.TripLiveFeedMessage'
+            $ref: '#/definitions/wsdto.TripLiveFeedMessage'
         "401":
           description: unauthorized
         "500":
@@ -4639,7 +4621,7 @@ paths:
         "101":
           description: Streamed WebSocket message format
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.DocumentAnalyzedMessage'
+            $ref: '#/definitions/wsdto.DocumentAnalyzedMessage'
         "401":
           description: unauthorized
         "500":
@@ -4672,19 +4654,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ZonesResponse'
+            $ref: '#/definitions/dto.ZonesResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: List zones
@@ -4701,30 +4683,30 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ZoneCreateRequest'
+          $ref: '#/definitions/dto.ZoneCreateRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse'
+            $ref: '#/definitions/dto.IDResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create zone
@@ -4746,19 +4728,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete zone
@@ -4777,23 +4759,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ZoneResponse'
+            $ref: '#/definitions/dto.ZoneResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get zone by ID
@@ -4813,7 +4795,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ZoneUpdateRequest'
+          $ref: '#/definitions/dto.ZoneUpdateRequest'
       produces:
       - application/json
       responses:
@@ -4822,19 +4804,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse'
+            $ref: '#/definitions/dto.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update zone

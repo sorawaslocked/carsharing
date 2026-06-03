@@ -43,11 +43,12 @@ type TripSummary struct {
 	DurationSeconds    int64   `json:"durationSeconds"`
 	DistanceTraveledKM float64 `json:"distanceTraveledKM"`
 
-	PricingSnapshot   PricingSnapshot `json:"pricingSnapshot"`
-	BaseCostTenge     int32           `json:"baseCostTenge"`
-	DistanceCostTenge int32           `json:"distanceCostTenge"`
-	OvertimeCostTenge int32           `json:"overtimeCostTenge"`
-	TotalCostTenge    int32           `json:"totalCostTenge"`
+	PricingSnapshot        PricingSnapshot `json:"pricingSnapshot"`
+	BaseCostTenge          int32           `json:"baseCostTenge"`
+	DistanceCostTenge      int32           `json:"distanceCostTenge"`
+	OvertimeCostTenge      int32           `json:"overtimeCostTenge"`
+	ZoneFeeAdjustmentTenge int32           `json:"zoneFeeAdjustmentTenge"`
+	TotalCostTenge         int32           `json:"totalCostTenge"`
 }
 
 type TripStatusReading struct {
@@ -198,10 +199,11 @@ func ToTripSummaryResponse(m model.TripSummary) TripSummary {
 			OvertimePolicy:    m.PricingSnapshot.OvertimePolicy,
 			OvertimeRateTenge: m.PricingSnapshot.OvertimeRateTenge,
 		},
-		BaseCostTenge:     m.BaseCostTenge,
-		DistanceCostTenge: m.DistanceCostTenge,
-		OvertimeCostTenge: m.OvertimeCostTenge,
-		TotalCostTenge:    m.TotalCostTenge,
+		BaseCostTenge:          m.BaseCostTenge,
+		DistanceCostTenge:      m.DistanceCostTenge,
+		OvertimeCostTenge:      m.OvertimeCostTenge,
+		ZoneFeeAdjustmentTenge: m.ZoneFeeAdjustmentTenge,
+		TotalCostTenge:         m.TotalCostTenge,
 	}
 }
 

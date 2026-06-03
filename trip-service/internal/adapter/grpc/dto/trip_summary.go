@@ -11,17 +11,18 @@ import (
 
 func TripSummaryToProto(s model.TripSummary) *basetripmb.TripSummary {
 	return &basetripmb.TripSummary{
-		TripId:             s.TripID,
-		BookingId:          s.BookingID,
-		StartedAt:          timestamppb.New(s.StartedAt),
-		EndedAt:            timestamppb.New(s.EndedAt),
-		DurationSeconds:    s.DurationSeconds,
-		DistanceTraveledKm: s.DistanceTraveledKM,
-		PricingSnapshot:    PricingSnapshotToProto(s.PricingSnapshot),
-		BaseCostTenge:      s.BaseCostTenge,
-		DistanceCostTenge:  s.DistanceCostTenge,
-		OvertimeCostTenge:  s.OvertimeCostTenge,
-		TotalCostTenge:     s.TotalCostTenge,
+		TripId:                 s.TripID,
+		BookingId:              s.BookingID,
+		StartedAt:              timestamppb.New(s.StartedAt),
+		EndedAt:                timestamppb.New(s.EndedAt),
+		DurationSeconds:        s.DurationSeconds,
+		DistanceTraveledKm:     s.DistanceTraveledKM,
+		PricingSnapshot:        PricingSnapshotToProto(s.PricingSnapshot),
+		BaseCostTenge:          s.BaseCostTenge,
+		DistanceCostTenge:      s.DistanceCostTenge,
+		OvertimeCostTenge:      s.OvertimeCostTenge,
+		ZoneFeeAdjustmentTenge: s.ZoneFeeAdjustmentTenge,
+		TotalCostTenge:         s.TotalCostTenge,
 	}
 }
 

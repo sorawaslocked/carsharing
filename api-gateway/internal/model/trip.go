@@ -49,11 +49,12 @@ type TripSummary struct {
 	DurationSeconds    int64
 	DistanceTraveledKM float64
 
-	PricingSnapshot   PricingSnapshot
-	BaseCostTenge     int32
-	DistanceCostTenge int32
-	OvertimeCostTenge int32
-	TotalCostTenge    int32
+	PricingSnapshot        PricingSnapshot
+	BaseCostTenge          int32
+	DistanceCostTenge      int32
+	OvertimeCostTenge      int32
+	ZoneFeeAdjustmentTenge int32
+	TotalCostTenge         int32
 }
 
 type TripStatusReading struct {

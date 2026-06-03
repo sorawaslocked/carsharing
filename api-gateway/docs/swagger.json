@@ -30,19 +30,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.AccessTokenResponse"
+                            "$ref": "#/definitions/dto.AccessTokenResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -68,7 +68,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.RegisterRequest"
+                            "$ref": "#/definitions/dto.RegisterRequest"
                         }
                     }
                 ],
@@ -76,25 +76,25 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -120,7 +120,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.LoginRequest"
+                            "$ref": "#/definitions/dto.LoginRequest"
                         }
                     }
                 ],
@@ -128,25 +128,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.AccessTokenResponse"
+                            "$ref": "#/definitions/dto.AccessTokenResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -174,13 +174,13 @@
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -251,26 +251,26 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.Booking"
+                                "$ref": "#/definitions/dto.Booking"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -299,7 +299,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.BookingCreateRequest"
+                            "$ref": "#/definitions/dto.BookingCreateRequest"
                         }
                     }
                 ],
@@ -307,31 +307,31 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -364,31 +364,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.Booking"
+                            "$ref": "#/definitions/dto.Booking"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -425,25 +425,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -481,7 +481,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.BookingStatusUpdateRequest"
+                            "$ref": "#/definitions/dto.BookingStatusUpdateRequest"
                         }
                     }
                 ],
@@ -492,25 +492,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -570,32 +570,32 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.BookingStatusReading"
+                                "$ref": "#/definitions/dto.BookingStatusReading"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -667,25 +667,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarInsurancesResponse"
+                            "$ref": "#/definitions/dto.CarInsurancesResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -714,7 +714,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarInsuranceCreateRequest"
+                            "$ref": "#/definitions/dto.CarInsuranceCreateRequest"
                         }
                     }
                 ],
@@ -722,31 +722,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -770,19 +770,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ImageUploadResponse"
+                            "$ref": "#/definitions/dto.ImageUploadResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -815,31 +815,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarInsuranceResponse"
+                            "$ref": "#/definitions/dto.CarInsuranceResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -873,25 +873,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -926,7 +926,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarInsuranceUpdateRequest"
+                            "$ref": "#/definitions/dto.CarInsuranceUpdateRequest"
                         }
                     }
                 ],
@@ -937,25 +937,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1017,25 +1017,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceRecordsResponse"
+                            "$ref": "#/definitions/dto.CarMaintenanceRecordsResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1073,7 +1073,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceRecordCompleteRequest"
+                            "$ref": "#/definitions/dto.CarMaintenanceRecordCompleteRequest"
                         }
                     }
                 ],
@@ -1084,25 +1084,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1126,19 +1126,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ImageUploadResponse"
+                            "$ref": "#/definitions/dto.ImageUploadResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1176,25 +1176,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplatesResponse"
+                            "$ref": "#/definitions/dto.CarMaintenanceTemplatesResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1223,7 +1223,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateCreateRequest"
+                            "$ref": "#/definitions/dto.CarMaintenanceTemplateCreateRequest"
                         }
                     }
                 ],
@@ -1231,25 +1231,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1280,7 +1280,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateAssignRequest"
+                            "$ref": "#/definitions/dto.CarMaintenanceTemplateAssignRequest"
                         }
                     }
                 ],
@@ -1291,25 +1291,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1342,31 +1342,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateItemResponse"
+                            "$ref": "#/definitions/dto.CarMaintenanceTemplateItemResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1400,25 +1400,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1453,7 +1453,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateUpdateRequest"
+                            "$ref": "#/definitions/dto.CarMaintenanceTemplateUpdateRequest"
                         }
                     }
                 ],
@@ -1464,25 +1464,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1590,25 +1590,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarModelsResponse"
+                            "$ref": "#/definitions/dto.CarModelsResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1637,7 +1637,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarModelCreateRequest"
+                            "$ref": "#/definitions/dto.CarModelCreateRequest"
                         }
                     }
                 ],
@@ -1645,31 +1645,31 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1694,19 +1694,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ImageUploadResponse"
+                            "$ref": "#/definitions/dto.ImageUploadResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1739,31 +1739,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarModelGetResponse"
+                            "$ref": "#/definitions/dto.CarModelGetResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1797,25 +1797,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1850,7 +1850,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarModelUpdateRequest"
+                            "$ref": "#/definitions/dto.CarModelUpdateRequest"
                         }
                     }
                 ],
@@ -1861,25 +1861,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -1989,12 +1989,6 @@
                         "in": "query"
                     },
                     {
-                        "type": "string",
-                        "description": "Filter by zone UUID",
-                        "name": "zoneId",
-                        "in": "query"
-                    },
-                    {
                         "type": "number",
                         "description": "Minimum fuel level (0–100)",
                         "name": "minFuelLevel",
@@ -2030,25 +2024,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarsResponse"
+                            "$ref": "#/definitions/dto.CarsResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2077,7 +2071,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarCreateRequest"
+                            "$ref": "#/definitions/dto.CarCreateRequest"
                         }
                     }
                 ],
@@ -2085,31 +2079,31 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2134,19 +2128,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ImageUploadResponse"
+                            "$ref": "#/definitions/dto.ImageUploadResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2179,31 +2173,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarResponse"
+                            "$ref": "#/definitions/dto.CarResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2237,25 +2231,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2290,7 +2284,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarUpdateRequest"
+                            "$ref": "#/definitions/dto.CarUpdateRequest"
                         }
                     }
                 ],
@@ -2301,25 +2295,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2357,7 +2351,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarStatusUpdateRequest"
+                            "$ref": "#/definitions/dto.CarStatusUpdateRequest"
                         }
                     }
                 ],
@@ -2368,25 +2362,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2444,31 +2438,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarStatusHistoryResponse"
+                            "$ref": "#/definitions/dto.CarStatusHistoryResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2506,7 +2500,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarTelemetryUpdateRequest"
+                            "$ref": "#/definitions/dto.CarTelemetryUpdateRequest"
                         }
                     }
                 ],
@@ -2517,25 +2511,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2593,31 +2587,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarTelemetryHistoryResponse"
+                            "$ref": "#/definitions/dto.CarTelemetryHistoryResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2642,19 +2636,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.DashboardResponse"
+                            "$ref": "#/definitions/dto.DashboardResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2674,7 +2668,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.HealthResponse"
+                            "$ref": "#/definitions/dto.HealthResponse"
                         }
                     }
                 }
@@ -2700,12 +2694,6 @@
                         "type": "string",
                         "description": "Filter by car model UUID",
                         "name": "modelID",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by zone UUID",
-                        "name": "zoneID",
                         "in": "query"
                     },
                     {
@@ -2755,25 +2743,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.PricingRulesResponse"
+                            "$ref": "#/definitions/dto.PricingRulesResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2784,7 +2772,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Defines a new pricing rule. Nil scope fields (modelID, zoneID, class) act as wildcards and apply to all values of that dimension.",
+                "description": "Defines a new pricing rule. Nil scope fields (modelID, class) act as wildcards and apply to all values of that dimension.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2802,7 +2790,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.PricingRuleCreateRequest"
+                            "$ref": "#/definitions/dto.PricingRuleCreateRequest"
                         }
                     }
                 ],
@@ -2810,31 +2798,31 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2867,31 +2855,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.PricingRuleResponse"
+                            "$ref": "#/definitions/dto.PricingRuleResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2925,25 +2913,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -2979,7 +2967,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.PricingRuleUpdateRequest"
+                            "$ref": "#/definitions/dto.PricingRuleUpdateRequest"
                         }
                     }
                 ],
@@ -2990,25 +2978,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3084,26 +3072,26 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.Trip"
+                                "$ref": "#/definitions/dto.Trip"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3132,7 +3120,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.TripStartRequest"
+                            "$ref": "#/definitions/dto.TripStartRequest"
                         }
                     }
                 ],
@@ -3140,43 +3128,43 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3209,37 +3197,37 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.Trip"
+                            "$ref": "#/definitions/dto.Trip"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3276,7 +3264,7 @@
                         "name": "body",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.TripCancelRequest"
+                            "$ref": "#/definitions/dto.TripCancelRequest"
                         }
                     }
                 ],
@@ -3287,37 +3275,37 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3354,37 +3342,37 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3444,38 +3432,38 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.TripStatusReading"
+                                "$ref": "#/definitions/dto.TripStatusReading"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3509,43 +3497,43 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.TripSummary"
+                            "$ref": "#/definitions/dto.TripSummary"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3626,25 +3614,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.UsersResponse"
+                            "$ref": "#/definitions/dto.UsersResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3673,7 +3661,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.UserCreateRequest"
+                            "$ref": "#/definitions/dto.UserCreateRequest"
                         }
                     }
                 ],
@@ -3681,31 +3669,31 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3736,7 +3724,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CheckActivationCodeRequest"
+                            "$ref": "#/definitions/dto.CheckActivationCodeRequest"
                         }
                     }
                 ],
@@ -3747,19 +3735,19 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3787,13 +3775,13 @@
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3824,7 +3812,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CreateDocumentRequest"
+                            "$ref": "#/definitions/dto.CreateDocumentRequest"
                         }
                     }
                 ],
@@ -3832,25 +3820,25 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3888,7 +3876,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CheckDocumentRequest"
+                            "$ref": "#/definitions/dto.CheckDocumentRequest"
                         }
                     }
                 ],
@@ -3899,25 +3887,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3948,7 +3936,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.GetUploadDocumentDataRequest"
+                            "$ref": "#/definitions/dto.GetUploadDocumentDataRequest"
                         }
                     }
                 ],
@@ -3956,25 +3944,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ImageUploadResponse"
+                            "$ref": "#/definitions/dto.ImageUploadResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -3999,19 +3987,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.UserResponse"
+                            "$ref": "#/definitions/dto.UserResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4040,7 +4028,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.UserProfileUpdateRequest"
+                            "$ref": "#/definitions/dto.UserProfileUpdateRequest"
                         }
                     }
                 ],
@@ -4051,25 +4039,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4094,19 +4082,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ImageUploadResponse"
+                            "$ref": "#/definitions/dto.ImageUploadResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4140,31 +4128,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.UserResponse"
+                            "$ref": "#/definitions/dto.UserResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4199,25 +4187,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4253,7 +4241,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.UserUpdateRequest"
+                            "$ref": "#/definitions/dto.UserUpdateRequest"
                         }
                     }
                 ],
@@ -4264,25 +4252,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4362,31 +4350,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.DocumentsResponse"
+                            "$ref": "#/definitions/dto.DocumentsResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4411,7 +4399,7 @@
                     "101": {
                         "description": "Streamed WebSocket message format",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.CarMaintenanceEventMessage"
+                            "$ref": "#/definitions/wsdto.CarMaintenanceEventMessage"
                         }
                     },
                     "401": {
@@ -4522,7 +4510,7 @@
                     "101": {
                         "description": "Streamed WebSocket message format",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.CarFleetMessage"
+                            "$ref": "#/definitions/wsdto.CarFleetMessage"
                         }
                     },
                     "400": {
@@ -4565,7 +4553,7 @@
                     "101": {
                         "description": "Streamed WebSocket message format",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.CarStatusMessage"
+                            "$ref": "#/definitions/wsdto.CarStatusMessage"
                         }
                     },
                     "401": {
@@ -4608,7 +4596,7 @@
                     "101": {
                         "description": "Streamed WebSocket message format",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.CarTelemetryMessage"
+                            "$ref": "#/definitions/wsdto.CarTelemetryMessage"
                         }
                     },
                     "401": {
@@ -4648,7 +4636,7 @@
                     "101": {
                         "description": "Streamed WebSocket message format",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.TripLiveFeedMessage"
+                            "$ref": "#/definitions/wsdto.TripLiveFeedMessage"
                         }
                     },
                     "401": {
@@ -4693,7 +4681,7 @@
                     "101": {
                         "description": "Streamed WebSocket message format",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.DocumentAnalyzedMessage"
+                            "$ref": "#/definitions/wsdto.DocumentAnalyzedMessage"
                         }
                     },
                     "401": {
@@ -4744,25 +4732,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ZonesResponse"
+                            "$ref": "#/definitions/dto.ZonesResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4791,7 +4779,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ZoneCreateRequest"
+                            "$ref": "#/definitions/dto.ZoneCreateRequest"
                         }
                     }
                 ],
@@ -4799,31 +4787,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.IDResponse"
+                            "$ref": "#/definitions/dto.IDResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4856,31 +4844,31 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ZoneResponse"
+                            "$ref": "#/definitions/dto.ZoneResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4914,25 +4902,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -4967,7 +4955,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ZoneUpdateRequest"
+                            "$ref": "#/definitions/dto.ZoneUpdateRequest"
                         }
                     }
                 ],
@@ -4978,25 +4966,25 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse"
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -5004,7 +4992,7 @@
         }
     },
     "definitions": {
-        "carsharing_api-gateway_internal_adapter_http_dto.AccessTokenData": {
+        "dto.AccessTokenData": {
             "type": "object",
             "properties": {
                 "expiresIn": {
@@ -5015,15 +5003,15 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.AccessTokenResponse": {
+        "dto.AccessTokenResponse": {
             "type": "object",
             "properties": {
                 "accessToken": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.AccessTokenData"
+                    "$ref": "#/definitions/dto.AccessTokenData"
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.Booking": {
+        "dto.Booking": {
             "type": "object",
             "properties": {
                 "carID": {
@@ -5045,7 +5033,7 @@
                     "type": "string"
                 },
                 "pricingSnapshot": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.PricingSnapshot"
+                    "$ref": "#/definitions/dto.PricingSnapshot"
                 },
                 "status": {
                     "type": "string",
@@ -5064,7 +5052,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.BookingCreateRequest": {
+        "dto.BookingCreateRequest": {
             "type": "object",
             "required": [
                 "carID",
@@ -5083,7 +5071,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.BookingStats": {
+        "dto.BookingStats": {
             "type": "object",
             "properties": {
                 "active": {
@@ -5091,7 +5079,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.BookingStatusReading": {
+        "dto.BookingStatusReading": {
             "type": "object",
             "properties": {
                 "actorID": {
@@ -5137,7 +5125,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.BookingStatusUpdateRequest": {
+        "dto.BookingStatusUpdateRequest": {
             "type": "object",
             "required": [
                 "status"
@@ -5159,7 +5147,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.Car": {
+        "dto.Car": {
             "type": "object",
             "properties": {
                 "batteryLevel": {
@@ -5196,7 +5184,7 @@
                     "type": "string"
                 },
                 "location": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.location"
+                    "$ref": "#/definitions/dto.location"
                 },
                 "mileageKm": {
                     "type": "integer"
@@ -5228,13 +5216,10 @@
                 },
                 "yearManufactured": {
                     "type": "integer"
-                },
-                "zoneID": {
-                    "type": "string"
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarCreateRequest": {
+        "dto.CarCreateRequest": {
             "type": "object",
             "required": [
                 "color",
@@ -5280,13 +5265,10 @@
                 },
                 "yearManufactured": {
                     "type": "integer"
-                },
-                "zoneID": {
-                    "type": "string"
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarInsurance": {
+        "dto.CarInsurance": {
             "type": "object",
             "properties": {
                 "carID": {
@@ -5343,7 +5325,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarInsuranceCreateRequest": {
+        "dto.CarInsuranceCreateRequest": {
             "type": "object",
             "required": [
                 "carID",
@@ -5385,15 +5367,15 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarInsuranceResponse": {
+        "dto.CarInsuranceResponse": {
             "type": "object",
             "properties": {
                 "insurance": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarInsurance"
+                    "$ref": "#/definitions/dto.CarInsurance"
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarInsuranceUpdateRequest": {
+        "dto.CarInsuranceUpdateRequest": {
             "type": "object",
             "properties": {
                 "costTenge": {
@@ -5431,18 +5413,18 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarInsurancesResponse": {
+        "dto.CarInsurancesResponse": {
             "type": "object",
             "properties": {
                 "insurances": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarInsurance"
+                        "$ref": "#/definitions/dto.CarInsurance"
                     }
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceRecord": {
+        "dto.CarMaintenanceRecord": {
             "type": "object",
             "properties": {
                 "assignedTo": {
@@ -5494,7 +5476,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceRecordCompleteRequest": {
+        "dto.CarMaintenanceRecordCompleteRequest": {
             "type": "object",
             "properties": {
                 "completedKm": {
@@ -5516,18 +5498,18 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceRecordsResponse": {
+        "dto.CarMaintenanceRecordsResponse": {
             "type": "object",
             "properties": {
                 "records": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceRecord"
+                        "$ref": "#/definitions/dto.CarMaintenanceRecord"
                     }
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplate": {
+        "dto.CarMaintenanceTemplate": {
             "type": "object",
             "properties": {
                 "dayInterval": {
@@ -5553,7 +5535,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateAssignRequest": {
+        "dto.CarMaintenanceTemplateAssignRequest": {
             "type": "object",
             "required": [
                 "carID",
@@ -5574,7 +5556,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateCreateRequest": {
+        "dto.CarMaintenanceTemplateCreateRequest": {
             "type": "object",
             "required": [
                 "name"
@@ -5600,15 +5582,15 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateItemResponse": {
+        "dto.CarMaintenanceTemplateItemResponse": {
             "type": "object",
             "properties": {
                 "template": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplate"
+                    "$ref": "#/definitions/dto.CarMaintenanceTemplate"
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplateUpdateRequest": {
+        "dto.CarMaintenanceTemplateUpdateRequest": {
             "type": "object",
             "properties": {
                 "dayInterval": {
@@ -5631,18 +5613,18 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplatesResponse": {
+        "dto.CarMaintenanceTemplatesResponse": {
             "type": "object",
             "properties": {
                 "templates": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarMaintenanceTemplate"
+                        "$ref": "#/definitions/dto.CarMaintenanceTemplate"
                     }
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarModel": {
+        "dto.CarModel": {
             "type": "object",
             "properties": {
                 "bodyType": {
@@ -5725,7 +5707,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarModelCreateRequest": {
+        "dto.CarModelCreateRequest": {
             "type": "object",
             "required": [
                 "bodyType",
@@ -5805,15 +5787,15 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarModelGetResponse": {
+        "dto.CarModelGetResponse": {
             "type": "object",
             "properties": {
                 "carModel": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarModel"
+                    "$ref": "#/definitions/dto.CarModel"
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarModelUpdateRequest": {
+        "dto.CarModelUpdateRequest": {
             "type": "object",
             "properties": {
                 "bodyType": {
@@ -5887,37 +5869,37 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarModelsResponse": {
+        "dto.CarModelsResponse": {
             "type": "object",
             "properties": {
                 "carModels": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarModel"
+                        "$ref": "#/definitions/dto.CarModel"
                     }
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarResponse": {
+        "dto.CarResponse": {
             "type": "object",
             "properties": {
                 "car": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.Car"
+                    "$ref": "#/definitions/dto.Car"
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarStatusHistoryResponse": {
+        "dto.CarStatusHistoryResponse": {
             "type": "object",
             "properties": {
                 "statusHistory": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarStatusReading"
+                        "$ref": "#/definitions/dto.CarStatusReading"
                     }
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarStatusReading": {
+        "dto.CarStatusReading": {
             "type": "object",
             "properties": {
                 "actorID": {
@@ -5969,7 +5951,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarStatusUpdateRequest": {
+        "dto.CarStatusUpdateRequest": {
             "type": "object",
             "required": [
                 "reason",
@@ -5995,18 +5977,18 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarTelemetryHistoryResponse": {
+        "dto.CarTelemetryHistoryResponse": {
             "type": "object",
             "properties": {
                 "telemetryHistory": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.CarTelemetryReading"
+                        "$ref": "#/definitions/dto.CarTelemetryReading"
                     }
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarTelemetryReading": {
+        "dto.CarTelemetryReading": {
             "type": "object",
             "properties": {
                 "actorID": {
@@ -6036,7 +6018,7 @@
                     "type": "string"
                 },
                 "location": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.location"
+                    "$ref": "#/definitions/dto.location"
                 },
                 "metadata": {
                     "type": "object",
@@ -6053,7 +6035,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarTelemetryUpdateRequest": {
+        "dto.CarTelemetryUpdateRequest": {
             "type": "object",
             "required": [
                 "reason"
@@ -6083,7 +6065,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarUpdateRequest": {
+        "dto.CarUpdateRequest": {
             "type": "object",
             "properties": {
                 "color": {
@@ -6109,24 +6091,21 @@
                 },
                 "telemetryId": {
                     "type": "string"
-                },
-                "zoneID": {
-                    "type": "string"
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CarsResponse": {
+        "dto.CarsResponse": {
             "type": "object",
             "properties": {
                 "cars": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.Car"
+                        "$ref": "#/definitions/dto.Car"
                     }
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CheckActivationCodeRequest": {
+        "dto.CheckActivationCodeRequest": {
             "type": "object",
             "required": [
                 "code"
@@ -6137,7 +6116,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CheckDocumentRequest": {
+        "dto.CheckDocumentRequest": {
             "type": "object",
             "required": [
                 "status"
@@ -6157,7 +6136,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.CreateDocumentRequest": {
+        "dto.CreateDocumentRequest": {
             "type": "object",
             "required": [
                 "imageType",
@@ -6178,30 +6157,30 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.DashboardResponse": {
+        "dto.DashboardResponse": {
             "type": "object",
             "properties": {
                 "bookings": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.BookingStats"
+                    "$ref": "#/definitions/dto.BookingStats"
                 },
                 "fleet": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.FleetStats"
+                    "$ref": "#/definitions/dto.FleetStats"
                 },
                 "insurance": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.InsuranceStats"
+                    "$ref": "#/definitions/dto.InsuranceStats"
                 },
                 "maintenance": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.MaintenanceStats"
+                    "$ref": "#/definitions/dto.MaintenanceStats"
                 },
                 "trips": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.TripStats"
+                    "$ref": "#/definitions/dto.TripStats"
                 },
                 "users": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.UserStats"
+                    "$ref": "#/definitions/dto.UserStats"
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.DependencyHealthResponse": {
+        "dto.DependencyHealthResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -6218,7 +6197,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.Document": {
+        "dto.Document": {
             "type": "object",
             "properties": {
                 "createdAt": {
@@ -6259,18 +6238,18 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.DocumentsResponse": {
+        "dto.DocumentsResponse": {
             "type": "object",
             "properties": {
                 "documents": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.Document"
+                        "$ref": "#/definitions/dto.Document"
                     }
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.ErrorDetail": {
+        "dto.ErrorDetail": {
             "type": "object",
             "properties": {
                 "message": {
@@ -6278,15 +6257,15 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.ErrorResponse": {
+        "dto.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ErrorDetail"
+                    "$ref": "#/definitions/dto.ErrorDetail"
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.FleetStats": {
+        "dto.FleetStats": {
             "type": "object",
             "properties": {
                 "available": {
@@ -6312,7 +6291,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.GetUploadDocumentDataRequest": {
+        "dto.GetUploadDocumentDataRequest": {
             "type": "object",
             "required": [
                 "imageType"
@@ -6329,13 +6308,13 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.HealthResponse": {
+        "dto.HealthResponse": {
             "type": "object",
             "properties": {
                 "services": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ServiceHealthResponse"
+                        "$ref": "#/definitions/dto.ServiceHealthResponse"
                     }
                 },
                 "status": {
@@ -6343,7 +6322,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.IDResponse": {
+        "dto.IDResponse": {
             "type": "object",
             "properties": {
                 "id": {
@@ -6351,7 +6330,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.ImageUploadData": {
+        "dto.ImageUploadData": {
             "type": "object",
             "properties": {
                 "objectKey": {
@@ -6362,15 +6341,15 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.ImageUploadResponse": {
+        "dto.ImageUploadResponse": {
             "type": "object",
             "properties": {
                 "uploadData": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.ImageUploadData"
+                    "$ref": "#/definitions/dto.ImageUploadData"
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.InsuranceStats": {
+        "dto.InsuranceStats": {
             "type": "object",
             "properties": {
                 "active": {
@@ -6381,7 +6360,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.LoginRequest": {
+        "dto.LoginRequest": {
             "type": "object",
             "required": [
                 "password"
@@ -6398,7 +6377,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.MaintenanceStats": {
+        "dto.MaintenanceStats": {
             "type": "object",
             "properties": {
                 "inProgress": {
@@ -6412,7 +6391,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.PricingRule": {
+        "dto.PricingRule": {
             "type": "object",
             "properties": {
                 "class": {
@@ -6470,13 +6449,10 @@
                 },
                 "updatedAt": {
                     "type": "string"
-                },
-                "zoneID": {
-                    "type": "string"
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.PricingRuleCreateRequest": {
+        "dto.PricingRuleCreateRequest": {
             "type": "object",
             "required": [
                 "rateTenge",
@@ -6526,21 +6502,18 @@
                         "by_hour",
                         "by_day"
                     ]
-                },
-                "zoneID": {
-                    "type": "string"
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.PricingRuleResponse": {
+        "dto.PricingRuleResponse": {
             "type": "object",
             "properties": {
                 "rule": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.PricingRule"
+                    "$ref": "#/definitions/dto.PricingRule"
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.PricingRuleUpdateRequest": {
+        "dto.PricingRuleUpdateRequest": {
             "type": "object",
             "properties": {
                 "class": {
@@ -6589,24 +6562,21 @@
                         "by_hour",
                         "by_day"
                     ]
-                },
-                "zoneID": {
-                    "type": "string"
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.PricingRulesResponse": {
+        "dto.PricingRulesResponse": {
             "type": "object",
             "properties": {
                 "rules": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.PricingRule"
+                        "$ref": "#/definitions/dto.PricingRule"
                     }
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.PricingSnapshot": {
+        "dto.PricingSnapshot": {
             "type": "object",
             "properties": {
                 "freeMinutes": {
@@ -6629,7 +6599,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.RegisterRequest": {
+        "dto.RegisterRequest": {
             "type": "object",
             "required": [
                 "birthDate",
@@ -6663,13 +6633,13 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.ServiceHealthResponse": {
+        "dto.ServiceHealthResponse": {
             "type": "object",
             "properties": {
                 "dependencies": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.DependencyHealthResponse"
+                        "$ref": "#/definitions/dto.DependencyHealthResponse"
                     }
                 },
                 "name": {
@@ -6686,7 +6656,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.Trip": {
+        "dto.Trip": {
             "type": "object",
             "properties": {
                 "bookingID": {
@@ -6711,7 +6681,7 @@
                     "type": "number"
                 },
                 "endLocation": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.location"
+                    "$ref": "#/definitions/dto.location"
                 },
                 "endMileageKM": {
                     "type": "integer"
@@ -6729,7 +6699,7 @@
                     "type": "number"
                 },
                 "startLocation": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.location"
+                    "$ref": "#/definitions/dto.location"
                 },
                 "startMileageKM": {
                     "type": "integer"
@@ -6753,7 +6723,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.TripCancelRequest": {
+        "dto.TripCancelRequest": {
             "type": "object",
             "properties": {
                 "reason": {
@@ -6761,7 +6731,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.TripStartRequest": {
+        "dto.TripStartRequest": {
             "type": "object",
             "required": [
                 "bookingID"
@@ -6772,7 +6742,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.TripStats": {
+        "dto.TripStats": {
             "type": "object",
             "properties": {
                 "active": {
@@ -6780,7 +6750,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.TripStatusReading": {
+        "dto.TripStatusReading": {
             "type": "object",
             "properties": {
                 "actorID": {
@@ -6819,7 +6789,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.TripSummary": {
+        "dto.TripSummary": {
             "type": "object",
             "properties": {
                 "baseCostTenge": {
@@ -6844,7 +6814,7 @@
                     "type": "integer"
                 },
                 "pricingSnapshot": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.PricingSnapshot"
+                    "$ref": "#/definitions/dto.PricingSnapshot"
                 },
                 "startedAt": {
                     "type": "string"
@@ -6854,10 +6824,13 @@
                 },
                 "tripID": {
                     "type": "string"
+                },
+                "zoneFeeAdjustmentTenge": {
+                    "type": "integer"
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.User": {
+        "dto.User": {
             "type": "object",
             "properties": {
                 "birthDate": {
@@ -6904,7 +6877,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.UserCreateRequest": {
+        "dto.UserCreateRequest": {
             "type": "object",
             "properties": {
                 "birthDate": {
@@ -6930,7 +6903,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.UserProfileUpdateRequest": {
+        "dto.UserProfileUpdateRequest": {
             "type": "object",
             "properties": {
                 "birthDate": {
@@ -6956,15 +6929,15 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.UserResponse": {
+        "dto.UserResponse": {
             "type": "object",
             "properties": {
                 "user": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.User"
+                    "$ref": "#/definitions/dto.User"
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.UserStats": {
+        "dto.UserStats": {
             "type": "object",
             "properties": {
                 "active": {
@@ -6984,7 +6957,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.UserUpdateRequest": {
+        "dto.UserUpdateRequest": {
             "type": "object",
             "properties": {
                 "birthDate": {
@@ -7028,18 +7001,18 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.UsersResponse": {
+        "dto.UsersResponse": {
             "type": "object",
             "properties": {
                 "users": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.User"
+                        "$ref": "#/definitions/dto.User"
                     }
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.Zone": {
+        "dto.Zone": {
             "type": "object",
             "properties": {
                 "boundary": {
@@ -7074,7 +7047,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.ZoneCreateRequest": {
+        "dto.ZoneCreateRequest": {
             "type": "object",
             "required": [
                 "boundary",
@@ -7102,15 +7075,15 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.ZoneResponse": {
+        "dto.ZoneResponse": {
             "type": "object",
             "properties": {
                 "zone": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.Zone"
+                    "$ref": "#/definitions/dto.Zone"
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.ZoneUpdateRequest": {
+        "dto.ZoneUpdateRequest": {
             "type": "object",
             "properties": {
                 "boundary": {
@@ -7136,18 +7109,18 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.ZonesResponse": {
+        "dto.ZonesResponse": {
             "type": "object",
             "properties": {
                 "zones": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_http_dto.Zone"
+                        "$ref": "#/definitions/dto.Zone"
                     }
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_http_dto.location": {
+        "dto.location": {
             "type": "object",
             "properties": {
                 "latitude": {
@@ -7158,18 +7131,18 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_websocket_dto.CarFleetMessage": {
+        "wsdto.CarFleetMessage": {
             "type": "object",
             "properties": {
                 "cars": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.SlimCar"
+                        "$ref": "#/definitions/wsdto.SlimCar"
                     }
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_websocket_dto.CarMaintenanceEventMessage": {
+        "wsdto.CarMaintenanceEventMessage": {
             "type": "object",
             "properties": {
                 "carID": {
@@ -7189,7 +7162,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_websocket_dto.CarStatusMessage": {
+        "wsdto.CarStatusMessage": {
             "type": "object",
             "properties": {
                 "carID": {
@@ -7203,7 +7176,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_websocket_dto.CarTelemetryMessage": {
+        "wsdto.CarTelemetryMessage": {
             "type": "object",
             "properties": {
                 "batteryLevel": {
@@ -7213,7 +7186,7 @@
                     "type": "number"
                 },
                 "location": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.SlimCarLocation"
+                    "$ref": "#/definitions/wsdto.SlimCarLocation"
                 },
                 "mileageKm": {
                     "type": "integer"
@@ -7223,13 +7196,13 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_websocket_dto.DocumentAnalyzedMessage": {
+        "wsdto.DocumentAnalyzedMessage": {
             "type": "object",
             "properties": {
                 "defects": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.DocumentDefect"
+                        "$ref": "#/definitions/wsdto.DocumentDefect"
                     }
                 },
                 "documentId": {
@@ -7243,7 +7216,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_websocket_dto.DocumentDefect": {
+        "wsdto.DocumentDefect": {
             "type": "object",
             "properties": {
                 "description": {
@@ -7254,7 +7227,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_websocket_dto.SlimCar": {
+        "wsdto.SlimCar": {
             "type": "object",
             "properties": {
                 "color": {
@@ -7270,7 +7243,7 @@
                     "type": "string"
                 },
                 "location": {
-                    "$ref": "#/definitions/carsharing_api-gateway_internal_adapter_websocket_dto.SlimCarLocation"
+                    "$ref": "#/definitions/wsdto.SlimCarLocation"
                 },
                 "modelID": {
                     "type": "string"
@@ -7280,7 +7253,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_websocket_dto.SlimCarLocation": {
+        "wsdto.SlimCarLocation": {
             "type": "object",
             "properties": {
                 "latitude": {
@@ -7291,7 +7264,7 @@
                 }
             }
         },
-        "carsharing_api-gateway_internal_adapter_websocket_dto.TripLiveFeedMessage": {
+        "wsdto.TripLiveFeedMessage": {
             "type": "object",
             "properties": {
                 "currentCostTenge": {

@@ -64,14 +64,15 @@ func TripFromProto(t *basetripb.Trip) model.Trip {
 
 func TripSummaryFromProto(s *basetripb.TripSummary) model.TripSummary {
 	summary := model.TripSummary{
-		TripID:             s.GetTripId(),
-		BookingID:          s.GetBookingId(),
-		DurationSeconds:    s.GetDurationSeconds(),
-		DistanceTraveledKM: s.GetDistanceTraveledKm(),
-		BaseCostTenge:      s.GetBaseCostTenge(),
-		DistanceCostTenge:  s.GetDistanceCostTenge(),
-		OvertimeCostTenge:  s.GetOvertimeCostTenge(),
-		TotalCostTenge:     s.GetTotalCostTenge(),
+		TripID:                 s.GetTripId(),
+		BookingID:              s.GetBookingId(),
+		DurationSeconds:        s.GetDurationSeconds(),
+		DistanceTraveledKM:     s.GetDistanceTraveledKm(),
+		BaseCostTenge:          s.GetBaseCostTenge(),
+		DistanceCostTenge:      s.GetDistanceCostTenge(),
+		OvertimeCostTenge:      s.GetOvertimeCostTenge(),
+		ZoneFeeAdjustmentTenge: s.GetZoneFeeAdjustmentTenge(),
+		TotalCostTenge:         s.GetTotalCostTenge(),
 	}
 
 	if s.GetStartedAt() != nil {

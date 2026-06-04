@@ -5168,10 +5168,10 @@
                 "id": {
                     "type": "string"
                 },
-                "imageStorageUrls": {
+                "images": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/dto.Image"
                     }
                 },
                 "isRetired": {
@@ -5287,10 +5287,10 @@
                 "id": {
                     "type": "string"
                 },
-                "imageURLs": {
+                "images": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/dto.Image"
                     }
                 },
                 "notes": {
@@ -5457,10 +5457,10 @@
                 "notes": {
                     "type": "string"
                 },
-                "receiptImageStorageUrls": {
+                "receiptImages": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/dto.Image"
                     }
                 },
                 "status": {
@@ -5677,10 +5677,10 @@
                 "id": {
                     "type": "string"
                 },
-                "imageStorageUrls": {
+                "images": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/dto.Image"
                     }
                 },
                 "model": {
@@ -6206,6 +6206,9 @@
                 "id": {
                     "type": "string"
                 },
+                "image": {
+                    "$ref": "#/definitions/dto.Image"
+                },
                 "imageType": {
                     "type": "string",
                     "enum": [
@@ -6214,9 +6217,6 @@
                         "driving_license_front",
                         "driving_license_back"
                     ]
-                },
-                "imageURL": {
-                    "type": "string"
                 },
                 "reason": {
                     "type": "string"
@@ -6326,6 +6326,17 @@
             "type": "object",
             "properties": {
                 "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.Image": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "url": {
                     "type": "string"
                 }
             }
@@ -6863,8 +6874,8 @@
                 "phoneNumber": {
                     "type": "string"
                 },
-                "profileImageURL": {
-                    "type": "string"
+                "profileImage": {
+                    "$ref": "#/definitions/dto.Image"
                 },
                 "roles": {
                     "type": "array",

@@ -5174,10 +5174,10 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "imageStorageUrls": {
+                "images": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/dto.Image"
                     }
                 },
                 "isRetired": {
@@ -5293,10 +5293,10 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "imageURLs": {
+                "images": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/dto.Image"
                     }
                 },
                 "notes": {
@@ -5463,10 +5463,10 @@ const docTemplate = `{
                 "notes": {
                     "type": "string"
                 },
-                "receiptImageStorageUrls": {
+                "receiptImages": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/dto.Image"
                     }
                 },
                 "status": {
@@ -5683,10 +5683,10 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "imageStorageUrls": {
+                "images": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/dto.Image"
                     }
                 },
                 "model": {
@@ -6212,6 +6212,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "image": {
+                    "$ref": "#/definitions/dto.Image"
+                },
                 "imageType": {
                     "type": "string",
                     "enum": [
@@ -6220,9 +6223,6 @@ const docTemplate = `{
                         "driving_license_front",
                         "driving_license_back"
                     ]
-                },
-                "imageURL": {
-                    "type": "string"
                 },
                 "reason": {
                     "type": "string"
@@ -6332,6 +6332,17 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.Image": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "url": {
                     "type": "string"
                 }
             }
@@ -6869,8 +6880,8 @@ const docTemplate = `{
                 "phoneNumber": {
                     "type": "string"
                 },
-                "profileImageURL": {
-                    "type": "string"
+                "profileImage": {
+                    "$ref": "#/definitions/dto.Image"
                 },
                 "roles": {
                     "type": "array",

@@ -121,9 +121,9 @@ definitions:
         type: string
       id:
         type: string
-      imageStorageUrls:
+      images:
         items:
-          type: string
+          $ref: '#/definitions/dto.Image'
         type: array
       isRetired:
         type: boolean
@@ -203,9 +203,9 @@ definitions:
         type: string
       id:
         type: string
-      imageURLs:
+      images:
         items:
-          type: string
+          $ref: '#/definitions/dto.Image'
         type: array
       notes:
         type: string
@@ -319,9 +319,9 @@ definitions:
         type: integer
       notes:
         type: string
-      receiptImageStorageUrls:
+      receiptImages:
         items:
-          type: string
+          $ref: '#/definitions/dto.Image'
         type: array
       status:
         enum:
@@ -469,9 +469,9 @@ definitions:
         type: string
       id:
         type: string
-      imageStorageUrls:
+      images:
         items:
-          type: string
+          $ref: '#/definitions/dto.Image'
         type: array
       model:
         type: string
@@ -838,14 +838,14 @@ definitions:
         type: string
       id:
         type: string
+      image:
+        $ref: '#/definitions/dto.Image'
       imageType:
         enum:
         - id_front
         - id_back
         - driving_license_front
         - driving_license_back
-        type: string
-      imageURL:
         type: string
       reason:
         type: string
@@ -919,6 +919,13 @@ definitions:
   dto.IDResponse:
     properties:
       id:
+        type: string
+    type: object
+  dto.Image:
+    properties:
+      key:
+        type: string
+      url:
         type: string
     type: object
   dto.ImageUploadData:
@@ -1285,8 +1292,8 @@ definitions:
         type: string
       phoneNumber:
         type: string
-      profileImageURL:
-        type: string
+      profileImage:
+        $ref: '#/definitions/dto.Image'
       roles:
         items:
           type: string

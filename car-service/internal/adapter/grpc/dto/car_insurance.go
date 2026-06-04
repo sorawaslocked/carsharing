@@ -71,7 +71,7 @@ func ToCarInsuranceProto(ins model.CarInsurance) *basecar.CarInsurance {
 		ExpiresAt: timestamppb.New(ins.ExpiresAt),
 		CostTenge: ins.CostTenge,
 		Status:    string(ins.Status),
-		ImageUrls: imageURLsFromImages(ins.Images),
+		Images:    imagesToProto(ins.Images),
 		CreatedAt: timestamppb.New(ins.CreatedAt),
 		UpdatedAt: timestamppb.New(ins.UpdatedAt),
 	}

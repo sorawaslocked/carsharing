@@ -52,3 +52,29 @@ func ImageUploadDataFromProto(u *basepb.ImageUploadData) sharedmodel.ImageUpload
 		ObjectKey:       u.GetObjectKey(),
 	}
 }
+
+func ImageFromProto(img *basepb.Image) sharedmodel.Image {
+	if img == nil {
+		return sharedmodel.Image{}
+	}
+	return sharedmodel.Image{Key: img.GetKey(), URL: img.GetUrl()}
+}
+
+func OptImageFromProto(img *basepb.Image) *sharedmodel.Image {
+	if img == nil {
+		return nil
+	}
+	result := ImageFromProto(img)
+	return &result
+}
+
+func ImagesFromProto(imgs []*basepb.Image) []sharedmodel.Image {
+	if len(imgs) == 0 {
+		return nil
+	}
+	result := make([]sharedmodel.Image, len(imgs))
+	for i, img := range imgs {
+		result[i] = ImageFromProto(img)
+	}
+	return result
+}

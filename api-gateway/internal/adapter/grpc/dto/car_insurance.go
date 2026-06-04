@@ -14,7 +14,7 @@ func CarInsuranceFromProto(i *basecarpb.CarInsurance) model.CarInsurance {
 		PolicyNum: i.GetPolicyNum(),
 		CostTenge: i.GetCostTenge(),
 		Status:    i.GetStatus(),
-		ImageURLs: i.GetImageUrls(),
+		Images:    ImagesFromProto(i.GetImages()),
 		Notes:     i.Notes,
 	}
 	if i.GetStartsAt() != nil {

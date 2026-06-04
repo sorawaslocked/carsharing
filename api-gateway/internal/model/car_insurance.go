@@ -17,8 +17,8 @@ type CarInsurance struct {
 	CostTenge int32
 	Status    string
 
-	ImageURLs []string
-	Notes     *string
+	Images []sharedmodel.Image
+	Notes  *string
 
 	CreatedAt time.Time
 	UpdatedAt time.Time

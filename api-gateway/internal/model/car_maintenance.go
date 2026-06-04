@@ -27,7 +27,7 @@ type CarMaintenanceRecord struct {
 	MileageAtCompletionKM *int32
 	CostTenge             *int32
 	AssignedTo            *string
-	ReceiptImageURLs      []string
+	ReceiptImages         []sharedmodel.Image
 	Notes                 *string
 
 	DueBy       *time.Time

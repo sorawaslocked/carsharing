@@ -115,7 +115,7 @@ func ToCarMaintenanceRecordProto(r model.CarMaintenanceRecord) *basecar.CarMaint
 		CostTenge:             r.CostTenge,
 		AssignedTo:            r.AssignedTo,
 		Notes:                 r.Notes,
-		ReceiptImageUrls:      imageURLsFromImages(r.ReceiptImages),
+		ReceiptImages:         imagesToProto(r.ReceiptImages),
 		CreatedAt:             timestamppb.New(r.CreatedAt),
 	}
 	if r.DueBy != nil {

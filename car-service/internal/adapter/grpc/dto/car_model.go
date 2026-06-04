@@ -91,7 +91,7 @@ func ToCarModelProto(cm model.CarModel) *basecar.CarModel {
 		EngineVolume: cm.EngineVolume,
 		RangeKm:      int32(cm.RangeKM),
 		Features:     cm.Features,
-		ImageUrls:    imageURLsFromImages(cm.Images),
+		Images:       imagesToProto(cm.Images),
 		CreatedAt:    timestamppb.New(cm.CreatedAt),
 		UpdatedAt:    timestamppb.New(cm.UpdatedAt),
 	}

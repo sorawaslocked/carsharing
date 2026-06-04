@@ -16,7 +16,7 @@ func UserFromProto(u *baseuser.User) model.User {
 		Password: model.Password{
 			Hash: u.GetPasswordHash(),
 		},
-		ProfileImageURL:    u.ProfileImageUrl,
+		ProfileImage:       OptImageFromProto(u.ProfileImage),
 		Roles:              u.GetRoles(),
 		IsDocumentVerified: u.GetIsDocumentVerified(),
 		IsEmailVerified:    u.GetIsEmailVerified(),

@@ -41,7 +41,7 @@ func CarMaintenanceRecordFromProto(r *basecarpb.CarMaintenanceRecord) model.CarM
 		MileageAtCompletionKM: r.MileageAtCompletionKm,
 		CostTenge:             r.CostTenge,
 		AssignedTo:            r.AssignedTo,
-		ReceiptImageURLs:      r.GetReceiptImageUrls(),
+		ReceiptImages:         ImagesFromProto(r.GetReceiptImages()),
 		Notes:                 r.Notes,
 	}
 	if r.GetDueBy() != nil {

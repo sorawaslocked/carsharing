@@ -17,7 +17,7 @@ type Document struct {
 	ImageType string  `json:"imageType" validate:"oneof=id_front id_back driving_license_front driving_license_back"`
 	Status    string  `json:"status" validate:"oneof=pending processed approved rejected"`
 	Reason    *string `json:"reason,omitempty"`
-	ImageURL  string  `json:"imageURL"`
+	Image     Image   `json:"image"`
 
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
@@ -44,7 +44,7 @@ func ToDocumentResponse(m model.Document) Document {
 		ImageType: m.ImageType,
 		Status:    m.Status,
 		Reason:    m.Reason,
-		ImageURL:  m.ImageURL,
+		Image:     toImage(m.Image),
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
 	}

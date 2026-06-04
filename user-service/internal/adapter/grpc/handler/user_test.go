@@ -193,8 +193,9 @@ func TestGetUser_WithProfileImageURL(t *testing.T) {
 	resp, err := h.GetUser(ctx, &usersvc.GetUserRequest{Id: testUserID})
 
 	require.NoError(t, err)
-	require.NotNil(t, resp.User.ProfileImageUrl)
-	assert.Equal(t, "https://minio/signed", *resp.User.ProfileImageUrl)
+	require.NotNil(t, resp.User.ProfileImage)
+	assert.Equal(t, testObjKey, resp.User.ProfileImage.Key)
+	assert.Equal(t, "https://minio/signed", resp.User.ProfileImage.Url)
 }
 
 // --- ListUsers ---
@@ -500,7 +501,8 @@ func TestListDocuments_Success(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, resp.Documents, 1)
 	assert.Equal(t, testDocID, resp.Documents[0].Id)
-	assert.Equal(t, "https://minio/signed", resp.Documents[0].ImageUrl)
+	require.NotNil(t, resp.Documents[0].Image)
+	assert.Equal(t, "https://minio/signed", resp.Documents[0].Image.Url)
 }
 
 func TestListDocuments_UserNotFound(t *testing.T) {

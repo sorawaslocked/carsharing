@@ -13,6 +13,34 @@ type location struct {
 	Longitude float64 `json:"longitude"`
 }
 
+type Image struct {
+	Key string `json:"key"`
+	URL string `json:"url"`
+}
+
+func toImage(m sharedmodel.Image) Image {
+	return Image{Key: m.Key, URL: m.URL}
+}
+
+func toImages(ms []sharedmodel.Image) []Image {
+	if len(ms) == 0 {
+		return nil
+	}
+	imgs := make([]Image, len(ms))
+	for i, m := range ms {
+		imgs[i] = toImage(m)
+	}
+	return imgs
+}
+
+func optToImage(m *sharedmodel.Image) *Image {
+	if m == nil {
+		return nil
+	}
+	img := toImage(*m)
+	return &img
+}
+
 type ImageUploadData struct {
 	PresignedPutURL string `json:"presignedPutURL"`
 	ObjectKey       string `json:"objectKey"`

@@ -5,14 +5,14 @@ import sharedmodel "carsharing/shared/model"
 import "time"
 
 type User struct {
-	ID              string
-	Email           string
-	PhoneNumber     *string
-	FirstName       string
-	LastName        string
-	BirthDate       string
-	Password        Password
-	ProfileImageURL *string
+	ID           string
+	Email        string
+	PhoneNumber  *string
+	FirstName    string
+	LastName     string
+	BirthDate    string
+	Password     Password
+	ProfileImage *sharedmodel.Image
 
 	Roles              []string
 	IsDocumentVerified bool

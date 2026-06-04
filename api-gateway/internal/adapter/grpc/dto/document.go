@@ -12,7 +12,7 @@ func DocumentFromProto(d *baseuser.Document) model.Document {
 		ImageType: d.GetImageType(),
 		Status:    d.GetStatus(),
 		Reason:    d.Error,
-		ImageURL:  d.GetImageUrl(),
+		Image:     ImageFromProto(d.GetImage()),
 		CreatedAt: d.GetCreatedAt().AsTime(),
 		UpdatedAt: d.GetUpdatedAt().AsTime(),
 	}

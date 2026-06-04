@@ -219,7 +219,7 @@ func ToCarProto(c model.Car) *basecar.Car {
 		IsRetired:        c.IsRetired,
 		Status:           string(c.Status),
 		Notes:            c.Notes,
-		ImageUrls:        imageURLsFromImages(c.Images),
+		Images:           imagesToProto(c.Images),
 		LastSeenAt:       timestamppb.New(c.LastSeenAt),
 		CreatedAt:        timestamppb.New(c.CreatedAt),
 		UpdatedAt:        timestamppb.New(c.UpdatedAt),
@@ -318,15 +318,13 @@ func ToImageUploadData(data sharedmodel.ImageUploadData) *base.ImageUploadData {
 	}
 }
 
-func imageURLsFromImages(images []sharedmodel.Image) []string {
+func imagesToProto(images []sharedmodel.Image) []*base.Image {
 	if len(images) == 0 {
 		return nil
 	}
-	urls := make([]string, 0, len(images))
-	for _, img := range images {
-		if img.URL != "" {
-			urls = append(urls, img.URL)
-		}
+	protos := make([]*base.Image, len(images))
+	for i, img := range images {
+		protos[i] = &base.Image{Key: img.Key, Url: img.URL}
 	}
-	return urls
+	return protos
 }

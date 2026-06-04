@@ -42,7 +42,7 @@ type Car struct {
 	Status           string    `json:"status" validate:"oneof=available reserved in_use maintenance out_of_service"`
 	IsRetired        bool      `json:"isRetired"`
 	Notes            *string   `json:"notes,omitempty"`
-	ImageStorageUrls []string  `json:"imageStorageUrls,omitempty"`
+	Images           []Image   `json:"images,omitempty"`
 	LastSeenAt       time.Time `json:"lastSeenAt"`
 	CreatedAt        time.Time `json:"createdAt"`
 	UpdatedAt        time.Time `json:"updatedAt"`
@@ -335,15 +335,15 @@ func ToCarResponse(m model.Car) Car {
 			Latitude:  m.Location.Latitude,
 			Longitude: m.Location.Longitude,
 		},
-		TelemetryID:      m.TelemetryID,
-		FuelStatus:       m.FuelStatus,
-		Status:           m.Status,
-		IsRetired:        m.IsRetired,
-		Notes:            m.Notes,
-		ImageStorageUrls: m.ImageURLs,
-		LastSeenAt:       m.LastSeenAt,
-		CreatedAt:        m.CreatedAt,
-		UpdatedAt:        m.UpdatedAt,
+		TelemetryID: m.TelemetryID,
+		FuelStatus:  m.FuelStatus,
+		Status:      m.Status,
+		IsRetired:   m.IsRetired,
+		Notes:       m.Notes,
+		Images:      toImages(m.Images),
+		LastSeenAt:  m.LastSeenAt,
+		CreatedAt:   m.CreatedAt,
+		UpdatedAt:   m.UpdatedAt,
 	}
 }
 

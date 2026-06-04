@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package base.car;
 
+import "base/common.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "carsharing/protos/gen/base/car";
@@ -28,7 +29,7 @@ message CarMaintenanceRecord {
   optional int32  mileage_at_completion_km = 6;
   optional int32  cost_tenge               = 7;
   optional string assigned_to              = 8;
-  repeated string receipt_image_urls       = 9;
+  repeated base.Image receipt_images        = 9;
   optional string notes                    = 10;
 
   google.protobuf.Timestamp due_by       = 11;

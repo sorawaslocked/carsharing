@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package base.car;
 
+import "base/common.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "carsharing/protos/gen/base/car";
@@ -22,7 +23,7 @@ message CarModel {
   int32 range_km = 11;
 
   repeated string features = 12;
-  repeated string image_urls = 13;
+  repeated base.Image images = 13;
 
   google.protobuf.Timestamp created_at = 14;
   google.protobuf.Timestamp updated_at = 15;

@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package base.user;
 
+import "base/common.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "carsharing/protos/gen/base/user";
@@ -14,7 +15,7 @@ message User {
   string last_name = 5;
   string birth_date = 6;
   bytes password_hash = 7;
-  optional string profile_image_url = 8;
+  optional base.Image profile_image = 8;
 
   repeated string roles = 9;
   bool is_document_verified = 10;
@@ -31,7 +32,7 @@ message Document {
   string image_type = 3;
   string status = 4;
   optional string error = 5;
-  string image_url = 6;
+  base.Image image = 6;
 
   google.protobuf.Timestamp created_at = 7;
   google.protobuf.Timestamp updated_at = 8;

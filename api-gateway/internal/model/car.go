@@ -24,8 +24,8 @@ type Car struct {
 	Status      string
 	IsRetired   bool
 
-	Notes     *string
-	ImageURLs []string
+	Notes  *string
+	Images []sharedmodel.Image
 
 	LastSeenAt time.Time
 	CreatedAt  time.Time

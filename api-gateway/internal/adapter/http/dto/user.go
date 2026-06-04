@@ -32,14 +32,14 @@ type AccessTokenResponse struct {
 }
 
 type User struct {
-	ID              string  `json:"id"`
-	Email           string  `json:"email"`
-	PhoneNumber     *string `json:"phoneNumber,omitempty"`
-	FirstName       string  `json:"firstName"`
-	LastName        string  `json:"lastName"`
-	BirthDate       string  `json:"birthDate"`
-	PasswordHash    []byte  `json:"-"`
-	ProfileImageURL *string `json:"profileImageURL"`
+	ID           string  `json:"id"`
+	Email        string  `json:"email"`
+	PhoneNumber  *string `json:"phoneNumber,omitempty"`
+	FirstName    string  `json:"firstName"`
+	LastName     string  `json:"lastName"`
+	BirthDate    string  `json:"birthDate"`
+	PasswordHash []byte  `json:"-"`
+	ProfileImage *Image  `json:"profileImage,omitempty"`
 
 	Roles              []string `json:"roles"`
 	IsDocumentVerified bool     `json:"isDocumentVerified"`
@@ -121,7 +121,7 @@ func ToUserResponse(m model.User) User {
 		LastName:           m.LastName,
 		BirthDate:          m.BirthDate,
 		PasswordHash:       m.Password.Hash,
-		ProfileImageURL:    m.ProfileImageURL,
+		ProfileImage:       optToImage(m.ProfileImage),
 		Roles:              m.Roles,
 		IsDocumentVerified: m.IsDocumentVerified,
 		IsEmailVerified:    m.IsEmailVerified,

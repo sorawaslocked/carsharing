@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package base.car;
 
+import "base/common.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "carsharing/protos/gen/base/car";
@@ -19,7 +20,7 @@ message CarInsurance {
   int32 cost_tenge = 8;
   string status = 9;
 
-  repeated string image_urls = 10;
+  repeated base.Image images = 10;
   optional string notes = 11;
 
   google.protobuf.Timestamp created_at = 12;

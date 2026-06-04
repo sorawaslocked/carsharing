@@ -19,7 +19,7 @@ func CarModelFromProto(m *basecarpb.CarModel) model.CarModel {
 		EngineVolume: m.EngineVolume,
 		RangeKM:      m.GetRangeKm(),
 		Features:     m.GetFeatures(),
-		ImageURLs:    m.GetImageUrls(),
+		Images:       ImagesFromProto(m.GetImages()),
 	}
 	if m.GetCreatedAt() != nil {
 		cm.CreatedAt = m.GetCreatedAt().AsTime()

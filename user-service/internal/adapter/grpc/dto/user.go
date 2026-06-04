@@ -5,6 +5,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	basepb "carsharing/protos/gen/base"
 	baseuserpb "carsharing/protos/gen/base/user"
 	usersvc "carsharing/protos/gen/service/user"
 	sharedvalidation "carsharing/shared/validation"
@@ -131,8 +132,8 @@ func UserToProto(user model.User) *baseuserpb.User {
 	if user.PhoneNumber != nil {
 		u.PhoneNumber = user.PhoneNumber
 	}
-	if user.ProfileImage.URL != "" {
-		u.ProfileImageUrl = &user.ProfileImage.URL
+	if user.ProfileImage.Key != "" {
+		u.ProfileImage = &basepb.Image{Key: user.ProfileImage.Key, Url: user.ProfileImage.URL}
 	}
 
 	return u

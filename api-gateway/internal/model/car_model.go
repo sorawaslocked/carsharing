@@ -19,8 +19,8 @@ type CarModel struct {
 	EngineVolume *float32
 	RangeKM      int32
 
-	Features  []string
-	ImageURLs []string
+	Features []string
+	Images   []sharedmodel.Image
 
 	CreatedAt time.Time
 	UpdatedAt time.Time

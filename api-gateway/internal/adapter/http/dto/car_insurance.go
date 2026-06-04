@@ -26,7 +26,7 @@ type CarInsurance struct {
 	ExpiresAt time.Time `json:"expiresAt"`
 	CostTenge int32     `json:"costTenge" validate:"min=0"`
 	Status    string    `json:"status" validate:"oneof=active expired cancelled"`
-	ImageURLs []string  `json:"imageURLs,omitempty"`
+	Images    []Image   `json:"images,omitempty"`
 	Notes     *string   `json:"notes,omitempty"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
@@ -131,7 +131,7 @@ func ToCarInsuranceResponse(m model.CarInsurance) CarInsurance {
 		ExpiresAt: m.ExpiresAt,
 		CostTenge: m.CostTenge,
 		Status:    m.Status,
-		ImageURLs: m.ImageURLs,
+		Images:    toImages(m.Images),
 		Notes:     m.Notes,
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,

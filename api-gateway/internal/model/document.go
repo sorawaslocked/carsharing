@@ -12,7 +12,7 @@ type Document struct {
 	ImageType string
 	Status    string
 	Reason    *string
-	ImageURL  string
+	Image     sharedmodel.Image
 
 	CreatedAt time.Time
 	UpdatedAt time.Time

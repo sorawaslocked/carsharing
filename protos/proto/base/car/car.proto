@@ -27,7 +27,7 @@ message Car {
   bool            is_retired    = 15;
 
   optional string notes      = 16;
-  repeated string image_urls = 17;
+  repeated base.Image images = 17;
 
   google.protobuf.Timestamp last_seen_at = 18;
   google.protobuf.Timestamp created_at   = 19;

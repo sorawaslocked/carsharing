@@ -25,7 +25,7 @@ func CarFromProto(c *basecarpb.Car) model.Car {
 		Status:           c.GetStatus(),
 		IsRetired:        c.GetIsRetired(),
 		Notes:            c.Notes,
-		ImageURLs:        c.GetImageUrls(),
+		Images:           ImagesFromProto(c.GetImages()),
 	}
 	if c.GetLastSeenAt() != nil {
 		car.LastSeenAt = c.GetLastSeenAt().AsTime()

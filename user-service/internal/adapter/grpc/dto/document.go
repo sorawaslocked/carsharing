@@ -62,9 +62,7 @@ func DocumentToProto(doc model.Document) *baseuserpb.Document {
 	if doc.Error != nil {
 		d.Error = doc.Error
 	}
-	if doc.Image.URL != "" {
-		d.ImageUrl = doc.Image.URL
-	}
+	d.Image = &basepb.Image{Key: doc.Image.Key, Url: doc.Image.URL}
 
 	return d
 }

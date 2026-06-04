@@ -17,21 +17,21 @@ type CarModelsResponse struct {
 }
 
 type CarModel struct {
-	ID               string    `json:"id"`
-	Brand            string    `json:"brand"`
-	Model            string    `json:"model"`
-	Year             int16     `json:"year"`
-	FuelType         string    `json:"fuelType" validate:"oneof=petrol diesel electric hybrid"`
-	Transmission     string    `json:"transmission" validate:"oneof=manual auto"`
-	BodyType         string    `json:"bodyType" validate:"oneof=sedan hatchback SUV crossover minivan coupe convertible pickup"`
-	Class            string    `json:"class" validate:"oneof=economy compact comfort business luxury"`
-	Seats            int8      `json:"seats"`
-	EngineVolume     *float32  `json:"engineVolume,omitempty"`
-	RangeKM          int32     `json:"rangeKm"`
-	Features         []string  `json:"features,omitempty"`
-	ImageStorageUrls []string  `json:"imageStorageUrls,omitempty"`
-	CreatedAt        time.Time `json:"createdAt"`
-	UpdatedAt        time.Time `json:"updatedAt"`
+	ID           string    `json:"id"`
+	Brand        string    `json:"brand"`
+	Model        string    `json:"model"`
+	Year         int16     `json:"year"`
+	FuelType     string    `json:"fuelType" validate:"oneof=petrol diesel electric hybrid"`
+	Transmission string    `json:"transmission" validate:"oneof=manual auto"`
+	BodyType     string    `json:"bodyType" validate:"oneof=sedan hatchback SUV crossover minivan coupe convertible pickup"`
+	Class        string    `json:"class" validate:"oneof=economy compact comfort business luxury"`
+	Seats        int8      `json:"seats"`
+	EngineVolume *float32  `json:"engineVolume,omitempty"`
+	RangeKM      int32     `json:"rangeKm"`
+	Features     []string  `json:"features,omitempty"`
+	Images       []Image   `json:"images,omitempty"`
+	CreatedAt    time.Time `json:"createdAt"`
+	UpdatedAt    time.Time `json:"updatedAt"`
 }
 
 type CarModelCreateRequest struct {
@@ -149,20 +149,20 @@ func CarModelFilterFromCtx(ctx *gin.Context) (model.CarModelFilter, error) {
 
 func ToCarModelResponse(m model.CarModel) CarModel {
 	return CarModel{
-		ID:               m.ID,
-		Brand:            m.Brand,
-		Model:            m.Model,
-		Year:             m.Year,
-		FuelType:         m.FuelType,
-		Transmission:     m.Transmission,
-		BodyType:         m.BodyType,
-		Class:            m.Class,
-		Seats:            m.Seats,
-		EngineVolume:     m.EngineVolume,
-		RangeKM:          m.RangeKM,
-		Features:         m.Features,
-		ImageStorageUrls: m.ImageURLs,
-		CreatedAt:        m.CreatedAt,
-		UpdatedAt:        m.UpdatedAt,
+		ID:           m.ID,
+		Brand:        m.Brand,
+		Model:        m.Model,
+		Year:         m.Year,
+		FuelType:     m.FuelType,
+		Transmission: m.Transmission,
+		BodyType:     m.BodyType,
+		Class:        m.Class,
+		Seats:        m.Seats,
+		EngineVolume: m.EngineVolume,
+		RangeKM:      m.RangeKM,
+		Features:     m.Features,
+		Images:       toImages(m.Images),
+		CreatedAt:    m.CreatedAt,
+		UpdatedAt:    m.UpdatedAt,
 	}
 }

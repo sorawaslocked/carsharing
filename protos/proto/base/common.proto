@@ -11,6 +11,11 @@ message TimeRange {
   optional google.protobuf.Timestamp to   = 2;
 }
 
+message Image {
+  string key = 1;
+  string url = 2;
+}
+
 message ImageUploadData {
   string presigned_put_url = 1;
   string object_key = 2;

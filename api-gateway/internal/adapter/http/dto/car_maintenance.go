@@ -30,19 +30,19 @@ type CarMaintenanceTemplate struct {
 }
 
 type CarMaintenanceRecord struct {
-	ID                      string     `json:"id"`
-	CarID                   string     `json:"carID"`
-	TemplateID              string     `json:"templateID"`
-	Status                  string     `json:"status" validate:"oneof=pending in_progress completed"`
-	MileageAtWarningKM      int32      `json:"mileageAtWarningKm"`
-	CompletedKm             *int32     `json:"completedKm,omitempty"`
-	CostTenge               *int32     `json:"costTenge,omitempty"`
-	AssignedTo              *string    `json:"assignedTo,omitempty"`
-	DueBy                   *time.Time `json:"dueBy,omitempty"`
-	CompletedAt             *time.Time `json:"completedAt,omitempty"`
-	ReceiptImageStorageUrls []string   `json:"receiptImageStorageUrls,omitempty"`
-	Notes                   *string    `json:"notes,omitempty"`
-	CreatedAt               time.Time  `json:"createdAt"`
+	ID                 string     `json:"id"`
+	CarID              string     `json:"carID"`
+	TemplateID         string     `json:"templateID"`
+	Status             string     `json:"status" validate:"oneof=pending in_progress completed"`
+	MileageAtWarningKM int32      `json:"mileageAtWarningKm"`
+	CompletedKm        *int32     `json:"completedKm,omitempty"`
+	CostTenge          *int32     `json:"costTenge,omitempty"`
+	AssignedTo         *string    `json:"assignedTo,omitempty"`
+	DueBy              *time.Time `json:"dueBy,omitempty"`
+	CompletedAt        *time.Time `json:"completedAt,omitempty"`
+	ReceiptImages      []Image    `json:"receiptImages,omitempty"`
+	Notes              *string    `json:"notes,omitempty"`
+	CreatedAt          time.Time  `json:"createdAt"`
 }
 
 type CarMaintenanceTemplateAssignRequest struct {
@@ -187,18 +187,18 @@ func ToCarMaintenanceTemplateResponse(m model.CarMaintenanceTemplate) CarMainten
 
 func ToCarMaintenanceRecordResponse(m model.CarMaintenanceRecord) CarMaintenanceRecord {
 	return CarMaintenanceRecord{
-		ID:                      m.ID,
-		CarID:                   m.CarID,
-		TemplateID:              m.TemplateID,
-		Status:                  m.Status,
-		MileageAtWarningKM:      m.MileageAtWarningKM,
-		CompletedKm:             m.MileageAtCompletionKM,
-		CostTenge:               m.CostTenge,
-		Notes:                   m.Notes,
-		AssignedTo:              m.AssignedTo,
-		DueBy:                   m.DueBy,
-		CompletedAt:             m.CompletedAt,
-		ReceiptImageStorageUrls: m.ReceiptImageURLs,
-		CreatedAt:               m.CreatedAt,
+		ID:                 m.ID,
+		CarID:              m.CarID,
+		TemplateID:         m.TemplateID,
+		Status:             m.Status,
+		MileageAtWarningKM: m.MileageAtWarningKM,
+		CompletedKm:        m.MileageAtCompletionKM,
+		CostTenge:          m.CostTenge,
+		Notes:              m.Notes,
+		AssignedTo:         m.AssignedTo,
+		DueBy:              m.DueBy,
+		CompletedAt:        m.CompletedAt,
+		ReceiptImages:      toImages(m.ReceiptImages),
+		CreatedAt:          m.CreatedAt,
 	}
 }

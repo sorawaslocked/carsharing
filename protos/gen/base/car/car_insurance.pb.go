@@ -7,6 +7,7 @@
 package car
 
 import (
+	base "carsharing/protos/gen/base"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -33,7 +34,7 @@ type CarInsurance struct {
 	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 	CostTenge     int32                  `protobuf:"varint,8,opt,name=cost_tenge,json=costTenge,proto3" json:"cost_tenge,omitempty"`
 	Status        string                 `protobuf:"bytes,9,opt,name=status,proto3" json:"status,omitempty"`
-	ImageUrls     []string               `protobuf:"bytes,10,rep,name=image_urls,json=imageUrls,proto3" json:"image_urls,omitempty"`
+	Images        []*base.Image          `protobuf:"bytes,10,rep,name=images,proto3" json:"images,omitempty"`
 	Notes         *string                `protobuf:"bytes,11,opt,name=notes,proto3,oneof" json:"notes,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
@@ -134,9 +135,9 @@ func (x *CarInsurance) GetStatus() string {
 	return ""
 }
 
-func (x *CarInsurance) GetImageUrls() []string {
+func (x *CarInsurance) GetImages() []*base.Image {
 	if x != nil {
-		return x.ImageUrls
+		return x.Images
 	}
 	return nil
 }
@@ -166,7 +167,7 @@ var File_base_car_car_insurance_proto protoreflect.FileDescriptor
 
 const file_base_car_car_insurance_proto_rawDesc = "" +
 	"\n" +
-	"\x1cbase/car/car_insurance.proto\x12\bbase.car\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe9\x03\n" +
+	"\x1cbase/car/car_insurance.proto\x12\bbase.car\x1a\x11base/common.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xef\x03\n" +
 	"\fCarInsurance\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x15\n" +
 	"\x06car_id\x18\x02 \x01(\tR\x05carId\x12\x12\n" +
@@ -179,10 +180,9 @@ const file_base_car_car_insurance_proto_rawDesc = "" +
 	"expires_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x12\x1d\n" +
 	"\n" +
 	"cost_tenge\x18\b \x01(\x05R\tcostTenge\x12\x16\n" +
-	"\x06status\x18\t \x01(\tR\x06status\x12\x1d\n" +
-	"\n" +
-	"image_urls\x18\n" +
-	" \x03(\tR\timageUrls\x12\x19\n" +
+	"\x06status\x18\t \x01(\tR\x06status\x12#\n" +
+	"\x06images\x18\n" +
+	" \x03(\v2\v.base.ImageR\x06images\x12\x19\n" +
 	"\x05notes\x18\v \x01(\tH\x00R\x05notes\x88\x01\x01\x129\n" +
 	"\n" +
 	"created_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
@@ -206,17 +206,19 @@ var file_base_car_car_insurance_proto_msgTypes = make([]protoimpl.MessageInfo, 1
 var file_base_car_car_insurance_proto_goTypes = []any{
 	(*CarInsurance)(nil),          // 0: base.car.CarInsurance
 	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
+	(*base.Image)(nil),            // 2: base.Image
 }
 var file_base_car_car_insurance_proto_depIdxs = []int32{
 	1, // 0: base.car.CarInsurance.starts_at:type_name -> google.protobuf.Timestamp
 	1, // 1: base.car.CarInsurance.expires_at:type_name -> google.protobuf.Timestamp
-	1, // 2: base.car.CarInsurance.created_at:type_name -> google.protobuf.Timestamp
-	1, // 3: base.car.CarInsurance.updated_at:type_name -> google.protobuf.Timestamp
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	2, // 2: base.car.CarInsurance.images:type_name -> base.Image
+	1, // 3: base.car.CarInsurance.created_at:type_name -> google.protobuf.Timestamp
+	1, // 4: base.car.CarInsurance.updated_at:type_name -> google.protobuf.Timestamp
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_base_car_car_insurance_proto_init() }

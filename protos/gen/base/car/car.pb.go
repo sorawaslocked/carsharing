@@ -41,7 +41,7 @@ type Car struct {
 	Status           string                 `protobuf:"bytes,14,opt,name=status,proto3" json:"status,omitempty"`
 	IsRetired        bool                   `protobuf:"varint,15,opt,name=is_retired,json=isRetired,proto3" json:"is_retired,omitempty"`
 	Notes            *string                `protobuf:"bytes,16,opt,name=notes,proto3,oneof" json:"notes,omitempty"`
-	ImageUrls        []string               `protobuf:"bytes,17,rep,name=image_urls,json=imageUrls,proto3" json:"image_urls,omitempty"`
+	Images           []*base.Image          `protobuf:"bytes,17,rep,name=images,proto3" json:"images,omitempty"`
 	LastSeenAt       *timestamppb.Timestamp `protobuf:"bytes,18,opt,name=last_seen_at,json=lastSeenAt,proto3" json:"last_seen_at,omitempty"`
 	CreatedAt        *timestamppb.Timestamp `protobuf:"bytes,19,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt        *timestamppb.Timestamp `protobuf:"bytes,20,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
@@ -184,9 +184,9 @@ func (x *Car) GetNotes() string {
 	return ""
 }
 
-func (x *Car) GetImageUrls() []string {
+func (x *Car) GetImages() []*base.Image {
 	if x != nil {
-		return x.ImageUrls
+		return x.Images
 	}
 	return nil
 }
@@ -548,7 +548,7 @@ var File_base_car_car_proto protoreflect.FileDescriptor
 
 const file_base_car_car_proto_rawDesc = "" +
 	"\n" +
-	"\x12base/car/car.proto\x12\bbase.car\x1a\x11base/common.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xd7\x05\n" +
+	"\x12base/car/car.proto\x12\bbase.car\x1a\x11base/common.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xdd\x05\n" +
 	"\x03Car\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
 	"\bmodel_id\x18\x02 \x01(\tR\amodelId\x12\x10\n" +
@@ -569,9 +569,8 @@ const file_base_car_car_proto_rawDesc = "" +
 	"\x06status\x18\x0e \x01(\tR\x06status\x12\x1d\n" +
 	"\n" +
 	"is_retired\x18\x0f \x01(\bR\tisRetired\x12\x19\n" +
-	"\x05notes\x18\x10 \x01(\tH\x02R\x05notes\x88\x01\x01\x12\x1d\n" +
-	"\n" +
-	"image_urls\x18\x11 \x03(\tR\timageUrls\x12<\n" +
+	"\x05notes\x18\x10 \x01(\tH\x02R\x05notes\x88\x01\x01\x12#\n" +
+	"\x06images\x18\x11 \x03(\v2\v.base.ImageR\x06images\x12<\n" +
 	"\flast_seen_at\x18\x12 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"lastSeenAt\x129\n" +
 	"\n" +
@@ -651,25 +650,27 @@ var file_base_car_car_proto_goTypes = []any{
 	(*CarStatusReading)(nil),      // 2: base.car.CarStatusReading
 	(*CarTelemetryReading)(nil),   // 3: base.car.CarTelemetryReading
 	(*base.Location)(nil),         // 4: base.Location
-	(*timestamppb.Timestamp)(nil), // 5: google.protobuf.Timestamp
-	(*structpb.Struct)(nil),       // 6: google.protobuf.Struct
+	(*base.Image)(nil),            // 5: base.Image
+	(*timestamppb.Timestamp)(nil), // 6: google.protobuf.Timestamp
+	(*structpb.Struct)(nil),       // 7: google.protobuf.Struct
 }
 var file_base_car_car_proto_depIdxs = []int32{
 	4,  // 0: base.car.Car.location:type_name -> base.Location
-	5,  // 1: base.car.Car.last_seen_at:type_name -> google.protobuf.Timestamp
-	5,  // 2: base.car.Car.created_at:type_name -> google.protobuf.Timestamp
-	5,  // 3: base.car.Car.updated_at:type_name -> google.protobuf.Timestamp
-	4,  // 4: base.car.SlimCar.location:type_name -> base.Location
-	6,  // 5: base.car.CarStatusReading.metadata:type_name -> google.protobuf.Struct
-	5,  // 6: base.car.CarStatusReading.recorded_at:type_name -> google.protobuf.Timestamp
-	4,  // 7: base.car.CarTelemetryReading.location:type_name -> base.Location
-	6,  // 8: base.car.CarTelemetryReading.metadata:type_name -> google.protobuf.Struct
-	5,  // 9: base.car.CarTelemetryReading.recorded_at:type_name -> google.protobuf.Timestamp
-	10, // [10:10] is the sub-list for method output_type
-	10, // [10:10] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	5,  // 1: base.car.Car.images:type_name -> base.Image
+	6,  // 2: base.car.Car.last_seen_at:type_name -> google.protobuf.Timestamp
+	6,  // 3: base.car.Car.created_at:type_name -> google.protobuf.Timestamp
+	6,  // 4: base.car.Car.updated_at:type_name -> google.protobuf.Timestamp
+	4,  // 5: base.car.SlimCar.location:type_name -> base.Location
+	7,  // 6: base.car.CarStatusReading.metadata:type_name -> google.protobuf.Struct
+	6,  // 7: base.car.CarStatusReading.recorded_at:type_name -> google.protobuf.Timestamp
+	4,  // 8: base.car.CarTelemetryReading.location:type_name -> base.Location
+	7,  // 9: base.car.CarTelemetryReading.metadata:type_name -> google.protobuf.Struct
+	6,  // 10: base.car.CarTelemetryReading.recorded_at:type_name -> google.protobuf.Timestamp
+	11, // [11:11] is the sub-list for method output_type
+	11, // [11:11] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_base_car_car_proto_init() }

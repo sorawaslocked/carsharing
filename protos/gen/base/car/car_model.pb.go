@@ -7,6 +7,7 @@
 package car
 
 import (
+	base "carsharing/protos/gen/base"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -36,7 +37,7 @@ type CarModel struct {
 	EngineVolume  *float32               `protobuf:"fixed32,10,opt,name=engine_volume,json=engineVolume,proto3,oneof" json:"engine_volume,omitempty"`
 	RangeKm       int32                  `protobuf:"varint,11,opt,name=range_km,json=rangeKm,proto3" json:"range_km,omitempty"`
 	Features      []string               `protobuf:"bytes,12,rep,name=features,proto3" json:"features,omitempty"`
-	ImageUrls     []string               `protobuf:"bytes,13,rep,name=image_urls,json=imageUrls,proto3" json:"image_urls,omitempty"`
+	Images        []*base.Image          `protobuf:"bytes,13,rep,name=images,proto3" json:"images,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,15,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -157,9 +158,9 @@ func (x *CarModel) GetFeatures() []string {
 	return nil
 }
 
-func (x *CarModel) GetImageUrls() []string {
+func (x *CarModel) GetImages() []*base.Image {
 	if x != nil {
-		return x.ImageUrls
+		return x.Images
 	}
 	return nil
 }
@@ -182,7 +183,7 @@ var File_base_car_car_model_proto protoreflect.FileDescriptor
 
 const file_base_car_car_model_proto_rawDesc = "" +
 	"\n" +
-	"\x18base/car/car_model.proto\x12\bbase.car\x1a\x1fgoogle/protobuf/timestamp.proto\"\xec\x03\n" +
+	"\x18base/car/car_model.proto\x12\bbase.car\x1a\x11base/common.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xf2\x03\n" +
 	"\bCarModel\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05brand\x18\x02 \x01(\tR\x05brand\x12\x14\n" +
@@ -196,9 +197,8 @@ const file_base_car_car_model_proto_rawDesc = "" +
 	"\rengine_volume\x18\n" +
 	" \x01(\x02H\x00R\fengineVolume\x88\x01\x01\x12\x19\n" +
 	"\brange_km\x18\v \x01(\x05R\arangeKm\x12\x1a\n" +
-	"\bfeatures\x18\f \x03(\tR\bfeatures\x12\x1d\n" +
-	"\n" +
-	"image_urls\x18\r \x03(\tR\timageUrls\x129\n" +
+	"\bfeatures\x18\f \x03(\tR\bfeatures\x12#\n" +
+	"\x06images\x18\r \x03(\v2\v.base.ImageR\x06images\x129\n" +
 	"\n" +
 	"created_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
@@ -220,16 +220,18 @@ func file_base_car_car_model_proto_rawDescGZIP() []byte {
 var file_base_car_car_model_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_base_car_car_model_proto_goTypes = []any{
 	(*CarModel)(nil),              // 0: base.car.CarModel
-	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
+	(*base.Image)(nil),            // 1: base.Image
+	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
 }
 var file_base_car_car_model_proto_depIdxs = []int32{
-	1, // 0: base.car.CarModel.created_at:type_name -> google.protobuf.Timestamp
-	1, // 1: base.car.CarModel.updated_at:type_name -> google.protobuf.Timestamp
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	1, // 0: base.car.CarModel.images:type_name -> base.Image
+	2, // 1: base.car.CarModel.created_at:type_name -> google.protobuf.Timestamp
+	2, // 2: base.car.CarModel.updated_at:type_name -> google.protobuf.Timestamp
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_base_car_car_model_proto_init() }

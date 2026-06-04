@@ -7,6 +7,7 @@
 package car
 
 import (
+	base "carsharing/protos/gen/base"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -124,7 +125,7 @@ type CarMaintenanceRecord struct {
 	MileageAtCompletionKm *int32                 `protobuf:"varint,6,opt,name=mileage_at_completion_km,json=mileageAtCompletionKm,proto3,oneof" json:"mileage_at_completion_km,omitempty"`
 	CostTenge             *int32                 `protobuf:"varint,7,opt,name=cost_tenge,json=costTenge,proto3,oneof" json:"cost_tenge,omitempty"`
 	AssignedTo            *string                `protobuf:"bytes,8,opt,name=assigned_to,json=assignedTo,proto3,oneof" json:"assigned_to,omitempty"`
-	ReceiptImageUrls      []string               `protobuf:"bytes,9,rep,name=receipt_image_urls,json=receiptImageUrls,proto3" json:"receipt_image_urls,omitempty"`
+	ReceiptImages         []*base.Image          `protobuf:"bytes,9,rep,name=receipt_images,json=receiptImages,proto3" json:"receipt_images,omitempty"`
 	Notes                 *string                `protobuf:"bytes,10,opt,name=notes,proto3,oneof" json:"notes,omitempty"`
 	DueBy                 *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=due_by,json=dueBy,proto3" json:"due_by,omitempty"`
 	CompletedAt           *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=completed_at,json=completedAt,proto3" json:"completed_at,omitempty"`
@@ -219,9 +220,9 @@ func (x *CarMaintenanceRecord) GetAssignedTo() string {
 	return ""
 }
 
-func (x *CarMaintenanceRecord) GetReceiptImageUrls() []string {
+func (x *CarMaintenanceRecord) GetReceiptImages() []*base.Image {
 	if x != nil {
-		return x.ReceiptImageUrls
+		return x.ReceiptImages
 	}
 	return nil
 }
@@ -258,7 +259,7 @@ var File_base_car_car_maintenance_proto protoreflect.FileDescriptor
 
 const file_base_car_car_maintenance_proto_rawDesc = "" +
 	"\n" +
-	"\x1ebase/car/car_maintenance.proto\x12\bbase.car\x1a\x1fgoogle/protobuf/timestamp.proto\"\x84\x02\n" +
+	"\x1ebase/car/car_maintenance.proto\x12\bbase.car\x1a\x11base/common.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x84\x02\n" +
 	"\x16CarMaintenanceTemplate\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12$\n" +
@@ -269,7 +270,7 @@ const file_base_car_car_maintenance_proto_rawDesc = "" +
 	"\bwarn_pct\x18\x06 \x01(\x01R\awarnPct\x12\x19\n" +
 	"\bpull_pct\x18\a \x01(\x01R\apullPctB\x0e\n" +
 	"\f_km_intervalB\x0f\n" +
-	"\r_day_interval\"\xed\x04\n" +
+	"\r_day_interval\"\xf3\x04\n" +
 	"\x14CarMaintenanceRecord\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x15\n" +
 	"\x06car_id\x18\x02 \x01(\tR\x05carId\x12\x1f\n" +
@@ -281,8 +282,8 @@ const file_base_car_car_maintenance_proto_rawDesc = "" +
 	"\n" +
 	"cost_tenge\x18\a \x01(\x05H\x01R\tcostTenge\x88\x01\x01\x12$\n" +
 	"\vassigned_to\x18\b \x01(\tH\x02R\n" +
-	"assignedTo\x88\x01\x01\x12,\n" +
-	"\x12receipt_image_urls\x18\t \x03(\tR\x10receiptImageUrls\x12\x19\n" +
+	"assignedTo\x88\x01\x01\x122\n" +
+	"\x0ereceipt_images\x18\t \x03(\v2\v.base.ImageR\rreceiptImages\x12\x19\n" +
 	"\x05notes\x18\n" +
 	" \x01(\tH\x03R\x05notes\x88\x01\x01\x121\n" +
 	"\x06due_by\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\x05dueBy\x12=\n" +
@@ -310,17 +311,19 @@ var file_base_car_car_maintenance_proto_msgTypes = make([]protoimpl.MessageInfo,
 var file_base_car_car_maintenance_proto_goTypes = []any{
 	(*CarMaintenanceTemplate)(nil), // 0: base.car.CarMaintenanceTemplate
 	(*CarMaintenanceRecord)(nil),   // 1: base.car.CarMaintenanceRecord
-	(*timestamppb.Timestamp)(nil),  // 2: google.protobuf.Timestamp
+	(*base.Image)(nil),             // 2: base.Image
+	(*timestamppb.Timestamp)(nil),  // 3: google.protobuf.Timestamp
 }
 var file_base_car_car_maintenance_proto_depIdxs = []int32{
-	2, // 0: base.car.CarMaintenanceRecord.due_by:type_name -> google.protobuf.Timestamp
-	2, // 1: base.car.CarMaintenanceRecord.completed_at:type_name -> google.protobuf.Timestamp
-	2, // 2: base.car.CarMaintenanceRecord.created_at:type_name -> google.protobuf.Timestamp
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	2, // 0: base.car.CarMaintenanceRecord.receipt_images:type_name -> base.Image
+	3, // 1: base.car.CarMaintenanceRecord.due_by:type_name -> google.protobuf.Timestamp
+	3, // 2: base.car.CarMaintenanceRecord.completed_at:type_name -> google.protobuf.Timestamp
+	3, // 3: base.car.CarMaintenanceRecord.created_at:type_name -> google.protobuf.Timestamp
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_base_car_car_maintenance_proto_init() }

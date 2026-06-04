@@ -7,6 +7,7 @@
 package user
 
 import (
+	base "carsharing/protos/gen/base"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -31,7 +32,7 @@ type User struct {
 	LastName           string                 `protobuf:"bytes,5,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
 	BirthDate          string                 `protobuf:"bytes,6,opt,name=birth_date,json=birthDate,proto3" json:"birth_date,omitempty"`
 	PasswordHash       []byte                 `protobuf:"bytes,7,opt,name=password_hash,json=passwordHash,proto3" json:"password_hash,omitempty"`
-	ProfileImageUrl    *string                `protobuf:"bytes,8,opt,name=profile_image_url,json=profileImageUrl,proto3,oneof" json:"profile_image_url,omitempty"`
+	ProfileImage       *base.Image            `protobuf:"bytes,8,opt,name=profile_image,json=profileImage,proto3,oneof" json:"profile_image,omitempty"`
 	Roles              []string               `protobuf:"bytes,9,rep,name=roles,proto3" json:"roles,omitempty"`
 	IsDocumentVerified bool                   `protobuf:"varint,10,opt,name=is_document_verified,json=isDocumentVerified,proto3" json:"is_document_verified,omitempty"`
 	IsEmailVerified    bool                   `protobuf:"varint,11,opt,name=is_email_verified,json=isEmailVerified,proto3" json:"is_email_verified,omitempty"`
@@ -121,11 +122,11 @@ func (x *User) GetPasswordHash() []byte {
 	return nil
 }
 
-func (x *User) GetProfileImageUrl() string {
-	if x != nil && x.ProfileImageUrl != nil {
-		return *x.ProfileImageUrl
+func (x *User) GetProfileImage() *base.Image {
+	if x != nil {
+		return x.ProfileImage
 	}
-	return ""
+	return nil
 }
 
 func (x *User) GetRoles() []string {
@@ -177,7 +178,7 @@ type Document struct {
 	ImageType     string                 `protobuf:"bytes,3,opt,name=image_type,json=imageType,proto3" json:"image_type,omitempty"`
 	Status        string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
 	Error         *string                `protobuf:"bytes,5,opt,name=error,proto3,oneof" json:"error,omitempty"`
-	ImageUrl      string                 `protobuf:"bytes,6,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`
+	Image         *base.Image            `protobuf:"bytes,6,opt,name=image,proto3" json:"image,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -249,11 +250,11 @@ func (x *Document) GetError() string {
 	return ""
 }
 
-func (x *Document) GetImageUrl() string {
+func (x *Document) GetImage() *base.Image {
 	if x != nil {
-		return x.ImageUrl
+		return x.Image
 	}
-	return ""
+	return nil
 }
 
 func (x *Document) GetCreatedAt() *timestamppb.Timestamp {
@@ -326,7 +327,7 @@ var File_base_user_user_proto protoreflect.FileDescriptor
 
 const file_base_user_user_proto_rawDesc = "" +
 	"\n" +
-	"\x14base/user/user.proto\x12\tbase.user\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb9\x04\n" +
+	"\x14base/user/user.proto\x12\tbase.user\x1a\x11base/common.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xbb\x04\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12&\n" +
@@ -336,8 +337,8 @@ const file_base_user_user_proto_rawDesc = "" +
 	"\tlast_name\x18\x05 \x01(\tR\blastName\x12\x1d\n" +
 	"\n" +
 	"birth_date\x18\x06 \x01(\tR\tbirthDate\x12#\n" +
-	"\rpassword_hash\x18\a \x01(\fR\fpasswordHash\x12/\n" +
-	"\x11profile_image_url\x18\b \x01(\tH\x01R\x0fprofileImageUrl\x88\x01\x01\x12\x14\n" +
+	"\rpassword_hash\x18\a \x01(\fR\fpasswordHash\x125\n" +
+	"\rprofile_image\x18\b \x01(\v2\v.base.ImageH\x01R\fprofileImage\x88\x01\x01\x12\x14\n" +
 	"\x05roles\x18\t \x03(\tR\x05roles\x120\n" +
 	"\x14is_document_verified\x18\n" +
 	" \x01(\bR\x12isDocumentVerified\x12*\n" +
@@ -347,16 +348,16 @@ const file_base_user_user_proto_rawDesc = "" +
 	"created_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
 	"updated_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\x0f\n" +
-	"\r_phone_numberB\x14\n" +
-	"\x12_profile_image_url\"\xa2\x02\n" +
+	"\r_phone_numberB\x10\n" +
+	"\x0e_profile_image\"\xa8\x02\n" +
 	"\bDocument\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x1d\n" +
 	"\n" +
 	"image_type\x18\x03 \x01(\tR\timageType\x12\x16\n" +
 	"\x06status\x18\x04 \x01(\tR\x06status\x12\x19\n" +
-	"\x05error\x18\x05 \x01(\tH\x00R\x05error\x88\x01\x01\x12\x1b\n" +
-	"\timage_url\x18\x06 \x01(\tR\bimageUrl\x129\n" +
+	"\x05error\x18\x05 \x01(\tH\x00R\x05error\x88\x01\x01\x12!\n" +
+	"\x05image\x18\x06 \x01(\v2\v.base.ImageR\x05image\x129\n" +
 	"\n" +
 	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
@@ -383,18 +384,21 @@ var file_base_user_user_proto_goTypes = []any{
 	(*User)(nil),                  // 0: base.user.User
 	(*Document)(nil),              // 1: base.user.Document
 	(*Defect)(nil),                // 2: base.user.Defect
-	(*timestamppb.Timestamp)(nil), // 3: google.protobuf.Timestamp
+	(*base.Image)(nil),            // 3: base.Image
+	(*timestamppb.Timestamp)(nil), // 4: google.protobuf.Timestamp
 }
 var file_base_user_user_proto_depIdxs = []int32{
-	3, // 0: base.user.User.created_at:type_name -> google.protobuf.Timestamp
-	3, // 1: base.user.User.updated_at:type_name -> google.protobuf.Timestamp
-	3, // 2: base.user.Document.created_at:type_name -> google.protobuf.Timestamp
-	3, // 3: base.user.Document.updated_at:type_name -> google.protobuf.Timestamp
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	3, // 0: base.user.User.profile_image:type_name -> base.Image
+	4, // 1: base.user.User.created_at:type_name -> google.protobuf.Timestamp
+	4, // 2: base.user.User.updated_at:type_name -> google.protobuf.Timestamp
+	3, // 3: base.user.Document.image:type_name -> base.Image
+	4, // 4: base.user.Document.created_at:type_name -> google.protobuf.Timestamp
+	4, // 5: base.user.Document.updated_at:type_name -> google.protobuf.Timestamp
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_base_user_user_proto_init() }

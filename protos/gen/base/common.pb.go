@@ -74,6 +74,58 @@ func (x *TimeRange) GetTo() *timestamppb.Timestamp {
 	return nil
 }
 
+type Image struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Key           string                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Url           string                 `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Image) Reset() {
+	*x = Image{}
+	mi := &file_base_common_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Image) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Image) ProtoMessage() {}
+
+func (x *Image) ProtoReflect() protoreflect.Message {
+	mi := &file_base_common_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Image.ProtoReflect.Descriptor instead.
+func (*Image) Descriptor() ([]byte, []int) {
+	return file_base_common_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Image) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *Image) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
 type ImageUploadData struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	PresignedPutUrl string                 `protobuf:"bytes,1,opt,name=presigned_put_url,json=presignedPutUrl,proto3" json:"presigned_put_url,omitempty"`
@@ -84,7 +136,7 @@ type ImageUploadData struct {
 
 func (x *ImageUploadData) Reset() {
 	*x = ImageUploadData{}
-	mi := &file_base_common_proto_msgTypes[1]
+	mi := &file_base_common_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -96,7 +148,7 @@ func (x *ImageUploadData) String() string {
 func (*ImageUploadData) ProtoMessage() {}
 
 func (x *ImageUploadData) ProtoReflect() protoreflect.Message {
-	mi := &file_base_common_proto_msgTypes[1]
+	mi := &file_base_common_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -109,7 +161,7 @@ func (x *ImageUploadData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ImageUploadData.ProtoReflect.Descriptor instead.
 func (*ImageUploadData) Descriptor() ([]byte, []int) {
-	return file_base_common_proto_rawDescGZIP(), []int{1}
+	return file_base_common_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ImageUploadData) GetPresignedPutUrl() string {
@@ -136,7 +188,7 @@ type Pagination struct {
 
 func (x *Pagination) Reset() {
 	*x = Pagination{}
-	mi := &file_base_common_proto_msgTypes[2]
+	mi := &file_base_common_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -148,7 +200,7 @@ func (x *Pagination) String() string {
 func (*Pagination) ProtoMessage() {}
 
 func (x *Pagination) ProtoReflect() protoreflect.Message {
-	mi := &file_base_common_proto_msgTypes[2]
+	mi := &file_base_common_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -161,7 +213,7 @@ func (x *Pagination) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Pagination.ProtoReflect.Descriptor instead.
 func (*Pagination) Descriptor() ([]byte, []int) {
-	return file_base_common_proto_rawDescGZIP(), []int{2}
+	return file_base_common_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Pagination) GetLimit() int64 {
@@ -188,7 +240,7 @@ type Location struct {
 
 func (x *Location) Reset() {
 	*x = Location{}
-	mi := &file_base_common_proto_msgTypes[3]
+	mi := &file_base_common_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -200,7 +252,7 @@ func (x *Location) String() string {
 func (*Location) ProtoMessage() {}
 
 func (x *Location) ProtoReflect() protoreflect.Message {
-	mi := &file_base_common_proto_msgTypes[3]
+	mi := &file_base_common_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -213,7 +265,7 @@ func (x *Location) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Location.ProtoReflect.Descriptor instead.
 func (*Location) Descriptor() ([]byte, []int) {
-	return file_base_common_proto_rawDescGZIP(), []int{3}
+	return file_base_common_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Location) GetLatitude() float64 {
@@ -244,7 +296,7 @@ type PricingSnapshot struct {
 
 func (x *PricingSnapshot) Reset() {
 	*x = PricingSnapshot{}
-	mi := &file_base_common_proto_msgTypes[4]
+	mi := &file_base_common_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -256,7 +308,7 @@ func (x *PricingSnapshot) String() string {
 func (*PricingSnapshot) ProtoMessage() {}
 
 func (x *PricingSnapshot) ProtoReflect() protoreflect.Message {
-	mi := &file_base_common_proto_msgTypes[4]
+	mi := &file_base_common_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -269,7 +321,7 @@ func (x *PricingSnapshot) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PricingSnapshot.ProtoReflect.Descriptor instead.
 func (*PricingSnapshot) Descriptor() ([]byte, []int) {
-	return file_base_common_proto_rawDescGZIP(), []int{4}
+	return file_base_common_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *PricingSnapshot) GetRateTenge() int32 {
@@ -323,7 +375,10 @@ const file_base_common_proto_rawDesc = "" +
 	"\x04from\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\x04from\x88\x01\x01\x12/\n" +
 	"\x02to\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x01R\x02to\x88\x01\x01B\a\n" +
 	"\x05_fromB\x05\n" +
-	"\x03_to\"\\\n" +
+	"\x03_to\"+\n" +
+	"\x05Image\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x10\n" +
+	"\x03url\x18\x02 \x01(\tR\x03url\"\\\n" +
 	"\x0fImageUploadData\x12*\n" +
 	"\x11presigned_put_url\x18\x01 \x01(\tR\x0fpresignedPutUrl\x12\x1d\n" +
 	"\n" +
@@ -361,18 +416,19 @@ func file_base_common_proto_rawDescGZIP() []byte {
 	return file_base_common_proto_rawDescData
 }
 
-var file_base_common_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_base_common_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_base_common_proto_goTypes = []any{
 	(*TimeRange)(nil),             // 0: base.TimeRange
-	(*ImageUploadData)(nil),       // 1: base.ImageUploadData
-	(*Pagination)(nil),            // 2: base.Pagination
-	(*Location)(nil),              // 3: base.Location
-	(*PricingSnapshot)(nil),       // 4: base.PricingSnapshot
-	(*timestamppb.Timestamp)(nil), // 5: google.protobuf.Timestamp
+	(*Image)(nil),                 // 1: base.Image
+	(*ImageUploadData)(nil),       // 2: base.ImageUploadData
+	(*Pagination)(nil),            // 3: base.Pagination
+	(*Location)(nil),              // 4: base.Location
+	(*PricingSnapshot)(nil),       // 5: base.PricingSnapshot
+	(*timestamppb.Timestamp)(nil), // 6: google.protobuf.Timestamp
 }
 var file_base_common_proto_depIdxs = []int32{
-	5, // 0: base.TimeRange.from:type_name -> google.protobuf.Timestamp
-	5, // 1: base.TimeRange.to:type_name -> google.protobuf.Timestamp
+	6, // 0: base.TimeRange.from:type_name -> google.protobuf.Timestamp
+	6, // 1: base.TimeRange.to:type_name -> google.protobuf.Timestamp
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -386,14 +442,14 @@ func file_base_common_proto_init() {
 		return
 	}
 	file_base_common_proto_msgTypes[0].OneofWrappers = []any{}
-	file_base_common_proto_msgTypes[4].OneofWrappers = []any{}
+	file_base_common_proto_msgTypes[5].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_base_common_proto_rawDesc), len(file_base_common_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

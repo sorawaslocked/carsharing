@@ -30,11 +30,16 @@ func NewCarModelRepository(log *slog.Logger, pool *pgxpool.Pool) *CarModelReposi
 func (r *CarModelRepository) Insert(ctx context.Context, cm model.CarModel) (string, error) {
 	log := pkglog.WithMetadata(pkglog.WithMethod(r.log, "Insert"), utils.MetadataFromCtx(ctx))
 
+	features := cm.Features
+	if features == nil {
+		features = []string{}
+	}
+
 	args := []any{
 		cm.Brand, cm.Model, cm.Year,
 		string(cm.FuelType), string(cm.Transmission), string(cm.BodyType), string(cm.Class),
 		cm.Seats, cm.EngineVolume, cm.RangeKM,
-		cm.Features, dto.ImagesToKeys(cm.Images),
+		features, dto.ImagesToKeys(cm.Images),
 		cm.CreatedAt, cm.UpdatedAt,
 	}
 	q := `INSERT INTO car_models

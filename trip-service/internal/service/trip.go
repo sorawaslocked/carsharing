@@ -436,8 +436,28 @@ func (s *TripService) StreamTripLiveFeed(ctx context.Context, tripID string, sen
 		return err
 	}
 
-	return s.telematics.StreamTelemetry(ctx, trip.CarID, func(t model.CarTelemetry) error {
-		current, err := s.tripRepo.GetByID(ctx, tripID)
+	streamCtx, cancelStream := context.WithCancel(ctx)
+	defer cancelStream()
+
+	go func() {
+		ticker := time.NewTicker(5 * time.Second)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-streamCtx.Done():
+				return
+			case <-ticker.C:
+				current, err := s.tripRepo.GetByID(streamCtx, tripID)
+				if err != nil || current.Status != model.TripStatusActive {
+					cancelStream()
+					return
+				}
+			}
+		}
+	}()
+
+	err = s.telematics.StreamTelemetry(streamCtx, trip.CarID, func(t model.CarTelemetry) error {
+		current, err := s.tripRepo.GetByID(streamCtx, tripID)
 		if err != nil {
 			log.Error("repo: polling trip status", pkglog.Err(err))
 			return err
@@ -456,6 +476,10 @@ func (s *TripService) StreamTripLiveFeed(ctx context.Context, tripID string, sen
 			DistanceTraveledKM: distanceKM,
 		})
 	})
+	if streamCtx.Err() != nil {
+		return io.EOF
+	}
+	return err
 }
 
 func isPrivileged(roles []sharedmodel.Role) bool {

@@ -719,6 +719,35 @@ func TestTripService_StreamTripLiveFeed_TripCompletedMidStream(t *testing.T) {
 	assert.ErrorIs(t, err, io.EOF)
 }
 
+func TestTripService_StreamTripLiveFeed_ClosesCleanlyWhenTripEndsWithNoTelemetry(t *testing.T) {
+	d := newDeps(t)
+	svc := newService(t, d)
+	ctx, cancel := context.WithCancel(ctxOwner(testUserID))
+	defer cancel()
+	trip := sampleActiveTrip()
+	booking := sampleBooking()
+
+	d.tripRepo.EXPECT().GetByID(mock.Anything, testTripID).Return(trip, nil).Once()
+	d.booking.EXPECT().GetBooking(mock.Anything, testBookingID).Return(booking, nil)
+	// StreamTelemetry blocks with no events — simulates a parked car after trip end.
+	// The stream context is cancelled externally (by the poller goroutine in production,
+	// or by the parent context here), and the resulting context error must map to io.EOF.
+	d.telematics.EXPECT().StreamTelemetry(mock.Anything, testCarID, mock.Anything).
+		RunAndReturn(func(ctx context.Context, _ string, _ func(model.CarTelemetry) error) error {
+			<-ctx.Done()
+			return ctx.Err()
+		})
+
+	go func() {
+		time.Sleep(10 * time.Millisecond)
+		cancel()
+	}()
+
+	err := svc.StreamTripLiveFeed(ctx, testTripID, func(model.TripLiveFeed) error { return nil })
+
+	assert.ErrorIs(t, err, io.EOF)
+}
+
 // ── EndTrip (conflict) ────────────────────────────────────────────────────────
 
 func TestTripService_EndTrip_Conflict(t *testing.T) {

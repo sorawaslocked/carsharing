@@ -78,9 +78,10 @@ func (c *TelematicsClient) StreamTelemetry(ctx context.Context, carID string, fn
 		}
 
 		t := model.CarTelemetry{
-			CarID:     carID,
-			MileageKM: resp.MileageKm,
-			FuelLevel: resp.FuelLevel,
+			CarID:      carID,
+			MileageKM:  resp.MileageKm,
+			FuelLevel:  resp.FuelLevel,
+			RecordedAt: time.Now(),
 		}
 		if resp.Location != nil {
 			t.Location = sharedmodel.Location{

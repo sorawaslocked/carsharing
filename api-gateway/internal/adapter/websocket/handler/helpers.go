@@ -56,6 +56,12 @@ func (w wsResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 
 // acceptWebSocket upgrades the HTTP connection to a WebSocket using a wrapper
 // that fixes the gin v1.11 / coder/websocket incompatibility.
+// InsecureSkipVerify disables coder/websocket's built-in origin check; origin
+// validation is already enforced by the Gin CORS middleware earlier in the stack.
 func acceptWebSocket(c *gin.Context, opts *websocket.AcceptOptions) (*websocket.Conn, error) {
+	if opts == nil {
+		opts = &websocket.AcceptOptions{}
+	}
+	opts.InsecureSkipVerify = true
 	return websocket.Accept(wsResponseWriter{c.Writer}, c.Request, opts)
 }

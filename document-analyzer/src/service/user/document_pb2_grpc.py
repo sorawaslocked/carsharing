@@ -6,7 +6,7 @@ import warnings
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 from service.user import document_pb2 as service_dot_user_dot_document__pb2
 
-GRPC_GENERATED_VERSION = '1.80.0'
+GRPC_GENERATED_VERSION = '1.81.0'
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 
@@ -26,7 +26,7 @@ if _version_not_supported:
     )
 
 
-class DocumentAnalyzerServiceStub(object):
+class DocumentAnalyzerServiceStub:
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -42,7 +42,7 @@ class DocumentAnalyzerServiceStub(object):
                 _registered_method=True)
 
 
-class DocumentAnalyzerServiceServicer(object):
+class DocumentAnalyzerServiceServicer:
     """Missing associated documentation comment in .proto file."""
 
     def Analyze(self, request, context):
@@ -67,7 +67,7 @@ def add_DocumentAnalyzerServiceServicer_to_server(servicer, server):
 
 
  # This class is part of an EXPERIMENTAL API.
-class DocumentAnalyzerService(object):
+class DocumentAnalyzerService:
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod

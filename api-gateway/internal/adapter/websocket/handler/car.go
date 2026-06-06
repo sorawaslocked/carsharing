@@ -1,8 +1,11 @@
 package handler
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"log/slog"
+	"time"
 
 	httpdto "carsharing/api-gateway/internal/adapter/http/dto"
 	wsdto "carsharing/api-gateway/internal/adapter/websocket/dto"
@@ -88,13 +91,19 @@ func (h *CarWsHandler) Fleet(c *gin.Context) {
 			}
 		}
 		logger.Info("fleet writing batch", slog.String("connID", connID), slog.Int("count", len(slim)))
-		return wsjson.Write(ctx, conn, wsdto.CarFleetMessage{Cars: slim})
+		writeCtx, writeCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer writeCancel()
+		return wsjson.Write(writeCtx, conn, wsdto.CarFleetMessage{Cars: slim})
 	})
-	if streamErr != nil {
+	switch {
+	case streamErr == nil:
+		conn.Close(websocket.StatusNormalClosure, "")
+	case errors.Is(streamErr, model.ErrForbidden), errors.Is(streamErr, model.ErrUnauthorized):
+		conn.Close(websocket.StatusPolicyViolation, streamErr.Error())
+	default:
 		logger.Error("fleet stream error", pkglog.Err(streamErr), slog.String("connID", connID))
+		conn.Close(websocket.StatusInternalError, "")
 	}
-
-	conn.Close(websocket.StatusNormalClosure, "")
 }
 
 // Telemetry godoc
@@ -130,7 +139,9 @@ func (h *CarWsHandler) Telemetry(c *gin.Context) {
 
 	streamErr := h.svc.StreamCarTelemetry(ctx, carID, func(event model.CarTelemetryEvent) error {
 		logger.Info("telemetry writing event", slog.String("connID", connID))
-		return wsjson.Write(ctx, conn, wsdto.CarTelemetryMessage{
+		writeCtx, writeCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer writeCancel()
+		return wsjson.Write(writeCtx, conn, wsdto.CarTelemetryMessage{
 			FuelLevel:    event.FuelLevel,
 			BatteryLevel: event.BatteryLevel,
 			MileageKM:    event.MileageKM,
@@ -138,11 +149,15 @@ func (h *CarWsHandler) Telemetry(c *gin.Context) {
 			RecordedAt:   event.RecordedAt.UTC().Format("2006-01-02T15:04:05Z"),
 		})
 	})
-	if streamErr != nil {
+	switch {
+	case streamErr == nil:
+		conn.Close(websocket.StatusNormalClosure, "")
+	case errors.Is(streamErr, model.ErrForbidden), errors.Is(streamErr, model.ErrUnauthorized):
+		conn.Close(websocket.StatusPolicyViolation, streamErr.Error())
+	default:
 		logger.Error("telemetry stream error", pkglog.Err(streamErr), slog.String("connID", connID))
+		conn.Close(websocket.StatusInternalError, "")
 	}
-
-	conn.Close(websocket.StatusNormalClosure, "")
 }
 
 // Status godoc
@@ -179,15 +194,21 @@ func (h *CarWsHandler) Status(c *gin.Context) {
 
 	streamErr := h.svc.StreamCarStatusUpdates(ctx, carID, func(event model.CarStatusEvent) error {
 		logger.Info("status writing event", slog.String("connID", connID))
-		return wsjson.Write(ctx, conn, wsdto.CarStatusMessage{
+		writeCtx, writeCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer writeCancel()
+		return wsjson.Write(writeCtx, conn, wsdto.CarStatusMessage{
 			CarID:      carID,
 			FromStatus: event.FromStatus,
 			ToStatus:   event.ToStatus,
 		})
 	})
-	if streamErr != nil {
+	switch {
+	case streamErr == nil:
+		conn.Close(websocket.StatusNormalClosure, "")
+	case errors.Is(streamErr, model.ErrForbidden), errors.Is(streamErr, model.ErrUnauthorized):
+		conn.Close(websocket.StatusPolicyViolation, streamErr.Error())
+	default:
 		logger.Error("status stream error", pkglog.Err(streamErr), slog.String("connID", connID))
+		conn.Close(websocket.StatusInternalError, "")
 	}
-
-	conn.Close(websocket.StatusNormalClosure, "")
 }

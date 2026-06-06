@@ -247,7 +247,7 @@ func (h *UserHandler) StreamDocumentAnalyzed(ctx context.Context, userID *string
 		})
 		if err != nil {
 			cancelStream()
-			if ctx.Err() != nil {
+			if ctx.Err() != nil || isCanceled(err) {
 				return nil
 			}
 			if isUnavailable(err) {
@@ -271,7 +271,7 @@ func (h *UserHandler) StreamDocumentAnalyzed(ctx context.Context, userID *string
 			}
 			if err != nil {
 				cancelStream()
-				if ctx.Err() != nil {
+				if ctx.Err() != nil || isCanceled(err) {
 					return nil
 				}
 				if isUnavailable(err) {

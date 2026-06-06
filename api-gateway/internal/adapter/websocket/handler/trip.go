@@ -1,7 +1,10 @@
 package handler
 
 import (
+	"context"
+	"errors"
 	"log/slog"
+	"time"
 
 	wsdto "carsharing/api-gateway/internal/adapter/websocket/dto"
 	"carsharing/api-gateway/internal/model"
@@ -52,15 +55,21 @@ func (h *TripWsHandler) LiveFeed(c *gin.Context) {
 	defer cancel()
 
 	streamErr := h.svc.StreamTripLiveFeed(ctx, tripID, func(feed model.TripLiveFeed) error {
-		return wsjson.Write(ctx, conn, wsdto.TripLiveFeedMessage{
+		writeCtx, writeCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer writeCancel()
+		return wsjson.Write(writeCtx, conn, wsdto.TripLiveFeedMessage{
 			ElapsedSeconds:     feed.ElapsedSeconds,
 			CurrentCostTenge:   feed.CurrentCostTenge,
 			DistanceTraveledKM: feed.DistanceTraveledKM,
 		})
 	})
-	if streamErr != nil {
+	switch {
+	case streamErr == nil:
+		conn.Close(websocket.StatusNormalClosure, "")
+	case errors.Is(streamErr, model.ErrForbidden), errors.Is(streamErr, model.ErrUnauthorized):
+		conn.Close(websocket.StatusPolicyViolation, streamErr.Error())
+	default:
 		logger.Error("live feed stream error", pkglog.Err(streamErr))
+		conn.Close(websocket.StatusInternalError, "")
 	}
-
-	conn.Close(websocket.StatusNormalClosure, "")
 }

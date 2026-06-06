@@ -13,3 +13,8 @@ func isUnavailable(err error) bool {
 	s, ok := status.FromError(err)
 	return ok && s.Code() == codes.Unavailable
 }
+
+func isCanceled(err error) bool {
+	s, ok := status.FromError(err)
+	return ok && s.Code() == codes.Canceled
+}

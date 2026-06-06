@@ -17,9 +17,10 @@ import (
 const subjectDocumentAnalyzed = "document.analyzed"
 
 type docSub struct {
-	userID *string
-	passed *bool
-	ch     chan model.DocumentAnalyzedEvent
+	userID    *string
+	passed    *bool
+	ch        chan model.DocumentAnalyzedEvent
+	closeOnce *sync.Once
 }
 
 type DocumentSubscriber struct {
@@ -47,23 +48,39 @@ func (s *DocumentSubscriber) Subscribe() error {
 // SubscribeStream registers a channel that receives DocumentAnalyzedEvents
 // matching the optional userID and passed filters. The returned cancel func
 // must be deferred by the caller to unregister and close the channel.
+// If a subscription for the same userID already exists it is evicted, ensuring
+// a reconnecting client only receives events from its new subscription.
 func (s *DocumentSubscriber) SubscribeStream(userID *string, passed *bool) (<-chan model.DocumentAnalyzedEvent, func()) {
 	ch := make(chan model.DocumentAnalyzedEvent, 1)
+	once := &sync.Once{}
 
 	s.mu.Lock()
-	s.subs = append(s.subs, docSub{userID: userID, passed: passed, ch: ch})
+	// Evict any existing subscription for the same userID so a reconnecting
+	// client does not accumulate duplicate, possibly stale-filtered subs.
+	if userID != nil {
+		kept := s.subs[:0]
+		for _, sub := range s.subs {
+			if sub.userID != nil && *sub.userID == *userID {
+				sub.closeOnce.Do(func() { close(sub.ch) })
+				continue
+			}
+			kept = append(kept, sub)
+		}
+		s.subs = kept
+	}
+	s.subs = append(s.subs, docSub{userID: userID, passed: passed, ch: ch, closeOnce: once})
 	s.mu.Unlock()
 
 	return ch, func() {
 		s.mu.Lock()
-		defer s.mu.Unlock()
 		for i, sub := range s.subs {
 			if sub.ch == ch {
 				s.subs = append(s.subs[:i], s.subs[i+1:]...)
 				break
 			}
 		}
-		close(ch)
+		s.mu.Unlock()
+		once.Do(func() { close(ch) })
 	}
 }
 

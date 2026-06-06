@@ -1,8 +1,11 @@
 package handler
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"log/slog"
+	"time"
 
 	wsdto "carsharing/api-gateway/internal/adapter/websocket/dto"
 	"carsharing/api-gateway/internal/model"
@@ -58,7 +61,9 @@ func (h *CarMaintenanceWsHandler) MaintenanceEvents(c *gin.Context) {
 			slog.String("connID", connID),
 			slog.String("eventType", event.EventType),
 		)
-		return wsjson.Write(ctx, conn, wsdto.CarMaintenanceEventMessage{
+		writeCtx, writeCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer writeCancel()
+		return wsjson.Write(writeCtx, conn, wsdto.CarMaintenanceEventMessage{
 			CarID:      event.CarID,
 			TemplateID: event.TemplateID,
 			RecordID:   event.RecordID,
@@ -66,9 +71,13 @@ func (h *CarMaintenanceWsHandler) MaintenanceEvents(c *gin.Context) {
 			OccurredAt: event.OccurredAt.UTC().Format("2006-01-02T15:04:05Z"),
 		})
 	})
-	if streamErr != nil {
+	switch {
+	case streamErr == nil:
+		conn.Close(websocket.StatusNormalClosure, "")
+	case errors.Is(streamErr, model.ErrForbidden), errors.Is(streamErr, model.ErrUnauthorized):
+		conn.Close(websocket.StatusPolicyViolation, streamErr.Error())
+	default:
 		logger.Error("maintenance events stream error", pkglog.Err(streamErr), slog.String("connID", connID))
+		conn.Close(websocket.StatusInternalError, "")
 	}
-
-	conn.Close(websocket.StatusNormalClosure, "")
 }

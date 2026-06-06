@@ -48,19 +48,18 @@ func (s *DocumentSubscriber) Subscribe() error {
 // SubscribeStream registers a channel that receives DocumentAnalyzedEvents
 // matching the optional userID and passed filters. The returned cancel func
 // must be deferred by the caller to unregister and close the channel.
-// If a subscription for the same userID already exists it is evicted, ensuring
-// a reconnecting client only receives events from its new subscription.
+// A subscription is evicted only when an exact duplicate (same userID AND same
+// passed filter) reconnects, so a client may hold both a passed=true and a
+// passed=false stream simultaneously without interference.
 func (s *DocumentSubscriber) SubscribeStream(userID *string, passed *bool) (<-chan model.DocumentAnalyzedEvent, func()) {
 	ch := make(chan model.DocumentAnalyzedEvent)
 	once := &sync.Once{}
 
 	s.mu.Lock()
-	// Evict any existing subscription for the same userID so a reconnecting
-	// client does not accumulate duplicate, possibly stale-filtered subs.
 	if userID != nil {
 		kept := s.subs[:0]
 		for _, sub := range s.subs {
-			if sub.userID != nil && *sub.userID == *userID {
+			if sub.userID != nil && *sub.userID == *userID && equalPassedFilter(sub.passed, passed) {
 				sub.closeOnce.Do(func() { close(sub.ch) })
 				continue
 			}
@@ -104,6 +103,16 @@ func (s *DocumentSubscriber) handleDocumentAnalyzed(msg *nats.Msg) {
 	}
 
 	s.fanOut(event)
+}
+
+func equalPassedFilter(a, b *bool) bool {
+	if a == nil && b == nil {
+		return true
+	}
+	if a == nil || b == nil {
+		return false
+	}
+	return *a == *b
 }
 
 func (s *DocumentSubscriber) fanOut(event model.DocumentAnalyzedEvent) {

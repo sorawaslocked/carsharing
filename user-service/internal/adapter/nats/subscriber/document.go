@@ -51,7 +51,7 @@ func (s *DocumentSubscriber) Subscribe() error {
 // If a subscription for the same userID already exists it is evicted, ensuring
 // a reconnecting client only receives events from its new subscription.
 func (s *DocumentSubscriber) SubscribeStream(userID *string, passed *bool) (<-chan model.DocumentAnalyzedEvent, func()) {
-	ch := make(chan model.DocumentAnalyzedEvent, 1)
+	ch := make(chan model.DocumentAnalyzedEvent)
 	once := &sync.Once{}
 
 	s.mu.Lock()

@@ -55,6 +55,7 @@ func (h *CarMaintenanceWsHandler) MaintenanceEvents(c *gin.Context) {
 
 	ctx, cancel := tokenDeadlineCtx(c)
 	defer cancel()
+	ctx = conn.CloseRead(ctx)
 
 	streamErr := h.svc.StreamMaintenanceEvents(ctx, func(event model.CarMaintenanceEvent) error {
 		logger.Info("maintenance events writing event",

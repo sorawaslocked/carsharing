@@ -76,6 +76,7 @@ func (h *CarWsHandler) Fleet(c *gin.Context) {
 
 	ctx, cancel := tokenDeadlineCtx(c)
 	defer cancel()
+	ctx = conn.CloseRead(ctx)
 
 	streamErr := h.svc.StreamCarsWithFilter(ctx, filter, func(cars []model.SlimCar) error {
 		slim := make([]wsdto.SlimCar, len(cars))
@@ -136,6 +137,7 @@ func (h *CarWsHandler) Telemetry(c *gin.Context) {
 
 	ctx, cancel := tokenDeadlineCtx(c)
 	defer cancel()
+	ctx = conn.CloseRead(ctx)
 
 	streamErr := h.svc.StreamCarTelemetry(ctx, carID, func(event model.CarTelemetryEvent) error {
 		logger.Info("telemetry writing event", slog.String("connID", connID))
@@ -191,6 +193,7 @@ func (h *CarWsHandler) Status(c *gin.Context) {
 
 	ctx, cancel := tokenDeadlineCtx(c)
 	defer cancel()
+	ctx = conn.CloseRead(ctx)
 
 	streamErr := h.svc.StreamCarStatusUpdates(ctx, carID, func(event model.CarStatusEvent) error {
 		logger.Info("status writing event", slog.String("connID", connID))

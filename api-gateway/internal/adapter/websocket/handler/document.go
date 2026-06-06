@@ -64,6 +64,7 @@ func (h *UserWsHandler) DocumentUpdates(c *gin.Context) {
 
 	ctx, cancel := tokenDeadlineCtx(c)
 	defer cancel()
+	ctx = conn.CloseRead(ctx)
 
 	streamErr := h.svc.StreamDocumentAnalyzed(ctx, userID, passed, func(event model.DocumentAnalyzedEvent) error {
 		defects := make([]wsdto.DocumentDefect, len(event.Defects))

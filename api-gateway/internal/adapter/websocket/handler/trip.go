@@ -53,6 +53,7 @@ func (h *TripWsHandler) LiveFeed(c *gin.Context) {
 
 	ctx, cancel := tokenDeadlineCtx(c)
 	defer cancel()
+	ctx = conn.CloseRead(ctx)
 
 	streamErr := h.svc.StreamTripLiveFeed(ctx, tripID, func(feed model.TripLiveFeed) error {
 		writeCtx, writeCancel := context.WithTimeout(context.Background(), 10*time.Second)

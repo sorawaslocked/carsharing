@@ -147,7 +147,7 @@ definitions:
         - maintenance
         - out_of_service
         type: string
-      telemetryId:
+      telemetryID:
         type: string
       updatedAt:
         type: string
@@ -176,7 +176,7 @@ definitions:
         type: string
       notes:
         type: string
-      telemetryId:
+      telemetryID:
         type: string
       vin:
         type: string
@@ -186,7 +186,7 @@ definitions:
     - color
     - licensePlate
     - modelID
-    - telemetryId
+    - telemetryID
     - vin
     - yearManufactured
     type: object
@@ -760,7 +760,7 @@ definitions:
         type: string
       notes:
         type: string
-      telemetryId:
+      telemetryID:
         type: string
     type: object
   dto.CarsResponse:
@@ -1518,11 +1518,11 @@ definitions:
         items:
           $ref: '#/definitions/wsdto.DocumentDefect'
         type: array
-      documentId:
+      documentID:
         type: string
       passed:
         type: boolean
-      userId:
+      userID:
         type: string
     type: object
   wsdto.DocumentDefect:
@@ -2206,11 +2206,11 @@ paths:
       parameters:
       - description: Filter by car UUID
         in: query
-        name: carId
+        name: carID
         type: string
       - description: Filter by template UUID
         in: query
-        name: templateId
+        name: templateID
         type: string
       - description: Filter by status
         enum:
@@ -4501,7 +4501,7 @@ paths:
         type: integer
       - description: Filter by zone ID
         in: query
-        name: zoneId
+        name: zoneID
         type: string
       - description: Minimum fuel level
         in: query
@@ -4612,11 +4612,11 @@ paths:
   /ws/users/documents:
     get:
       description: WebSocket stream of DocumentAnalyzedEvents from the user service.
-        Accepts optional userId and passed query params to filter events.
+        Accepts optional userID and passed query params to filter events.
       parameters:
       - description: Filter by user ID
         in: query
-        name: userId
+        name: userID
         type: string
       - description: Filter by pass/fail result
         in: query

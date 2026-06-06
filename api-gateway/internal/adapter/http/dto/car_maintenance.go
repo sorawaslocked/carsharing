@@ -153,10 +153,10 @@ func CarMaintenanceTemplateFilterFromCtx(ctx *gin.Context) (model.CarMaintenance
 func CarMaintenanceRecordFilterFromCtx(ctx *gin.Context) (model.CarMaintenanceRecordFilter, error) {
 	f := model.CarMaintenanceRecordFilter{}
 
-	if v := ctx.Query("carId"); v != "" {
+	if v := ctx.Query("carID"); v != "" {
 		f.CarID = &v
 	}
-	if v := ctx.Query("templateId"); v != "" {
+	if v := ctx.Query("templateID"); v != "" {
 		f.TemplateID = &v
 	}
 	if v := ctx.Query("status"); v != "" {

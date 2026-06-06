@@ -41,7 +41,7 @@ func NewCarWsHandler(svc CarStreamService, logger *slog.Logger) *CarWsHandler {
 // @Param        latitude      query  number   false  "Center latitude for radius search"
 // @Param        longitude     query  number   false  "Center longitude for radius search"
 // @Param        radiusM       query  integer  false  "Radius in meters"
-// @Param        zoneId        query  string   false  "Filter by zone ID"
+// @Param        zoneID        query  string   false  "Filter by zone ID"
 // @Param        minFuelLevel  query  number   false  "Minimum fuel level"
 // @Param        status        query  string   false  "Filter by status"
 // @Produce      json

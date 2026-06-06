@@ -253,8 +253,8 @@ func (h *CarMaintenanceHandler) AssignTemplate(ctx *gin.Context) {
 // @Tags         car-maintenance
 // @Produce      json
 // @Security     BearerAuth
-// @Param        carId       query     string   false  "Filter by car UUID"
-// @Param        templateId  query     string   false  "Filter by template UUID"
+// @Param        carID       query     string   false  "Filter by car UUID"
+// @Param        templateID  query     string   false  "Filter by template UUID"
 // @Param        status      query     string   false  "Filter by status"  Enums(pending, in_progress, completed)
 // @Param        limit       query     integer  false  "Pagination limit"
 // @Param        offset      query     integer  false  "Pagination offset"

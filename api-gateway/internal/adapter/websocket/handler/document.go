@@ -27,10 +27,10 @@ func NewUserWsHandler(svc DocumentStreamService, logger *slog.Logger) *UserWsHan
 
 // DocumentUpdates godoc
 // @Summary      Document analyzed stream
-// @Description  WebSocket stream of DocumentAnalyzedEvents from the user service. Accepts optional userId and passed query params to filter events.
+// @Description  WebSocket stream of DocumentAnalyzedEvents from the user service. Accepts optional userID and passed query params to filter events.
 // @Tags         users
 // @Security     BearerAuth
-// @Param        userId  query  string  false  "Filter by user ID"
+// @Param        userID  query  string  false  "Filter by user ID"
 // @Param        passed  query  bool    false  "Filter by pass/fail result"
 // @Produce      json
 // @Success      101  {object}  wsdto.DocumentAnalyzedMessage  "Streamed WebSocket message format"

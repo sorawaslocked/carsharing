@@ -37,7 +37,7 @@ type Car struct {
 	FuelLevel        *float32  `json:"fuelLevel,omitempty"`
 	BatteryLevel     *float32  `json:"batteryLevel,omitempty"`
 	Location         location  `json:"location"`
-	TelemetryID      string    `json:"telemetryId"`
+	TelemetryID      string    `json:"telemetryID"`
 	FuelStatus       string    `json:"fuelStatus"`
 	Status           string    `json:"status" validate:"oneof=available reserved in_use maintenance out_of_service"`
 	IsRetired        bool      `json:"isRetired"`
@@ -81,7 +81,7 @@ type CarCreateRequest struct {
 	LicensePlate     string   `json:"licensePlate" binding:"required"`
 	Color            string   `json:"color" binding:"required"`
 	YearManufactured int16    `json:"yearManufactured" binding:"required"`
-	TelemetryID      string   `json:"telemetryId" binding:"required"`
+	TelemetryID      string   `json:"telemetryID" binding:"required"`
 	MileageKM        *int64   `json:"mileageKm"`
 	FuelLevel        *float32 `json:"fuelLevel"`
 	BatteryLevel     *float32 `json:"batteryLevel"`
@@ -94,7 +94,7 @@ type CarUpdateRequest struct {
 	ModelID      *string  `json:"modelID"`
 	LicensePlate *string  `json:"licensePlate"`
 	Color        *string  `json:"color"`
-	TelemetryID  *string  `json:"telemetryId"`
+	TelemetryID  *string  `json:"telemetryID"`
 	IsRetired    *bool    `json:"isRetired"`
 	Notes        *string  `json:"notes"`
 	ImageKeys    []string `json:"imageKeys"`

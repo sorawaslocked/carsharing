@@ -986,13 +986,13 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Filter by car UUID",
-                        "name": "carId",
+                        "name": "carID",
                         "in": "query"
                     },
                     {
                         "type": "string",
                         "description": "Filter by template UUID",
-                        "name": "templateId",
+                        "name": "templateID",
                         "in": "query"
                     },
                     {
@@ -4496,7 +4496,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Filter by zone ID",
-                        "name": "zoneId",
+                        "name": "zoneID",
                         "in": "query"
                     },
                     {
@@ -4661,7 +4661,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "WebSocket stream of DocumentAnalyzedEvents from the user service. Accepts optional userId and passed query params to filter events.",
+                "description": "WebSocket stream of DocumentAnalyzedEvents from the user service. Accepts optional userID and passed query params to filter events.",
                 "produces": [
                     "application/json"
                 ],
@@ -4673,7 +4673,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Filter by user ID",
-                        "name": "userId",
+                        "name": "userID",
                         "in": "query"
                     },
                     {
@@ -5211,7 +5211,7 @@ const docTemplate = `{
                         "out_of_service"
                     ]
                 },
-                "telemetryId": {
+                "telemetryID": {
                     "type": "string"
                 },
                 "updatedAt": {
@@ -5231,7 +5231,7 @@ const docTemplate = `{
                 "color",
                 "licensePlate",
                 "modelID",
-                "telemetryId",
+                "telemetryID",
                 "vin",
                 "yearManufactured"
             ],
@@ -5263,7 +5263,7 @@ const docTemplate = `{
                 "notes": {
                     "type": "string"
                 },
-                "telemetryId": {
+                "telemetryID": {
                     "type": "string"
                 },
                 "vin": {
@@ -6095,7 +6095,7 @@ const docTemplate = `{
                 "notes": {
                     "type": "string"
                 },
-                "telemetryId": {
+                "telemetryID": {
                     "type": "string"
                 }
             }
@@ -7222,13 +7222,13 @@ const docTemplate = `{
                         "$ref": "#/definitions/wsdto.DocumentDefect"
                     }
                 },
-                "documentId": {
+                "documentID": {
                     "type": "string"
                 },
                 "passed": {
                     "type": "boolean"
                 },
-                "userId": {
+                "userID": {
                     "type": "string"
                 }
             }

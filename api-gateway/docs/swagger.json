@@ -980,13 +980,13 @@
                     {
                         "type": "string",
                         "description": "Filter by car UUID",
-                        "name": "carId",
+                        "name": "carID",
                         "in": "query"
                     },
                     {
                         "type": "string",
                         "description": "Filter by template UUID",
-                        "name": "templateId",
+                        "name": "templateID",
                         "in": "query"
                     },
                     {
@@ -4490,7 +4490,7 @@
                     {
                         "type": "string",
                         "description": "Filter by zone ID",
-                        "name": "zoneId",
+                        "name": "zoneID",
                         "in": "query"
                     },
                     {
@@ -4655,7 +4655,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "WebSocket stream of DocumentAnalyzedEvents from the user service. Accepts optional userId and passed query params to filter events.",
+                "description": "WebSocket stream of DocumentAnalyzedEvents from the user service. Accepts optional userID and passed query params to filter events.",
                 "produces": [
                     "application/json"
                 ],
@@ -4667,7 +4667,7 @@
                     {
                         "type": "string",
                         "description": "Filter by user ID",
-                        "name": "userId",
+                        "name": "userID",
                         "in": "query"
                     },
                     {
@@ -5205,7 +5205,7 @@
                         "out_of_service"
                     ]
                 },
-                "telemetryId": {
+                "telemetryID": {
                     "type": "string"
                 },
                 "updatedAt": {
@@ -5225,7 +5225,7 @@
                 "color",
                 "licensePlate",
                 "modelID",
-                "telemetryId",
+                "telemetryID",
                 "vin",
                 "yearManufactured"
             ],
@@ -5257,7 +5257,7 @@
                 "notes": {
                     "type": "string"
                 },
-                "telemetryId": {
+                "telemetryID": {
                     "type": "string"
                 },
                 "vin": {
@@ -6089,7 +6089,7 @@
                 "notes": {
                     "type": "string"
                 },
-                "telemetryId": {
+                "telemetryID": {
                     "type": "string"
                 }
             }
@@ -7216,13 +7216,13 @@
                         "$ref": "#/definitions/wsdto.DocumentDefect"
                     }
                 },
-                "documentId": {
+                "documentID": {
                     "type": "string"
                 },
                 "passed": {
                     "type": "boolean"
                 },
-                "userId": {
+                "userID": {
                     "type": "string"
                 }
             }

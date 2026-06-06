@@ -240,11 +240,13 @@ func (h *UserHandler) StreamDocumentAnalyzed(ctx context.Context, userID *string
 			return nil
 		}
 
-		stream, err := h.client.StreamDocumentAnalyzed(ctx, &usersvc.StreamDocumentAnalyzedRequest{
+		streamCtx, cancelStream := context.WithCancel(ctx)
+		stream, err := h.client.StreamDocumentAnalyzed(streamCtx, &usersvc.StreamDocumentAnalyzedRequest{
 			UserId: userID,
 			Passed: passed,
 		})
 		if err != nil {
+			cancelStream()
 			if ctx.Err() != nil {
 				return nil
 			}
@@ -264,9 +266,11 @@ func (h *UserHandler) StreamDocumentAnalyzed(ctx context.Context, userID *string
 		for {
 			msg, err := stream.Recv()
 			if errors.Is(err, io.EOF) {
+				cancelStream()
 				return nil
 			}
 			if err != nil {
+				cancelStream()
 				if ctx.Err() != nil {
 					return nil
 				}
@@ -297,6 +301,7 @@ func (h *UserHandler) StreamDocumentAnalyzed(ctx context.Context, userID *string
 				Passed:     msg.GetPassed(),
 				Defects:    defects,
 			}); err != nil {
+				cancelStream()
 				return err
 			}
 		}

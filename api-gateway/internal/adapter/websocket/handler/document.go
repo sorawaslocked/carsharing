@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -86,9 +87,13 @@ func (h *UserWsHandler) DocumentUpdates(c *gin.Context) {
 			Defects:    defects,
 		})
 	})
-	if streamErr != nil {
+	switch {
+	case streamErr == nil:
+		conn.Close(websocket.StatusNormalClosure, "")
+	case errors.Is(streamErr, model.ErrForbidden), errors.Is(streamErr, model.ErrUnauthorized):
+		conn.Close(websocket.StatusPolicyViolation, streamErr.Error())
+	default:
 		logger.Error("document stream error", pkglog.Err(streamErr))
+		conn.Close(websocket.StatusInternalError, "")
 	}
-
-	conn.Close(websocket.StatusNormalClosure, "")
 }

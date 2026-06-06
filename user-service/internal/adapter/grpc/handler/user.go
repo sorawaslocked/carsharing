@@ -253,6 +253,9 @@ func (h *UserHandler) StreamDocumentAnalyzed(req *usersvc.StreamDocumentAnalyzed
 	// If they omit userID entirely, default to their own so they don't receive
 	// every user's events.
 	if !hasPrivilegedRole(md.UserRoles) {
+		if md.UserID == nil {
+			return dto.ToStatusError(model.ErrUnauthenticated)
+		}
 		if req.UserId == nil {
 			req.UserId = md.UserID
 		} else if *req.UserId != *md.UserID {

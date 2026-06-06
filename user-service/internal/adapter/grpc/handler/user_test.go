@@ -65,8 +65,18 @@ func ptr[T any](v T) *T { return &v }
 func newHandler(t *testing.T) (*handler.UserHandler, *mocks.MockUserService) {
 	t.Helper()
 	svc := mocks.NewMockUserService(t)
-	h := handler.NewUserHandler(slog.New(slog.NewTextHandler(io.Discard, nil)), svc)
+	h := handler.NewUserHandler(slog.New(slog.NewTextHandler(io.Discard, nil)), svc, &noopSubscriber{})
 	return h, svc
+}
+
+// noopSubscriber satisfies handler.DocumentAnalyzedSubscriber for tests that
+// don't exercise streaming; returns a pre-closed channel so nothing blocks.
+type noopSubscriber struct{}
+
+func (n *noopSubscriber) SubscribeStream(_ *string, _ *bool) (<-chan model.DocumentAnalyzedEvent, func()) {
+	ch := make(chan model.DocumentAnalyzedEvent)
+	close(ch)
+	return ch, func() {}
 }
 
 func baseUser() model.User {

@@ -26,15 +26,31 @@ _NATS_CONNECT_RETRIES = 10
 _NATS_CONNECT_DELAY = 3.0
 
 
+async def _nats_error_cb(exc) -> None:
+    logger.error("NATS error: %s", exc)
+
+
+async def _nats_disconnected_cb() -> None:
+    logger.warning("NATS disconnected")
+
+
+async def _nats_reconnected_cb() -> None:
+    logger.info("NATS reconnected")
+
+
+async def _nats_closed_cb() -> None:
+    logger.info("NATS connection closed")
+
+
 async def _connect_nats(url: str) -> nats.aio.client.Client:
     for attempt in range(1, _NATS_CONNECT_RETRIES + 1):
         try:
             nc = await nats.connect(
                 url,
-                error_cb=lambda exc: logger.error("NATS error: %s", exc),
-                disconnected_cb=lambda: logger.warning("NATS disconnected"),
-                reconnected_cb=lambda: logger.info("NATS reconnected"),
-                closed_cb=lambda: logger.info("NATS connection closed"),
+                error_cb=_nats_error_cb,
+                disconnected_cb=_nats_disconnected_cb,
+                reconnected_cb=_nats_reconnected_cb,
+                closed_cb=_nats_closed_cb,
             )
             logger.info("Connected to NATS at %s", url)
             return nc

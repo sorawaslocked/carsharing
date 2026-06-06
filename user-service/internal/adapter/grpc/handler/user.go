@@ -250,8 +250,12 @@ func (h *UserHandler) StreamDocumentAnalyzed(req *usersvc.StreamDocumentAnalyzed
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "StreamDocumentAnalyzed"), md)
 
 	// Non-privileged callers may only stream events for their own user ID.
+	// If they omit userID entirely, default to their own so they don't receive
+	// every user's events.
 	if !hasPrivilegedRole(md.UserRoles) {
-		if req.UserId != nil && *req.UserId != *md.UserID {
+		if req.UserId == nil {
+			req.UserId = md.UserID
+		} else if *req.UserId != *md.UserID {
 			return dto.ToStatusError(model.ErrInsufficientPermissions)
 		}
 	}

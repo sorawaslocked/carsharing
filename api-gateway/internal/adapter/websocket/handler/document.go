@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"context"
 	"log/slog"
+	"time"
 
 	wsdto "carsharing/api-gateway/internal/adapter/websocket/dto"
 	"carsharing/api-gateway/internal/model"
@@ -70,7 +72,14 @@ func (h *UserWsHandler) DocumentUpdates(c *gin.Context) {
 				Description: d.Description,
 			}
 		}
-		return wsjson.Write(ctx, conn, wsdto.DocumentAnalyzedMessage{
+		// Use a per-write context instead of the token-deadline ctx. If ctx's
+		// deadline expires mid-frame, the underlying net.Conn write deadline
+		// would cut the frame short and corrupt the WebSocket stream, causing
+		// the client to see an abnormal closure. The stream lifetime is still
+		// governed by ctx via the gRPC layer.
+		writeCtx, writeCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer writeCancel()
+		return wsjson.Write(writeCtx, conn, wsdto.DocumentAnalyzedMessage{
 			DocumentID: event.DocumentID,
 			UserID:     event.UserID,
 			Passed:     event.Passed,

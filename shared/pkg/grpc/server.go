@@ -28,7 +28,7 @@ type ServerConfig struct {
 
 	MaxConnectionIdle  time.Duration `yaml:"max_connection_idle" env:"GRPC_SERVER_MAX_CONNECTION_IDLE" env-default:"15m"`
 	MaxConnectionAge   time.Duration `yaml:"max_connection_age" env:"GRPC_SERVER_MAX_CONNECTION_AGE" env-default:"30m"`
-	MaxConnectionGrace time.Duration `yaml:"max_connection_grace" env:"GRPC_SERVER_MAX_CONNECTION_GRACE" env-default:"5s"`
+	MaxConnectionGrace time.Duration `yaml:"max_connection_grace" env:"GRPC_SERVER_MAX_CONNECTION_GRACE" env-default:"30s"`
 }
 
 func NewServer(

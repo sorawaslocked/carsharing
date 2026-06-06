@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"log/slog"
+	"time"
 
 	"carsharing/api-gateway/internal/adapter/grpc/dto"
 	"carsharing/api-gateway/internal/model"
@@ -233,49 +234,71 @@ func (h *UserHandler) CheckActivationCode(ctx context.Context, code string) erro
 
 func (h *UserHandler) StreamDocumentAnalyzed(ctx context.Context, userID *string, passed *bool, send func(model.DocumentAnalyzedEvent) error) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "StreamDocumentAnalyzed"), utils.MetadataFromCtx(ctx))
-	log.Debug("starting stream")
 
-	stream, err := h.client.StreamDocumentAnalyzed(ctx, &usersvc.StreamDocumentAnalyzedRequest{
-		UserId: userID,
-		Passed: passed,
-	})
-	if err != nil {
+	for {
 		if ctx.Err() != nil {
 			return nil
 		}
-		log.Warn("streaming document analyzed", pkglog.Err(err))
-		return dto.FromGrpcErr(err)
-	}
-	log.Debug("stream opened")
 
-	for {
-		msg, err := stream.Recv()
-		if errors.Is(err, io.EOF) {
-			return nil
-		}
+		stream, err := h.client.StreamDocumentAnalyzed(ctx, &usersvc.StreamDocumentAnalyzedRequest{
+			UserId: userID,
+			Passed: passed,
+		})
 		if err != nil {
 			if ctx.Err() != nil {
 				return nil
 			}
-			log.Warn("receiving document analyzed stream", pkglog.Err(err))
+			if isUnavailable(err) {
+				log.Warn("transient error opening document stream, reconnecting", pkglog.Err(err))
+				select {
+				case <-time.After(streamReconnectDelay):
+				case <-ctx.Done():
+					return nil
+				}
+				continue
+			}
+			log.Warn("streaming document analyzed", pkglog.Err(err))
 			return dto.FromGrpcErr(err)
 		}
 
-		defects := make([]model.DocumentDefect, len(msg.GetDefects()))
-		for i, d := range msg.GetDefects() {
-			defects[i] = model.DocumentDefect{
-				Type:        d.GetType(),
-				Description: d.GetDescription(),
+		for {
+			msg, err := stream.Recv()
+			if errors.Is(err, io.EOF) {
+				return nil
 			}
-		}
+			if err != nil {
+				if ctx.Err() != nil {
+					return nil
+				}
+				if isUnavailable(err) {
+					log.Warn("document stream interrupted, reconnecting", pkglog.Err(err))
+					select {
+					case <-time.After(streamReconnectDelay):
+					case <-ctx.Done():
+						return nil
+					}
+					break
+				}
+				log.Warn("receiving document analyzed stream", pkglog.Err(err))
+				return dto.FromGrpcErr(err)
+			}
 
-		if err = send(model.DocumentAnalyzedEvent{
-			DocumentID: msg.GetDocumentId(),
-			UserID:     msg.GetUserId(),
-			Passed:     msg.GetPassed(),
-			Defects:    defects,
-		}); err != nil {
-			return err
+			defects := make([]model.DocumentDefect, len(msg.GetDefects()))
+			for i, d := range msg.GetDefects() {
+				defects[i] = model.DocumentDefect{
+					Type:        d.GetType(),
+					Description: d.GetDescription(),
+				}
+			}
+
+			if err = send(model.DocumentAnalyzedEvent{
+				DocumentID: msg.GetDocumentId(),
+				UserID:     msg.GetUserId(),
+				Passed:     msg.GetPassed(),
+				Defects:    defects,
+			}); err != nil {
+				return err
+			}
 		}
 	}
 }

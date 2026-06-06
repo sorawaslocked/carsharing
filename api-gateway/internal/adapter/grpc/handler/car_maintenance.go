@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"log/slog"
+	"time"
 
 	"carsharing/api-gateway/internal/adapter/grpc/dto"
 	"carsharing/api-gateway/internal/model"
@@ -210,33 +211,55 @@ func (h *CarMaintenanceHandler) AssignTemplate(ctx context.Context, data model.C
 
 func (h *CarMaintenanceHandler) StreamMaintenanceEvents(ctx context.Context, send func(model.CarMaintenanceEvent) error) error {
 	log := pkglog.WithMetadata(pkglog.WithMethod(h.log, "StreamMaintenanceEvents"), utils.MetadataFromCtx(ctx))
-	log.Debug("starting stream")
 
-	stream, err := h.streamClient.StreamMaintenanceEvents(ctx, &emptypb.Empty{})
-	if err != nil {
+	for {
 		if ctx.Err() != nil {
 			return nil
 		}
-		log.Warn("streaming maintenance events", pkglog.Err(err))
-		return dto.FromGrpcErr(err)
-	}
-	log.Debug("stream opened")
 
-	for {
-		msg, err := stream.Recv()
-		if errors.Is(err, io.EOF) {
-			return nil
-		}
+		stream, err := h.streamClient.StreamMaintenanceEvents(ctx, &emptypb.Empty{})
 		if err != nil {
 			if ctx.Err() != nil {
 				return nil
 			}
-			log.Warn("receiving maintenance events stream", pkglog.Err(err))
+			if isUnavailable(err) {
+				log.Warn("transient error opening maintenance events stream, reconnecting", pkglog.Err(err))
+				select {
+				case <-time.After(streamReconnectDelay):
+				case <-ctx.Done():
+					return nil
+				}
+				continue
+			}
+			log.Warn("streaming maintenance events", pkglog.Err(err))
 			return dto.FromGrpcErr(err)
 		}
 
-		if err = send(dto.CarMaintenanceEventFromProto(msg)); err != nil {
-			return err
+		for {
+			msg, err := stream.Recv()
+			if errors.Is(err, io.EOF) {
+				return nil
+			}
+			if err != nil {
+				if ctx.Err() != nil {
+					return nil
+				}
+				if isUnavailable(err) {
+					log.Warn("maintenance events stream interrupted, reconnecting", pkglog.Err(err))
+					select {
+					case <-time.After(streamReconnectDelay):
+					case <-ctx.Done():
+						return nil
+					}
+					break
+				}
+				log.Warn("receiving maintenance events stream", pkglog.Err(err))
+				return dto.FromGrpcErr(err)
+			}
+
+			if err = send(dto.CarMaintenanceEventFromProto(msg)); err != nil {
+				return err
+			}
 		}
 	}
 }

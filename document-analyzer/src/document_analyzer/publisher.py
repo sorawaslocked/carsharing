@@ -25,6 +25,7 @@ class EventPublisher:
             ],
         )
         await self._nc.publish(self._subject, event.SerializeToString())
+        await self._nc.flush()
         logger.info(
             "Published DocumentAnalyzedEvent for document %s to subject '%s' (passed=%s)",
             document_id, self._subject, result.passed,

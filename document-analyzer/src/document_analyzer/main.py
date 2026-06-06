@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 import nats
+from nats.errors import NoServersError
 
 from document_analyzer import server
 from document_analyzer.analyzer import DocumentAnalyzer
@@ -21,6 +22,31 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+_NATS_CONNECT_RETRIES = 10
+_NATS_CONNECT_DELAY = 3.0
+
+
+async def _connect_nats(url: str) -> nats.aio.client.Client:
+    for attempt in range(1, _NATS_CONNECT_RETRIES + 1):
+        try:
+            nc = await nats.connect(
+                url,
+                error_cb=lambda exc: logger.error("NATS error: %s", exc),
+                disconnected_cb=lambda: logger.warning("NATS disconnected"),
+                reconnected_cb=lambda: logger.info("NATS reconnected"),
+                closed_cb=lambda: logger.info("NATS connection closed"),
+            )
+            logger.info("Connected to NATS at %s", url)
+            return nc
+        except NoServersError:
+            if attempt == _NATS_CONNECT_RETRIES:
+                raise
+            logger.warning(
+                "NATS not reachable at %s (attempt %d/%d), retrying in %.0fs...",
+                url, attempt, _NATS_CONNECT_RETRIES, _NATS_CONNECT_DELAY,
+            )
+            await asyncio.sleep(_NATS_CONNECT_DELAY)
+
 
 async def main() -> None:
     parser = argparse.ArgumentParser()
@@ -29,8 +55,7 @@ async def main() -> None:
 
     cfg = load_config(Path(args.config))
 
-    nc = await nats.connect(cfg.nats.url)
-    logger.info("Connected to NATS at %s", cfg.nats.url)
+    nc = await _connect_nats(cfg.nats.url)
 
     storage = MinioStorage(cfg.minio)
     analyzer = DocumentAnalyzer(cfg.analyzer)

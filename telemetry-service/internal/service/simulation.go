@@ -10,12 +10,6 @@ import (
 	osrm "github.com/gojuno/go.osrm"
 )
 
-const (
-	speedKmh           = 40.0
-	fuelConsumPerKm    = float32(0.2)
-	batteryConsumPerKm = float32(0.25)
-)
-
 // SimulationRequest carries the initial car state when registering a stream.
 type SimulationRequest struct {
 	CarId        string
@@ -46,20 +40,26 @@ type simEntry struct {
 
 // SimulationService manages per-car telemetry simulations.
 type SimulationService struct {
-	osrmClient  *osrm.OSRM
-	osrmProfile string
-	interval    time.Duration
-	mu          sync.Mutex
-	activeSims  map[string]*simEntry
-	counter     atomic.Uint64
+	osrmClient         *osrm.OSRM
+	osrmProfile        string
+	interval           time.Duration
+	speedKmh           float64
+	fuelConsumPerKm    float32
+	batteryConsumPerKm float32
+	mu                 sync.Mutex
+	activeSims         map[string]*simEntry
+	counter            atomic.Uint64
 }
 
-func NewSimulationService(osrmClient *osrm.OSRM, osrmProfile string, interval time.Duration) *SimulationService {
+func NewSimulationService(osrmClient *osrm.OSRM, osrmProfile string, interval time.Duration, speedKmh float64, fuelConsumPerKm, batteryConsumPerKm float32) *SimulationService {
 	return &SimulationService{
-		osrmClient:  osrmClient,
-		osrmProfile: osrmProfile,
-		interval:    interval,
-		activeSims:  make(map[string]*simEntry),
+		osrmClient:         osrmClient,
+		osrmProfile:        osrmProfile,
+		interval:           interval,
+		speedKmh:           speedKmh,
+		fuelConsumPerKm:    fuelConsumPerKm,
+		batteryConsumPerKm: batteryConsumPerKm,
+		activeSims:         make(map[string]*simEntry),
 	}
 }
 
@@ -175,7 +175,7 @@ func (s *SimulationService) runStream(
 		slog.Info("trip started, simulation running", "car_id", req.CarId)
 
 		walker := s.fetchRoute(ctx, lat, lng)
-		distPerTick := speedKmh * 1000.0 / 3600.0 * s.interval.Seconds()
+		distPerTick := s.speedKmh * 1000.0 / 3600.0 * s.interval.Seconds()
 		ticker := time.NewTicker(s.interval)
 
 		tripActive := true
@@ -210,14 +210,14 @@ func (s *SimulationService) runStream(
 				distKm := float32(distM / 1000)
 
 				if fuelLevel != nil {
-					v := *fuelLevel - distKm*fuelConsumPerKm
+					v := *fuelLevel - distKm*s.fuelConsumPerKm
 					if v < 0 {
 						v = 0
 					}
 					fuelLevel = &v
 				}
 				if batteryLevel != nil {
-					v := *batteryLevel - distKm*batteryConsumPerKm
+					v := *batteryLevel - distKm*s.batteryConsumPerKm
 					if v < 0 {
 						v = 0
 					}

@@ -44,7 +44,7 @@ func main() {
 	slog.Info("connected to database")
 
 	osrmClient := osrm.NewFromURL(cfg.OSRMUrl)
-	simSvc := service.NewSimulationService(osrmClient, cfg.OSRMProfile, interval)
+	simSvc := service.NewSimulationService(osrmClient, cfg.OSRMProfile, interval, cfg.SpeedKmh, cfg.FuelConsumPerKm, cfg.BatteryConsumPerKm)
 
 	tripSub, err := natssub.NewTripSubscriber(cfg.NATSUrl, cfg.TripStartedSubject, cfg.TripEndedSubject, cfg.TripCancelledSubject, simSvc)
 	if err != nil {
